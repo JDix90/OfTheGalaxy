@@ -11,8 +11,15 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    // A concrete origin so jsdom exposes a working localStorage (the opaque
+    // about:blank origin makes localStorage unavailable -> "not a function").
+    environmentOptions: { jsdom: { url: 'http://localhost/' } },
     globals: true,
     setupFiles: ['./tests/setup/testUtils.jsx'],
+    // Unit/component tests only. Playwright e2e specs (tests/e2e/**) run via
+    // `npm run test:e2e`, not vitest.
+    include: ['tests/unit/**/*.{test,spec}.{js,jsx}'],
+    exclude: ['node_modules/**', 'tests/e2e/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
