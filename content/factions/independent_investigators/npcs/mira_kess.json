@@ -1,0 +1,58 @@
+{
+  "id": "npc_mira_kess",
+  "name": "Mira Kess",
+  "species": "human",
+  "occupation": "Former Compound Resident",
+  "factionId": "independent_investigators",
+  "location": {
+    "planet": "chandrila",
+    "area": "refugee_settlement",
+    "x": 120,
+    "y": 85
+  },
+  "npcType": "companion",
+  "isCompanion": true,
+  "dialogue": {
+    "greeting": {
+      "stranger": "I don't know you. What do you want?",
+      "acquaintance": "Oh, you again. What is it?",
+      "friend": "Good to see a friendly face. The settlement can feel... isolating.",
+      "confidant": "I'm glad you're here. I need to tell you something I've never told anyone..."
+    },
+    "questRelated": {
+      "iia_main_01_compound_investigation": "You want to know about the compound? I... I'm not sure I'm ready to talk about it. But if you're investigating, maybe it's time someone knew the truth."
+    },
+    "general": [
+      "The nights are the worst. That's when the memories come back.",
+      "I used to think I'd never feel safe again. But here, with people who understand... it's different.",
+      "Dr. Voss has been helping me process what happened. She's brilliant, you know."
+    ]
+  },
+  "quests": ["iia_main_01_compound_investigation"],
+  "vendorInventory": null,
+  "companionAbilities": {
+    "combat": ["precise_shot", "tactical_retreat"],
+    "utility": ["lockpicking", "first_aid"]
+  },
+  "companionStats": {
+    "health": 80,
+    "damage": 15,
+    "defense": 10,
+    "specialization": "stealth"
+  },
+  "appearance": {
+    "age": "late 20s",
+    "build": "slim",
+    "hair": "dark, shoulder-length",
+    "eyes": "brown",
+    "distinguishingFeatures": "scar on left forearm"
+  },
+  "biography": "Mira Kess spent most of her life in Compound 7-Alpha, an Imperial detention facility that held refugees from across the galaxy. She was just a child when she arrived, torn from her family during the chaos of the Galactic Civil War. The compound became her entire world—a place of fear, loss, and unexpected moments of human connection. After the compound's mysterious closure, Mira and other survivors were relocated to Chandrila. She now works with the Independent Investigators Alliance to uncover the truth about what happened at the compound and to help other survivors process their trauma.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 75,
+    "formality": 30,
+    "humor": 20,
+    "trust": 40
+  }
+}

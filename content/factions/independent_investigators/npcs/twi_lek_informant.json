@@ -1,0 +1,54 @@
+{
+  "id": "npc_twi_lek_informant",
+  "name": "Keth Varr",
+  "species": "twi'lek",
+  "occupation": "Information Broker",
+  "factionId": "independent_investigators",
+  "location": {
+    "planet": "ryloth",
+    "area": "lessu",
+    "x": 515,
+    "y": 485
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "You're new here. What do you want?",
+      "acquaintance": "Back again? I hope you have credits this time.",
+      "friend": "Good to see you. I might have some information that interests you.",
+      "confidant": "My friend, I trust you completely. Here's what I know about the refugees..."
+    },
+    "questRelated": {
+      "iia_ryloth_01_trail_begins": "The refugees? They came from Tann Province. The mines there... something's not right. The syndicate controls everything, and they're not talking. If you want to find the truth about Compound 7-Alpha, start in Tann Province. But be careful—the syndicate has eyes everywhere."
+    },
+    "general": [
+      "Lessu used to be a peaceful place. Now? The syndicate runs everything.",
+      "I've heard whispers about refugees from some compound. Imperial business, they say.",
+      "The New Republic is here, but they're not doing much. Too much red tape.",
+      "If you're looking for information, you've come to the right place. For the right price."
+    ]
+  },
+  "quests": ["iia_ryloth_01_trail_begins"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "early 30s",
+    "build": "slim",
+    "hair": "n/a (twi'lek)",
+    "eyes": "blue",
+    "distinguishingFeatures": "Blue lekku with white markings, scar above left eye"
+  },
+  "biography": "Keth Varr is a Twi'lek information broker who operates in Lessu's cantina district. Once a miner in the syndicate operations, he left after witnessing something he shouldn't have. Now he trades information to survive, always careful not to cross the syndicate too directly. He has connections throughout Ryloth's underworld and knows more about the refugee situation than most.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 60,
+    "formality": 20,
+    "humor": 40,
+    "trust": 30
+  }
+}
+
+
+

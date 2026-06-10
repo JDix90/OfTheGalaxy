@@ -1,0 +1,79 @@
+{
+  "id": "iia_ryloth_02_mines_investigation",
+  "factionId": "independent_investigators",
+  "questType": "main",
+  "title": "Mines of Deception",
+  "description": "The refugee settlement has confirmed that many of them worked in various mining operations before being taken to Compound 7-Alpha. There's an abandoned mine in the mining district that might hold clues. The mine foreman, Grakk Torr, was last seen there. Investigate the abandoned mine and confront the foreman to uncover the truth about the connection between the mines and the compound.",
+  "shortDescription": "Investigate an abandoned mine and confront the foreman",
+  "prerequisites": {
+    "level": 4,
+    "reputation": {
+      "independent_investigators": 55
+    },
+    "completedQuests": ["iia_ryloth_01_trail_begins"],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "travel_mines",
+      "type": "travel",
+      "description": "Travel to the abandoned mine in the mining district",
+      "location": {
+        "planet": "ryloth",
+        "area": "mining_district"
+      }
+    },
+    {
+      "id": "reach_mine_deep",
+      "type": "reach_depth",
+      "description": "Reach the deep levels of the abandoned mine where the foreman's office is located",
+      "target": "poi_abandoned_mine",
+      "depthZone": 3
+    },
+    {
+      "id": "obtain_datapad",
+      "type": "collect",
+      "description": "Find and obtain the foreman's datapad containing evidence (search defeated enemies)",
+      "target": "mine_foreman_datapad",
+      "count": 1
+    },
+    {
+      "id": "discover_compound_connection",
+      "type": "discover",
+      "description": "Discover evidence linking the mines to Compound 7-Alpha",
+      "evidenceId": "evidence_mines_compound_link"
+    },
+    {
+      "id": "confront_foreman",
+      "type": "interact",
+      "description": "Confront Mine Foreman Grakk Torr with the evidence",
+      "target": "npc_mine_foreman"
+    }
+  ],
+  "rewards": {
+    "xp": 1000,
+    "credits": 500,
+    "reputation": {
+      "independent_investigators": 40
+    },
+    "items": [
+      {
+        "itemId": "mine_foreman_datapad",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["iia_ryloth_03_refugee_liberation"]
+  },
+  "questGiverId": "npc_refugee_leader",
+  "startLocation": {
+    "planet": "ryloth",
+    "area": "tann_province"
+  },
+  "estimatedTime": 75,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": "iia_main_chain",
+  "chainOrder": 3
+}
+
+

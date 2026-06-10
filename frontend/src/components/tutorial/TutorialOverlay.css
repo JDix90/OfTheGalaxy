@@ -1,0 +1,27 @@
+/**
+ * Tutorial Overlay Styles
+ */
+
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9997;
+  pointer-events: none;
+}
+
+/* Higher z-index when random encounter tutorial is active (must be above encounter dialog) */
+.tutorial-overlay.random-encounter-active {
+  z-index: 10001;
+}
+
+.tutorial-overlay * {
+  pointer-events: auto;
+}
+
+
+
+
+

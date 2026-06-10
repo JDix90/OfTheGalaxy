@@ -1,0 +1,83 @@
+{
+  "navMesh": {
+    "version": "1.0",
+    "planetId": "dantooine",
+    "polygons": [
+      {
+        "id": "nav_001",
+        "terrainType": "navigable",
+        "vertices": [
+          {"x": 0, "y": 0},
+          {"x": 1000, "y": 0},
+          {"x": 1000, "y": 700},
+          {"x": 0, "y": 700}
+        ],
+        "neighbors": ["nav_002", "nav_003"],
+        "center": {"x": 500, "y": 350},
+        "area": 700000
+      },
+      {
+        "id": "nav_002",
+        "terrainType": "navigable",
+        "vertices": [
+          {"x": 0, "y": 700},
+          {"x": 600, "y": 700},
+          {"x": 600, "y": 1000},
+          {"x": 0, "y": 1000}
+        ],
+        "neighbors": ["nav_001", "nav_003"],
+        "center": {"x": 300, "y": 850},
+        "area": 180000
+      },
+      {
+        "id": "nav_003",
+        "terrainType": "navigable",
+        "vertices": [
+          {"x": 600, "y": 700},
+          {"x": 1000, "y": 700},
+          {"x": 1000, "y": 1000},
+          {"x": 600, "y": 1000}
+        ],
+        "neighbors": ["nav_001", "nav_002"],
+        "center": {"x": 800, "y": 850},
+        "area": 120000
+      }
+    ],
+    "connections": [
+      {
+        "from": "nav_001",
+        "to": "nav_002",
+        "cost": 1.0,
+        "edge": {
+          "start": {"x": 0, "y": 700},
+          "end": {"x": 600, "y": 700}
+        }
+      },
+      {
+        "from": "nav_001",
+        "to": "nav_003",
+        "cost": 1.0,
+        "edge": {
+          "start": {"x": 600, "y": 700},
+          "end": {"x": 1000, "y": 700}
+        }
+      },
+      {
+        "from": "nav_002",
+        "to": "nav_003",
+        "cost": 1.0,
+        "edge": {
+          "start": {"x": 600, "y": 700},
+          "end": {"x": 600, "y": 1000}
+        }
+      }
+    ],
+    "metadata": {
+      "created": "2024-12-01",
+      "polygonCount": 3,
+      "maxComplexity": 4
+    }
+  }
+}
+
+

@@ -1,0 +1,116 @@
+/**
+ * Turn Order Styles
+ */
+
+.turn-order {
+  grid-column: 1;
+  grid-row: 2;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.turn-order h3 {
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.25rem;
+}
+
+.turn-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.turn-order-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.turn-order-item.current {
+  border-color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.3);
+}
+
+.turn-order-item.player {
+  border-left: 4px solid var(--primary-color);
+}
+
+.turn-order-item.enemy {
+  border-left: 4px solid #ef4444;
+}
+
+.turn-order-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 60px;
+}
+
+.current-indicator {
+  color: #34d399;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.turn-number {
+  background: rgba(74, 158, 255, 0.2);
+  border: 1px solid var(--primary-color);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.turn-order-item.current .turn-number {
+  background: rgba(52, 211, 153, 0.3);
+  border-color: #34d399;
+  color: #34d399;
+}
+
+.turn-order-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.turn-order-name {
+  font-weight: bold;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.turn-order-type {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.turn-order-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.turn-order-health {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+

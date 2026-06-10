@@ -1,0 +1,77 @@
+{
+  "id": "ryloth_side_02_lost_runner",
+  "factionId": "smugglers_guild",
+  "questType": "side",
+  "title": "The Lost Runner",
+  "description": "Dex Rinn, a smuggler, is worried about his friend Jax, a spice runner who was supposed to make a delivery two days ago but never came back. The route goes through the desert between Lessu and Tann Province. It's dangerous out there—Tusken Raiders, syndicate patrols, sandstorms. Can you help find him?",
+  "shortDescription": "Find a missing spice runner in the Ryloth desert",
+  "prerequisites": {
+    "level": 4,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "speak_worried_smuggler",
+      "type": "interact",
+      "description": "Speak with Dex Rinn about his missing friend",
+      "target": "npc_worried_smuggler"
+    },
+    {
+      "id": "search_route",
+      "type": "travel",
+      "description": "Search the spice runner's route through the desert",
+      "location": {
+        "planet": "ryloth",
+        "area": "desert"
+      }
+    },
+    {
+      "id": "find_runner",
+      "type": "discover",
+      "description": "Find the missing runner (alive or dead)",
+      "evidenceId": "evidence_lost_runner"
+    },
+    {
+      "id": "recover_cargo",
+      "type": "collect",
+      "description": "Recover the lost spice cargo",
+      "target": "lost_spice_cargo",
+      "count": 1
+    },
+    {
+      "id": "return_to_dex",
+      "type": "deliver",
+      "description": "Return to Dex with news (and cargo if found)",
+      "target": "npc_worried_smuggler"
+    }
+  ],
+  "rewards": {
+    "xp": 1000,
+    "credits": 1500,
+    "reputation": {
+      "smugglers_guild": 35
+    },
+    "items": [
+      {
+        "itemId": "lost_spice_cargo",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_worried_smuggler",
+  "startLocation": {
+    "planet": "ryloth",
+    "area": "lessu"
+  },
+  "estimatedTime": 60,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+
+

@@ -1,0 +1,65 @@
+{
+  "id": "sg_tatooine_02_preparation",
+  "factionId": "smugglers_guild",
+  "questType": "main",
+  "title": "Preparing for the Hunt",
+  "description": "Kara Vex, a professional hunter known as 'Stalker,' has agreed to help you hunt the krayt dragon. She's hunted krayt dragons before and knows their weaknesses. But first, you need the right equipment and a solid plan. Krayt dragons are smart, fast, and deadly. Going in unprepared is suicide.",
+  "shortDescription": "Prepare for the krayt dragon hunt with expert hunter Kara Vex",
+  "prerequisites": {
+    "level": 6,
+    "reputation": {
+      "smugglers_guild": 30
+    },
+    "completedQuests": ["sg_tatooine_01_krayt_legend"],
+    "items": ["krayt_report"]
+  },
+  "objectives": [
+    {
+      "id": "meet_hunter",
+      "type": "interact",
+      "description": "Meet with Kara 'Stalker' Vex to discuss the hunt",
+      "target": "npc_hunting_party_member"
+    },
+    {
+      "id": "gather_equipment",
+      "type": "collect",
+      "description": "Gather hunting equipment (heavy weapons, explosives, medpacs)",
+      "target": "hunting_equipment",
+      "count": 5
+    },
+    {
+      "id": "plan_attack",
+      "type": "custom",
+      "description": "Plan the attack strategy with Kara",
+      "target": "hunt_planning"
+    },
+    {
+      "id": "recruit_companion",
+      "type": "custom",
+      "description": "Recruit Kara as a companion for the hunt (optional)",
+      "target": "recruit_kara"
+    }
+  ],
+  "rewards": {
+    "xp": 750,
+    "credits": 300,
+    "reputation": {
+      "smugglers_guild": 20
+    },
+    "items": [],
+    "unlocks": ["sg_tatooine_03_dragon_hunt"]
+  },
+  "questGiverId": "npc_hunting_party_member",
+  "startLocation": {
+    "planet": "tatooine",
+    "area": "mos_eisley"
+  },
+  "estimatedTime": 45,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": "sg_tatooine_krayt_chain",
+  "chainOrder": 2
+}
+
+
+

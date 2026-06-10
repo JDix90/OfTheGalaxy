@@ -1,0 +1,233 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Quest Schema",
+  "description": "Schema for quest data files in Of the Galaxy",
+  "type": "object",
+  "required": ["id", "factionId", "questType", "title", "description", "objectives", "rewards"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "description": "Unique quest identifier (e.g., 'iia_main_01_compound_investigation')",
+      "examples": ["iia_main_01_compound_investigation", "nr_side_05_diplomatic_mission"]
+    },
+    "factionId": {
+      "type": "string",
+      "enum": [
+        "independent_investigators",
+        "new_republic",
+        "imperial_remnant",
+        "smugglers_guild",
+        "jedi_seekers",
+        "corporate_sector",
+        "outer_rim_settlers"
+      ],
+      "description": "Faction that owns this quest"
+    },
+    "questType": {
+      "type": "string",
+      "enum": ["main", "side", "dynamic", "companion", "repeatable"],
+      "description": "Type of quest"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Quest title displayed to player"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full quest description"
+    },
+    "shortDescription": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Brief quest summary for quest lists"
+    },
+    "prerequisites": {
+      "type": "object",
+      "description": "Requirements to unlock this quest",
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimum character level required"
+        },
+        "reputation": {
+          "type": "object",
+          "description": "Required reputation with factions",
+          "additionalProperties": {
+            "type": "integer",
+            "description": "Minimum reputation value"
+          }
+        },
+        "completedQuests": {
+          "type": "array",
+          "description": "Quest IDs that must be completed first",
+          "items": {
+            "type": "string"
+          }
+        },
+        "items": {
+          "type": "array",
+          "description": "Item IDs that must be in inventory",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "default": {
+        "level": 1,
+        "reputation": {},
+        "completedQuests": [],
+        "items": []
+      }
+    },
+    "objectives": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Quest objectives that must be completed",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "description"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique objective identifier"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["interact", "discover", "collect", "defeat", "travel", "deliver", "custom", "clear_dungeon", "defeat_boss", "reach_depth"],
+            "description": "Type of objective"
+          },
+          "description": {
+            "type": "string",
+            "description": "Objective description shown to player"
+          },
+          "target": {
+            "type": "string",
+            "description": "Target ID (NPC ID, location ID, item ID, etc.)"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number required (for collect/defeat objectives)"
+          },
+          "evidenceId": {
+            "type": "string",
+            "description": "Evidence ID to discover (for discover objectives)"
+          },
+          "location": {
+            "type": "object",
+            "description": "Location requirement (for travel objectives)",
+            "properties": {
+              "planet": { "type": "string" },
+              "area": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "rewards": {
+      "type": "object",
+      "description": "Rewards granted upon quest completion",
+      "properties": {
+        "xp": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Experience points awarded"
+        },
+        "credits": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Credits awarded"
+        },
+        "reputation": {
+          "type": "object",
+          "description": "Reputation changes with factions",
+          "additionalProperties": {
+            "type": "integer",
+            "description": "Reputation change (can be negative)"
+          }
+        },
+        "items": {
+          "type": "array",
+          "description": "Items awarded",
+          "items": {
+            "type": "object",
+            "required": ["itemId", "quantity"],
+            "properties": {
+              "itemId": {
+                "type": "string",
+                "description": "Item ID to award"
+              },
+              "quantity": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Quantity of item"
+              }
+            }
+          }
+        },
+        "unlocks": {
+          "type": "array",
+          "description": "Quest IDs unlocked upon completion",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "default": {
+        "xp": 0,
+        "credits": 0,
+        "reputation": {},
+        "items": [],
+        "unlocks": []
+      }
+    },
+    "questGiverId": {
+      "type": ["string", "null"],
+      "description": "NPC ID who gives this quest"
+    },
+    "startLocation": {
+      "type": "object",
+      "description": "Location where quest starts",
+      "properties": {
+        "planet": {
+          "type": "string",
+          "description": "Planet ID"
+        },
+        "area": {
+          "type": "string",
+          "description": "Area or sub-map name"
+        }
+      }
+    },
+    "estimatedTime": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Estimated completion time in minutes"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["easy", "medium", "hard", "very_hard"],
+      "description": "Quest difficulty level"
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Whether quest is currently active/available",
+      "default": true
+    },
+    "chainId": {
+      "type": ["string", "null"],
+      "description": "Quest chain ID (if part of a chain)"
+    },
+    "chainOrder": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "Order in quest chain (1 = first, 2 = second, etc.)"
+    }
+  },
+  "additionalProperties": false
+}
+
+

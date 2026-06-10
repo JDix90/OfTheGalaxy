@@ -1,0 +1,30 @@
+{
+  "choiceId": "choice_iia_01_001",
+  "questId": "iia_main_01_compound_investigation",
+  "choiceText": "How do you want to approach Mira Kess?",
+  "selectedOption": "Be direct and ask about the compound",
+  "availableOptions": [
+    "Be direct and ask about the compound",
+    "Approach gently and show empathy",
+    "Use your investigator credentials",
+    "Leave and come back later"
+  ],
+  "timestamp": "2024-12-01T10:30:00Z",
+  "consequences": {
+    "reputation": {
+      "independent_investigators": 5
+    },
+    "unlocks": [],
+    "blocks": [],
+    "flags": {
+      "mira_approach_direct": true,
+      "mira_trust_level": "cautious"
+    }
+  },
+  "metadata": {
+    "dialogueNode": "mira_intro_choice"
+  }
+}
+
+
+

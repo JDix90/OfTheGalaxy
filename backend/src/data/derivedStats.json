@@ -1,0 +1,146 @@
+{
+  "combat": {
+    "attackRating": {
+      "formula": "(baseAttack + weaponBase) * (1 + advWeapons * 0.02) * (1 + strength * 0.01)",
+      "description": "Attack Rating = (Base Attack + Weapon Base) × (1 + Advanced Weapons × 2%) × (1 + Strength × 1%)",
+      "components": [
+        {
+          "name": "baseAttack",
+          "source": "calculated",
+          "description": "Base attack from attributes (STR/2 + AGI/4)"
+        },
+        {
+          "name": "weaponBase",
+          "source": "equipment",
+          "description": "Base damage from equipped weapon"
+        },
+        {
+          "name": "advWeapons",
+          "source": "skill",
+          "description": "Advanced Weapons skill level"
+        },
+        {
+          "name": "strength",
+          "source": "attribute",
+          "description": "Strength attribute value"
+        }
+      ]
+    },
+    "defenseRating": {
+      "formula": "(baseDefense + armorBase) * (1 + tacticalAwareness * 0.03) * (1 + endurance * 0.01)",
+      "description": "Defense Rating = (Base Defense + Armor Base) × (1 + Tactical Awareness × 3%) × (1 + Endurance × 1%)",
+      "components": [
+        {
+          "name": "baseDefense",
+          "source": "calculated",
+          "description": "Base defense from attributes (END/2)"
+        },
+        {
+          "name": "armorBase",
+          "source": "equipment",
+          "description": "Base defense from equipped armor"
+        },
+        {
+          "name": "tacticalAwareness",
+          "source": "skill",
+          "description": "Tactical Awareness skill level"
+        },
+        {
+          "name": "endurance",
+          "source": "attribute",
+          "description": "Endurance attribute value"
+        }
+      ]
+    },
+    "critChance": {
+      "formula": "0.05 + (perception - 10) * 0.01 + advWeapons * 0.01",
+      "description": "Crit Chance = 5% base + Perception bonus + Advanced Weapons bonus (with DR)",
+      "usesDR": true,
+      "drParams": {
+        "cap": 0.50,
+        "threshold": 0.15,
+        "power": 1.5
+      },
+      "components": [
+        {
+          "name": "base",
+          "value": 0.05,
+          "description": "Base 5% crit chance"
+        },
+        {
+          "name": "perception",
+          "source": "attribute",
+          "description": "Perception attribute value"
+        },
+        {
+          "name": "advWeapons",
+          "source": "skill",
+          "description": "Advanced Weapons skill level"
+        }
+      ]
+    },
+    "dodgeChance": {
+      "formula": "(agility - 10) * 0.005",
+      "description": "Dodge Chance = Agility bonus (with DR)",
+      "usesDR": true,
+      "drParams": {
+        "cap": 0.60,
+        "threshold": 0.12,
+        "power": 1.5
+      },
+      "components": [
+        {
+          "name": "agility",
+          "source": "attribute",
+          "description": "Agility attribute value"
+        }
+      ]
+    }
+  },
+  "stealth": {
+    "stealthPower": {
+      "formula": "agility * 0.6 + basicStealth * 5",
+      "description": "Stealth Power = Agility × 0.6 + Basic Stealth × 5",
+      "components": [
+        {
+          "name": "agility",
+          "source": "attribute",
+          "description": "Agility attribute value"
+        },
+        {
+          "name": "basicStealth",
+          "source": "skill",
+          "description": "Basic Stealth skill level"
+        }
+      ]
+    }
+  },
+  "technical": {
+    "techSuccess": {
+      "formula": "intelligence + hacking - difficulty",
+      "description": "Tech Success = Intelligence + Hacking - Difficulty (logistic function)",
+      "usesLogistic": true,
+      "logisticParams": {
+        "k": 0.35
+      },
+      "components": [
+        {
+          "name": "intelligence",
+          "source": "attribute",
+          "description": "Intelligence attribute value"
+        },
+        {
+          "name": "hacking",
+          "source": "skill",
+          "description": "Hacking skill level"
+        },
+        {
+          "name": "difficulty",
+          "source": "context",
+          "description": "Terminal/lock difficulty"
+        }
+      ]
+    }
+  }
+}
+

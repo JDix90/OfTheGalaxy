@@ -1,0 +1,60 @@
+{
+  "id": "npc_imperial_commander_dantooine",
+  "name": "Commander Thorne",
+  "species": "human",
+  "occupation": "Imperial Remnant Commander",
+  "factionId": "imperial_remnant",
+  "location": {
+    "planet": "dantooine",
+    "area": "base_region",
+    "x": 610,
+    "y": 210
+  },
+  "npcType": "enemy",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "You're not supposed to be here. This is Imperial territory.",
+      "acquaintance": "You again. I warned you to stay away.",
+      "friend": null,
+      "confidant": null
+    },
+    "questRelated": {
+      "nr_dantooine_04_imperial_threat": "The New Republic thinks they can just take what they want. They're wrong. This base, this intelligence—it belongs to the Empire. We were here first, and we'll be here last. You've interfered with our operations for the last time. Prepare to face the might of the Imperial Remnant."
+    },
+    "general": [
+      "The Empire will rise again. The New Republic is weak, divided.",
+      "We follow orders. We maintain order. That's what the galaxy needs.",
+      "The Rebel base was a mistake. We're correcting that mistake.",
+      "You New Republic types think you're heroes. You're just terrorists with better PR.",
+      "The Empire brought peace and order. The New Republic brings chaos."
+    ]
+  },
+  "quests": ["nr_dantooine_04_imperial_threat"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": {
+    "health": 180,
+    "damage": 30,
+    "defense": 20,
+    "specialization": "tactical"
+  },
+  "appearance": {
+    "age": "mid 40s",
+    "build": "military, imposing",
+    "hair": "gray, military cut",
+    "eyes": "cold gray",
+    "distinguishingFeatures": "Imperial Remnant uniform, military bearing, scar on right cheek, always armed"
+  },
+  "biography": "Commander Thorne is a dedicated Imperial Remnant officer who believes the Empire was right and the New Republic is a mistake. He's been operating in the Outer Rim, trying to recover Imperial intelligence and establish Remnant presence. He's not evil—he genuinely believes in order and stability—but he's willing to do whatever it takes to restore the Empire. He represents the ongoing threat of the Imperial Remnant and the complexity of the post-war galaxy.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 20,
+    "formality": 80,
+    "humor": 5,
+    "trust": 25
+  }
+}
+
+
+

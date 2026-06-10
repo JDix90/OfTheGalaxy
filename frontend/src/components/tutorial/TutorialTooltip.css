@@ -1,0 +1,131 @@
+/**
+ * Tutorial Tooltip Styles
+ */
+
+.tutorial-tooltip {
+  position: fixed;
+  z-index: 10000;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px solid #00d4ff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 350px;
+  box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
+  animation: tutorialTooltipFadeIn 0.3s ease-out;
+  pointer-events: auto;
+}
+
+/* Higher z-index for random encounter tutorial tooltip (must be above encounter dialog) */
+.tutorial-tooltip.random-encounter-tooltip {
+  z-index: 10001;
+}
+
+@keyframes tutorialTooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tutorial-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tutorial-tooltip-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #00d4ff;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.tutorial-tooltip-description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.tutorial-tooltip-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.tutorial-tooltip-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tutorial-tooltip-button-primary {
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  color: #ffffff;
+}
+
+.tutorial-tooltip-button-primary:hover {
+  background: linear-gradient(135deg, #00e5ff 0%, #00aadd 100%);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.tutorial-tooltip-button-secondary {
+  background: transparent;
+  color: #999;
+  border: 1px solid #555;
+}
+
+.tutorial-tooltip-button-secondary:hover {
+  color: #ccc;
+  border-color: #777;
+}
+
+.tutorial-tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+}
+
+.tutorial-tooltip-arrow-top {
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #00d4ff;
+}
+
+.tutorial-tooltip-arrow-bottom {
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #00d4ff;
+}
+
+.tutorial-tooltip-arrow-left {
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: #00d4ff;
+}
+
+.tutorial-tooltip-arrow-right {
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #00d4ff;
+}
+
+
+
+
+

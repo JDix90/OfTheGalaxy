@@ -1,0 +1,56 @@
+{
+  "id": "npc_refugee_leader",
+  "name": "Lira Tann",
+  "species": "twi'lek",
+  "occupation": "Refugee Camp Leader",
+  "factionId": null,
+  "location": {
+    "planet": "ryloth",
+    "area": "tann_province",
+    "x": 185,
+    "y": 285
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "Welcome to our settlement. We don't get many visitors. Are you here to help?",
+      "acquaintance": "You've been kind to us. Thank you.",
+      "friend": "My friend, you've given us hope. We won't forget this.",
+      "confidant": "You've become like family to us. I trust you with our lives."
+    },
+    "questRelated": {
+      "iia_ryloth_02_mines_investigation": "Many of our people worked in the mines before being taken to Compound 7-Alpha. There's an abandoned mine in the mining district—the foreman, Grakk Torr, was last seen there. He knows more than he's telling. If you can find evidence in that mine and confront him, we might finally learn the truth about what happened to our people. Please, investigate the abandoned mine and confront the foreman.",
+      "iia_ryloth_02_mines_investigation_location": "The abandoned mine is in the mining district. It's been closed for years, but Grakk Torr still goes there sometimes. If you can reach the deep levels where his office is, you might find evidence. Be careful—the mine is dangerous, and there may be security systems or even enemies still lurking there.",
+      "iia_ryloth_03_refugee_liberation": "We came from Compound 7-Alpha. The Empire... they did terrible things. We escaped, but many didn't. Now the syndicate hunts us, and we can't stay here. We need to get off Ryloth, but we have nowhere to go. Can you help us? We need transport, supplies, and protection. Please, help us find a new home."
+    },
+    "general": [
+      "Every day we're here, we're in danger. The syndicate knows where we are.",
+      "We lost everything at Compound 7-Alpha. Our homes, our families...",
+      "The New Republic says they'll help, but we're still waiting.",
+      "I never thought I'd be leading a refugee camp. But someone had to step up.",
+      "We're not asking for charity. We just need a chance to start over."
+    ]
+  },
+  "quests": ["iia_ryloth_03_refugee_liberation"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "late 30s",
+    "build": "average",
+    "hair": "n/a (twi'lek)",
+    "eyes": "green",
+    "distinguishingFeatures": "Green lekku, tired eyes, worn clothing"
+  },
+  "biography": "Lira Tann was a teacher on a small Outer Rim world before being taken to Compound 7-Alpha with her family. She lost her husband and one of her children in the compound, but managed to escape with her surviving daughter. Now she leads a refugee camp of survivors, doing her best to keep hope alive while fighting for their survival. She's strong, compassionate, and determined to find a better future for her people.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 90,
+    "formality": 40,
+    "humor": 20,
+    "trust": 50
+  }
+}
+
+

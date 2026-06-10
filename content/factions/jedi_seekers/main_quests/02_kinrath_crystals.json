@@ -1,0 +1,83 @@
+{
+  "id": "js_dantooine_02_kinrath_crystals",
+  "factionId": "jedi_seekers",
+  "questType": "main",
+  "title": "The Kinrath Cave",
+  "description": "The ancient map fragment points to the Kinrath Cave, where Force-sensitive Dantari crystals can be found. These crystals are essential for lightsaber construction and Force enhancements. But the cave is extremely dangerous—kinrath creatures guard it fiercely. Master Voss believes you're ready for this challenge, but warns that the cave will test both your combat skills and your connection to the Force.",
+  "shortDescription": "Retrieve Dantari crystals from the dangerous Kinrath Cave",
+  "prerequisites": {
+    "level": 6,
+    "reputation": {
+      "jedi_seekers": 50
+    },
+    "completedQuests": ["js_dantooine_01_enclave_call"],
+    "items": ["ancient_map_fragment"]
+  },
+  "objectives": [
+    {
+      "id": "travel_cave",
+      "type": "travel",
+      "description": "Travel to the Kinrath Cave",
+      "location": {
+        "planet": "dantooine",
+        "area": "wilderness"
+      }
+    },
+    {
+      "id": "reach_cave_deep",
+      "type": "reach_depth",
+      "description": "Reach the deepest chamber of the Kinrath Cave where the crystals grow",
+      "target": "poi_kinrath_cave",
+      "depthZone": 3
+    },
+    {
+      "id": "defeat_kinrath_boss",
+      "type": "defeat_boss",
+      "description": "Defeat the Kinrath Matriarch guarding the crystal chamber",
+      "target": "poi_kinrath_cave"
+    },
+    {
+      "id": "collect_crystals",
+      "type": "collect",
+      "description": "Collect Dantari crystals from the cave (search defeated enemies or find in treasure caches)",
+      "target": "dantari_crystals",
+      "count": 3
+    },
+    {
+      "id": "make_choice",
+      "type": "custom",
+      "description": "Choose how to use the crystals (lightsaber construction or Force enhancement)",
+      "target": "crystal_choice"
+    }
+  ],
+  "rewards": {
+    "xp": 2000,
+    "credits": 1000,
+    "reputation": {
+      "jedi_seekers": 75
+    },
+    "items": [
+      {
+        "itemId": "dantari_crystals",
+        "quantity": 3
+      },
+      {
+        "itemId": "lightsaber_crystal",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_jedi_seeker_mentor",
+  "startLocation": {
+    "planet": "dantooine",
+    "area": "enclave_region"
+  },
+  "estimatedTime": 120,
+  "difficulty": "hard",
+  "isActive": true,
+  "chainId": "js_dantooine_enclave_chain",
+  "chainOrder": 2
+}
+
+

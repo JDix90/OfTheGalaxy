@@ -1,0 +1,84 @@
+{
+  "id": "nr_dantooine_01_abandoned_base",
+  "factionId": "new_republic",
+  "questType": "main",
+  "title": "The Abandoned Base",
+  "description": "Commander Elena Rost of New Republic Intelligence has received intelligence that the abandoned Rebel base on Dantooine may still contain classified information from the early days of the Alliance. The Empire discovered the base during the war, but some data may have been missed. The base is dangerous—old security systems, possible Imperial traps, maybe even Imperial Remnant activity. But the intelligence could be invaluable.",
+  "shortDescription": "Recover classified intelligence from the abandoned Rebel base",
+  "prerequisites": {
+    "level": 5,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_officer",
+      "type": "interact",
+      "description": "Meet with Commander Elena Rost",
+      "target": "npc_nr_intel_officer"
+    },
+    {
+      "id": "travel_base",
+      "type": "travel",
+      "description": "Travel to the abandoned Rebel base",
+      "location": {
+        "planet": "dantooine",
+        "area": "base_region"
+      }
+    },
+    {
+      "id": "reach_command_center",
+      "type": "reach_depth",
+      "description": "Reach the command center deep within the base where classified data is stored",
+      "target": "poi_abandoned_rebel_base",
+      "depthZone": 3
+    },
+    {
+      "id": "obtain_key",
+      "type": "collect",
+      "description": "Obtain security override key (search defeated enemies or find in security office)",
+      "target": "security_key",
+      "count": 1
+    },
+    {
+      "id": "recover_datapads",
+      "type": "collect",
+      "description": "Recover Rebel intelligence datapads from the command center",
+      "target": "rebel_datapads",
+      "count": 1
+    },
+    {
+      "id": "return_intelligence",
+      "type": "deliver",
+      "description": "Return the intelligence to Commander Rost",
+      "target": "npc_nr_intel_officer"
+    }
+  ],
+  "rewards": {
+    "xp": 1500,
+    "credits": 1000,
+    "reputation": {
+      "new_republic": 50
+    },
+    "items": [
+      {
+        "itemId": "nr_commendation",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["nr_dantooine_04_imperial_threat"]
+  },
+  "questGiverId": "npc_nr_intel_officer",
+  "startLocation": {
+    "planet": "dantooine",
+    "area": "settlement"
+  },
+  "estimatedTime": 90,
+  "difficulty": "hard",
+  "isActive": true,
+  "chainId": "nr_dantooine_base_chain",
+  "chainOrder": 1
+}
+
+

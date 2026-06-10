@@ -1,0 +1,55 @@
+{
+  "id": "npc_old_farmer",
+  "name": "Owen Lars",
+  "species": "human",
+  "occupation": "Moisture Farmer",
+  "factionId": null,
+  "location": {
+    "planet": "tatooine",
+    "area": "mos_eisley",
+    "x": 405,
+    "y": 395
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "You look like you've seen some things. Care to hear a story?",
+      "acquaintance": "Back for another tale? I've got plenty.",
+      "friend": "My friend, you've earned my trust. Let me tell you about the krayt dragon...",
+      "confidant": "You're one of the few who understands. The desert holds many secrets, and the krayt dragon is the greatest of them all."
+    },
+    "questRelated": {
+      "sg_tatooine_01_krayt_legend": "I've lived on Tatooine my whole life, and I've seen things that would make your hair stand on end. But nothing compares to the krayt dragon. There's one out in the Jundland Wastes—bigger than any I've ever seen. It's been attacking moisture farms, leaving nothing but bones. Some say it's protecting something. Others say it's just old and angry. Either way, someone needs to deal with it. Are you that someone?"
+    },
+    "general": [
+      "The desert is unforgiving, but it's home. I wouldn't trade it for anything.",
+      "I remember when Luke Skywalker lived here. He was just a kid then, dreaming of adventure.",
+      "Krayt dragons are smart. They remember. If you hunt one, make sure you finish the job.",
+      "The Jundland Wastes are no place for the unprepared. Respect the desert, or it will kill you.",
+      "I've seen hunters come and go. Most don't come back. But you... you might be different."
+    ]
+  },
+  "quests": ["sg_tatooine_01_krayt_legend"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "elderly",
+    "build": "weathered, thin",
+    "hair": "gray, balding",
+    "eyes": "pale blue",
+    "distinguishingFeatures": "Deep wrinkles from sun exposure, calloused hands, traditional moisture farmer clothing"
+  },
+  "biography": "Owen Lars is an old moisture farmer who's lived on Tatooine his entire life. He's not related to the famous Lars family, but he knew them. He's seen the planet change over the decades, from Imperial occupation to Hutt control to the current lawless state. He's a storyteller, a keeper of Tatooine's history, and he knows more about the planet's dangers than most. The krayt dragon legend is one of many stories he tells, but this one is real, and it's getting closer to the settlements.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 50,
+    "formality": 40,
+    "humor": 30,
+    "trust": 45
+  }
+}
+
+
+

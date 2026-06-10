@@ -1,0 +1,289 @@
+/* GameWorld Page Styles */
+
+.game-world {
+  min-height: 100vh;
+  padding-top: 60px; /* Account for Navigation bar */
+}
+
+.game-header {
+  padding: 1.5rem 2rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.game-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+}
+
+.character-summary {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.character-name-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.character-name-wrapper:hover {
+  background: rgba(74, 158, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.character-name-wrapper:active {
+  transform: translateY(0);
+}
+
+.character-name {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.character-level {
+  color: var(--primary-color);
+}
+
+.game-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: 1rem; /* Reduced top padding since HUD is above */
+}
+
+.game-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.welcome-message {
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+}
+
+.welcome-message h2 {
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+}
+
+.welcome-message p {
+  margin: 0.75rem 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.welcome-message ul {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  color: var(--text-secondary);
+}
+
+.welcome-message li {
+  margin: 0.5rem 0;
+}
+
+.welcome-message .note {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: rgba(251, 191, 36, 0.1);
+  border-left: 4px solid var(--warning-color);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.quick-actions {
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.quick-actions h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.test-combat-btn {
+  border: 2px dashed var(--warning-color) !important;
+  opacity: 0.8;
+}
+
+.test-combat-btn:hover:not(:disabled) {
+  border-color: var(--warning-color) !important;
+  opacity: 1;
+  background-color: rgba(251, 191, 36, 0.1) !important;
+}
+
+.action-card {
+  background-color: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 8px;
+}
+
+.action-card:not(:disabled):hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+}
+
+.action-icon {
+  font-size: 3rem;
+}
+
+.action-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.game-sidebar {
+  position: sticky;
+  top: 80px; /* Account for Navigation + HUD */
+  height: fit-content;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.character-panel {
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.character-panel h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--primary-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.character-vitals {
+  margin-bottom: 1.5rem;
+}
+
+.vital {
+  margin-bottom: 1rem;
+}
+
+.vital-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.vital-bar {
+  background-color: var(--bg-tertiary);
+  height: 1.5rem;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.25rem 0;
+}
+
+.vital-fill {
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.vital-fill.health {
+  background-color: var(--danger-color);
+}
+
+.vital-fill.stamina {
+  background-color: var(--success-color);
+}
+
+.vital-fill.xp {
+  background-color: var(--primary-color);
+}
+
+.vital-value {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+.character-stats {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.character-stats h4 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stat-name {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.stat-value {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .game-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-sidebar {
+    position: relative;
+    top: 0;
+  }
+}
+

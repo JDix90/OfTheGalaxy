@@ -1,0 +1,23 @@
+{
+  "id": "blaster_pistol_01",
+  "name": "DL-44 Heavy Blaster Pistol",
+  "description": "A reliable heavy blaster pistol favored by smugglers and bounty hunters.",
+  "itemType": "weapon",
+  "rarity": "uncommon",
+  "factionId": null,
+  "minReputationTier": null,
+  "stats": {
+    "damage": 25,
+    "accuracy": 75,
+    "range": 30
+  },
+  "baseValue": 500,
+  "weight": 2.5,
+  "stackSize": 1,
+  "equipmentSlot": "weapon",
+  "icon": "blaster_pistol_01.png",
+  "metadata": {}
+}
+
+
+

@@ -1,0 +1,115 @@
+.crafting-success-container {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.crafting-success-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 12px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 200px;
+  max-width: 300px;
+  color: var(--text-primary);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tooltip-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 6px rgba(74, 158, 255, 0.5);
+}
+
+.tooltip-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.tooltip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.success-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  padding: 2px 0;
+}
+
+.breakdown-label {
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.breakdown-value {
+  color: var(--primary-color);
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.preview-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.preview-section h5 {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 2px 0;
+}
+
+.preview-label {
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.preview-value {
+  color: var(--success-color, #34d399);
+  font-weight: bold;
+  margin-left: 8px;
+}
+

@@ -1,0 +1,55 @@
+{
+  "id": "npc_dantooine_farmer",
+  "name": "Jorn Kess",
+  "species": "human",
+  "occupation": "Farmer",
+  "factionId": "outer_rim_settlers",
+  "location": {
+    "planet": "dantooine",
+    "area": "settlement",
+    "x": 315,
+    "y": 515
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "Welcome to our settlement. We don't get many visitors. Are you here to help?",
+      "acquaintance": "You've been kind to us. Thank you.",
+      "friend": "My friend, you've become part of our community. Welcome.",
+      "confidant": "You're one of us now. This settlement is your home too."
+    },
+    "questRelated": {
+      "dantooine_side_01_kinrath_menace": "The kinrath... they've been getting bolder. Coming closer to the settlement. Last week, they attacked one of our farms. We're not fighters, but we can't just abandon our homes. Can you help us? We need someone to clear out the kinrath nest. We don't have much to pay, but we'll give you what we can, and you'll have our eternal gratitude."
+    },
+    "general": [
+      "Life here is simple, but it's good. We're free.",
+      "The kinrath are part of Dantooine, but they need to stay in their territory.",
+      "We came here to escape the war. We just want peace.",
+      "The settlement is growing. More people come every year.",
+      "We help each other here. That's how we survive."
+    ]
+  },
+  "quests": ["dantooine_side_01_kinrath_menace"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "mid 50s",
+    "build": "weathered, strong",
+    "hair": "brown, graying",
+    "eyes": "kind brown",
+    "distinguishingFeatures": "Farmer's clothing, calloused hands, warm smile, practical demeanor"
+  },
+  "biography": "Jorn Kess is a farmer who came to Dantooine to escape the chaos of the Galactic Civil War. He's built a life here, raising crops and helping build the settlement. He's kind, hardworking, and deeply cares about his community. The kinrath attacks are threatening everything he's built, and he's desperate for help. He represents the ordinary people trying to live peaceful lives in a galaxy still recovering from war.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 75,
+    "formality": 30,
+    "humor": 40,
+    "trust": 65
+  }
+}
+
+
+

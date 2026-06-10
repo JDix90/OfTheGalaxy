@@ -1,0 +1,64 @@
+{
+  "id": "npc_hunting_party_member",
+  "name": "Kara \"Stalker\" Vex",
+  "species": "human",
+  "occupation": "Bounty Hunter / Hunter",
+  "factionId": "smugglers_guild",
+  "location": {
+    "planet": "tatooine",
+    "area": "mos_eisley",
+    "x": 400,
+    "y": 400
+  },
+  "npcType": "companion",
+  "isCompanion": true,
+  "dialogue": {
+    "greeting": {
+      "stranger": "You're hunting the krayt dragon? That's either brave or stupid. I like it.",
+      "acquaintance": "Ready for the hunt? I've got your back.",
+      "friend": "Partner, we've been through some scrapes. This dragon won't be easy, but we've got this.",
+      "confidant": "I've hunted krayt dragons before. This one's different—bigger, smarter. But together, we can take it down."
+    },
+    "questRelated": {
+      "sg_tatooine_02_preparation": "I've hunted krayt dragons on three different worlds. They're smart, they're fast, and they're deadly. But I know their weaknesses. If you're serious about this hunt, I'm in. I'll help you prepare, and I'll fight by your side. But we need the right equipment, and we need a plan. No going in blind.",
+      "sg_tatooine_03_dragon_hunt": "The time has come. You've prepared, you've planned, and now you face the legendary krayt dragon. This is no ordinary hunt—this creature is massive, intelligent, and extremely dangerous. But the rewards are legendary: a krayt dragon pearl, bones for crafting, and the respect of every hunter in the Outer Rim. The hunt begins now. The dragon's lair is in the Jundland Wastes—you'll need to navigate through the dangerous wastes to reach it. Are you ready?",
+      "sg_tatooine_03_dragon_hunt_location": "The krayt dragon's lair is deep in the Jundland Wastes. You'll need to reach depth zone 4—the deepest point—where the dragon makes its nest. The path is treacherous, filled with dangers, but the dragon itself is the greatest threat. Be prepared for the fight of your life."
+    },
+    "general": [
+      "Krayt dragons are apex predators. Respect them, or they'll kill you.",
+      "I've seen what a krayt dragon can do to a fully armored speeder. We need to be smart.",
+      "The Jundland Wastes are their territory. We're just visitors.",
+      "Hunting isn't about killing. It's about understanding your prey.",
+      "I've lost friends to krayt dragons. I won't lose another."
+    ]
+  },
+  "quests": ["sg_tatooine_02_preparation"],
+  "vendorInventory": null,
+  "companionAbilities": {
+    "combat": ["precise_shot", "tactical_positioning", "beast_lore"],
+    "utility": ["tracking", "survival", "equipment_maintenance"]
+  },
+  "companionStats": {
+    "health": 100,
+    "damage": 30,
+    "defense": 15,
+    "specialization": "hunting"
+  },
+  "appearance": {
+    "age": "early 30s",
+    "build": "athletic, wiry",
+    "hair": "red, braided",
+    "eyes": "green",
+    "distinguishingFeatures": "Scar across left cheek, hunting gear, multiple weapon holsters, confident stance"
+  },
+  "biography": "Kara Vex, known as 'Stalker' in hunting circles, is a professional hunter who specializes in dangerous creatures. She's hunted krayt dragons, rancors, and other apex predators across the galaxy. She's skilled, experienced, and knows how to survive in the most dangerous environments. She's also pragmatic—she hunts for profit, but she respects her prey. She can be recruited as a companion for the krayt dragon hunt, providing valuable expertise and combat support.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 40,
+    "formality": 30,
+    "humor": 50,
+    "trust": 55
+  }
+}
+
+

@@ -1,0 +1,227 @@
+.item-tooltip {
+  position: fixed;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 250px;
+  max-width: 350px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  pointer-events: auto;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tooltip-header h4 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  text-shadow: 0 0 6px rgba(74, 158, 255, 0.5);
+}
+
+.equipped-badge {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.tooltip-body {
+  color: var(--text-primary);
+}
+
+.tooltip-section {
+  margin-bottom: 0.5rem;
+}
+
+.tooltip-section:last-child {
+  margin-bottom: 0;
+}
+
+.item-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.acquired-from {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.tooltip-close-button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.tooltip-close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.tooltip-stats-label {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+}
+
+.tooltip-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.stat-value {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.equipment-slot-info {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+}
+
+.tooltip-actions {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.equip-button {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.equip-button:hover {
+  background-color: #5a9fd4;
+  box-shadow: 0 4px 8px rgba(74, 158, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.equip-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Item Set Styles */
+.item-set-label {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  color: var(--primary-color);
+}
+
+.item-set-description {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.item-set-pieces {
+  margin-bottom: 0.75rem;
+}
+
+.set-pieces-label {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.set-pieces-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: none;
+}
+
+.set-piece {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.set-piece.current-item {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.item-set-bonuses {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.set-bonuses-label {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.set-bonus {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(74, 158, 255, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.bonus-tier {
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.bonus-description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+

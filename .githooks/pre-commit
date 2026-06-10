@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Pre-commit hook: block commits that contain secrets.
+# Enable once with:  git config core.hooksPath .githooks
+exec "$(git rev-parse --show-toplevel)/scripts/check-secrets.sh"

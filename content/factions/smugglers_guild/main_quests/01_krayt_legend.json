@@ -1,0 +1,70 @@
+{
+  "id": "sg_tatooine_01_krayt_legend",
+  "factionId": "smugglers_guild",
+  "questType": "main",
+  "title": "The Krayt Dragon Legend",
+  "description": "An old moisture farmer tells you of a legendary krayt dragon in the Jundland Wastes—bigger and more dangerous than any seen before. It's been attacking moisture farms, leaving nothing but bones. Some say it's protecting something valuable. Others say it's just old and angry. Either way, someone needs to deal with it. Are you that someone?",
+  "shortDescription": "Investigate the legendary krayt dragon in the Jundland Wastes",
+  "prerequisites": {
+    "level": 5,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "speak_farmer",
+      "type": "interact",
+      "description": "Speak with the old moisture farmer about the krayt dragon",
+      "target": "npc_old_farmer"
+    },
+    {
+      "id": "obtain_report",
+      "type": "collect",
+      "description": "Obtain the krayt dragon sighting report",
+      "target": "krayt_report",
+      "count": 1
+    },
+    {
+      "id": "investigate_wastes",
+      "type": "travel",
+      "description": "Travel to the Jundland Wastes to investigate",
+      "location": {
+        "planet": "tatooine",
+        "area": "jundland_wastes"
+      }
+    }
+    },
+    {
+      "id": "find_dragon_lair",
+      "type": "discover",
+      "description": "Find the krayt dragon's lair",
+      "evidenceId": "evidence_dragon_lair"
+    }
+  ],
+  "rewards": {
+    "xp": 1000,
+    "credits": 500,
+    "reputation": {
+      "smugglers_guild": 30
+    },
+    "items": [
+      {
+        "itemId": "krayt_report",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["sg_tatooine_02_preparation"]
+  },
+  "questGiverId": "npc_old_farmer",
+  "startLocation": {
+    "planet": "tatooine",
+    "area": "mos_eisley"
+  },
+  "estimatedTime": 60,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": "sg_tatooine_krayt_chain",
+  "chainOrder": 1
+}
+

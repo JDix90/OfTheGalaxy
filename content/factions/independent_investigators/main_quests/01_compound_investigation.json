@@ -1,0 +1,59 @@
+{
+  "id": "iia_main_01_compound_investigation",
+  "factionId": "independent_investigators",
+  "questType": "main",
+  "title": "Echoes from Compound 7-Alpha",
+  "description": "A group of refugees from the mysterious Compound 7-Alpha have arrived at the settlement on Chandrila. Their stories hint at something far darker than a simple Imperial detention facility. Investigate their past and uncover the truth about what happened at the compound.",
+  "shortDescription": "Investigate the refugees from Compound 7-Alpha",
+  "prerequisites": {
+    "level": 1,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_mira",
+      "type": "interact",
+      "description": "Speak with Mira Kess at the refugee settlement",
+      "target": "npc_mira_kess"
+    },
+    {
+      "id": "discover_evidence_1",
+      "type": "discover",
+      "description": "Uncover Mira's childhood memory",
+      "evidenceId": "evidence_mira_t1_childhood"
+    },
+    {
+      "id": "meet_jax",
+      "type": "interact",
+      "description": "Find and speak with Jax Riven",
+      "target": "npc_jax_riven"
+    },
+    {
+      "id": "discover_evidence_2",
+      "type": "discover",
+      "description": "Learn about Jax's arrival at the compound",
+      "evidenceId": "evidence_jax_t1_arrival"
+    }
+  ],
+  "rewards": {
+    "xp": 500,
+    "credits": 200,
+    "reputation": {
+      "independent_investigators": 25
+    },
+    "items": [],
+    "unlocks": ["iia_main_02_deeper_investigation"]
+  },
+  "questGiverId": "npc_coordinator_valen",
+  "startLocation": {
+    "planet": "chandrila",
+    "area": "refugee_settlement"
+  },
+  "estimatedTime": 45,
+  "difficulty": "easy",
+  "isActive": true,
+  "chainId": "iia_main_chain",
+  "chainOrder": 1
+}

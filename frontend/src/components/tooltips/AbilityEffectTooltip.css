@@ -1,0 +1,118 @@
+.ability-effect-container {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.ability-effect-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 12px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 250px;
+  max-width: 350px;
+  color: var(--text-primary);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.tooltip-header {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tooltip-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 6px rgba(74, 158, 255, 0.5);
+}
+
+.tooltip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.effect-cost {
+  display: flex;
+  gap: 1rem;
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+
+.cost-item {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cost-label {
+  color: var(--text-secondary);
+}
+
+.cost-value {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.effect-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.effect-item {
+  padding: 8px;
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.effect-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.effect-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.effect-value {
+  color: var(--success-color, #4ade80);
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.effect-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.breakdown-line {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+}
+
+.effect-duration {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+

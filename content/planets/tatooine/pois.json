@@ -1,0 +1,83 @@
+{
+  "planetId": "tatooine",
+  "pointsOfInterest": [
+    {
+      "id": "poi_mos_eisley",
+      "name": "Mos Eisley Spaceport",
+      "type": "spaceport",
+      "description": "A wretched hive of scum and villainy. The main spaceport on Tatooine, filled with cantinas, markets, and all manner of shady characters.",
+      "location": {
+        "x": 400,
+        "y": 400,
+        "area": "mos_eisley"
+      },
+      "subMapType": "spaceport"
+    },
+    {
+      "id": "poi_jabbas_palace",
+      "name": "Jabba's Palace",
+      "type": "palace",
+      "description": "The former stronghold of Jabba the Hutt. Now abandoned but still dangerous, filled with traps and potential treasure.",
+      "location": {
+        "x": 600,
+        "y": 200,
+        "area": "dune_sea"
+      },
+      "subMapType": "palace",
+      "dangerLevel": 6
+    },
+    {
+      "id": "poi_lars_homestead",
+      "name": "The Lars Homestead",
+      "type": "historic_site",
+      "description": "The abandoned moisture farm where Luke Skywalker grew up. A place of historical significance, now empty but holding secrets.",
+      "location": {
+        "x": 300,
+        "y": 500,
+        "area": "jundland_wastes"
+      },
+      "subMapType": "landscape"
+    },
+    {
+      "id": "poi_beggars_canyon",
+      "name": "Beggar's Canyon",
+      "type": "wilderness",
+      "description": "A treacherous canyon system where legendary swoop bike races are held. Home to dangerous creatures and hidden dangers.",
+      "location": {
+        "x": 250,
+        "y": 450,
+        "area": "jundland_wastes"
+      },
+      "subMapType": "wilderness",
+      "dangerLevel": 5
+    },
+    {
+      "id": "poi_jundland_wastes",
+      "name": "Jundland Wastes",
+      "type": "wilderness",
+      "description": "The vast desert wasteland of Tatooine, home to krayt dragons, Tusken Raiders, and other dangers.",
+      "location": {
+        "x": 200,
+        "y": 400,
+        "area": "jundland_wastes"
+      },
+      "subMapType": "wilderness",
+      "dangerLevel": 7
+    },
+    {
+      "id": "poi_mos_eisley_cantina",
+      "name": "Mos Eisley Cantina",
+      "type": "cantina",
+      "description": "The famous cantina where deals are made and information is traded. A hub for smugglers and bounty hunters.",
+      "location": {
+        "x": 410,
+        "y": 390,
+        "area": "mos_eisley"
+      },
+      "subMapType": "cantina"
+    }
+  ]
+}
+
+
+

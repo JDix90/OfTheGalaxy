@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Item Schema",
+  "description": "Schema for item data files in Of the Galaxy",
+  "type": "object",
+  "required": ["id", "name", "itemType", "rarity"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "description": "Unique item identifier (e.g., 'blaster_pistol_01')"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Item name displayed to player"
+    },
+    "description": {
+      "type": "string",
+      "description": "Item description and lore"
+    },
+    "itemType": {
+      "type": "string",
+      "enum": ["weapon", "armor", "equipment", "consumable", "resource", "quest_item", "junk"],
+      "description": "Type of item"
+    },
+    "rarity": {
+      "type": "string",
+      "enum": ["common", "uncommon", "rare", "epic", "legendary"],
+      "description": "Item rarity tier"
+    },
+    "factionId": {
+      "type": ["string", "null"],
+      "enum": [
+        "independent_investigators",
+        "new_republic",
+        "imperial_remnant",
+        "smugglers_guild",
+        "jedi_seekers",
+        "corporate_sector",
+        "outer_rim_settlers",
+        null
+      ],
+      "description": "Faction that owns this item (null for faction-neutral items)"
+    },
+    "minReputationTier": {
+      "type": ["string", "null"],
+      "enum": ["neutral", "friendly", "trusted", "allied", "revered", null],
+      "description": "Minimum reputation tier required to equip/purchase"
+    },
+    "stats": {
+      "type": "object",
+      "description": "Item statistics (varies by item type)",
+      "properties": {
+        "damage": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Damage value (weapons)"
+        },
+        "accuracy": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Accuracy percentage (weapons)"
+        },
+        "fireRate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Fire rate (weapons)"
+        },
+        "range": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Range in meters (weapons)"
+        },
+        "defense": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Defense value (armor)"
+        },
+        "mobility": {
+          "type": "integer",
+          "description": "Mobility modifier (armor, can be negative)"
+        },
+        "resistance": {
+          "type": "object",
+          "description": "Damage resistance (armor)",
+          "properties": {
+            "energy": { "type": "integer", "minimum": 0 },
+            "physical": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "specialEffects": {
+          "type": "array",
+          "description": "Special effects or abilities",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "baseValue": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Base credit value of item"
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Item weight in kg"
+    },
+    "stackSize": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Maximum stack size (1 for non-stackable items)"
+    },
+    "equipmentSlot": {
+      "type": ["string", "null"],
+      "enum": ["weapon", "armor", "accessory", "tool", null],
+      "description": "Equipment slot (null for non-equippable items)"
+    },
+    "icon": {
+      "type": ["string", "null"],
+      "description": "Icon filename or path"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
+
+
+

@@ -1,0 +1,503 @@
+/* Galaxy Map Styles */
+
+.galaxy-map-container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 2rem;
+}
+
+.galaxy-map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.galaxy-map-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+
+.map-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.map-controls button {
+  padding: 0.5rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.map-controls button:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.map-controls select {
+  padding: 0.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.galaxy-map-content {
+  display: flex;
+  gap: 2rem;
+  height: calc(100vh - 200px);
+}
+
+.map-canvas-container {
+  flex: 1;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  min-height: 500px;
+  min-width: 500px;
+}
+
+.galaxy-map-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.galaxy-map-canvas:active {
+  cursor: grabbing;
+}
+
+.map-sidebar {
+  width: 350px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.map-stats {
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.stats-text {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.stats-text strong {
+  color: var(--primary-color);
+}
+
+.stats-hint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.planets-hint {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.system-details h2 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.system-region {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.system-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.system-info {
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.planets-list {
+  margin-top: 1.5rem;
+}
+
+.planets-list h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.planet-item {
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.planet-item:hover {
+  border-color: var(--primary-color);
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.planet-item.selected {
+  border-color: var(--primary-color);
+  background: rgba(74, 158, 255, 0.2);
+}
+
+.planet-item.current {
+  border-color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.planet-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.planet-type {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.current-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: #4ade80;
+  color: #0f172a;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.routes-list {
+  margin-top: 1.5rem;
+}
+
+.routes-list h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.route-item {
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.route-item:hover {
+  border-color: var(--primary-color);
+  background: rgba(74, 158, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.route-destination {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.route-info {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.planet-details {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.planet-details h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.planet-info {
+  margin-bottom: 1.5rem;
+}
+
+.planet-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.planet-actions {
+  margin-top: 1rem;
+}
+
+.travel-cost-info {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.9rem;
+}
+
+.cost-row span:first-child {
+  color: var(--text-secondary);
+}
+
+.cost-row span:last-child {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.cost-row .sufficient {
+  color: #4ade80;
+}
+
+.cost-row .insufficient {
+  color: #ef4444;
+}
+
+.travel-button {
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.travel-button:hover:not(:disabled) {
+  background: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+}
+
+.travel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.travel-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.travel-confirm-dialog {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.travel-confirm-dialog h2 {
+  margin: 0 0 1.5rem 0;
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+}
+
+.confirm-details {
+  margin-bottom: 1.5rem;
+}
+
+.confirm-details p {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.cost-breakdown {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cost-item:last-child {
+  border-bottom: none;
+}
+
+.cost-item span:first-child {
+  color: var(--text-secondary);
+}
+
+.cost-item span:last-child {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.cost-item .sufficient {
+  color: #4ade80;
+}
+
+.cost-item .insufficient {
+  color: #ef4444;
+}
+
+.insufficient-funds {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #ef4444;
+  text-align: center;
+  font-weight: 600;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.confirm-button,
+.cancel-button {
+  flex: 1;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.confirm-button {
+  background: var(--primary-color);
+  color: white;
+}
+
+.confirm-button:hover:not(:disabled) {
+  background: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.confirm-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: var(--bg-dark);
+}
+
+.loading,
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.error {
+  color: #ef4444;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .galaxy-map-content {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .map-canvas-container {
+    height: 500px;
+  }
+
+  .map-sidebar {
+    width: 100%;
+  }
+}
+

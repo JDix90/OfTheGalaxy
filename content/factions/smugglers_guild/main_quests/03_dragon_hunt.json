@@ -1,0 +1,88 @@
+{
+  "id": "sg_tatooine_03_dragon_hunt",
+  "factionId": "smugglers_guild",
+  "questType": "main",
+  "title": "The Dragon Hunt",
+  "description": "The time has come. You've prepared, you've planned, and now you face the legendary krayt dragon. This is no ordinary hunt—this creature is massive, intelligent, and extremely dangerous. But the rewards are legendary: a krayt dragon pearl, bones for crafting, and the respect of every hunter in the Outer Rim. The hunt begins now.",
+  "shortDescription": "Hunt and defeat the legendary krayt dragon",
+  "prerequisites": {
+    "level": 7,
+    "reputation": {
+      "smugglers_guild": 50
+    },
+    "completedQuests": ["sg_tatooine_02_preparation"],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "travel_to_lair",
+      "type": "travel",
+      "description": "Travel to the krayt dragon's lair in the Jundland Wastes",
+      "location": {
+        "planet": "tatooine",
+        "area": "jundland_wastes"
+      }
+    },
+    {
+      "id": "reach_dragon_lair",
+      "type": "reach_depth",
+      "description": "Navigate through the dangerous wastes to reach the dragon's lair at the deepest point",
+      "target": "poi_jundland_wastes",
+      "depthZone": 4
+    },
+    {
+      "id": "defeat_dragon",
+      "type": "defeat_boss",
+      "description": "Defeat the legendary krayt dragon in its lair",
+      "target": "poi_jundland_wastes"
+    },
+    {
+      "id": "recover_pearl",
+      "type": "collect",
+      "description": "Recover the krayt dragon pearl from the defeated dragon",
+      "target": "krayt_pearl",
+      "count": 1
+    },
+    {
+      "id": "recover_bones",
+      "type": "collect",
+      "description": "Recover krayt dragon bones (search the dragon's remains)",
+      "target": "dragon_bones",
+      "count": 5
+    }
+  ],
+  "rewards": {
+    "xp": 3000,
+    "credits": 5000,
+    "reputation": {
+      "smugglers_guild": 75
+    },
+    "items": [
+      {
+        "itemId": "krayt_pearl",
+        "quantity": 1
+      },
+      {
+        "itemId": "dragon_bones",
+        "quantity": 5
+      },
+      {
+        "itemId": "dragon_scale",
+        "quantity": 3
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_hunting_party_member",
+  "startLocation": {
+    "planet": "tatooine",
+    "area": "jundland_wastes"
+  },
+  "estimatedTime": 120,
+  "difficulty": "very_hard",
+  "isActive": true,
+  "chainId": "sg_tatooine_krayt_chain",
+  "chainOrder": 3
+}
+
+

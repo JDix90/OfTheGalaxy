@@ -1,0 +1,94 @@
+.inventory-slot {
+  aspect-ratio: 1;
+  min-width: 64px;
+  min-height: 64px;
+  background-color: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inventory-slot.empty {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-style: dashed;
+}
+
+.inventory-slot.filled {
+  background-color: var(--bg-secondary);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.2);
+}
+
+.inventory-slot:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 12px rgba(74, 158, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.item-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.item-icon-placeholder {
+  opacity: 0.8;
+}
+
+.item-quantity {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.equipped-indicator {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  background-color: var(--primary-color);
+  color: white;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  box-shadow: 0 0 6px rgba(74, 158, 255, 0.6);
+}
+
+.inventory-slot.equippable {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+}
+
+.inventory-slot.equippable:hover {
+  border-color: #a78bfa;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+
+.equippable-indicator {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.8));
+}
+
+

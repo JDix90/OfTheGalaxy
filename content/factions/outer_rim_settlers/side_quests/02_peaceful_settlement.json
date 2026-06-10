@@ -1,0 +1,58 @@
+{
+  "id": "dantooine_side_02_peaceful_settlement",
+  "factionId": "outer_rim_settlers",
+  "questType": "side",
+  "title": "A Peaceful Settlement",
+  "description": "Elder Mara, the leader of the Dantooine settlement, needs help with various tasks to keep the settlement running smoothly. The settlement is growing, and that brings challenges: establishing trade routes, mediating disputes, building infrastructure. They're not asking for handouts—they're asking for partnership. Can you help them?",
+  "shortDescription": "Help the settlement with various tasks and challenges",
+  "prerequisites": {
+    "level": 3,
+    "reputation": {
+      "outer_rim_settlers": 20
+    },
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "speak_elder",
+      "type": "interact",
+      "description": "Speak with Elder Mara about settlement needs",
+      "target": "npc_settlement_leader"
+    },
+    {
+      "id": "complete_tasks",
+      "type": "custom",
+      "description": "Complete settlement tasks (trade negotiations, dispute mediation, infrastructure help)",
+      "target": "settlement_tasks",
+      "count": 3
+    }
+  ],
+  "rewards": {
+    "xp": 750,
+    "credits": 300,
+    "reputation": {
+      "outer_rim_settlers": 30
+    },
+    "items": [
+      {
+        "itemId": "settler_gift",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_settlement_leader",
+  "startLocation": {
+    "planet": "dantooine",
+    "area": "settlement"
+  },
+  "estimatedTime": 45,
+  "difficulty": "easy",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+
+

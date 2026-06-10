@@ -1,0 +1,56 @@
+{
+  "id": "npc_village_elder",
+  "name": "Elder Tala",
+  "species": "twi'lek",
+  "occupation": "Village Elder",
+  "factionId": null,
+  "location": {
+    "planet": "ryloth",
+    "area": "tann_province",
+    "x": 190,
+    "y": 290
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "Welcome, traveler. You honor our village with your presence.",
+      "acquaintance": "You've been kind to our people. We remember.",
+      "friend": "My friend, you've become part of our community. Welcome home.",
+      "confidant": "You've saved our village. We will tell your story for generations."
+    },
+    "questRelated": {
+      "ryloth_side_01_village_liberation": "Our village has been under the thumb of the criminal syndicate for too long. They take our resources, intimidate our people, and leave us with nothing. The thugs are based in The Syndicate Mines, using it as their base of operations. The New Republic says they'll help, but we need action now. Can you help us drive out the syndicate thugs from their stronghold? We're not fighters, but we're willing to stand with you.",
+      "ryloth_side_01_village_liberation_thugs": "The thugs? They've taken over The Syndicate Mines in the mining district. It's their base of operations—they use it to store stolen goods and plan their raids on our village. The mines are dangerous, filled with their guards and traps. But if you can clear them out, our village will finally be free. The mines are in the mining district, southeast of here.",
+      "ryloth_side_01_village_liberation_location": "The Syndicate Mines are in the mining district, southeast of Tann Province. The thugs have fortified it, turning it into their base. That's where you'll find them, and where they've been storing the stolen artifacts from our people. Be careful—the mines are dangerous, and the syndicate boss controls everything from there.",
+      "ryloth_side_01_village_liberation_return": "You've done it! The mines are cleared, and our village is finally free! The syndicate thugs are gone, and we can finally live in peace. Thank you, traveler. You've given us our freedom back. Here, take this—it's a token of our gratitude. The artifact you recovered... it means everything to our people. We will remember your courage for generations."
+    },
+    "general": [
+      "Our village has stood for generations. We will not be broken.",
+      "The syndicate thinks we're weak. They're wrong.",
+      "The New Republic promises much, but delivers little. We need action, not words.",
+      "Our people are strong. We just need someone to stand with us.",
+      "Tradition and honor guide us. The syndicate knows nothing of these things."
+    ]
+  },
+  "quests": ["ryloth_side_01_village_liberation"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "elderly",
+    "build": "frail but dignified",
+    "hair": "n/a (twi'lek)",
+    "eyes": "wise blue",
+    "distinguishingFeatures": "White lekku with age spots, traditional Twi'lek robes, walking staff"
+  },
+  "biography": "Elder Tala has led her village in Tann Province for over forty years. She's seen the Clone Wars, the Empire's occupation, and now the New Republic's arrival. She's wise, patient, and deeply cares for her people. The syndicate's presence has been a blight on her village, and she's determined to see them driven out. She represents the traditional Twi'lek values of community, honor, and resilience.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 85,
+    "formality": 60,
+    "humor": 30,
+    "trust": 55
+  }
+}
+

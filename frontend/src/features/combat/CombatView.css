@@ -1,0 +1,146 @@
+/**
+ * Combat View Styles
+ */
+
+.combat-view {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.combat-view.loading,
+.combat-view.error,
+.combat-view.no-encounter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.error-message,
+.no-encounter-message {
+  font-size: 1.2rem;
+  color: var(--error-color);
+  margin-bottom: 1rem;
+}
+
+.combat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
+  border-bottom: 2px solid var(--primary-color);
+  margin-bottom: 2rem;
+  border-radius: 8px;
+}
+
+.combat-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--primary-color);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.combat-main {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.5rem;
+  min-height: calc(100vh - 200px);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.combatants-container {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.enemies-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.enemies-container .combatant-display {
+  /* Ensure enemy cards have the same dimensions as player cards */
+  min-width: 300px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.enemy-turn-indicator {
+  grid-column: 2;
+  grid-row: 3;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.enemy-turn-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.enemy-turn-message .spinner {
+  animation: spin 1s linear infinite;
+  font-size: 2rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1200px) {
+  .combat-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .combatants-container {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .enemy-turn-indicator {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+

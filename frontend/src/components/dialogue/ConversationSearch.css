@@ -1,0 +1,77 @@
+/**
+ * ConversationSearch Component Styles
+ * Phase 5: Search UI styling
+ */
+
+.conversation-search {
+  padding: 12px;
+  background: rgba(26, 26, 46, 0.8);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.conversation-search-input {
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.conversation-search-input:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.conversation-search-input::placeholder {
+  color: #888;
+}
+
+.search-clear-button {
+  position: absolute;
+  right: 8px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear-button:hover {
+  color: #ff4444;
+}
+
+.search-indicator {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(0, 212, 255, 0.15);
+  border-left: 3px solid #00d4ff;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #e0e0e0;
+}
+
+.search-indicator strong {
+  color: #00d4ff;
+}
+
+
+
+

@@ -1,0 +1,4098 @@
+{
+  "exportDate": "2025-11-29T01:32:15.681Z",
+  "totalPlanets": 88,
+  "planets": [
+    {
+      "id": "ahch_to",
+      "name": "Ahch-To",
+      "system": {
+        "id": "ahch_to_system",
+        "name": "Ahch-To System",
+        "region": "Unknown Regions",
+        "coordinates": {
+          "x": 95,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Ahch-To is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ahch_to_moon",
+      "name": "Ahch-To Moon",
+      "system": {
+        "id": "ahch_to_system",
+        "name": "Ahch-To System",
+        "region": "Unknown Regions",
+        "coordinates": {
+          "x": 95,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Ahch-To Moon is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "alderaan",
+      "name": "Alderaan",
+      "system": {
+        "id": "alderaan_system",
+        "name": "Alderaan System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": 5,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 2000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Alderaan is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Aldera",
+          "New Alderaan"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Aldera"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "alderaan_moon_1",
+      "name": "Alderaan Moon I",
+      "system": {
+        "id": "alderaan_system",
+        "name": "Alderaan System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": 5,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.8,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Alderaan Moon I is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ansion",
+      "name": "Ansion",
+      "system": {
+        "id": "ansion_system",
+        "name": "Ansion System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -7,
+          "y": 12
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 600000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Ansion is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Cantras Gola"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Cantras Gola"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "bespin",
+      "name": "Bespin",
+      "system": {
+        "id": "bespin_system",
+        "name": "Bespin System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 45,
+          "y": -10
+        }
+      },
+      "traits": {
+        "planetType": "gas_giant",
+        "climate": "variable",
+        "atmosphere": "breathable",
+        "gravity": 0.75,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 6000000,
+        "factionControl": "independent",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Bespin is a gas_giant planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Cloud City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Cloud City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "bespin_moon_1",
+      "name": "Bespin Moon I",
+      "system": {
+        "id": "bespin_system",
+        "name": "Bespin System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 45,
+          "y": -10
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "variable",
+        "atmosphere": "breathable",
+        "gravity": 0.7,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Bespin Moon I is a terrestrial planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "bothawui",
+      "name": "Bothawui",
+      "system": {
+        "id": "bothawui_system",
+        "name": "Bothawui System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": -18,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 3000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Bothawui is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Drev'starn"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Drev'starn"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "bothawui_moon",
+      "name": "Bothawui Moon",
+      "system": {
+        "id": "bothawui_system",
+        "name": "Bothawui System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": -18,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 500000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Bothawui Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Outpost"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Outpost"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "brentaal",
+      "name": "Brentaal",
+      "system": {
+        "id": "brentaal_system",
+        "name": "Brentaal System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -12,
+          "y": 8
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1500000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Brentaal is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Brentaal City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Brentaal City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "cato_neimoidia",
+      "name": "Cato Neimoidia",
+      "system": {
+        "id": "cato_neimoidia_system",
+        "name": "Cato Neimoidia System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 24,
+          "y": 10
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1000000000,
+        "factionControl": "independent",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Cato Neimoidia is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Cato Neimoidia City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Cato Neimoidia City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "cato_neimoidia_moon",
+      "name": "Cato Neimoidia Moon",
+      "system": {
+        "id": "cato_neimoidia_system",
+        "name": "Cato Neimoidia System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 24,
+          "y": 10
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 500000,
+        "factionControl": "independent",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Cato Neimoidia Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Base"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Base"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "chandrila",
+      "name": "Chandrila",
+      "system": {
+        "id": "chandrila_system",
+        "name": "Chandrila System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -5,
+          "y": 10
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1200000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Chandrila is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Hanna City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Hanna City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "csilla",
+      "name": "Csilla",
+      "system": {
+        "id": "chiss_space_system",
+        "name": "Chiss Space System",
+        "region": "Unknown Regions",
+        "coordinates": {
+          "x": 105,
+          "y": 15
+        }
+      },
+      "traits": {
+        "planetType": "ice",
+        "climate": "frozen",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 2500000000,
+        "factionControl": "chiss",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Csilla is a ice planet with a frozen climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Csaplar"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Csaplar"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "naporar",
+      "name": "Naporar",
+      "system": {
+        "id": "chiss_space_system",
+        "name": "Chiss Space System",
+        "region": "Unknown Regions",
+        "coordinates": {
+          "x": 105,
+          "y": 15
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 500000000,
+        "factionControl": "chiss",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Naporar is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Naporar City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Naporar City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "commenor",
+      "name": "Commenor",
+      "system": {
+        "id": "commenor_system",
+        "name": "Commenor System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": 3,
+          "y": 7
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 900000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Commenor is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Commenor City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Commenor City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "corellia",
+      "name": "Corellia",
+      "system": {
+        "id": "corellia_system",
+        "name": "Corellia System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 3000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Corellia is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Coronet",
+          "Doaba Guerfel",
+          "Tyrena"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Coronet"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "drall",
+      "name": "Drall",
+      "system": {
+        "id": "corellia_system",
+        "name": "Corellia System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.95,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 500000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Drall is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Brellyr"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Brellyr"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "selonia",
+      "name": "Selonia",
+      "system": {
+        "id": "corellia_system",
+        "name": "Corellia System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 100000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Selonia is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Hunchuzuc"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Hunchuzuc"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "coruscant",
+      "name": "Coruscant",
+      "system": {
+        "id": "coruscant_system",
+        "name": "Coruscant System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -10,
+          "y": 5
+        }
+      },
+      "traits": {
+        "planetType": "urban",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1000000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Coruscant is a urban planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Galactic City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Galactic City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [
+        {
+          "id": "coruscant_galactic_city_medical_center_medical_center",
+          "name": "Galactic City Medical Center Medical_center",
+          "type": "medical_center",
+          "template": "medium",
+          "parentLocationId": "Galactic City Medical Center",
+          "parentLocationType": "poi",
+          "metadata": {
+            "lore": "A medical_center location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "medical_center sub-map for Galactic City Medical Center on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_senate_district_market_market",
+          "name": "Senate District Market Market",
+          "type": "market",
+          "template": "medium",
+          "parentLocationId": "Senate District Market",
+          "parentLocationType": "market",
+          "metadata": {
+            "lore": "A market location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "market sub-map for Senate District Market on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_jedi_temple_temple",
+          "name": "Jedi Temple Temple",
+          "type": "temple",
+          "template": "medium",
+          "parentLocationId": "Jedi Temple",
+          "parentLocationType": "poi",
+          "metadata": {
+            "lore": "A temple location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "temple sub-map for Jedi Temple on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_coco_town_markets_market",
+          "name": "CoCo Town Markets Market",
+          "type": "market",
+          "template": "medium",
+          "parentLocationId": "CoCo Town Markets",
+          "parentLocationType": "poi",
+          "metadata": {
+            "lore": "A market location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "market sub-map for CoCo Town Markets on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_senate_district_city",
+          "name": "Senate District City",
+          "type": "city",
+          "template": "medium",
+          "parentLocationId": "Senate District",
+          "parentLocationType": "city",
+          "metadata": {
+            "lore": "A city location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "city sub-map for Senate District on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_uscru_district_city",
+          "name": "Uscru District City",
+          "type": "city",
+          "template": "medium",
+          "parentLocationId": "Uscru District",
+          "parentLocationType": "city",
+          "metadata": {
+            "lore": "A city location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "city sub-map for Uscru District on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_coco_town_city",
+          "name": "CoCo Town City",
+          "type": "city",
+          "template": "medium",
+          "parentLocationId": "CoCo Town",
+          "parentLocationType": "city",
+          "metadata": {
+            "lore": "A city location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "city sub-map for CoCo Town on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_galactic_city_city",
+          "name": "Galactic City City",
+          "type": "city",
+          "template": "medium",
+          "parentLocationId": "Galactic City",
+          "parentLocationType": "city",
+          "metadata": {
+            "lore": "A city location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "city sub-map for Galactic City on Coruscant",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "coruscant_galactic_senate_building_government",
+          "name": "Galactic Senate Building Government",
+          "type": "government",
+          "template": "medium",
+          "parentLocationId": "Galactic Senate Building",
+          "parentLocationType": "poi",
+          "metadata": {
+            "lore": "A government location on Coruscant",
+            "faction": "new_republic",
+            "dangerLevel": 1,
+            "description": "government sub-map for Galactic Senate Building on Coruscant",
+            "restrictions": {}
+          }
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "coruscant_moon",
+      "name": "Coruscant Moon",
+      "system": {
+        "id": "coruscant_system",
+        "name": "Coruscant System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -10,
+          "y": 5
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 50000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Coruscant Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Base"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Base"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "dac",
+      "name": "Dac",
+      "system": {
+        "id": "dac_system",
+        "name": "Dac System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 16,
+          "y": -10
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 25000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Dac is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Coral City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Coral City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "dagobah",
+      "name": "Dagobah",
+      "system": {
+        "id": "dagobah_system",
+        "name": "Dagobah System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 62,
+          "y": 30
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 6,
+        "terrain": null,
+        "description": "Dagobah is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "dagobah_moon",
+      "name": "Dagobah Moon",
+      "system": {
+        "id": "dagobah_system",
+        "name": "Dagobah System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 62,
+          "y": 30
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 0.95,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 7,
+        "terrain": null,
+        "description": "Dagobah Moon is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "dantooine",
+      "name": "Dantooine",
+      "system": {
+        "id": "dantooine_system",
+        "name": "Dantooine System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 35,
+          "y": -25
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 10000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Dantooine is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Khoonda"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Khoonda"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "dathomir",
+      "name": "Dathomir",
+      "system": {
+        "id": "dathomir_system",
+        "name": "Dathomir System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 70,
+          "y": -40
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "variable",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 8,
+        "terrain": null,
+        "description": "Dathomir is a terrestrial planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "endor",
+      "name": "Endor",
+      "system": {
+        "id": "endor_system",
+        "name": "Endor System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 40,
+          "y": 25
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 30000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Endor is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "endor_moon",
+      "name": "Endor Moon",
+      "system": {
+        "id": "endor_system",
+        "name": "Endor System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 40,
+          "y": 25
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.8,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Endor Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "eriadu",
+      "name": "Eriadu",
+      "system": {
+        "id": "eriadu_system",
+        "name": "Eriadu System",
+        "region": "Colonies",
+        "coordinates": {
+          "x": 8,
+          "y": -8
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 22000000000,
+        "factionControl": "imperial_remnant",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Eriadu is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Eriadu City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Eriadu City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "exegol",
+      "name": "Exegol",
+      "system": {
+        "id": "exegol_system",
+        "name": "Exegol System",
+        "region": "Wild Space",
+        "coordinates": {
+          "x": 90,
+          "y": 10
+        }
+      },
+      "traits": {
+        "planetType": "barren",
+        "climate": "variable",
+        "atmosphere": "toxic",
+        "gravity": 1.1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": "imperial_remnant",
+        "dangerLevel": 10,
+        "terrain": null,
+        "description": "Exegol is a barren planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "felucia",
+      "name": "Felucia",
+      "system": {
+        "id": "felucia_system",
+        "name": "Felucia System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 32,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 0.75,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": "independent",
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Felucia is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "felucia_moon",
+      "name": "Felucia Moon",
+      "system": {
+        "id": "felucia_system",
+        "name": "Felucia System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 32,
+          "y": -5
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 0.7,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 6,
+        "terrain": null,
+        "description": "Felucia Moon is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "fondor",
+      "name": "Fondor",
+      "system": {
+        "id": "fondor_system",
+        "name": "Fondor System",
+        "region": "Colonies",
+        "coordinates": {
+          "x": -15,
+          "y": 2
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 5000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Fondor is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Fondor City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Fondor City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [
+        {
+          "id": "fondor_fondor_city_1_city",
+          "name": "Fondor City 1 City",
+          "type": "city",
+          "template": "medium",
+          "parentLocationId": "Fondor City 1",
+          "parentLocationType": "city",
+          "metadata": {
+            "lore": "A city location on Fondor",
+            "faction": "new_republic",
+            "dangerLevel": 2,
+            "description": "city sub-map for Fondor City 1 on Fondor",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "fondor_fondor_city_2_city",
+          "name": "Fondor City 2 City",
+          "type": "city",
+          "template": "medium",
+          "parentLocationId": "Fondor City 2",
+          "parentLocationType": "city",
+          "metadata": {
+            "lore": "A city location on Fondor",
+            "faction": "new_republic",
+            "dangerLevel": 2,
+            "description": "city sub-map for Fondor City 2 on Fondor",
+            "restrictions": {}
+          }
+        },
+        {
+          "id": "fondor_fondor_city_5_city",
+          "name": "Fondor City 5 City",
+          "type": "city",
+          "template": "medium",
+          "parentLocationId": "Fondor City 5",
+          "parentLocationType": "city",
+          "metadata": {
+            "lore": "A city location on Fondor",
+            "faction": "new_republic",
+            "dangerLevel": 2,
+            "description": "city sub-map for Fondor City 5 on Fondor",
+            "restrictions": {}
+          }
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "geonosis_outer",
+      "name": "Geonosis Outer",
+      "system": {
+        "id": "geonosis_outer_system",
+        "name": "Geonosis Outer System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 52,
+          "y": -25
+        }
+      },
+      "traits": {
+        "planetType": "desert",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 50000,
+        "factionControl": "independent",
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Geonosis Outer is a desert planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Outer Hive"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Outer Hive"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "geonosis",
+      "name": "Geonosis",
+      "system": {
+        "id": "geonosis_system",
+        "name": "Geonosis System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 35,
+          "y": -10
+        }
+      },
+      "traits": {
+        "planetType": "desert",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 100000000,
+        "factionControl": "independent",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Geonosis is a desert planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Stalgasin Hive"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Stalgasin Hive"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "geonosis_moon",
+      "name": "Geonosis Moon",
+      "system": {
+        "id": "geonosis_system",
+        "name": "Geonosis System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 35,
+          "y": -10
+        }
+      },
+      "traits": {
+        "planetType": "desert",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Geonosis Moon is a desert planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "hoth",
+      "name": "Hoth",
+      "system": {
+        "id": "hoth_system",
+        "name": "Hoth System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 60,
+          "y": 20
+        }
+      },
+      "traits": {
+        "planetType": "ice",
+        "climate": "frozen",
+        "atmosphere": "breathable",
+        "gravity": 1.1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 6,
+        "terrain": null,
+        "description": "Hoth is a ice planet with a frozen climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "hoth_moon",
+      "name": "Hoth Moon",
+      "system": {
+        "id": "hoth_system",
+        "name": "Hoth System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 60,
+          "y": 20
+        }
+      },
+      "traits": {
+        "planetType": "ice",
+        "climate": "frozen",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 7,
+        "terrain": null,
+        "description": "Hoth Moon is a ice planet with a frozen climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ilum",
+      "name": "Ilum",
+      "system": {
+        "id": "ilum_system",
+        "name": "Ilum System",
+        "region": "Wild Space",
+        "coordinates": {
+          "x": 88,
+          "y": -15
+        }
+      },
+      "traits": {
+        "planetType": "ice",
+        "climate": "frozen",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Ilum is a ice planet with a frozen climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ilum_moon",
+      "name": "Ilum Moon",
+      "system": {
+        "id": "ilum_system",
+        "name": "Ilum System",
+        "region": "Wild Space",
+        "coordinates": {
+          "x": 88,
+          "y": -15
+        }
+      },
+      "traits": {
+        "planetType": "ice",
+        "climate": "frozen",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 6,
+        "terrain": null,
+        "description": "Ilum Moon is a ice planet with a frozen climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ithor",
+      "name": "Ithor",
+      "system": {
+        "id": "ithor_system",
+        "name": "Ithor System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 22,
+          "y": 5
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Ithor is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "jakku",
+      "name": "Jakku",
+      "system": {
+        "id": "jakku_system",
+        "name": "Jakku System",
+        "region": "Unknown Regions",
+        "coordinates": {
+          "x": 80,
+          "y": -50
+        }
+      },
+      "traits": {
+        "planetType": "desert",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 5000,
+        "factionControl": null,
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Jakku is a desert planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Niima Outpost"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Niima Outpost"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "kamino",
+      "name": "Kamino",
+      "system": {
+        "id": "kamino_system",
+        "name": "Kamino System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 75,
+          "y": 5
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1000000000,
+        "factionControl": null,
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Kamino is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Tipoca City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Tipoca City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "kamino_moon",
+      "name": "Kamino Moon",
+      "system": {
+        "id": "kamino_system",
+        "name": "Kamino System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 75,
+          "y": 5
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Kamino Moon is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "kashyyyk",
+      "name": "Kashyyyk",
+      "system": {
+        "id": "kashyyyk_system",
+        "name": "Kashyyyk System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 25,
+          "y": 15
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 45000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Kashyyyk is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Kachirho",
+          "Rwookrrorro"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Kachirho"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "kuat",
+      "name": "Kuat",
+      "system": {
+        "id": "kuat_system",
+        "name": "Kuat System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -8,
+          "y": -3
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 8000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Kuat is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Kuat City",
+          "Kuat Drive Yards"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Kuat City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "kuat_2",
+      "name": "Kuat II",
+      "system": {
+        "id": "kuat_system",
+        "name": "Kuat System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -8,
+          "y": -3
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.95,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 2000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Kuat II is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Kuat II City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Kuat II City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "kuat_moon",
+      "name": "Kuat Moon",
+      "system": {
+        "id": "kuat_system",
+        "name": "Kuat System",
+        "region": "Core Worlds",
+        "coordinates": {
+          "x": -8,
+          "y": -3
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 50000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Kuat Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Base"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Base"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "malastare",
+      "name": "Malastare",
+      "system": {
+        "id": "malastare_system",
+        "name": "Malastare System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 22,
+          "y": -12
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 4000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Malastare is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Malastare City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Malastare City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "malastare_moon",
+      "name": "Malastare Moon",
+      "system": {
+        "id": "malastare_system",
+        "name": "Malastare System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 22,
+          "y": -12
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Malastare Moon is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Outpost"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Outpost"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "concord_dawn",
+      "name": "Concord Dawn",
+      "system": {
+        "id": "mandalore_system",
+        "name": "Mandalore System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 55,
+          "y": 10
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 500000,
+        "factionControl": "mandalorian",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Concord Dawn is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Concord Dawn City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Concord Dawn City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "mandalore",
+      "name": "Mandalore",
+      "system": {
+        "id": "mandalore_system",
+        "name": "Mandalore System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 55,
+          "y": 10
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 4000000,
+        "factionControl": "mandalorian",
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Mandalore is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Keldabe",
+          "Sundari"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Keldabe"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "mon_cala",
+      "name": "Mon Cala",
+      "system": {
+        "id": "mon_cala_system",
+        "name": "Mon Cala System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 15,
+          "y": -12
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 27000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Mon Cala is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Coral City",
+          "Heurkea"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Coral City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "mon_cala_moon",
+      "name": "Mon Cala Moon",
+      "system": {
+        "id": "mon_cala_system",
+        "name": "Mon Cala System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 15,
+          "y": -12
+        }
+      },
+      "traits": {
+        "planetType": "ocean",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 50000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Mon Cala Moon is a ocean planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Station"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Station"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "mustafar",
+      "name": "Mustafar",
+      "system": {
+        "id": "mustafar_system",
+        "name": "Mustafar System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 65,
+          "y": -15
+        }
+      },
+      "traits": {
+        "planetType": "volcanic",
+        "climate": "variable",
+        "atmosphere": "toxic",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 20000,
+        "factionControl": "imperial_remnant",
+        "dangerLevel": 9,
+        "terrain": null,
+        "description": "Mustafar is a volcanic planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Fust",
+          "Mining Facility"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Fust"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "mygeeto",
+      "name": "Mygeeto",
+      "system": {
+        "id": "mygeeto_system",
+        "name": "Mygeeto System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 38,
+          "y": 12
+        }
+      },
+      "traits": {
+        "planetType": "ice",
+        "climate": "frozen",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 19000000,
+        "factionControl": "imperial_remnant",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Mygeeto is a ice planet with a frozen climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Mygeeto City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Mygeeto City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "mygeeto_moon",
+      "name": "Mygeeto Moon",
+      "system": {
+        "id": "mygeeto_system",
+        "name": "Mygeeto System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 38,
+          "y": 12
+        }
+      },
+      "traits": {
+        "planetType": "ice",
+        "climate": "frozen",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Mygeeto Moon is a ice planet with a frozen climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "naboo",
+      "name": "Naboo",
+      "system": {
+        "id": "naboo_system",
+        "name": "Naboo System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 20,
+          "y": -15
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 4500000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 1,
+        "terrain": null,
+        "description": "Naboo is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Theed",
+          "Otoh Gunga"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Theed"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "naboo_moon",
+      "name": "Naboo Moon",
+      "system": {
+        "id": "naboo_system",
+        "name": "Naboo System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 20,
+          "y": -15
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.8,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Naboo Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "nar_shaddaa",
+      "name": "Nar Shaddaa",
+      "system": {
+        "id": "nar_shaddaa_system",
+        "name": "Nar Shaddaa System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 68,
+          "y": -20
+        }
+      },
+      "traits": {
+        "planetType": "urban",
+        "climate": "variable",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 85000000000,
+        "factionControl": "hutt_cartel",
+        "dangerLevel": 6,
+        "terrain": null,
+        "description": "Nar Shaddaa is a urban planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Nar Shaddaa City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Nar Shaddaa City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "nar_shaddaa_moon",
+      "name": "Nar Shaddaa Moon",
+      "system": {
+        "id": "nar_shaddaa_system",
+        "name": "Nar Shaddaa System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 68,
+          "y": -20
+        }
+      },
+      "traits": {
+        "planetType": "urban",
+        "climate": "variable",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 50000000,
+        "factionControl": "hutt_cartel",
+        "dangerLevel": 6,
+        "terrain": null,
+        "description": "Nar Shaddaa Moon is a urban planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "dxun",
+      "name": "Dxun",
+      "system": {
+        "id": "onderon_system",
+        "name": "Onderon System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 40,
+          "y": -8
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 1.1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Dxun is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "onderon",
+      "name": "Onderon",
+      "system": {
+        "id": "onderon_system",
+        "name": "Onderon System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 40,
+          "y": -8
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 5000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Onderon is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Iziz"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Iziz"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ord_mantell",
+      "name": "Ord Mantell",
+      "system": {
+        "id": "ord_mantell_system",
+        "name": "Ord Mantell System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 48,
+          "y": 18
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 5000000,
+        "factionControl": "independent",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Ord Mantell is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Worlport"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Worlport"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ord_mantell_moon",
+      "name": "Ord Mantell Moon",
+      "system": {
+        "id": "ord_mantell_system",
+        "name": "Ord Mantell System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 48,
+          "y": 18
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 500000,
+        "factionControl": "independent",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Ord Mantell Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Port"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Port"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "rendili",
+      "name": "Rendili",
+      "system": {
+        "id": "rendili_system",
+        "name": "Rendili System",
+        "region": "Colonies",
+        "coordinates": {
+          "x": 12,
+          "y": 3
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1800000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Rendili is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Rendili City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Rendili City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "rodia",
+      "name": "Rodia",
+      "system": {
+        "id": "rodia_system",
+        "name": "Rodia System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 18,
+          "y": -8
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1300000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Rodia is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Equator City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Equator City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "rodia_moon",
+      "name": "Rodia Moon",
+      "system": {
+        "id": "rodia_system",
+        "name": "Rodia System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 18,
+          "y": -8
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Rodia Moon is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ryloth_deep",
+      "name": "Ryloth Deep",
+      "system": {
+        "id": "ryloth_deep_system",
+        "name": "Ryloth Deep System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 72,
+          "y": -28
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 100000,
+        "factionControl": "new_republic",
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Ryloth Deep is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Deep Settlement"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Deep Settlement"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ryloth_expansion",
+      "name": "Ryloth Expansion",
+      "system": {
+        "id": "ryloth_expansion_system",
+        "name": "Ryloth Expansion System",
+        "region": "Expansion Region",
+        "coordinates": {
+          "x": 45,
+          "y": -22
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 500000,
+        "factionControl": "new_republic",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Ryloth Expansion is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Outpost Alpha"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Outpost Alpha"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ryloth_outer",
+      "name": "Ryloth Outer",
+      "system": {
+        "id": "ryloth_outer_system",
+        "name": "Ryloth Outer System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 58,
+          "y": -35
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 200000,
+        "factionControl": "new_republic",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Ryloth Outer is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Outer Settlement"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Outer Settlement"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ryloth",
+      "name": "Ryloth",
+      "system": {
+        "id": "ryloth_system",
+        "name": "Ryloth System",
+        "region": "Expansion Region",
+        "coordinates": {
+          "x": 30,
+          "y": -20
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1500000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Ryloth is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lessu",
+          "Kala'uun"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lessu"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ryloth_unknown",
+      "name": "Ryloth Unknown",
+      "system": {
+        "id": "ryloth_unknown_system",
+        "name": "Ryloth Unknown System",
+        "region": "Unknown Regions",
+        "coordinates": {
+          "x": 100,
+          "y": -25
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 6,
+        "terrain": null,
+        "description": "Ryloth Unknown is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "ryloth_wild",
+      "name": "Ryloth Wild",
+      "system": {
+        "id": "ryloth_wild_system",
+        "name": "Ryloth Wild System",
+        "region": "Wild Space",
+        "coordinates": {
+          "x": 85,
+          "y": -35
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 7,
+        "terrain": null,
+        "description": "Ryloth Wild is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "saleucami",
+      "name": "Saleucami",
+      "system": {
+        "id": "saleucami_system",
+        "name": "Saleucami System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 26,
+          "y": -18
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 3000000,
+        "factionControl": "independent",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Saleucami is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Saleucami City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Saleucami City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "saleucami_moon",
+      "name": "Saleucami Moon",
+      "system": {
+        "id": "saleucami_system",
+        "name": "Saleucami System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 26,
+          "y": -18
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.95,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Saleucami Moon is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "scarif",
+      "name": "Scarif",
+      "system": {
+        "id": "scarif_system",
+        "name": "Scarif System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 45,
+          "y": -45
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": "imperial_remnant",
+        "dangerLevel": 7,
+        "terrain": null,
+        "description": "Scarif is a terrestrial planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "sullust",
+      "name": "Sullust",
+      "system": {
+        "id": "sullust_system",
+        "name": "Sullust System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 10,
+          "y": -15
+        }
+      },
+      "traits": {
+        "planetType": "volcanic",
+        "climate": "variable",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 10000000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Sullust is a volcanic planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Plesstila",
+          "Sullust City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Plesstila"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "sullust_moon",
+      "name": "Sullust Moon",
+      "system": {
+        "id": "sullust_system",
+        "name": "Sullust System",
+        "region": "Inner Rim",
+        "coordinates": {
+          "x": 10,
+          "y": -15
+        }
+      },
+      "traits": {
+        "planetType": "volcanic",
+        "climate": "variable",
+        "atmosphere": "breathable",
+        "gravity": 0.8,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Sullust Moon is a volcanic planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Lunar Base"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Lunar Base"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "taris",
+      "name": "Taris",
+      "system": {
+        "id": "taris_system",
+        "name": "Taris System",
+        "region": "Expansion Region",
+        "coordinates": {
+          "x": 42,
+          "y": 15
+        }
+      },
+      "traits": {
+        "planetType": "urban",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 6000000000,
+        "factionControl": "independent",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Taris is a urban planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Upper City",
+          "Lower City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Upper City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "tatooine",
+      "name": "Tatooine",
+      "system": {
+        "id": "tatooine_system",
+        "name": "Tatooine System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 50,
+          "y": -30
+        }
+      },
+      "traits": {
+        "planetType": "desert",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 200000,
+        "factionControl": "hutt_cartel",
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Tatooine is a desert planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Mos Eisley",
+          "Mos Espa",
+          "Anchorhead"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Mos Eisley"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "tatooine_moon",
+      "name": "Tatooine Moon",
+      "system": {
+        "id": "tatooine_system",
+        "name": "Tatooine System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 50,
+          "y": -30
+        }
+      },
+      "traits": {
+        "planetType": "desert",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 5,
+        "terrain": null,
+        "description": "Tatooine Moon is a desert planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "telos",
+      "name": "Telos",
+      "system": {
+        "id": "telos_system",
+        "name": "Telos System",
+        "region": "Expansion Region",
+        "coordinates": {
+          "x": 48,
+          "y": -18
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 1,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 1000000,
+        "factionControl": "new_republic",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Telos is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Telos City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Telos City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "utapau",
+      "name": "Utapau",
+      "system": {
+        "id": "utapau_system",
+        "name": "Utapau System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 28,
+          "y": 8
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 95000000,
+        "factionControl": "independent",
+        "dangerLevel": 2,
+        "terrain": null,
+        "description": "Utapau is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [
+          "Pau City"
+        ],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Pau City"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "utapau_moon",
+      "name": "Utapau Moon",
+      "system": {
+        "id": "utapau_system",
+        "name": "Utapau System",
+        "region": "Mid Rim",
+        "coordinates": {
+          "x": 28,
+          "y": 8
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "arid",
+        "atmosphere": "breathable",
+        "gravity": 0.85,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Utapau Moon is a terrestrial planet with a arid climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "yavin_4",
+      "name": "Yavin 4",
+      "system": {
+        "id": "yavin_system",
+        "name": "Yavin System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 55,
+          "y": -40
+        }
+      },
+      "traits": {
+        "planetType": "jungle",
+        "climate": "tropical",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": "new_republic",
+        "dangerLevel": 3,
+        "terrain": null,
+        "description": "Yavin 4 is a jungle planet with a tropical climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "yavin_8",
+      "name": "Yavin 8",
+      "system": {
+        "id": "yavin_system",
+        "name": "Yavin System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 55,
+          "y": -40
+        }
+      },
+      "traits": {
+        "planetType": "terrestrial",
+        "climate": "temperate",
+        "atmosphere": "breathable",
+        "gravity": 0.9,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 4,
+        "terrain": null,
+        "description": "Yavin 8 is a terrestrial planet with a temperate climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    },
+    {
+      "id": "yavin_prime",
+      "name": "Yavin Prime",
+      "system": {
+        "id": "yavin_system",
+        "name": "Yavin System",
+        "region": "Outer Rim",
+        "coordinates": {
+          "x": 55,
+          "y": -40
+        }
+      },
+      "traits": {
+        "planetType": "gas_giant",
+        "climate": "variable",
+        "atmosphere": "toxic",
+        "gravity": 2.5,
+        "dayLength": null,
+        "yearLength": null,
+        "population": 0,
+        "factionControl": null,
+        "dangerLevel": 8,
+        "terrain": null,
+        "description": "Yavin Prime is a gas_giant planet with a variable climate.",
+        "lore": null
+      },
+      "locations": {
+        "majorCities": [],
+        "pointsOfInterest": [],
+        "landingZones": [
+          {
+            "x": 0,
+            "y": 0,
+            "id": "main",
+            "area": "landing_zone",
+            "name": "Landing Zone"
+          }
+        ],
+        "resources": []
+      },
+      "submaps": [],
+      "metadata": {}
+    }
+  ]
+}

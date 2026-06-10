@@ -1,0 +1,410 @@
+.stats-bar {
+  position: fixed;
+  top: 60px; /* Account for Navigation bar */
+  left: 1rem; /* Add left margin to prevent overflow */
+  right: 80px; /* Account for HUD menu button */
+  height: 65px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.25rem;
+  z-index: 1002; /* Above HUD container (1001) */
+}
+
+.stats-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  min-width: 0; /* Allow shrinking */
+}
+
+.stat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0; /* Allow shrinking */
+  flex-shrink: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  min-width: 60px;
+}
+
+.stat-bar-container {
+  position: relative;
+  width: 160px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.health-fill {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  transition: width 0.5s ease-out;
+}
+
+.health-fill.healing {
+  animation: health-healing 1.5s ease-out;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.8), 0 0 24px rgba(34, 197, 94, 0.6);
+}
+
+@keyframes health-healing {
+  0% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 1), 0 0 30px rgba(34, 197, 94, 0.8);
+    filter: brightness(1.3);
+  }
+  100% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    filter: brightness(1);
+  }
+}
+
+.regen-indicator {
+  font-size: 0.75em;
+  color: var(--success-color, #4caf50);
+  margin-left: 0.5em;
+  opacity: 0.8;
+  font-weight: normal;
+}
+
+.regen-indicator::before {
+  content: "↻ ";
+  display: inline-block;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.stamina-fill {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+.stamina-fill.stamina-normal {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+.stamina-fill.stamina-low {
+  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.stamina-fill.stamina-warning {
+  background: linear-gradient(90deg, #f97316 0%, #fb923c 100%);
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+  animation: pulse-warning 1.5s ease-in-out infinite;
+}
+
+.stamina-fill.stamina-critical {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+  animation: pulse-critical 1s ease-in-out infinite;
+}
+
+.stamina-fill.regenerating {
+  animation: pulse-regenerating 2s ease-in-out infinite;
+}
+
+.stamina-fill.restoring {
+  animation: stamina-restoring 1.5s ease-out;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.8), 0 0 24px rgba(59, 130, 246, 0.6);
+}
+
+@keyframes stamina-restoring {
+  0% {
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 1), 0 0 30px rgba(59, 130, 246, 0.8);
+    filter: brightness(1.3);
+  }
+  100% {
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    filter: brightness(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes pulse-warning {
+  0%, 100% { 
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+  }
+  50% { 
+    opacity: 0.8;
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.9);
+  }
+}
+
+@keyframes pulse-critical {
+  0%, 100% { 
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+  }
+  50% { 
+    opacity: 0.7;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 1);
+  }
+}
+
+@keyframes pulse-regenerating {
+  0%, 100% { 
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+  }
+  50% { 
+    opacity: 0.8;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.9);
+  }
+}
+
+.status-effect-badge {
+  font-size: 0.75em;
+  margin-left: 0.5em;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  font-weight: 600;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.stamina-warning {
+  font-size: 0.75em;
+  color: #f87171;
+  margin-top: 0.25em;
+  font-weight: 600;
+  animation: pulse-warning-text 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-warning-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.stamina-percent {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  margin-left: 0.25em;
+}
+
+.stamina.stamina-critical .stat-label {
+  color: #f87171;
+}
+
+.stamina.stamina-warning .stat-label {
+  color: #fb923c;
+}
+
+.stamina.stamina-low .stat-label {
+  color: #fbbf24;
+}
+
+.regen-timer {
+  font-size: 0.75em;
+  color: var(--text-secondary, #999);
+  margin-top: 0.25em;
+  font-style: italic;
+}
+
+.stamina-fill {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+.stat-bar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+.healing-effect {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+  animation: healing-float 1.5s ease-out forwards;
+}
+
+.healing-effect.stamina-healing {
+  top: -25px;
+}
+
+.healing-text {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #22c55e;
+  text-shadow: 
+    0 0 8px rgba(34, 197, 94, 0.8),
+    0 0 16px rgba(34, 197, 94, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.8);
+  background: rgba(34, 197, 94, 0.2);
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+@keyframes healing-float {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+.stats-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.stat-item.credits,
+.stat-item.level,
+.stat-item.xp {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: rgba(74, 158, 255, 0.2);
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+  font-size: 0.9rem;
+}
+
+.stat-item.credits.clickable,
+.stat-item.level.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.stat-item.credits.clickable:hover,
+.stat-item.level.clickable:hover {
+  background-color: rgba(74, 158, 255, 0.3);
+  border-color: #60a5fa;
+  box-shadow: 0 0 12px rgba(74, 158, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.stat-item.credits.clickable:active,
+.stat-item.level.clickable:active {
+  transform: translateY(0);
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+}
+
+.stat-icon {
+  font-size: 1.2rem;
+}
+
+.stat-value {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .stats-bar {
+    right: 320px; /* Slightly less margin on smaller screens */
+  }
+}
+
+@media (max-width: 1200px) {
+  .stats-bar {
+    right: 300px;
+    left: 0.5rem;
+  }
+  
+  .stat-bar-container {
+    width: 140px;
+  }
+  
+  .stat-item {
+    min-width: 0;
+  }
+}
+
+/* Context-aware positioning */
+.hud-gameworld .stats-bar {
+  right: 360px; /* Account for character panel (340px) + HUD menu (80px) */
+}
+
+.hud-submap .stats-bar {
+  top: 90px; /* Account for submap header (80px) + small spacing */
+  right: 80px; /* Account for HUD menu button */
+  left: 1rem; /* Ensure left margin */
+}
+
+.hud-other .stats-bar {
+  right: 80px; /* Account for HUD menu button */
+}
+
+.hud-gameworld .minimap,
+.hud-gameworld .minimap-toggle {
+  right: 340px; /* Account for character panel */
+}
+
+.hud-other .minimap,
+.hud-other .minimap-toggle {
+  right: 20px; /* Normal position on other pages */
+}
+

@@ -1,0 +1,55 @@
+{
+  "id": "npc_imperial_agent_coruscant",
+  "name": "Agent Karr",
+  "species": "human",
+  "occupation": "Imperial Remnant Agent",
+  "factionId": "imperial_remnant",
+  "location": {
+    "planet": "coruscant",
+    "area": "underworld",
+    "x": 310,
+    "y": 810
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "I have a proposition for you. One that could be very profitable.",
+      "acquaintance": "You've proven useful. I have another job for you.",
+      "friend": "My friend, you understand the value of order. I appreciate that.",
+      "confidant": "You've become one of my most trusted operatives. This mission is critical."
+    },
+    "questRelated": {
+      "js_coruscant_01_ruined_temple": "The Jedi Temple... it holds artifacts that belong to the Empire. The New Republic thinks they can just claim everything, but they're wrong. There's something in the Temple—something powerful. I need someone to retrieve it. You'll be well paid, and you'll be serving a greater cause. The Empire will rise again, and those who help us now will be rewarded. Are you interested?"
+    },
+    "general": [
+      "The New Republic is weak. The Empire was strong. We will be strong again.",
+      "Order. Stability. That's what the galaxy needs. That's what the Empire provides.",
+      "The Jedi were enemies of the Empire. Their artifacts belong to us.",
+      "We operate in the shadows now. But our time will come again.",
+      "Loyalty to the Empire is rewarded. Betrayal is punished."
+    ]
+  },
+  "quests": ["js_coruscant_01_ruined_temple"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "mid 30s",
+    "build": "athletic, military",
+    "hair": "black, short",
+    "eyes": "cold blue",
+    "distinguishingFeatures": "Underworld clothing (disguise), military bearing, hidden Imperial insignia, observant eyes"
+  },
+  "biography": "Agent Karr is an Imperial Remnant operative working undercover on Coruscant. He's part of a covert cell trying to recover Imperial assets and undermine the New Republic. He's intelligent, dedicated, and believes the Empire was right. He's not a fanatic—he's pragmatic and knows the Empire needs to adapt—but he's committed to the cause. He represents the ongoing threat of the Imperial Remnant and offers an alternative path for players who might sympathize with Imperial ideals.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 25,
+    "formality": 70,
+    "humor": 10,
+    "trust": 30
+  }
+}
+
+
+

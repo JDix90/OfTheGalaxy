@@ -1,0 +1,83 @@
+{
+  "id": "iia_ryloth_04_syndicate_exposure",
+  "factionId": "independent_investigators",
+  "questType": "main",
+  "title": "Exposing the Syndicate",
+  "description": "With the refugees safe and evidence in hand, it's time to expose the syndicate's connection to Compound 7-Alpha. Vorak Kresh, the syndicate leader, must be confronted. This will be dangerous—the syndicate has power and connections throughout the Outer Rim. But the truth must come out, and those responsible for the compound must face justice.",
+  "shortDescription": "Confront and expose the syndicate leader",
+  "prerequisites": {
+    "level": 6,
+    "reputation": {
+      "independent_investigators": 145
+    },
+    "completedQuests": ["iia_ryloth_03_refugee_liberation"],
+    "items": ["mine_foreman_datapad", "refugee_gratitude"]
+  },
+  "objectives": [
+    {
+      "id": "gather_evidence",
+      "type": "collect",
+      "description": "Gather all evidence against the syndicate",
+      "target": "syndicate_evidence",
+      "count": 3
+    },
+    {
+      "id": "confront_syndicate_leader",
+      "type": "interact",
+      "description": "Confront Syndicate Leader Vorak Kresh",
+      "target": "npc_syndicate_leader"
+    },
+    {
+      "id": "defeat_syndicate_leader",
+      "type": "defeat",
+      "description": "Defeat Vorak Kresh and his guards",
+      "target": "npc_syndicate_leader",
+      "count": 1
+    },
+    {
+      "id": "recover_syndicate_records",
+      "type": "collect",
+      "description": "Recover syndicate records proving the connection to Compound 7-Alpha",
+      "target": "syndicate_records",
+      "count": 1
+    },
+    {
+      "id": "expose_syndicate",
+      "type": "custom",
+      "description": "Expose the syndicate's connection to Compound 7-Alpha (deliver evidence to New Republic or IIA)",
+      "target": "syndicate_exposure"
+    }
+  ],
+  "rewards": {
+    "xp": 2000,
+    "credits": 2000,
+    "reputation": {
+      "independent_investigators": 75,
+      "new_republic": 30
+    },
+    "items": [
+      {
+        "itemId": "syndicate_bounty",
+        "quantity": 1
+      },
+      {
+        "itemId": "corporate_intel",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["iia_main_03_compound_revelation"]
+  },
+  "questGiverId": "npc_refugee_leader",
+  "startLocation": {
+    "planet": "ryloth",
+    "area": "lessu"
+  },
+  "estimatedTime": 120,
+  "difficulty": "very_hard",
+  "isActive": true,
+  "chainId": "iia_main_chain",
+  "chainOrder": 5
+}
+
+
+

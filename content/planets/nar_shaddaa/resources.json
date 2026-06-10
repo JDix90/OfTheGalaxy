@@ -1,0 +1,54 @@
+{
+  "planetId": "nar_shaddaa",
+  "resources": [
+    {
+      "id": "resource_scrap_metal",
+      "name": "Scrap Metal",
+      "type": "industrial",
+      "rarity": "common",
+      "description": "Salvaged metal from the constant construction and destruction on Nar Shaddaa. Valuable for crafting and repairs.",
+      "spawnRate": 0.4
+    },
+    {
+      "id": "resource_electronics",
+      "name": "Electronics Components",
+      "type": "technology",
+      "rarity": "uncommon",
+      "description": "Salvaged electronics and circuit boards from the moon's extensive technology infrastructure.",
+      "spawnRate": 0.25
+    },
+    {
+      "id": "resource_credits_cache",
+      "name": "Hidden Credits",
+      "type": "valuable",
+      "rarity": "rare",
+      "description": "Stashes of credits hidden by smugglers, criminals, or those who met untimely ends. Finding one is like winning the lottery.",
+      "spawnRate": 0.05
+    },
+    {
+      "id": "resource_spice_sample",
+      "name": "Spice Sample",
+      "type": "contraband",
+      "rarity": "uncommon",
+      "description": "Small amounts of spice left behind in the lower levels. Illegal to possess, but valuable on the black market.",
+      "spawnRate": 0.15
+    },
+    {
+      "id": "resource_weapon_parts",
+      "name": "Weapon Components",
+      "type": "military",
+      "rarity": "uncommon",
+      "description": "Parts and components from weapons that have seen use in the moon's constant conflicts.",
+      "spawnRate": 0.2
+    },
+    {
+      "id": "resource_data_chip",
+      "name": "Data Chips",
+      "type": "technology",
+      "rarity": "common",
+      "description": "Information storage devices containing everything from trade routes to blackmail material. Information is power on Nar Shaddaa.",
+      "spawnRate": 0.3
+    }
+  ]
+}
+

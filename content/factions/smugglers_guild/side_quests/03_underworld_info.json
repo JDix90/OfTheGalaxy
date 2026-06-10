@@ -1,0 +1,55 @@
+{
+  "id": "coruscant_side_01_underworld_info",
+  "factionId": "smugglers_guild",
+  "questType": "side",
+  "title": "Underworld Information",
+  "description": "Silas Karr, the information broker in Coruscant's underworld, has various pieces of valuable information for sale. Some might be useful for your current investigations, others might be valuable for future quests. Information is currency in the underworld, and Karr has plenty of it.",
+  "shortDescription": "Purchase valuable information from the underworld broker",
+  "prerequisites": {
+    "level": 4,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_broker",
+      "type": "interact",
+      "description": "Meet with information broker Silas Karr",
+      "target": "npc_info_broker"
+    },
+    {
+      "id": "purchase_info",
+      "type": "custom",
+      "description": "Purchase valuable information (requires credits)",
+      "target": "info_purchase"
+    }
+  ],
+  "rewards": {
+    "xp": 500,
+    "credits": 0,
+    "reputation": {
+      "smugglers_guild": 20
+    },
+    "items": [
+      {
+        "itemId": "valuable_info",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_info_broker",
+  "startLocation": {
+    "planet": "coruscant",
+    "area": "underworld"
+  },
+  "estimatedTime": 30,
+  "difficulty": "easy",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+
+

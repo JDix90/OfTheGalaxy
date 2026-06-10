@@ -1,0 +1,32 @@
+{
+  "planetId": "dantooine",
+  "resources": [
+    {
+      "id": "resource_dantari_crystals",
+      "name": "Dantari Crystals",
+      "type": "resource",
+      "rarity": "rare",
+      "description": "Force-sensitive crystals found in the Kinrath Cave. Possess unique properties and are highly sought after by Jedi Seekers.",
+      "baseValue": 800,
+      "weight": 0.3,
+      "stackSize": 5,
+      "uses": ["crafting", "force_enhancement", "lightsaber_construction", "quest_item"],
+      "locations": ["The Kinrath Cave"]
+    },
+    {
+      "id": "resource_kinrath_eggs",
+      "name": "Kinrath Eggs",
+      "type": "resource",
+      "rarity": "uncommon",
+      "description": "Eggs from kinrath creatures. Used in alchemy and crafting, though dangerous to obtain.",
+      "baseValue": 200,
+      "weight": 0.5,
+      "stackSize": 10,
+      "uses": ["crafting", "alchemy", "trade"],
+      "locations": ["The Kinrath Cave", "Kinrath nests"]
+    }
+  ]
+}
+
+
+

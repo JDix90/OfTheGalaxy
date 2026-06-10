@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NPC Schema",
+  "description": "Schema for NPC data files in Of the Galaxy",
+  "type": "object",
+  "required": ["id", "name", "species", "location"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "description": "Unique NPC identifier (e.g., 'npc_mira_kess')"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "NPC name"
+    },
+    "species": {
+      "type": "string",
+      "description": "Species of the NPC (e.g., 'human', 'twilek', 'wookiee')"
+    },
+    "occupation": {
+      "type": "string",
+      "description": "NPC's occupation or role"
+    },
+    "factionId": {
+      "type": ["string", "null"],
+      "enum": [
+        "independent_investigators",
+        "new_republic",
+        "imperial_remnant",
+        "smugglers_guild",
+        "jedi_seekers",
+        "corporate_sector",
+        "outer_rim_settlers",
+        null
+      ],
+      "description": "Faction the NPC belongs to"
+    },
+    "location": {
+      "type": "object",
+      "required": ["planet"],
+      "properties": {
+        "planet": {
+          "type": "string",
+          "description": "Planet ID where NPC is located"
+        },
+        "area": {
+          "type": "string",
+          "description": "Area or sub-map name"
+        },
+        "x": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "X coordinate on planet map"
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "Y coordinate on planet map"
+        }
+      }
+    },
+    "npcType": {
+      "type": "string",
+      "enum": ["standard", "companion", "vendor", "quest_giver", "enemy"],
+      "description": "Type of NPC",
+      "default": "standard"
+    },
+    "isCompanion": {
+      "type": "boolean",
+      "description": "Whether NPC can be recruited as companion",
+      "default": false
+    },
+    "dialogue": {
+      "type": "object",
+      "description": "NPC dialogue structure",
+      "properties": {
+        "greeting": {
+          "type": "object",
+          "description": "Greeting dialogue based on relationship tier",
+          "properties": {
+            "stranger": { "type": "string" },
+            "acquaintance": { "type": "string" },
+            "friend": { "type": "string" },
+            "confidant": { "type": "string" }
+          }
+        },
+        "questRelated": {
+          "type": "object",
+          "description": "Quest-specific dialogue",
+          "additionalProperties": {
+            "type": "string",
+            "description": "Dialogue for specific quest ID"
+          }
+        },
+        "general": {
+          "type": "array",
+          "description": "General dialogue lines",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "quests": {
+      "type": "array",
+      "description": "Quest IDs associated with this NPC",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "vendorInventory": {
+      "type": ["array", "null"],
+      "description": "Items NPC sells (null if not a vendor)",
+      "items": {
+        "type": "string",
+        "description": "Item ID"
+      }
+    },
+    "companionAbilities": {
+      "type": ["object", "null"],
+      "description": "Companion abilities (null if not a companion)",
+      "properties": {
+        "combat": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "utility": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "companionStats": {
+      "type": ["object", "null"],
+      "description": "Companion combat stats",
+      "properties": {
+        "health": { "type": "integer", "minimum": 1 },
+        "damage": { "type": "integer", "minimum": 0 },
+        "defense": { "type": "integer", "minimum": 0 },
+        "specialization": { "type": "string" }
+      }
+    },
+    "appearance": {
+      "type": "object",
+      "description": "Physical appearance description",
+      "properties": {
+        "age": { "type": "string" },
+        "build": { "type": "string" },
+        "hair": { "type": "string" },
+        "eyes": { "type": "string" },
+        "distinguishingFeatures": { "type": "string" }
+      }
+    },
+    "biography": {
+      "type": "string",
+      "description": "NPC's backstory and biography"
+    },
+    "isAvailable": {
+      "type": "boolean",
+      "description": "Whether NPC is currently available",
+      "default": true
+    },
+    "personalityTraits": {
+      "type": "object",
+      "description": "Personality trait values (0-100)",
+      "properties": {
+        "empathy": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "formality": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "humor": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "trust": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    }
+  },
+  "additionalProperties": false
+}
+
+
+

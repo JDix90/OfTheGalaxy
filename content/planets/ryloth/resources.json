@@ -1,0 +1,32 @@
+{
+  "planetId": "ryloth",
+  "resources": [
+    {
+      "id": "resource_ryll_spice",
+      "name": "Ryll Spice",
+      "type": "resource",
+      "rarity": "uncommon",
+      "description": "A valuable spice native to Ryloth, highly sought after in galactic trade. The primary export of the planet.",
+      "baseValue": 150,
+      "weight": 0.5,
+      "stackSize": 100,
+      "uses": ["trade", "crafting", "quest_item"],
+      "locations": ["The Syndicate Mines", "Tann Province"]
+    },
+    {
+      "id": "resource_doonium",
+      "name": "Doonium",
+      "type": "resource",
+      "rarity": "common",
+      "description": "A durable metal ore found in Ryloth's mines. Used in ship construction and industrial applications.",
+      "baseValue": 50,
+      "weight": 2.0,
+      "stackSize": 50,
+      "uses": ["crafting", "trade"],
+      "locations": ["The Syndicate Mines"]
+    }
+  ]
+}
+
+
+

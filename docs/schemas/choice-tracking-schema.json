@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Choice Tracking Schema",
+  "description": "Schema for tracking player choices in quests",
+  "type": "object",
+  "required": ["choiceId", "questId", "choiceText", "selectedOption"],
+  "properties": {
+    "choiceId": {
+      "type": "string",
+      "description": "Unique identifier for this choice instance"
+    },
+    "questId": {
+      "type": "string",
+      "description": "Quest ID where choice was made"
+    },
+    "choiceText": {
+      "type": "string",
+      "description": "The choice prompt shown to the player"
+    },
+    "selectedOption": {
+      "type": "string",
+      "description": "The option the player selected"
+    },
+    "availableOptions": {
+      "type": "array",
+      "description": "All options that were available",
+      "items": {
+        "type": "string"
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the choice was made"
+    },
+    "consequences": {
+      "type": "object",
+      "description": "Consequences of this choice",
+      "properties": {
+        "reputation": {
+          "type": "object",
+          "description": "Reputation changes",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "unlocks": {
+          "type": "array",
+          "description": "Quest IDs or content unlocked",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blocks": {
+          "type": "array",
+          "description": "Quest IDs or content blocked",
+          "items": {
+            "type": "string"
+          }
+        },
+        "flags": {
+          "type": "object",
+          "description": "Story flags set by this choice",
+          "additionalProperties": {
+            "type": ["string", "boolean", "number"]
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
+
+
+
