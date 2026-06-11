@@ -31,7 +31,8 @@ export class ProgressionSystem {
    * Calculate XP for a given level
    */
   static calculateXPForLevel(level) {
-    return Math.floor(100 * Math.pow(level, 1.5));
+    // Mirror of backend PlayerCharacter.getXPForNextLevel (curve exponent 1.25).
+    return Math.floor(100 * Math.pow(level, 1.25));
   }
 
   /**

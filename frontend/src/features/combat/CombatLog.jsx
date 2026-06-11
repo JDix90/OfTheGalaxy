@@ -34,6 +34,9 @@ export default function CombatLog({ encounter, actionHistory = [] }) {
           }
           return `⚔️ ${attackerName} hit ${targetName} for ${action.damage} damage`;
         }
+        if (action.dodged) {
+          return `✨ ${targetName} dodged ${attackerName}'s attack`;
+        }
         return `❌ ${attackerName} missed ${targetName}`;
 
       case 'defend':

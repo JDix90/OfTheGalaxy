@@ -36,6 +36,9 @@ export default function CombatantDisplay({
     >
       <div className="combatant-header">
         <h3 className="combatant-name">{combatant.name}</h3>
+        {combatant.type === 'enemy' && combatant.tier && combatant.tier !== 'normal' && (
+          <span className={`tier-badge tier-${combatant.tier}`}>{combatant.tier}</span>
+        )}
         {isCurrentTurn && <span className="turn-indicator">Current Turn</span>}
       </div>
 

@@ -77,6 +77,9 @@ function calculateDerivedStat(category, statName, context) {
       value = equipment[component.name] || 0;
     } else if (component.source === 'context') {
       value = difficulty;
+    } else if (component.source === 'level') {
+      // Character level, for per-level stat scaling (attack, crit).
+      value = character.level || 1;
     } else if (component.source === 'calculated') {
       // Handle calculated values (baseAttack, baseDefense, etc.)
       // These should be passed in equipment object
@@ -183,9 +186,10 @@ function calculateCombatStats(context) {
   // Add skill crit bonus from passive bonuses (if any from other skills)
   if (skillCritBonus > 0) {
     // Recalculate with skill bonus added to raw value
-    const rawCrit = critChance.breakdown.base.value + 
-                    (critChance.breakdown.perception.value - 10) * 0.01 + 
-                    critChance.breakdown.advWeapons.value * 0.01 + 
+    const rawCrit = critChance.breakdown.base.value +
+                    (critChance.breakdown.perception.value - 10) * 0.01 +
+                    critChance.breakdown.advWeapons.value * 0.01 +
+                    (critChance.breakdown.level?.value || 0) * 0.004 +
                     skillCritBonus;
     const drParams = derivedStatsDefs.combat.critChance.drParams;
     critChance.value = applyDR(rawCrit, drParams.cap, drParams.threshold, drParams.power);

@@ -227,7 +227,9 @@ class CombatService {
     let modifiedDefense = Math.floor(combatStats.defenseRating.value);
     // Apply armor mobility to base speed (positive = faster, negative = slower)
     let modifiedSpeed = baseSpeed + armorMobility;
-    let modifiedAccuracy = finalAccuracy;
+    // Per-level accuracy growth (caps at +8) so leveling improves hit rate, not
+    // just HP. Mirrored in scripts/gameplay-sim.js makePlayer.
+    let modifiedAccuracy = finalAccuracy + Math.min(8, (character.level || 1) * 0.5);
 
     // Apply additional combat bonuses from skills (beyond what's in derived stats)
     // Basic Combat damage bonus is multiplicative on top of derived attack rating
@@ -312,12 +314,13 @@ class CombatService {
     const finalSpeed = statsWithSetBonuses.speed || modifiedSpeed;
     const finalEffectAccuracy = statsWithSetBonuses.accuracy || modifiedAccuracy;
 
-    // Calculate crit chance with DR (including item bonuses from special effects)
-    const { calculateCritChance } = require('../utils/diminishingReturns');
+    // Crit chance: use the value already computed by calculateCombatStats, which
+    // accounts for perception, skills, DR — and (P2 fix) the per-level term. This
+    // previously recomputed crit via calculateCritChance(), discarding the
+    // formula value, so any level scaling never reached combat.
     const perception = stats.perception || 10;
     const skillCritBonus = passiveBonuses.combat.critChance || 0; // Already in percentage
-    // Item crit bonus will be added in calculateDamage if present
-    const finalCritChance = calculateCritChance(perception, skillCritBonus, 0);
+    const finalCritChance = combatStats.critChance.value;
     
     // Store raw values for calculateDamage to add item bonuses
     const critChanceData = {
@@ -395,7 +398,13 @@ class CombatService {
       name: enemyTemplate.name,
       type: 'enemy',
       enemyTemplate: enemyTemplate.name,
-      stats: { ...enemyTemplate.stats },
+      tier: enemyTemplate.tier || 'normal', // threat tier, surfaced in the combat UI
+      level: enemyTemplate.level,
+      stats: {
+        ...enemyTemplate.stats,
+        // Modest evasion from speed (cap 15%) so dodge applies to enemies too.
+        dodgeChance: Math.min(0.15, Math.max(0, ((enemyTemplate.stats.speed || 10) - 10) * 0.01))
+      },
       equipment: { ...enemyTemplate.equipment },
       statusEffects: [],
       position: { x: 0, y: 0 },
@@ -793,6 +802,8 @@ class CombatService {
       } else {
         console.log(`🛡️ ${attacker.name} attacked ${target.name} but all damage was absorbed by shield`);
       }
+    } else if (damageResult.dodged) {
+      console.log(`✨ ${target.name} dodged ${attacker.name}'s attack`);
     } else {
       console.log(`💥 ${attacker.name} missed ${target.name} (health: ${target.stats.health})`);
     }
@@ -838,6 +849,7 @@ class CombatService {
       target: targetId,
       damage: damageResult.damage,
       hit: damageResult.hit,
+      dodged: damageResult.dodged || false,
       critical: damageResult.critical,
       message: damageResult.message,
       staminaCost: staminaCost > 0 ? staminaCost : undefined
@@ -882,6 +894,21 @@ class CombatService {
         hit: false,
         critical: false,
         message: `${attacker.name} missed!`
+      };
+    }
+
+    // Evasion: even on a hit, the defender may dodge. This is the consumer of
+    // stats.dodgeChance (Agility/derived), which was previously computed and
+    // displayed but never rolled in combat.
+    const dodgeChance = defender.stats.dodgeChance || 0;
+    if (dodgeChance > 0 && Math.random() < dodgeChance) {
+      return {
+        damage: 0,
+        shieldDamage: 0,
+        hit: false,
+        dodged: true,
+        critical: false,
+        message: `${defender.name} dodged ${attacker.name}'s attack!`
       };
     }
 
@@ -1724,6 +1751,8 @@ class CombatService {
     const target = enemyCombatants[Math.floor(Math.random() * enemyCombatants.length)];
     
     // Calculate damage
+    // TODO: route companion attacks through calculateDamage() so they share the
+    // accuracy/crit/dodge/defense model instead of this simplified inline calc.
     const baseDamage = companion.stats.attack || 10;
     const defense = target.stats.defense || 0;
     const damage = Math.max(1, baseDamage - Math.floor(defense / 2));
@@ -2015,7 +2044,7 @@ class CombatService {
       const respawnService = require('./respawnService');
       try {
         await respawnService.respawnPlayer(encounter.characterId, {
-          healthRestorePercent: 50, // Restore to 50% health
+          healthRestorePercent: 40, // Restore to 40% health — a slightly bigger setback (light retune)
           chargeFee: true // Charge medical fee
         });
         console.log(`💀 Player defeated, respawned at safe location`);

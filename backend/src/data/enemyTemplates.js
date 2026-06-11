@@ -7,15 +7,16 @@ const enemyTemplates = {
   stormtrooper: {
     name: 'Stormtrooper',
     level: 1,
+    tier: 'normal',
     stats: {
       health: 100,
       maxHealth: 100,
       stamina: 50,
       maxStamina: 50,
-      attack: 15,
+      attack: 22,
       defense: 10,
       speed: 12,
-      accuracy: 60 // Stormtroopers miss a lot!
+      accuracy: 64 // Stormtroopers still miss a fair bit
     },
     equipment: {
       weapon: { itemId: 'blaster_rifle_01', damage: 20 },
@@ -36,6 +37,7 @@ const enemyTemplates = {
   stormtrooper_sergeant: {
     name: 'Stormtrooper Sergeant',
     level: 3,
+    tier: 'veteran',
     stats: {
       health: 150,
       maxHealth: 150,
@@ -66,6 +68,7 @@ const enemyTemplates = {
   pirate: {
     name: 'Pirate',
     level: 2,
+    tier: 'veteran',
     stats: {
       health: 120,
       maxHealth: 120,
@@ -95,6 +98,7 @@ const enemyTemplates = {
   syndicate_thug: {
     name: 'Syndicate Thug',
     level: 3,
+    tier: 'veteran',
     stats: {
       health: 140,
       maxHealth: 140,
@@ -121,12 +125,13 @@ const enemyTemplates = {
   pirate_captain: {
     name: 'Pirate Captain',
     level: 5,
+    tier: 'elite',
     stats: {
-      health: 200,
-      maxHealth: 200,
+      health: 175,
+      maxHealth: 175,
       stamina: 70,
       maxStamina: 70,
-      attack: 25,
+      attack: 24,
       defense: 18,
       speed: 16,
       accuracy: 75
@@ -147,6 +152,7 @@ const enemyTemplates = {
   droid_security: {
     name: 'Security Droid',
     level: 2,
+    tier: 'veteran',
     stats: {
       health: 110,
       maxHealth: 110,
@@ -173,12 +179,13 @@ const enemyTemplates = {
   bounty_hunter: {
     name: 'Bounty Hunter',
     level: 4,
+    tier: 'elite',
     stats: {
-      health: 180,
-      maxHealth: 180,
+      health: 165,
+      maxHealth: 165,
       stamina: 65,
       maxStamina: 65,
-      attack: 22,
+      attack: 21,
       defense: 16,
       speed: 15,
       accuracy: 80
@@ -199,12 +206,13 @@ const enemyTemplates = {
   wild_animal: {
     name: 'Wild Animal',
     level: 1,
+    tier: 'normal',
     stats: {
       health: 90,
       maxHealth: 90,
       stamina: 60,
       maxStamina: 60,
-      attack: 14,
+      attack: 19,
       defense: 8,
       speed: 16,
       accuracy: 70
@@ -268,9 +276,12 @@ function scaleEnemyForLevel(enemyTemplate, playerLevel, difficulty = 'moderate')
   const scaledMaxHealth = scaledHealth;
   
   // Attack and defense scale more conservatively
-  const attackScale = 1 + (playerLevel - 1) * 0.06; // 6% per level
+  const attackScale = 1 + (playerLevel - 1) * 0.10; // 10% per level (keeps pace with per-level player power)
   const defenseScale = 1 + (playerLevel - 1) * 0.05; // 5% per level
-  
+  // XP scales faster than the other stats so kills-to-level stays reasonable
+  // against the flattened XP curve (was tied to the 8% health levelScale).
+  const xpScale = 1 + (playerLevel - 1) * 0.50;
+
   const scaled = {
     ...enemyTemplate,
     level: playerLevel,
@@ -286,7 +297,7 @@ function scaleEnemyForLevel(enemyTemplate, playerLevel, difficulty = 'moderate')
       speed: enemyTemplate.stats.speed,
       accuracy: enemyTemplate.stats.accuracy
     },
-    xpReward: Math.round(enemyTemplate.xpReward * levelScale * multiplier.xp),
+    xpReward: Math.round(enemyTemplate.xpReward * xpScale * multiplier.xp),
     creditsReward: Math.round(enemyTemplate.creditsReward * levelScale * multiplier.credits)
   };
 

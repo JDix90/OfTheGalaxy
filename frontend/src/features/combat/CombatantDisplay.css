@@ -2,6 +2,22 @@
  * Combatant Display Styles
  */
 
+/* Threat-tier badge (veteran / elite / boss) */
+.tier-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+}
+.tier-badge.tier-veteran { background: #2d5a8c; color: #cfe3ff; }
+.tier-badge.tier-elite   { background: #8c5a2d; color: #ffe0b3; }
+.tier-badge.tier-boss    { background: #8c2d2d; color: #ffc9c9; }
+
 .combatant-display {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
   border: 2px solid var(--border-color);

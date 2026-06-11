@@ -119,11 +119,12 @@ class AchievementService {
     // Award XP
     if (rewards.xp) {
       character.xp += rewards.xp;
-      // Check for level up (simplified)
-      const xpForNextLevel = character.level * 100;
-      if (character.xp >= xpForNextLevel) {
+      // Level up using the SAME curve as the character model. (Was a buggy
+      // linear `level * 100` with a single-level check, which diverged from
+      // getXPForNextLevel and mis-tracked XP debt on level-up.)
+      while (character.xp >= character.getXPForNextLevel()) {
+        character.xp -= character.getXPForNextLevel();
         character.level += 1;
-        character.xp -= xpForNextLevel;
       }
     }
 

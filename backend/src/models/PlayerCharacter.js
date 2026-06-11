@@ -176,7 +176,10 @@ module.exports = (sequelize) => {
 
   // Instance methods
   PlayerCharacter.prototype.getXPForNextLevel = function() {
-    return Math.floor(100 * Math.pow(this.level, 1.5));
+    // Curve exponent 1.25 (was 1.5) — flattened so leveling via combat stays
+    // viable; paired with higher enemy XP scaling. Keep in sync with the
+    // frontend mirrors (CharacterManager, ProgressionSystem) and the sim.
+    return Math.floor(100 * Math.pow(this.level, 1.25));
   };
 
   PlayerCharacter.prototype.canLevelUp = function() {

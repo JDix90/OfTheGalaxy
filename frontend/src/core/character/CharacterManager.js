@@ -60,7 +60,8 @@ export class CharacterManager {
    * Calculate XP needed for next level
    */
   getXPForNextLevel() {
-    return Math.floor(100 * Math.pow(this.level, 1.5));
+    // Mirror of backend PlayerCharacter.getXPForNextLevel (curve exponent 1.25).
+    return Math.floor(100 * Math.pow(this.level, 1.25));
   }
 
   /**

@@ -1,8 +1,8 @@
 {
   "combat": {
     "attackRating": {
-      "formula": "(baseAttack + weaponBase) * (1 + advWeapons * 0.02) * (1 + strength * 0.01)",
-      "description": "Attack Rating = (Base Attack + Weapon Base) × (1 + Advanced Weapons × 2%) × (1 + Strength × 1%)",
+      "formula": "(baseAttack + weaponBase) * (1 + advWeapons * 0.02) * (1 + strength * 0.01) * (1 + level * 0.015)",
+      "description": "Attack Rating = (Base Attack + Weapon Base) × (1 + Advanced Weapons × 2%) × (1 + Strength × 1%) × (1 + Level × 1.5%)",
       "components": [
         {
           "name": "baseAttack",
@@ -23,6 +23,11 @@
           "name": "strength",
           "source": "attribute",
           "description": "Strength attribute value"
+        },
+        {
+          "name": "level",
+          "source": "level",
+          "description": "Character level (per-level attack scaling)"
         }
       ]
     },
@@ -53,8 +58,8 @@
       ]
     },
     "critChance": {
-      "formula": "0.05 + (perception - 10) * 0.01 + advWeapons * 0.01",
-      "description": "Crit Chance = 5% base + Perception bonus + Advanced Weapons bonus (with DR)",
+      "formula": "0.05 + (perception - 10) * 0.01 + advWeapons * 0.01 + level * 0.004",
+      "description": "Crit Chance = 5% base + Perception bonus + Advanced Weapons bonus + Level bonus (with DR)",
       "usesDR": true,
       "drParams": {
         "cap": 0.50,
@@ -76,6 +81,11 @@
           "name": "advWeapons",
           "source": "skill",
           "description": "Advanced Weapons skill level"
+        },
+        {
+          "name": "level",
+          "source": "level",
+          "description": "Character level (per-level crit scaling)"
         }
       ]
     },
