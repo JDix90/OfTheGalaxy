@@ -94,7 +94,9 @@ describe('StatsBar', () => {
       />
     );
 
-    expect(screen.getByText(/Exhausted/i)).toBeInTheDocument();
+    // At 0 stamina the UI surfaces the "Exhausted" status in both the status
+    // badge and the warning banner, so assert at least one is present.
+    expect(screen.getAllByText(/Exhausted/i).length).toBeGreaterThan(0);
   });
 
   test('should show fatigued status when stamina is low', () => {
