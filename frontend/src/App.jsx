@@ -12,6 +12,8 @@ import Navigation from './components/Navigation';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ProtectedRoute from './components/ProtectedRoute';
+import ToastHost from './components/common/Toast';
+import ReputationHost from './components/faction/ReputationHost';
 import { TutorialProvider } from './contexts/TutorialContext';
 
 // Lazy load pages for code splitting
@@ -24,6 +26,7 @@ const GameWorld = lazy(() => import('./pages/GameWorld'));
 const QuestLog = lazy(() => import('./features/quests/QuestLog'));
 const GalaxyMap = lazy(() => import('./pages/GalaxyMap'));
 const PlanetSurface = lazy(() => import('./pages/PlanetSurface'));
+const PlanetSurface3D = lazy(() => import('./pages/PlanetSurface3D'));
 const SubMapView = lazy(() => import('./pages/SubMapView'));
 const NPCBrowser = lazy(() => import('./pages/NPCBrowser'));
 const InventoryView = lazy(() => import('./features/inventory/InventoryView'));
@@ -32,6 +35,10 @@ const TradingView = lazy(() => import('./features/trading/TradingView'));
 const CraftingView = lazy(() => import('./features/crafting/CraftingView'));
 const ExplorationJournal = lazy(() => import('./features/exploration/ExplorationJournal'));
 const CombatView = lazy(() => import('./features/combat/CombatView'));
+// Phase-0 3D spike (standalone, unauthenticated throwaway route).
+const SpikePage = lazy(() => import('./spike/SpikePage'));
+// Phase-1 walkable surface harness (standalone, unauthenticated — synthetic data).
+const SurfaceTest = lazy(() => import('./pages/SurfaceTest'));
 
 function App() {
   const { currentCharacter } = useCharacterStore();
@@ -41,7 +48,9 @@ function App() {
       <TutorialProvider>
         <div className="app">
           {currentCharacter && <Navigation />}
-          
+          <ToastHost />
+          <ReputationHost />
+
           <Suspense fallback={<LoadingSpinner fullScreen message="Loading game..." />}>
           <Routes>
         {/* Landing page */}
@@ -94,16 +103,24 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/game/planet/:planetId" 
+        <Route
+          path="/game/planet/:planetId"
           element={
             <ProtectedRoute>
               {currentCharacter ? <PlanetSurface /> : <Navigate to="/character/select" />}
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/game/location/:planetId/:parentLocationId/:parentLocationType/:type" 
+        <Route
+          path="/game/planet3d/:planetId"
+          element={
+            <ProtectedRoute>
+              {currentCharacter ? <PlanetSurface3D /> : <Navigate to="/character/select" />}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/game/location/:planetId/:parentLocationId/:parentLocationType/:type"
           element={
             <ProtectedRoute>
               {currentCharacter ? <SubMapView /> : <Navigate to="/character/select" />}
@@ -176,6 +193,11 @@ function App() {
         />
         
         {/* Catch-all redirect */}
+        {/* Phase-0 3D spike — standalone, no auth/character required */}
+        <Route path="/spike" element={<SpikePage />} />
+        {/* Phase-1 walkable surface harness — standalone, synthetic data */}
+        <Route path="/surface-test" element={<SurfaceTest />} />
+
         <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Suspense>
