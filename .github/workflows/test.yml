@@ -49,6 +49,12 @@ jobs:
           DATABASE_URL: postgres://postgres:test@localhost:5432/test_db
           NODE_ENV: test
           JWT_SECRET: test-secret-key
+          # config/database.js (test) reads these; align them with the postgres service.
+          DB_USER: postgres
+          DB_PASSWORD: test
+          DB_NAME_TEST: test_db
+          DB_HOST: localhost
+          DB_PORT: 5432
       
       - name: Run backend tests
         run: |
@@ -58,6 +64,12 @@ jobs:
           DATABASE_URL: postgres://postgres:test@localhost:5432/test_db
           NODE_ENV: test
           JWT_SECRET: test-secret-key
+          # config/database.js (test) reads these; align them with the postgres service.
+          DB_USER: postgres
+          DB_PASSWORD: test
+          DB_NAME_TEST: test_db
+          DB_HOST: localhost
+          DB_PORT: 5432
       
       - name: Upload backend coverage
         uses: codecov/codecov-action@v3

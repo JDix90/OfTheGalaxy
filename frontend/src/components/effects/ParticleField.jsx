@@ -33,6 +33,7 @@ export default function ParticleField({ ambient = null, rate = 0.5, maxAmbient =
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return undefined; // no 2D context (e.g. jsdom in tests) — skip the FX
     let disposed = false;
 
     // Preload the sprites we might draw so the cache is warm.

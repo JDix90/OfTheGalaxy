@@ -10,10 +10,14 @@ const jwt = require('jsonwebtoken');
  * Create a test user
  */
 async function createTestUser(overrides = {}) {
+  // Create users the way the app does: the User model stores `passwordHash`
+  // (no `password` virtual), so hash up front. Random suffix avoids same-ms
+  // email collisions when a test creates several users in quick succession.
+  const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const passwordHash = await User.hashPassword('TestPassword123!');
   return await User.create({
-    email: `test-${Date.now()}@test.com`,
-    password: 'TestPassword123!',
-    username: `testuser-${Date.now()}`,
+    email: `test-${unique}@test.com`,
+    passwordHash,
     ...overrides
   });
 }
