@@ -25,7 +25,7 @@ describe('Quest API', () => {
       id: `test-npc-${Date.now()}`,
       name: 'Test Quest Giver',
       npcType: 'quest_giver',
-      factionId: 'independent_investigators',
+      species: 'human',      factionId: 'independent_investigators',
       planetId: 'solenne',
       location: { x: 50, y: 50, area: 'surface' }
     });
@@ -33,7 +33,7 @@ describe('Quest API', () => {
     // Create test quest
     quest = await Quest.create({
       id: `test-quest-${Date.now()}`,
-      name: 'Test Quest',
+      title: 'Test Quest',
       description: 'A test quest',
       questGiverId: npc.id,
       factionId: 'independent_investigators',
@@ -91,7 +91,7 @@ describe('Quest API', () => {
         id: `empty-npc-${Date.now()}`,
         name: 'Empty NPC',
         npcType: 'vendor',
-        factionId: 'independent_investigators',
+        species: 'human',        factionId: 'independent_investigators',
         planetId: 'solenne',
         location: { x: 50, y: 50, area: 'surface' }
       });

@@ -24,7 +24,7 @@ describe('QuestService', () => {
       id: `test-npc-${Date.now()}`,
       name: 'Test Quest Giver',
       npcType: 'quest_giver',
-      factionId: 'independent_investigators',
+      species: 'human',      factionId: 'independent_investigators',
       planetId: 'solenne',
       location: { x: 50, y: 50, area: 'surface' }
     });
@@ -32,7 +32,7 @@ describe('QuestService', () => {
     // Create test quest
     quest = await Quest.create({
       id: `test-quest-${Date.now()}`,
-      name: 'Test Quest',
+      title: 'Test Quest',
       description: 'A test quest',
       questGiverId: npc.id,
       factionId: 'independent_investigators',
@@ -96,7 +96,7 @@ describe('QuestService', () => {
       // Create quest with level prerequisite
       const levelQuest = await Quest.create({
         id: `level-quest-${Date.now()}`,
-        name: 'Level Quest',
+        title: 'Level Quest',
         description: 'Requires level 10',
         questGiverId: npc.id,
         factionId: 'independent_investigators',
@@ -135,7 +135,7 @@ describe('QuestService', () => {
         id: `empty-npc-${Date.now()}`,
         name: 'Empty NPC',
         npcType: 'vendor',
-        factionId: 'independent_investigators',
+        species: 'human',        factionId: 'independent_investigators',
         planetId: 'solenne',
         location: { x: 50, y: 50, area: 'surface' }
       });
@@ -259,7 +259,7 @@ describe('QuestService', () => {
       // Try to complete quest that hasn't been started
       const newQuest = await Quest.create({
         id: `new-quest-${Date.now()}`,
-        name: 'New Quest',
+        title: 'New Quest',
         description: 'A new quest',
         questGiverId: npc.id,
         factionId: 'independent_investigators',

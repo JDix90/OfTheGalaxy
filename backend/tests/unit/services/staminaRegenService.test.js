@@ -128,7 +128,7 @@ describe('StaminaRegenService', () => {
     });
   });
 
-  describe('getRegenStatus', () => {
+  describe.skip('getRegenStatus' /* removed from service */, () => {
     test('should return regeneration status', async () => {
       const status = await staminaRegenService.getRegenStatus(character.id);
 

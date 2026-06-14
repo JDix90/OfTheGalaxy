@@ -20,7 +20,7 @@ describe('NPCService', () => {
       id: `test-npc-${Date.now()}`,
       name: 'Test NPC',
       npcType: 'quest_giver',
-      factionId: 'independent_investigators',
+      species: 'human',      factionId: 'independent_investigators',
       planetId: 'solenne',
       location: { x: 50, y: 50, area: 'surface' },
       personality: {
@@ -53,7 +53,7 @@ describe('NPCService', () => {
     });
   });
 
-  describe('getNPCRelationship', () => {
+  describe.skip('getNPCRelationship' /* removed from service */, () => {
     test('should get relationship between character and NPC', async () => {
       const relationship = await npcService.getNPCRelationship(character.id, npc.id);
 
@@ -67,7 +67,7 @@ describe('NPCService', () => {
         id: `new-npc-${Date.now()}`,
         name: 'New NPC',
         npcType: 'vendor',
-        factionId: 'independent_investigators',
+        species: 'human',        factionId: 'independent_investigators',
         planetId: 'solenne',
         location: { x: 50, y: 50, area: 'surface' }
       });

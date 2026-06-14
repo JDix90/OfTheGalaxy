@@ -24,7 +24,7 @@ describe('VendorService', () => {
       id: `vendor-${Date.now()}`,
       name: 'Test Vendor',
       npcType: 'vendor',
-      factionId: 'independent_investigators',
+      species: 'human',      factionId: 'independent_investigators',
       planetId: 'solenne',
       location: { x: 50, y: 50, area: 'surface' },
       vendorInventory: [
@@ -60,7 +60,7 @@ describe('VendorService', () => {
         id: `empty-vendor-${Date.now()}`,
         name: 'Empty Vendor',
         npcType: 'vendor',
-        factionId: 'independent_investigators',
+        species: 'human',        factionId: 'independent_investigators',
         planetId: 'solenne',
         location: { x: 50, y: 50, area: 'surface' }
       });

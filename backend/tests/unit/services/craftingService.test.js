@@ -33,7 +33,7 @@ describe('CraftingService', () => {
     materialItem1 = await Item.create({
       id: `material-1-${Date.now()}`,
       name: 'Test Material 1',
-      itemType: 'material',
+      itemType: 'resource',
       rarity: 'common',
       value: 10,
       weight: 0.1
@@ -42,7 +42,7 @@ describe('CraftingService', () => {
     materialItem2 = await Item.create({
       id: `material-2-${Date.now()}`,
       name: 'Test Material 2',
-      itemType: 'material',
+      itemType: 'resource',
       rarity: 'common',
       value: 15,
       weight: 0.1

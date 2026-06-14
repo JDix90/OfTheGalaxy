@@ -74,7 +74,7 @@ describe('CombatService', () => {
 
     test('should throw error if character not found', async () => {
       await expect(
-        combatService.createEncounter('invalid-id', 'random', ['ironclad'])
+        combatService.createEncounter('00000000-0000-0000-0000-000000000000', 'random', ['ironclad'])
       ).rejects.toThrow('Character not found');
     });
 
@@ -181,7 +181,7 @@ describe('CombatService', () => {
 
     test('should throw error if encounter not found', async () => {
       await expect(
-        combatService.executeAction('invalid-id', 'combatant-id', 'attack', 'target-id')
+        combatService.executeAction('00000000-0000-0000-0000-000000000000', 'combatant-id', 'attack', 'target-id')
       ).rejects.toThrow();
     });
 
@@ -205,7 +205,7 @@ describe('CombatService', () => {
 
     test('should advance to next turn', async () => {
       const initialTurn = encounter.currentTurn;
-      const result = await combatService.advanceTurn(encounter.id);
+      const result = await combatService.advanceTurn(encounter);
 
       expect(result.currentTurn).toBe(initialTurn + 1);
     });
@@ -215,10 +215,10 @@ describe('CombatService', () => {
       
       // Advance to last turn
       for (let i = 0; i < turnOrderLength - 1; i++) {
-        await combatService.advanceTurn(encounter.id);
+        await combatService.advanceTurn(encounter);
       }
 
-      const result = await combatService.advanceTurn(encounter.id);
+      const result = await combatService.advanceTurn(encounter);
       expect(result.currentTurn).toBe(0);
     });
 
@@ -229,7 +229,7 @@ describe('CombatService', () => {
       
       // Advance to player turn
       while (encounter.currentTurn !== playerIndex) {
-        encounter = await combatService.advanceTurn(encounter.id);
+        encounter = await combatService.advanceTurn(encounter);
       }
 
       // Execute player action
@@ -242,7 +242,7 @@ describe('CombatService', () => {
       );
 
       // Advance turn (should process enemy)
-      const result = await combatService.advanceTurn(encounter.id);
+      const result = await combatService.advanceTurn(encounter);
       expect(result).toBeDefined();
     });
   });
@@ -271,7 +271,7 @@ describe('CombatService', () => {
         { where: { id: encounter.id } }
       );
 
-      const result = await combatService.checkVictoryConditions(encounter.id);
+      const result = await combatService.checkVictoryConditions(encounter);
       expect(result.victory).toBe(true);
       expect(result.winner).toBe('player');
     });
@@ -287,13 +287,13 @@ describe('CombatService', () => {
         { where: { id: encounter.id } }
       );
 
-      const result = await combatService.checkVictoryConditions(encounter.id);
+      const result = await combatService.checkVictoryConditions(encounter);
       expect(result.victory).toBe(true);
       expect(result.winner).toBe('enemy');
     });
 
     test('should return no victory if combat continues', async () => {
-      const result = await combatService.checkVictoryConditions(encounter.id);
+      const result = await combatService.checkVictoryConditions(encounter);
       expect(result.victory).toBe(false);
     });
   });

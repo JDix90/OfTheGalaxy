@@ -79,6 +79,7 @@ describe('ensureEncounterOwnership', () => {
     character = await createTestCharacter(owner.id);
     encounter = await CombatEncounter.create({
       characterId: character.id,
+      encounterType: 'random',
       status: 'active',
       combatants: [],
       turnOrder: [],

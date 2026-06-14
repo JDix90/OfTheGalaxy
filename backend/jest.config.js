@@ -39,6 +39,7 @@ module.exports = {
     '**/__tests__/**/*.test.js',
     '**/tests/**/*.test.js'
   ],
+  globalSetup: '<rootDir>/tests/setup/globalSetup.js',
   setupFilesAfterEnv: ['<rootDir>/tests/setup/testDatabase.js'],
   testTimeout: 30000,
   verbose: true,
