@@ -45,6 +45,10 @@ module.exports = {
   ],
   globalSetup: '<rootDir>/tests/setup/globalSetup.js',
   setupFilesAfterEnv: ['<rootDir>/tests/setup/testDatabase.js'],
+  // Run serially: all suites share one test database and the global beforeEach wipes
+  // tables, so parallel workers would clobber each other's rows mid-test
+  // ("Instance could not be reloaded"). Serial keeps the shared-DB suite correct.
+  maxWorkers: 1,
   testTimeout: 30000,
   verbose: true,
   forceExit: true,
