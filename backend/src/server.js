@@ -152,8 +152,12 @@ const startServer = async () => {
   }
 };
 
-// Start the server
-startServer();
+// Start the server only when run directly (`node src/server.js`). When the app is
+// imported (e.g. supertest integration tests), do NOT auto-listen — multiple imports
+// would otherwise collide on the port (EADDRINUSE). Supertest drives the app object.
+if (require.main === module) {
+  startServer();
+}
 
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {
