@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { formatDisplayName } from '../../utils/formatName';
 import './Minimap.css';
 
 export default function Minimap({ character }) {
@@ -58,21 +59,22 @@ export default function Minimap({ character }) {
         {isGalaxyMap ? (
           <div className="minimap-placeholder">
             <p>Galaxy View</p>
-            <p className="minimap-location">Current: {character.currentPlanet || 'Unknown'}</p>
+            <p className="minimap-location">Current: {character.currentPlanet ? formatDisplayName(character.currentPlanet) : 'Unknown'}</p>
           </div>
         ) : isPlanetSurface ? (
           <div className="minimap-placeholder">
             <p>Planet Surface</p>
-            <p className="minimap-location">{character.currentPlanet || 'Unknown Planet'}</p>
+            <p className="minimap-location">{character.currentPlanet ? formatDisplayName(character.currentPlanet) : 'Unknown Planet'}</p>
           </div>
         ) : isSubMap ? (
           <div className="minimap-placeholder">
             <p>Location</p>
-            <p className="minimap-location">{character.currentPlanet || 'Unknown'}</p>
+            <p className="minimap-location">{character.currentPlanet ? formatDisplayName(character.currentPlanet) : 'Unknown'}</p>
           </div>
         ) : (
           <div className="minimap-placeholder">
-            <p>No Map Available</p>
+            <p className="minimap-location-label">Current Location</p>
+            <p className="minimap-location">📍 {character.currentPlanet ? formatDisplayName(character.currentPlanet) : 'Unknown'}</p>
           </div>
         )}
       </div>

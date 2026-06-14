@@ -23,10 +23,10 @@ const ABILITY_DEFINITIONS = {
     source: 'skill'
   },
   // Add other abilities as needed for tooltips
-  force_insight: {
-    id: 'force_insight',
-    name: 'Force Insight',
-    description: 'Unlocks Force perception abilities',
+  veil_insight: {
+    id: 'veil_insight',
+    name: 'Veil Insight',
+    description: 'Unlocks Veil perception abilities',
     type: 'utility',
     targetType: 'self',
     cost: { stamina: 0 },

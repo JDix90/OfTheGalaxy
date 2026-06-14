@@ -32,7 +32,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(50),
       allowNull: false,
       validate: {
-        isIn: [['human', 'twilek', 'rodian', 'wookiee', 'zabrak', 'togruta', 'mirialan', 'chiss']]
+        isIn: [['human', 'sytheen', 'skarn', 'ursk', 'karnaki', 'sethari', 'jeharu', 'vorne']]
       }
     },
     background: {
@@ -109,7 +109,7 @@ module.exports = (sequelize) => {
     // Current location
     currentPlanet: {
       type: DataTypes.STRING(100),
-      defaultValue: 'chandrila',
+      defaultValue: 'solenne',
       field: 'current_planet'
     },
     currentLocation: {

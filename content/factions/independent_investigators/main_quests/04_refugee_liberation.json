@@ -1,16 +1,16 @@
 {
-  "id": "iia_ryloth_03_refugee_liberation",
+  "id": "iia_sytha_03_refugee_liberation",
   "factionId": "independent_investigators",
   "questType": "main",
   "title": "Refugee Liberation",
-  "description": "With evidence of the connection between the mines and Compound 7-Alpha, the refugees are in even greater danger. The syndicate knows they're talking, and they won't hesitate to silence them. Lira Tann, the refugee leader, needs help getting her people to safety. Help them secure transport, supplies, and protection to escape Ryloth and find a new home.",
-  "shortDescription": "Help the refugees escape Ryloth and find safety",
+  "description": "With evidence of the connection between the mines and Compound 7-Alpha, the refugees are in even greater danger. The syndicate knows they're talking, and they won't hesitate to silence them. Lira Tann, the refugee leader, needs help getting her people to safety. Help them secure transport, supplies, and protection to escape Sytha and find a new home.",
+  "shortDescription": "Help the refugees escape Sytha and find safety",
   "prerequisites": {
     "level": 5,
     "reputation": {
       "independent_investigators": 95
     },
-    "completedQuests": ["iia_ryloth_02_mines_investigation"],
+    "completedQuests": ["iia_sytha_02_mines_investigation"],
     "items": ["mine_foreman_datapad"]
   },
   "objectives": [
@@ -23,7 +23,7 @@
     {
       "id": "secure_transport",
       "type": "custom",
-      "description": "Secure transport for the refugees (negotiate with smugglers or New Republic)",
+      "description": "Secure transport for the refugees (negotiate with smugglers or Concord)",
       "target": "transport_negotiation"
     },
     {
@@ -43,7 +43,7 @@
     {
       "id": "evacuate_refugees",
       "type": "custom",
-      "description": "Successfully evacuate the refugees from Ryloth",
+      "description": "Successfully evacuate the refugees from Sytha",
       "target": "refugee_evacuation"
     }
   ],
@@ -60,11 +60,11 @@
         "quantity": 1
       }
     ],
-    "unlocks": ["iia_ryloth_04_syndicate_exposure"]
+    "unlocks": ["iia_sytha_04_syndicate_exposure"]
   },
   "questGiverId": "npc_refugee_leader",
   "startLocation": {
-    "planet": "ryloth",
+    "planet": "sytha",
     "area": "tann_province"
   },
   "estimatedTime": 90,

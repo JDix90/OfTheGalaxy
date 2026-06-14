@@ -1,0 +1,55 @@
+{
+  "id": "npc_info_broker",
+  "name": "Silas \"The Shadow\" Karr",
+  "species": "human",
+  "occupation": "Information Broker",
+  "factionId": "drift_cartel",
+  "location": {
+    "planet": "centralis",
+    "area": "underworld",
+    "x": 305,
+    "y": 805
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "Information is currency. What do you want to know?",
+      "acquaintance": "Back for more? Good. I've got new information.",
+      "friend": "My friend, you've been a good customer. I'll give you a discount.",
+      "confidant": "You're one of the few people I trust down here. What do you need?"
+    },
+    "questRelated": {
+      "nr_centralis_03_underworld_connection": "Senator Vorin? Yeah, I know about him. He's dirty. Real dirty. But proving it... that's the hard part. I've got information—records, witnesses, evidence. But it'll cost you. And it's dangerous. The Corporate Sector doesn't like people poking around in their business. Still interested?"
+    },
+    "general": [
+      "The underworld knows everything. You just have to know who to ask.",
+      "Information is power. I sell power.",
+      "Down here, credits talk. Everything else is just noise.",
+      "I've survived in the underworld for twenty years. I know how to stay alive.",
+      "The upper levels think they're safe. They're wrong. We know all their secrets."
+    ]
+  },
+  "quests": ["nr_centralis_03_underworld_connection", "centralis_side_01_underworld_info"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "mid 40s",
+    "build": "lean, dangerous",
+    "hair": "black, short",
+    "eyes": "dark, calculating",
+    "distinguishingFeatures": "Underworld clothing, multiple hidden weapons, datapad, always watching, scarred hands"
+  },
+  "biography": "Silas Karr, known as 'The Shadow,' is an information broker who operates in Centralis's underworld. He's been selling information for decades, building a network of contacts that extends from the lowest levels to the highest echelons of power. He's pragmatic, amoral, but not evil—he's just a businessman. He knows about Senator Vorin's corruption because information is his business, and he's willing to sell it to the right buyer. He represents the underworld's role in exposing the corruption of the upper levels.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 30,
+    "formality": 40,
+    "humor": 50,
+    "trust": 35
+  }
+}
+
+
+

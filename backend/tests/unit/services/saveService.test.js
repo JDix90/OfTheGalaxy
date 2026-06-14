@@ -14,12 +14,12 @@ describe('SaveService', () => {
 
   beforeEach(async () => {
     user = await createTestUser();
-    character = await createTestCharacter(user.id, { level: 1, xp: 0, credits: 100, currentPlanet: 'tatooine' });
-    await PlayerInventory.create({ characterId: character.id, itemId: 'blaster_pistol', quantity: 1, equipped: true, equipmentSlot: 'weapon' });
+    character = await createTestCharacter(user.id, { level: 1, xp: 0, credits: 100, currentPlanet: 'gravenmoor' });
+    await PlayerInventory.create({ characterId: character.id, itemId: 'pulser_pistol', quantity: 1, equipped: true, equipmentSlot: 'weapon' });
   });
 
   test('createSave snapshots character, inventory and faction reputation (v1.1)', async () => {
-    await FactionReputation.create({ characterId: character.id, factionId: 'new_republic', reputation: 40, tier: 'neutral' });
+    await FactionReputation.create({ characterId: character.id, factionId: 'concord', reputation: 40, tier: 'neutral' });
 
     const slot = await saveService.createSave(user.id, character.id, SLOT, 'probe');
     expect(slot.saveData.version).toBe('1.1');
@@ -30,17 +30,17 @@ describe('SaveService', () => {
   });
 
   test('restoreSave rolls back character, inventory and reputation', async () => {
-    await FactionReputation.create({ characterId: character.id, factionId: 'new_republic', reputation: 40, tier: 'neutral' });
+    await FactionReputation.create({ characterId: character.id, factionId: 'concord', reputation: 40, tier: 'neutral' });
     await saveService.createSave(user.id, character.id, SLOT, 'probe');
 
     // Mutate live state.
     character.credits = 999;
     character.level = 5;
     character.xp = 1234;
-    character.currentPlanet = 'coruscant';
+    character.currentPlanet = 'centralis';
     await character.save();
     await PlayerInventory.create({ characterId: character.id, itemId: 'medkit', quantity: 7 });
-    const rep = await FactionReputation.findOne({ where: { characterId: character.id, factionId: 'new_republic' } });
+    const rep = await FactionReputation.findOne({ where: { characterId: character.id, factionId: 'concord' } });
     rep.reputation = 500;
     await rep.save();
 
@@ -51,14 +51,14 @@ describe('SaveService', () => {
     expect(restored.credits).toBe(100);
     expect(restored.level).toBe(1);
     expect(restored.xp).toBe(0);
-    expect(restored.currentPlanet).toBe('tatooine');
+    expect(restored.currentPlanet).toBe('gravenmoor');
 
     const inv = await PlayerInventory.findAll({ where: { characterId: character.id } });
     expect(inv).toHaveLength(1);
-    expect(inv[0].itemId).toBe('blaster_pistol');
+    expect(inv[0].itemId).toBe('pulser_pistol');
     expect(inv[0].equipped).toBe(true);
 
-    const restoredRep = await FactionReputation.findOne({ where: { characterId: character.id, factionId: 'new_republic' } });
+    const restoredRep = await FactionReputation.findOne({ where: { characterId: character.id, factionId: 'concord' } });
     expect(restoredRep.reputation).toBe(40);
   });
 

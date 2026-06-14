@@ -1,0 +1,55 @@
+{
+  "id": "npc_dominion_agent_centralis",
+  "name": "Agent Karr",
+  "species": "human",
+  "occupation": "Dominion Remnant Agent",
+  "factionId": "dominion_remnant",
+  "location": {
+    "planet": "centralis",
+    "area": "underworld",
+    "x": 310,
+    "y": 810
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "I have a proposition for you. One that could be very profitable.",
+      "acquaintance": "You've proven useful. I have another job for you.",
+      "friend": "My friend, you understand the value of order. I appreciate that.",
+      "confidant": "You've become one of my most trusted operatives. This mission is critical."
+    },
+    "questRelated": {
+      "js_centralis_01_ruined_temple": "The Keeper Sanctum... it holds artifacts that belong to the Iron Dominion. The Concord thinks they can just claim everything, but they're wrong. There's something in the Temple—something powerful. I need someone to retrieve it. You'll be well paid, and you'll be serving a greater cause. The Iron Dominion will rise again, and those who help us now will be rewarded. Are you interested?"
+    },
+    "general": [
+      "The Concord is weak. The Iron Dominion was strong. We will be strong again.",
+      "Order. Stability. That's what the galaxy needs. That's what the Iron Dominion provides.",
+      "The Keeper were enemies of the Iron Dominion. Their artifacts belong to us.",
+      "We operate in the shadows now. But our time will come again.",
+      "Loyalty to the Iron Dominion is rewarded. Betrayal is punished."
+    ]
+  },
+  "quests": ["js_centralis_01_ruined_temple"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "mid 30s",
+    "build": "athletic, military",
+    "hair": "black, short",
+    "eyes": "cold blue",
+    "distinguishingFeatures": "Underworld clothing (disguise), military bearing, hidden Dominion insignia, observant eyes"
+  },
+  "biography": "Agent Karr is a Dominion Remnant operative working undercover on Centralis. He's part of a covert cell trying to recover Dominion assets and undermine the Concord. He's intelligent, dedicated, and believes the Iron Dominion was right. He's not a fanatic—he's pragmatic and knows the Iron Dominion needs to adapt—but he's committed to the cause. He represents the ongoing threat of the Dominion Remnant and offers an alternative path for players who might sympathize with Dominion ideals.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 25,
+    "formality": 70,
+    "humor": 10,
+    "trust": 30
+  }
+}
+
+
+

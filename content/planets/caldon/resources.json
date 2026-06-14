@@ -1,0 +1,32 @@
+{
+  "planetId": "caldon",
+  "resources": [
+    {
+      "id": "resource_dantari_crystals",
+      "name": "Dantari Crystals",
+      "type": "resource",
+      "rarity": "rare",
+      "description": "Veil-touched crystals found in the Venox Cave. Possess unique properties and are highly sought after by Keeper Seekers.",
+      "baseValue": 800,
+      "weight": 0.3,
+      "stackSize": 5,
+      "uses": ["crafting", "veil_enhancement", "arcblade_construction", "quest_item"],
+      "locations": ["The Venox Cave"]
+    },
+    {
+      "id": "resource_venox_eggs",
+      "name": "Venox Eggs",
+      "type": "resource",
+      "rarity": "uncommon",
+      "description": "Eggs from venox creatures. Used in alchemy and crafting, though dangerous to obtain.",
+      "baseValue": 200,
+      "weight": 0.5,
+      "stackSize": 10,
+      "uses": ["crafting", "alchemy", "trade"],
+      "locations": ["The Venox Cave", "Venox nests"]
+    }
+  ]
+}
+
+
+

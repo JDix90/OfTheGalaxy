@@ -12,7 +12,56 @@ import { npcApi } from '../../services/api/npcApi';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import TutorialOverlay from '../../components/tutorial/TutorialOverlay';
+import { formatDisplayName } from '../../utils/formatName';
+import { pushToast } from '../../state/toastSlice';
+import { getTierLabel } from '../../utils/factionTiers';
 import './TradingView.css';
+
+/**
+ * Itemized price modifier rows from a price breakdown, expressed from the
+ * player's perspective on the final price (cheaper to buy / more to sell = good).
+ */
+function PriceBreakdown({ breakdown, isBuy }) {
+  if (!breakdown) return null;
+  const rows = [];
+  // A positive modifier fraction `d` always favors the player (lower buy price /
+  // higher sell payout). The displayed sign reflects price direction, which is
+  // inverted between buying and selling.
+  const fmt = (d) => {
+    const pct = Math.round(Math.abs(d) * 100);
+    const sign = isBuy ? (d > 0 ? '−' : '+') : (d > 0 ? '+' : '−');
+    return `${sign}${pct}%`;
+  };
+  const good = (d) => d > 0;
+  // Only surface a modifier if it rounds to at least 1% — avoids noisy "−0%" rows.
+  const meaningful = (d) => Math.round(Math.abs(d) * 100) >= 1;
+
+  if (meaningful(breakdown.charismaPct)) rows.push({ key: 'cha', label: 'Charisma', value: breakdown.charismaPct });
+  if (meaningful(breakdown.relationshipPct)) rows.push({ key: 'rel', label: 'Relationship', value: breakdown.relationshipPct });
+  if (meaningful(breakdown.factionPct)) {
+    rows.push({
+      key: 'fac',
+      label: `Standing${breakdown.factionTier ? ` · ${getTierLabel(breakdown.factionTier)}` : ''}`,
+      value: breakdown.factionPct
+    });
+  }
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="price-breakdown">
+      <div className="price-line subtle">
+        <span>Base</span>
+        <span>{breakdown.base} cr</span>
+      </div>
+      {rows.map((r) => (
+        <div className={`price-line subtle ${good(r.value) ? 'mod-good' : 'mod-bad'}`} key={r.key}>
+          <span>{r.label}</span>
+          <span>{fmt(r.value)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function TradingView() {
   const { npcId } = useParams();
@@ -111,7 +160,7 @@ export default function TradingView() {
 
   const handleBuy = async () => {
     if (!selectedItem || !currentCharacter) return;
-    
+
     try {
       setIsLoading(true);
       const result = await vendorApi.buyItem(npcId, currentCharacter.id, selectedItem.itemId, quantity);
@@ -137,11 +186,11 @@ export default function TradingView() {
         await loadCharacter(currentCharacter.id);
       }
       
-      alert(`Purchased ${quantity}x ${purchaseResult.item.name} for ${purchaseResult.totalCost} credits!`);
+      pushToast({ type: 'success', message: `Purchased ${quantity}× ${purchaseResult.item.name} for ${purchaseResult.totalCost} credits` });
       setSelectedItem(null);
       setQuantity(1);
     } catch (err) {
-      alert(`Failed to buy item: ${err.message}`);
+      pushToast({ type: 'error', message: `Couldn't buy item: ${err.message}` });
     } finally {
       setIsLoading(false);
     }
@@ -179,11 +228,11 @@ export default function TradingView() {
         await loadCharacter(currentCharacter.id);
       }
       
-      alert(`Sold ${quantity}x ${saleResult.item.name} for ${saleResult.totalValue} credits!`);
+      pushToast({ type: 'success', message: `Sold ${quantity}× ${saleResult.item.name} for ${saleResult.totalValue} credits` });
       setSelectedItem(null);
       setQuantity(1);
     } catch (err) {
-      alert(`Failed to sell item: ${err.message}`);
+      pushToast({ type: 'error', message: `Couldn't sell item: ${err.message}` });
     } finally {
       setIsLoading(false);
     }
@@ -290,15 +339,15 @@ export default function TradingView() {
                       onMouseEnter={() => handleItemHover(vendorItem)}
                     >
                       <div className="item-name">
-                        {vendorItem.itemDefinition?.name || vendorItem.itemId}
+                        {vendorItem.itemDefinition?.name || formatDisplayName(vendorItem.itemId)}
                       </div>
                       <div className="item-details">
                         <span className="item-quantity">
                           Qty: {vendorItem.quantity === -1 || vendorItem.quantity === null ? 'Unlimited' : vendorItem.quantity}
                         </span>
-                        {vendorItem.itemDefinition?.value && (
+                        {(vendorItem.buyPrice ?? vendorItem.itemDefinition?.value) && (
                           <span className="item-value">
-                            {vendorItem.itemDefinition.value} credits
+                            {vendorItem.buyPrice ?? vendorItem.itemDefinition.value} credits
                           </span>
                         )}
                       </div>
@@ -325,7 +374,7 @@ export default function TradingView() {
                       }}
                       onMouseEnter={() => handleItemHover(item)}
                     >
-                      <div className="item-name">{item.itemId}</div>
+                      <div className="item-name">{item.itemDefinition?.name || formatDisplayName(item.itemId)}</div>
                       <div className="item-details">
                         <span className="item-quantity">Qty: {item.quantity}</span>
                       </div>
@@ -345,10 +394,7 @@ export default function TradingView() {
                 <h3>Transaction Details</h3>
                 <div className="selected-item-info">
                   <div className="selected-item-name">
-                    {activeTab === 'buy' 
-                      ? (selectedItem.itemDefinition?.name || selectedItem.itemId)
-                      : selectedItem.itemId
-                    }
+                    {selectedItem.itemDefinition?.name || formatDisplayName(selectedItem.itemId)}
                   </div>
                   
                   {/* Item Description */}
@@ -367,7 +413,7 @@ export default function TradingView() {
                           <div className="requirement-line">
                             <span>Faction:</span>
                             <span className="faction-name">
-                              {selectedItem.itemDefinition.factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              {formatDisplayName(selectedItem.itemDefinition.factionId)}
                             </span>
                           </div>
                         )}
@@ -412,6 +458,7 @@ export default function TradingView() {
 
                   {priceQuote && (
                     <div className="price-quote">
+                      <PriceBreakdown breakdown={priceQuote.breakdown} isBuy={activeTab === 'buy'} />
                       <div className="price-line">
                         <span>Unit Price:</span>
                         <span>{priceQuote.unitPrice} credits</span>

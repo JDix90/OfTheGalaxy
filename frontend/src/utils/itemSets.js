@@ -7,14 +7,14 @@
  * Item Set Definitions (matches backend itemSets.js)
  */
 const ITEM_SETS = {
-  imperial_set: {
-    id: 'imperial_set',
-    name: 'Imperial Set',
-    description: 'Equipment worn by Imperial personnel. Provides accuracy and defense bonuses.',
+  dominion_set: {
+    id: 'dominion_set',
+    name: 'Dominion Set',
+    description: 'Equipment worn by Dominion personnel. Provides accuracy and defense bonuses.',
     pieces: [
-      'blaster_rifle_01',
-      'armor_heavy_imperial_standard',
-      'imperial_commendation'
+      'pulser_rifle_01',
+      'armor_heavy_dominion_standard',
+      'dominion_commendation'
     ],
     bonuses: {
       2: {
@@ -28,24 +28,24 @@ const ITEM_SETS = {
       }
     }
   },
-  jedi_set: {
-    id: 'jedi_set',
-    name: 'Jedi Set',
-    description: 'Equipment used by Jedi. Enhances Force abilities and power.',
+  keeper_set: {
+    id: 'keeper_set',
+    name: 'Keeper Set',
+    description: 'Equipment used by Keeper. Enhances Veil abilities and power.',
     pieces: [
-      'lightsaber_01',
-      'armor_light_jedi',
-      'jedi_artifact'
+      'arcblade_01',
+      'armor_light_keeper',
+      'keeper_artifact'
     ],
     bonuses: {
       2: {
         forcePower: 10,
-        description: '2-piece: +10 Force Power'
+        description: '2-piece: +10 Veil Power'
       },
       3: {
         forcePower: 20,
         forceAbilityEffectiveness: 15,
-        description: '3-piece: +20 Force Power, +15% Force ability effectiveness'
+        description: '3-piece: +20 Veil Power, +15% Veil ability effectiveness'
       }
     }
   },
@@ -54,7 +54,7 @@ const ITEM_SETS = {
     name: 'Smuggler Set',
     description: 'Equipment favored by smugglers. Improves smuggling success and charisma.',
     pieces: [
-      'blaster_pistol_01',
+      'pulser_pistol_01',
       'armor_light_smuggler',
       'smuggler_badge'
     ],
@@ -70,14 +70,14 @@ const ITEM_SETS = {
       }
     }
   },
-  mandalorian_set: {
-    id: 'mandalorian_set',
-    name: 'Mandalorian Set',
-    description: 'Mandalorian-crafted equipment. Provides significant combat bonuses.',
+  ironkin_set: {
+    id: 'ironkin_set',
+    name: 'Ironkin Set',
+    description: 'Ironkin-crafted equipment. Provides significant combat bonuses.',
     pieces: [
-      'weapon_mandalorian_01',
+      'weapon_ironkin_01',
       'armor_heavy_beskar',
-      'accessory_mandalorian_01'
+      'accessory_ironkin_01'
     ],
     bonuses: {
       2: {
@@ -139,11 +139,11 @@ export function formatSetBonus(bonus) {
   if (bonus.accuracy) parts.push(`+${bonus.accuracy}% Accuracy`);
   if (bonus.defense) parts.push(`+${bonus.defense}% Defense`);
   if (bonus.damage) parts.push(`+${bonus.damage}% Damage`);
-  if (bonus.forcePower) parts.push(`+${bonus.forcePower} Force Power`);
+  if (bonus.forcePower) parts.push(`+${bonus.forcePower} Veil Power`);
   if (bonus.charisma) parts.push(`+${bonus.charisma} Charisma`);
   if (bonus.smugglingSuccess) parts.push(`+${bonus.smugglingSuccess}% Smuggling`);
-  if (bonus.energyResistance) parts.push(`+${bonus.energyResistance}% Energy Resistance`);
-  if (bonus.forceAbilityEffectiveness) parts.push(`+${bonus.forceAbilityEffectiveness}% Force Ability Effectiveness`);
+  if (bonus.energyResistance) parts.push(`+${bonus.energyResistance}% Energy Uprising`);
+  if (bonus.forceAbilityEffectiveness) parts.push(`+${bonus.forceAbilityEffectiveness}% Veil Ability Effectiveness`);
   
   return parts.join(', ') || bonus.description || 'Set bonus';
 }

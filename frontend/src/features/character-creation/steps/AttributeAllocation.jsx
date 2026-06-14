@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { calculateBaseStats, getSpeciesBonus, getBackgroundBonus, getTotalBonus } from '../../../utils/characterBonuses';
+import { calculateCritChance, calculateDodgeChance } from '../../../utils/diminishingReturns';
 
 const ATTRIBUTES = [
   {
@@ -135,6 +136,27 @@ export default function AttributeAllocation({ characterData, onUpdate }) {
 
   const pointsRemaining = STARTING_POINTS - totalSpent;
 
+  // Live preview of the derived combat stats these attributes produce at level 1,
+  // using the same formulas the in-game character uses — so allocation feels real.
+  const derived = useMemo(() => {
+    const s = stats;
+    return {
+      health: 100 + ((s.endurance - 10) * 10),
+      stamina: 100 + ((s.endurance - 10) * 5),
+      carry: 50 + (s.strength * 5),
+      crit: calculateCritChance(s.perception || 10, 0, 0),
+      dodge: calculateDodgeChance(s.agility || 10, 0, 0)
+    };
+  }, [stats]);
+
+  const DERIVED_ROWS = [
+    { key: 'health', label: 'Max Health', icon: '❤️', value: derived.health, from: 'Endurance' },
+    { key: 'stamina', label: 'Max Stamina', icon: '⚡', value: derived.stamina, from: 'Endurance' },
+    { key: 'crit', label: 'Crit Chance', icon: '🎯', value: `${(derived.crit * 100).toFixed(1)}%`, from: 'Perception' },
+    { key: 'dodge', label: 'Dodge', icon: '✨', value: `${(derived.dodge * 100).toFixed(1)}%`, from: 'Agility' },
+    { key: 'carry', label: 'Carry Weight', icon: '🎒', value: derived.carry, from: 'Strength' }
+  ];
+
   useEffect(() => {
     onUpdate({ stats });
   }, [stats]);
@@ -238,9 +260,22 @@ export default function AttributeAllocation({ characterData, onUpdate }) {
         })}
       </div>
 
+      <div className="derived-preview">
+        <h4 className="derived-preview-title">Derived Stats <span className="derived-preview-note">— update live as you allocate</span></h4>
+        <div className="derived-preview-grid">
+          {DERIVED_ROWS.map((row) => (
+            <div key={row.key} className="derived-stat" title={`Scales with ${row.from}`}>
+              <span className="derived-stat-icon">{row.icon}</span>
+              <span className="derived-stat-value">{row.value}</span>
+              <span className="derived-stat-label">{row.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {pointsRemaining > 0 && (
         <div className="allocation-warning">
-          ⚠️ You have {pointsRemaining} unspent point{pointsRemaining !== 1 ? 's' : ''}. 
+          ⚠️ You have {pointsRemaining} unspent point{pointsRemaining !== 1 ? 's' : ''}.
           You can proceed, but it's recommended to allocate all points.
         </div>
       )}

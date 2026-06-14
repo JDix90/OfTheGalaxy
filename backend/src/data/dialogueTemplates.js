@@ -230,41 +230,41 @@ const dialogueTemplates = [
       stranger: "The {factionName}? We're not aligned with any major faction. We prefer to stay neutral and independent.",
       acquaintance: "The {factionName} represents neutrality. We don't take sides in galactic conflicts. It's safer that way.",
       friend: "Friend, the {factionName} is about staying out of the major conflicts. We believe in independence and neutrality. It's not always easy, but it's our way.",
-      confidant: "My friend, the {factionName} philosophy is simple: stay neutral, stay independent. We don't answer to the Republic, Empire, or any other major power. It's a difficult path, but it's ours."
+      confidant: "My friend, the {factionName} philosophy is simple: stay neutral, stay independent. We don't answer to the Concord, Iron Dominion, or any other major power. It's a difficult path, but it's ours."
     }
   },
 
   {
-    id: 'faction_info_jedi_01',
+    id: 'faction_info_keeper_01',
     category: 'faction_info',
-    topics: ['faction', 'faction_info', 'jedi', 'lore'],
+    topics: ['faction', 'faction_info', 'keeper', 'lore'],
     relationshipTiers: ['stranger', 'acquaintance', 'friend', 'confidant'],
     npcTypes: ['generic', 'quest_giver'],
     context: {},
     weight: 1.7,
     helpful: true,
     responses: {
-      stranger: "The Jedi? They're an ancient order of Force-users. Not many left these days, but their legacy remains.",
-      acquaintance: "The Jedi Order was once a powerful force for peace. They were guardians of the Republic. These days, they're mostly legends.",
-      friend: "Friend, the Jedi were keepers of peace and justice. They used the Force for good. The Jedi Temple on Coruscant was their stronghold, though it's been through many changes.",
-      confidant: "My friend, the Jedi Order has a long and complex history. They were peacekeepers, but also warriors when needed. The Force flows through them, connecting all living things. Their teachings still influence many, even if the Order itself has diminished."
+      stranger: "The Keeper? They're an ancient order of Veil-users. Not many left these days, but their legacy remains.",
+      acquaintance: "The Keeper Order was once a powerful force for peace. They were guardians of the Concord. These days, they're mostly legends.",
+      friend: "Friend, the Keeper were keepers of peace and justice. They used the Veil for good. The Keeper Sanctum on Centralis was their stronghold, though it's been through many changes.",
+      confidant: "My friend, the Keeper Order has a long and complex history. They were peacekeepers, but also warriors when needed. The Veil flows through them, connecting all living things. Their teachings still influence many, even if the Order itself has diminished."
     }
   },
 
   {
-    id: 'faction_info_jedi_02',
+    id: 'faction_info_keeper_02',
     category: 'faction_info',
-    topics: ['faction', 'faction_info', 'jedi', 'lore'],
+    topics: ['faction', 'faction_info', 'keeper', 'lore'],
     relationshipTiers: ['stranger', 'acquaintance', 'friend', 'confidant'],
     npcTypes: ['generic', 'quest_giver'],
     context: {},
     weight: 1.6,
     helpful: true,
     responses: {
-      stranger: "The Jedi Order? They're Force-wielders who served the Republic. Not much left of them now.",
-      acquaintance: "The Jedi were guardians of peace. They used lightsabers and the Force. The Jedi Temple on Coruscant was their home.",
-      friend: "Friend, the Jedi were powerful Force-users who protected the galaxy. They followed a code of peace and justice. Many say they're all gone, but legends persist.",
-      confidant: "My friend, the Jedi Order was one of the most powerful organizations in the galaxy. They were peacekeepers, but also warriors. Their connection to the Force made them formidable. Even now, their influence is felt across the galaxy."
+      stranger: "The Keeper Order? They're Veil-wielders who served the Concord. Not much left of them now.",
+      acquaintance: "The Keeper were guardians of peace. They used arcblades and the Veil. The Keeper Sanctum on Centralis was their home.",
+      friend: "Friend, the Keeper were powerful Veil-users who protected the galaxy. They followed a code of peace and justice. Many say they're all gone, but legends persist.",
+      confidant: "My friend, the Keeper Order was one of the most powerful organizations in the galaxy. They were peacekeepers, but also warriors. Their connection to the Veil made them formidable. Even now, their influence is felt across the galaxy."
     }
   },
 
@@ -530,8 +530,8 @@ const dialogueTemplates = [
     responses: {
       stranger: "Take care out there. Stay safe.",
       acquaintance: "Good luck with your travels. Come back anytime.",
-      friend: "Friend, stay safe out there. May the Force be with you.",
-      confidant: "My dear friend, take care. If you need anything, you know where to find me. May the Force be with you."
+      friend: "Friend, stay safe out there. May the Veil be with you.",
+      confidant: "My dear friend, take care. If you need anything, you know where to find me. May the Veil be with you."
     }
   },
 
@@ -1050,8 +1050,8 @@ const dialogueTemplates = [
     helpful: false,
     responses: {
       acquaintance: "Good luck with your travels. Stay safe out there.",
-      friend: "Good luck, friend! May the Force be with you.",
-      confidant: "Good luck, my friend! May the Force be with you, and may you find what you're looking for."
+      friend: "Good luck, friend! May the Veil be with you.",
+      confidant: "Good luck, my friend! May the Veil be with you, and may you find what you're looking for."
     }
   },
 

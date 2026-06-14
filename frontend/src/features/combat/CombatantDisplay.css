@@ -300,3 +300,22 @@
 }
 
 
+
+/* --- #17A juice: HP-bar tween + hit shake --- */
+.combatant-display .stat-bar-progress {
+  transition: width 0.4s ease;
+}
+.combatant-display.hit-shake {
+  animation: combatant-hit-shake 0.32s ease;
+}
+@keyframes combatant-hit-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .combatant-display.hit-shake { animation: none; }
+  .combatant-display .stat-bar-progress { transition: none; }
+}

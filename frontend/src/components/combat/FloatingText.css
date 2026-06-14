@@ -1,0 +1,38 @@
+/* Floating combat feedback text */
+.floating-text {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  z-index: 1500;
+  pointer-events: none;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
+  animation: floating-rise 0.95s ease-out forwards;
+  white-space: nowrap;
+}
+
+.floating-damage { color: #ffffff; font-size: 1.6rem; }
+.floating-crit   { color: #fbbf24; font-size: 2.3rem; letter-spacing: 0.02em; }
+.floating-miss   { color: #94a3b8; font-size: 1.3rem; font-weight: 700; }
+.floating-dodge  { color: #67e8f9; font-size: 1.3rem; font-weight: 700; }
+.floating-heal   { color: #6ee79a; font-size: 1.6rem; }
+
+@keyframes floating-rise {
+  0%   { opacity: 0; transform: translate(-50%, -30%) scale(0.7); }
+  15%  { opacity: 1; transform: translate(-50%, -55%) scale(1.05); }
+  70%  { opacity: 1; transform: translate(-50%, -95%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -130%) scale(0.95); }
+}
+
+/* Crit pops a bit harder */
+.floating-crit { animation: floating-rise-crit 1.05s ease-out forwards; }
+@keyframes floating-rise-crit {
+  0%   { opacity: 0; transform: translate(-50%, -30%) scale(0.6) rotate(-4deg); }
+  18%  { opacity: 1; transform: translate(-50%, -60%) scale(1.35) rotate(2deg); }
+  70%  { opacity: 1; transform: translate(-50%, -100%) scale(1.1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, -140%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-text { animation-duration: 0.6s; }
+  .floating-crit { animation: floating-rise 0.6s ease-out forwards; }
+}

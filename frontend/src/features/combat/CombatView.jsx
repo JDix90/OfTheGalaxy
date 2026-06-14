@@ -14,8 +14,14 @@ import CombatLog from './CombatLog';
 import VictoryScreen from './VictoryScreen';
 import PauseMenu from '../menus/PauseMenu';
 import TutorialOverlay from '../../components/tutorial/TutorialOverlay';
+import FloatingText from '../../components/combat/FloatingText';
+import ParticleField from '../../components/effects/ParticleField';
+import { emitImpact } from '../../services/particleEngine';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { prefersReducedMotion } from '../../utils/motion';
 import './CombatView.css';
+
+let _fxId = 1;
 
 export default function CombatView() {
   const { encounterId } = useParams();
@@ -38,8 +44,71 @@ export default function CombatView() {
   const [showVictoryScreen, setShowVictoryScreen] = useState(false);
   const [victoryData, setVictoryData] = useState(null);
   const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
+  const [floatingTexts, setFloatingTexts] = useState([]); // { id, text, kind, x, y }
+  const [shakeIds, setShakeIds] = useState([]);            // combatant ids briefly shaking
+  const [screenShake, setScreenShake] = useState(false);
   const pollingRef = useRef(null);
   const isPollingRef = useRef(false);
+
+  // Capture the player's level at the start of combat, BEFORE any kill-reward
+  // reloads the character in the store. combatSlice.executeAction refreshes
+  // currentCharacter to its post-combat level on the killing blow, so reading
+  // the level inside VictoryScreen would already see the incremented value.
+  // We snapshot it here on the first render that has a character available
+  // (which is always before the player can act) and hand it to VictoryScreen.
+  const preCombatLevelRef = useRef(null);
+  if (preCombatLevelRef.current === null && currentCharacter?.level != null) {
+    preCombatLevelRef.current = currentCharacter.level;
+  }
+
+  // Spawn floating numbers + hit shakes from a resolved action (player attack +
+  // any bundled enemy counterattacks). Positions are read from the rendered
+  // combatant cards at hit time; the layout is fixed so this stays accurate.
+  const playCombatFx = (action) => {
+    if (!action) return;
+    const actions = [action, ...(action.enemyActions || [])];
+    const reduced = prefersReducedMotion();
+    const toShake = [];
+    let sawCrit = false;
+
+    actions.forEach((a, i) => {
+      if (a.type !== 'attack' || !a.target) return;
+      const el = document.querySelector(`[data-combatant-id="${a.target}"]`);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height * 0.32;
+
+      let text, kind;
+      if (a.dodged) { text = 'Dodge'; kind = 'dodge'; }
+      else if (a.hit === false) { text = 'Miss'; kind = 'miss'; }
+      else {
+        text = `-${a.damage}`;
+        kind = a.critical ? 'crit' : 'damage';
+        toShake.push(a.target);
+        if (a.critical) sawCrit = true;
+      }
+
+      const id = _fxId++;
+      const landed = kind === 'damage' || kind === 'crit';
+      // small stagger so bundled hits don't overlap perfectly
+      setTimeout(() => {
+        setFloatingTexts((prev) => [...prev, { id, text, kind, x, y }]);
+        setTimeout(() => setFloatingTexts((prev) => prev.filter((f) => f.id !== id)), 1100);
+        // Impact sparks at the strike point (sprite particles + circle fallback)
+        if (!reduced && landed) emitImpact(x, y, kind === 'crit' ? 'crit' : 'hit');
+      }, i * 180);
+    });
+
+    if (!reduced && toShake.length) {
+      setShakeIds(toShake);
+      setTimeout(() => setShakeIds([]), 320);
+    }
+    if (!reduced && sawCrit) {
+      setScreenShake(true);
+      setTimeout(() => setScreenShake(false), 260);
+    }
+  };
   
   // Store return location when entering combat
   const returnLocationRef = useRef(location.state?.returnLocation || null);
@@ -182,6 +251,9 @@ export default function CombatView() {
       );
 
       console.log('🎮 Action result:', result);
+
+      // Juice: floating damage/crit/miss/dodge numbers + hit shake
+      playCombatFx(result.action);
 
       // Check if player successfully fled
       if (result.action?.type === 'flee' && result.action?.success === true) {
@@ -327,6 +399,7 @@ export default function CombatView() {
         encounter={victoryData.encounter}
         onClose={null}
         returnLocation={returnLocationRef.current || location.state?.returnLocation}
+        preCombatLevel={preCombatLevelRef.current}
       />
     );
   }
@@ -353,7 +426,11 @@ export default function CombatView() {
   }
 
   return (
-    <div className="combat-view">
+    <div className={`combat-view ${screenShake ? 'screen-shake' : ''}`}>
+      <ParticleField />
+      {floatingTexts.map((f) => (
+        <FloatingText key={f.id} text={f.text} kind={f.kind} x={f.x} y={f.y} />
+      ))}
       <PauseMenu isOpen={isPauseMenuOpen} onClose={() => setIsPauseMenuOpen(false)} />
       <div className="combat-header">
         <h1>Combat</h1>
@@ -378,6 +455,7 @@ export default function CombatView() {
               isCurrentTurn={isPlayerTurn}
               isSelected={selectedTarget === playerCombatant.id}
               onSelect={() => setSelectedTarget(playerCombatant.id)}
+              shake={shakeIds.includes(playerCombatant.id)}
             />
           )}
 
@@ -404,6 +482,7 @@ export default function CombatView() {
                 isCurrentTurn={currentCombatantId === enemy.id}
                 isSelected={selectedTarget === enemy.id}
                 onSelect={() => setSelectedTarget(enemy.id)}
+                shake={shakeIds.includes(enemy.id)}
               />
             ))}
           </div>

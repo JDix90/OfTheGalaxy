@@ -1,11 +1,11 @@
 {
   "id": "npc_refugee_leader",
   "name": "Lira Tann",
-  "species": "twi'lek",
+  "species": "sytheen",
   "occupation": "Refugee Camp Leader",
   "factionId": null,
   "location": {
-    "planet": "ryloth",
+    "planet": "sytha",
     "area": "tann_province",
     "x": 185,
     "y": 285
@@ -20,26 +20,26 @@
       "confidant": "You've become like family to us. I trust you with our lives."
     },
     "questRelated": {
-      "iia_ryloth_02_mines_investigation": "Many of our people worked in the mines before being taken to Compound 7-Alpha. There's an abandoned mine in the mining district—the foreman, Grakk Torr, was last seen there. He knows more than he's telling. If you can find evidence in that mine and confront him, we might finally learn the truth about what happened to our people. Please, investigate the abandoned mine and confront the foreman.",
-      "iia_ryloth_02_mines_investigation_location": "The abandoned mine is in the mining district. It's been closed for years, but Grakk Torr still goes there sometimes. If you can reach the deep levels where his office is, you might find evidence. Be careful—the mine is dangerous, and there may be security systems or even enemies still lurking there.",
-      "iia_ryloth_03_refugee_liberation": "We came from Compound 7-Alpha. The Empire... they did terrible things. We escaped, but many didn't. Now the syndicate hunts us, and we can't stay here. We need to get off Ryloth, but we have nowhere to go. Can you help us? We need transport, supplies, and protection. Please, help us find a new home."
+      "iia_sytha_02_mines_investigation": "Many of our people worked in the mines before being taken to Compound 7-Alpha. There's an abandoned mine in the mining district—the foreman, Grakk Torr, was last seen there. He knows more than he's telling. If you can find evidence in that mine and confront him, we might finally learn the truth about what happened to our people. Please, investigate the abandoned mine and confront the foreman.",
+      "iia_sytha_02_mines_investigation_location": "The abandoned mine is in the mining district. It's been closed for years, but Grakk Torr still goes there sometimes. If you can reach the deep levels where his office is, you might find evidence. Be careful—the mine is dangerous, and there may be security systems or even enemies still lurking there.",
+      "iia_sytha_03_refugee_liberation": "We came from Compound 7-Alpha. The Iron Dominion... they did terrible things. We escaped, but many didn't. Now the syndicate hunts us, and we can't stay here. We need to get off Sytha, but we have nowhere to go. Can you help us? We need transport, supplies, and protection. Please, help us find a new home."
     },
     "general": [
       "Every day we're here, we're in danger. The syndicate knows where we are.",
       "We lost everything at Compound 7-Alpha. Our homes, our families...",
-      "The New Republic says they'll help, but we're still waiting.",
+      "The Concord says they'll help, but we're still waiting.",
       "I never thought I'd be leading a refugee camp. But someone had to step up.",
       "We're not asking for charity. We just need a chance to start over."
     ]
   },
-  "quests": ["iia_ryloth_03_refugee_liberation"],
+  "quests": ["iia_sytha_03_refugee_liberation"],
   "vendorInventory": null,
   "companionAbilities": null,
   "companionStats": null,
   "appearance": {
     "age": "late 30s",
     "build": "average",
-    "hair": "n/a (twi'lek)",
+    "hair": "n/a (sytheen)",
     "eyes": "green",
     "distinguishingFeatures": "Green lekku, tired eyes, worn clothing"
   },

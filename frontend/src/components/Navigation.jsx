@@ -7,6 +7,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
 import { useAuthStore } from '../state/authSlice';
+import './Navigation.css';
 
 export default function Navigation() {
   const location = useLocation();

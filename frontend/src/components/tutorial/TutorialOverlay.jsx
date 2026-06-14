@@ -11,6 +11,7 @@ import { useCombatStore } from '../../state/combatSlice';
 import { TUTORIAL_STATES } from '../../services/tutorialStateMachine';
 import { tutorialApi } from '../../services/api/tutorialApi';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
+import tutorialMetrics from '../../services/tutorialMetrics';
 import TutorialTooltip from './TutorialTooltip';
 import TutorialHighlight from './TutorialHighlight';
 import './TutorialOverlay.css';
@@ -18,22 +19,22 @@ import './TutorialOverlay.css';
 // Tutorial step configurations
 const TUTORIAL_STEPS = {
   [TUTORIAL_STATES.STARTING]: {
-    title: 'Welcome to the Galaxy!',
-    description: "You've arrived at the spaceport. Let's get you oriented and ready to begin your adventure.",
+    title: 'Planetfall on Solenne',
+    description: "You've made planetfall at the Solenne docks, edge of the Severed Reach. Dockmaster Jax runs these landing bays — find him and he'll show you how to stay breathing out here.",
     target: null, // Center tooltip
     position: 'center',
     showHighlight: false
   },
   [TUTORIAL_STATES.ORIENT_UI]: {
-    title: 'Welcome to the Galaxy!',
-    description: "You've arrived at the spaceport. Let's get you oriented. Use the arrow keys or WASD to move around.",
+    title: 'Planetfall on Solenne',
+    description: "Welcome to the Solenne docks. Get your bearings, then look for Dockmaster Jax. Move with the arrow keys or WASD.",
     target: null, // Center tooltip
     position: 'center',
     showHighlight: false
   },
   [TUTORIAL_STATES.MOVEMENT_INTRO]: {
-    title: 'Movement',
-    description: 'Use WASD or arrow keys to move your character. Try moving toward the highlighted contact.',
+    title: 'Find Your Feet',
+    description: 'Move with WASD or the arrow keys. Make your way toward the highlighted contact — that\'s Dockmaster Jax.',
     target: 'planet-map-canvas',
     position: 'center',
     showHighlight: true,
@@ -257,8 +258,8 @@ const TUTORIAL_STEPS = {
     showHighlight: false
   },
   [TUTORIAL_STATES.TUTORIAL_COMPLETE]: {
-    title: 'Congratulations!',
-    description: "You've completed your first quest! Here are your rewards. You're ready to explore the galaxy on your own.",
+    title: "You're On Your Way",
+    description: "You've learned the four things that keep a drifter alive: move with WASD, fight turn-by-turn, heal with medpacs from your inventory (I), and trade where your standing changes the price. The galaxy map is open now — there are quests waiting across the Reach. It's wide and it doesn't care about you, but Jax does, a little. Now get going.",
     target: null,
     position: 'center',
     showHighlight: false
@@ -414,7 +415,23 @@ export default function TutorialOverlay() {
   const { startEncounter } = useCombatStore();
   const { currentState, isActive, skipTutorial, transitionTo, isLoading, isStateCompleted, completeStep, stateMachine } = useTutorial();
   const [dismissedSteps, setDismissedSteps] = useState(new Set());
-  
+
+  // Dev-only golden-path pacing instrumentation: timestamp each state entry so we
+  // can measure the run against the ~10-minute target and spot stalls. A fresh
+  // run (leaving not_started) resets the clock. No-op in production.
+  const prevMetricStateRef = useRef(null);
+  useEffect(() => {
+    if (!currentState || currentState === TUTORIAL_STATES.NOT_STARTED) {
+      prevMetricStateRef.current = currentState;
+      return;
+    }
+    if (prevMetricStateRef.current === TUTORIAL_STATES.NOT_STARTED) {
+      tutorialMetrics.reset();
+    }
+    tutorialMetrics.mark(currentState);
+    prevMetricStateRef.current = currentState;
+  }, [currentState]);
+
   // Debug log at component level
   if (currentState === TUTORIAL_STATES.COMBAT_INTRO) {
     console.log('[TutorialOverlay] COMBAT_INTRO state detected:', { currentState, isActive, isLoading });
@@ -484,21 +501,8 @@ export default function TutorialOverlay() {
   }, [currentState, isOnPlanetSurface, isOnSubmap, isOnGameWorld, currentCharacter, navigate]);
   
   // Get tutorial NPC name based on character background
-  const tutorialNPCName = useMemo(() => {
-    if (!currentCharacter?.background) return 'Sergeant Kael'; // Default fallback
-    
-    const tutorialNPCNames = {
-      smuggler: 'Dockmaster Jax',
-      scholar: 'Archivist Tera',
-      soldier: 'Sergeant Kael',
-      medic: 'Medic Voss',
-      engineer: 'Tech Specialist Rynn',
-      diplomat: 'Ambassador Lira',
-      pilot: 'Flight Controller Dex'
-    };
-    
-    return tutorialNPCNames[currentCharacter.background] || tutorialNPCNames.soldier;
-  }, [currentCharacter?.background]);
+  // #16: the onboarding guide is unified to Dockmaster Jax for every background.
+  const tutorialNPCName = 'Dockmaster Jax';
   
   // Get current step configuration - adjust based on current page
   const currentStep = useMemo(() => {
@@ -511,8 +515,8 @@ export default function TutorialOverlay() {
       // On GameWorld page - show welcome that makes sense for this page
       return {
         ...baseStep,
-        title: 'Welcome to the Galaxy!',
-        description: "You've arrived at the spaceport. Let's get you oriented. Click 'Next' to travel to your starting planet and begin your adventure.",
+        title: 'Welcome to the Severed Reach',
+        description: "Your ship's logged in and the docks are waiting. Click 'Next' to make planetfall and meet the dockmaster who'll show you the ropes.",
         target: null,
         position: 'center'
       };
@@ -613,7 +617,22 @@ export default function TutorialOverlay() {
     console.log('[TutorialOverlay] Not rendering - loading or no step:', { isLoading, currentStep: !!currentStep, currentState });
     return null;
   }
-  
+
+  // Anchor the overlay to the right screen so it never "follows" the player onto an
+  // unrelated page (e.g. a movement/NPC step lingering on top of the vendor screen):
+  // vendor steps show ONLY on the vendor page, and non-vendor steps NEVER show there.
+  const VENDOR_STATES = [
+    TUTORIAL_STATES.VENDOR_INTRO,
+    TUTORIAL_STATES.VENDOR_OPENED,
+    TUTORIAL_STATES.VENDOR_ITEM_HOVER_EXPLAINED,
+    TUTORIAL_STATES.VENDOR_BUY_MEDPAC,
+    TUTORIAL_STATES.VENDOR_SELL_DROID_PARTS
+  ];
+  const isVendorState = VENDOR_STATES.includes(currentState);
+  if (isOnVendor && !isVendorState) return null;
+  if (!isOnVendor && isVendorState && !isOnGameWorld) return null;
+
+
   // Don't show tutorial overlay if the current state has already been completed
   // This prevents the overlay from reappearing for states the player has already dismissed
   // BUT allow early tutorial states and COMBAT_INTRO to show even if marked as completed

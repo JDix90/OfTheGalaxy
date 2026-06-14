@@ -166,9 +166,9 @@ function calculatePathDistance(path) {
 
 // Test planets with Nav-Mesh data
 const testPlanets = [
-  { id: 'tatooine', name: 'Tatooine' },
-  { id: 'dantooine', name: 'Dantooine' },
-  { id: 'hoth', name: 'Hoth' }
+  { id: 'gravenmoor', name: 'Gravenmoor' },
+  { id: 'caldon', name: 'Caldon' },
+  { id: 'rime', name: 'Rime' }
 ];
 
 /**

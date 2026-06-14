@@ -11,22 +11,16 @@ class CharacterService {
    */
   async createCharacter(userId, characterData) {
     const { name, species, background, appearance, stats } = characterData;
-    
-    // Apply species bonuses
-    const speciesBonuses = this.getSpeciesBonuses(species);
-    const finalStats = { ...stats };
-    
-    Object.keys(speciesBonuses).forEach(stat => {
-      finalStats[stat] = (finalStats[stat] || 10) + speciesBonuses[stat];
-    });
-    
-    // Apply background bonuses
+
     const backgroundBonuses = this.getBackgroundBonuses(background);
-    
-    Object.keys(backgroundBonuses.stats).forEach(stat => {
-      finalStats[stat] = (finalStats[stat] || 10) + backgroundBonuses.stats[stat];
-    });
-    
+
+    // The stats coming from the creation UI ALREADY include the species +
+    // background attribute bonuses (they're baked into the base shown to the
+    // player) plus the player's allocated points. Store them verbatim — do NOT
+    // re-apply the bonuses here, or they get double-counted and the in-game
+    // attributes drift above what the player saw on the confirmation screen.
+    const finalStats = { ...stats };
+
     const character = await PlayerCharacter.create({
       userId,
       name,
@@ -34,6 +28,8 @@ class CharacterService {
       background,
       appearance,
       stats: finalStats,
+      xp: 0,
+      level: 1,
       currentPlanet: backgroundBonuses.startingPlanet,
       credits: backgroundBonuses.startingCredits
     });
@@ -77,13 +73,13 @@ class CharacterService {
   getSpeciesBonuses(species) {
     const speciesBonuses = {
       human: { strength: 1, intelligence: 1, charisma: 1 },
-      wookiee: { strength: 3, endurance: 2, intelligence: -1, charisma: -1 },
-      twilek: { charisma: 2, agility: 2, strength: -1 },
-      rodian: { perception: 2, agility: 2, endurance: -1 },
-      zabrak: { endurance: 2, strength: 2, charisma: -1 },
-      togruta: { perception: 2, intelligence: 2, strength: -1 },
-      mirialan: { agility: 2, perception: 2, endurance: -1 },
-      chiss: { intelligence: 2, perception: 2, strength: -1 }
+      ursk: { strength: 3, endurance: 2, intelligence: -1, charisma: -1 },
+      sytheen: { charisma: 2, agility: 2, strength: -1 },
+      skarn: { perception: 2, agility: 2, endurance: -1 },
+      karnaki: { endurance: 2, strength: 2, charisma: -1 },
+      sethari: { perception: 2, intelligence: 2, strength: -1 },
+      jeharu: { agility: 2, perception: 2, endurance: -1 },
+      vorne: { intelligence: 2, perception: 2, strength: -1 }
     };
     
     return speciesBonuses[species] || {};
@@ -96,45 +92,45 @@ class CharacterService {
     const backgrounds = {
       smuggler: {
         stats: { agility: 2, charisma: 1 },
-        startingPlanet: 'nar_shaddaa',
+        startingPlanet: 'sinkport',
         startingCredits: 2000,
-        startingItems: ['blaster_pistol_01', 'armor_light_01', 'medpac_01']
+        startingItems: ['pulser_pistol_01', 'armor_light_01', 'medpac_01']
       },
       scholar: {
         stats: { intelligence: 3 },
-        startingPlanet: 'coruscant',
+        startingPlanet: 'centralis',
         startingCredits: 1500,
         startingItems: ['datapad_01', 'armor_light_01', 'medpac_01']
       },
       soldier: {
         stats: { strength: 2, endurance: 1 },
-        startingPlanet: 'chandrila',
+        startingPlanet: 'solenne',
         startingCredits: 1000,
-        startingItems: ['blaster_rifle_01', 'armor_medium_01', 'medpac_01', 'stimpack_01']
+        startingItems: ['pulser_rifle_01', 'armor_medium_01', 'medpac_01', 'stimpack_01']
       },
       medic: {
         stats: { intelligence: 1, charisma: 2 },
-        startingPlanet: 'chandrila',
+        startingPlanet: 'solenne',
         startingCredits: 1200,
-        startingItems: ['blaster_pistol_01', 'armor_light_01', 'medpac_01', 'medpac_01']
+        startingItems: ['pulser_pistol_01', 'armor_light_01', 'medpac_01', 'medpac_01']
       },
       engineer: {
         stats: { intelligence: 2, perception: 1 },
-        startingPlanet: 'corellia',
+        startingPlanet: 'drydock',
         startingCredits: 1300,
-        startingItems: ['blaster_pistol_01', 'armor_light_01', 'medpac_01']
+        startingItems: ['pulser_pistol_01', 'armor_light_01', 'medpac_01']
       },
       diplomat: {
         stats: { charisma: 3 },
-        startingPlanet: 'naboo',
+        startingPlanet: 'eloria',
         startingCredits: 2500,
-        startingItems: ['blaster_pistol_01', 'armor_light_01', 'comlink_01', 'medpac_01']
+        startingItems: ['pulser_pistol_01', 'armor_light_01', 'comlink_01', 'medpac_01']
       },
       pilot: {
         stats: { agility: 2, perception: 1 },
-        startingPlanet: 'corellia',
+        startingPlanet: 'drydock',
         startingCredits: 1800,
-        startingItems: ['blaster_pistol_01', 'armor_light_01', 'medpac_01']
+        startingItems: ['pulser_pistol_01', 'armor_light_01', 'medpac_01']
       }
     };
     

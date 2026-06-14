@@ -35,7 +35,7 @@ describe('CombatService', () => {
       const encounter = await combatService.createEncounter(
         character.id,
         'random',
-        ['stormtrooper']
+        ['ironclad']
       );
 
       expect(encounter).toBeDefined();
@@ -60,13 +60,13 @@ describe('CombatService', () => {
       const encounter1 = await combatService.createEncounter(
         character.id,
         'random',
-        ['stormtrooper']
+        ['ironclad']
       );
 
       const encounter2 = await combatService.createEncounter(
         character.id,
         'random',
-        ['stormtrooper']
+        ['ironclad']
       );
 
       expect(encounter1.id).toBe(encounter2.id);
@@ -74,7 +74,7 @@ describe('CombatService', () => {
 
     test('should throw error if character not found', async () => {
       await expect(
-        combatService.createEncounter('invalid-id', 'random', ['stormtrooper'])
+        combatService.createEncounter('invalid-id', 'random', ['ironclad'])
       ).rejects.toThrow('Character not found');
     });
 
@@ -128,7 +128,7 @@ describe('CombatService', () => {
       encounter = await combatService.createEncounter(
         character.id,
         'random',
-        ['stormtrooper']
+        ['ironclad']
       );
     });
 
@@ -199,7 +199,7 @@ describe('CombatService', () => {
       encounter = await combatService.createEncounter(
         character.id,
         'random',
-        ['stormtrooper']
+        ['ironclad']
       );
     });
 
@@ -254,7 +254,7 @@ describe('CombatService', () => {
       encounter = await combatService.createEncounter(
         character.id,
         'random',
-        ['stormtrooper']
+        ['ironclad']
       );
     });
 

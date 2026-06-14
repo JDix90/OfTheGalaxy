@@ -1,0 +1,26 @@
+/* Character select — friendlier empty state */
+.character-select {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  background:
+    radial-gradient(1000px 500px at 50% -10%, rgba(56, 130, 246, 0.12), transparent 60%),
+    #070b18;
+}
+.character-select-container { width: 100%; max-width: 760px; }
+
+.no-characters {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(20, 28, 48, 0.5);
+  border: 1px solid rgba(90, 120, 200, 0.18);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+.no-characters-icon { font-size: 3.2rem; }
+.no-characters h2 { margin: 0; color: #e3edff; }
+.no-characters p { color: #8aa0bd; max-width: 36ch; margin: 0 0 1rem; }

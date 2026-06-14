@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { formatDisplayName } from '../utils/formatName';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
 import { useDiscoveryStore } from '../state/discoverySlice';
@@ -19,6 +20,8 @@ import DialogueInterface from '../features/dialogue/DialogueInterface';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import ResourceEncounterDialog from '../components/resource/ResourceEncounterDialog';
 import { renderSubMap } from '../utils/subMapRenderer';
+import { assetManager } from '../services/assetManager';
+import ParticleField from '../components/effects/ParticleField';
 import { useOptimizedCanvas } from '../hooks/useOptimizedCanvas';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HUD from '../components/hud/HUD';
@@ -150,12 +153,12 @@ export default function SubMapView() {
     try {
       // Try to load existing NPCs
       // Pass parentLocationId, planetId, and area to help find NPCs by area
-      // Extract area from parentLocationId (e.g., "Lessu, the Capital City" -> "lessu")
+      // Extract area from parentLocationId (e.g., "Sythmar, the Capital City" -> "sythmar")
       let area = null;
       if (subMap.parentLocationId) {
         const parentLower = subMap.parentLocationId.toLowerCase();
-        if (parentLower.includes('lessu')) {
-          area = 'lessu';
+        if (parentLower.includes('sythmar')) {
+          area = 'sythmar';
         } else if (parentLower.includes('tann')) {
           area = 'tann_province';
         }
@@ -1054,7 +1057,7 @@ export default function SubMapView() {
             await loadSubMapNPCs(subMap);
             console.log('[SubMapView] Reloaded NPCs after ensuring tutorial NPC');
             
-            // Force a re-render by marking the canvas as dirty
+            // Veil a re-render by marking the canvas as dirty
             markFullRedraw();
             
             // Verify tutorial NPC is now in the NPCs array
@@ -1261,7 +1264,7 @@ export default function SubMapView() {
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      needsFullRedraw = true; // Force full redraw on resize
+      needsFullRedraw = true; // Veil full redraw on resize
     }
 
     const ctx = canvas.getContext('2d');
@@ -1461,6 +1464,18 @@ export default function SubMapView() {
       stopRender();
     };
   }, [subMap, requestRender, stopRender, markFullRedraw, renderSubMapOptimized]);
+
+  // Preload POI building sprites for this sub-map so they paint without needing
+  // a hover/move to trigger a redraw. Repaints once the art is in the cache.
+  useEffect(() => {
+    const pois = subMap?.pointsOfInterest;
+    if (!pois || pois.length === 0) return;
+    let cancelled = false;
+    const types = [...new Set(pois.map((p) => p.type).filter(Boolean))];
+    Promise.all(types.map((t) => assetManager.loadPOISprite(t).catch(() => null)))
+      .then(() => { if (!cancelled) markFullRedraw(); });
+    return () => { cancelled = true; };
+  }, [subMap, markFullRedraw]);
 
   // Mark dirty areas when dynamic elements change
   useEffect(() => {
@@ -3211,8 +3226,8 @@ export default function SubMapView() {
       let newY = currentLoc.y || 50;
 
       let shouldMove = false;
-      let moveSpeed = 2; // Default movement speed in percentage points
-      
+      let moveSpeed = 3.5; // Movement step per key press (% of map) — snappier per-tap response
+
       // Get collision map for non-dungeon submaps (layout already declared above)
       const collisionMap = layout.collisionMap;
 
@@ -3904,7 +3919,7 @@ export default function SubMapView() {
             setCurrentCharacter(updatedCharacter);
             // Ensure movement is enabled after position restore
             setIsMoving(false);
-            // Force a re-render to update the canvas
+            // Veil a re-render to update the canvas
             setTimeout(() => {
               markFullRedraw();
             }, 100);
@@ -3971,6 +3986,9 @@ export default function SubMapView() {
   return (
     <div className="submap-view">
       <HUD />
+      {subMap.type !== 'dungeon' && (
+        <ParticleField ambient="mist" rate={0.3} maxAmbient={18} />
+      )}
       {subMap.type === 'dungeon' && (
         <DungeonDepthIndicator
           currentDepthZone={currentDepthZone}
@@ -3988,9 +4006,11 @@ export default function SubMapView() {
             displayName = displayName.replace(/^(poi|submap)_\w+_/i, '');
             // Replace underscores with spaces and capitalize words
             displayName = displayName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            // Collapse an accidentally duplicated trailing word, e.g. "Spaceport Spaceport"
+            displayName = displayName.replace(/\b(\w+)\s+\1\b/gi, '$1');
             return displayName;
           })()}</h2>
-          <p>{subMap.metadata?.description || `${subMap.type} on ${effectivePlanetId}`}</p>
+          <p>{subMap.metadata?.description || `${formatDisplayName(subMap.type)} on ${formatDisplayName(effectivePlanetId)}`}</p>
         </div>
         <div className="submap-controls">
           <button onClick={() => setZoom(prev => Math.min(3, prev + 0.1))}>+</button>
@@ -4009,6 +4029,15 @@ export default function SubMapView() {
           onMouseLeave={handleCanvasMouseLeave}
           style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
         />
+        {subMap.type !== 'dungeon' && (
+          <div className="submap-npc-legend">
+            <span className="legend-item"><span className="legend-dot" style={{ background: '#fbbf24' }} /> Quest</span>
+            <span className="legend-item"><span className="legend-dot" style={{ background: '#34d399' }} /> Vendor</span>
+            <span className="legend-item"><span className="legend-dot" style={{ background: '#a78bfa' }} /> Companion</span>
+            <span className="legend-item"><span className="legend-dot" style={{ background: '#ef4444' }} /> Faction</span>
+            <span className="legend-item"><span className="legend-dot" style={{ background: '#60a5fa' }} /> Citizen</span>
+          </div>
+        )}
       </div>
 
       {selectedBuilding && (

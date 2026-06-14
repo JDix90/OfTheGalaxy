@@ -93,12 +93,18 @@ const runMigrations = async () => {
     console.log("\n✅ All migrations completed successfully!");
   } catch (error) {
     console.error("\n✗ Migration failed:", error.message);
-    process.exit(1);
-  } finally {
-    await sequelize.close();
-    console.log("\n🔌 Database connection closed.");
+    throw error;
   }
 };
 
-runMigrations();
+module.exports = { runMigrations };
+
+// Direct CLI use (`npm run migrate`): own the connection lifecycle + exit code here,
+// so runMigrations() stays safe to import (e.g. from the Jest setup) without
+// process.exit-ing the worker or closing the shared models connection.
+if (require.main === module) {
+  runMigrations()
+    .then(async () => { await sequelize.close(); process.exit(0); })
+    .catch(async () => { await sequelize.close(); process.exit(1); });
+}
 

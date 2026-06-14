@@ -501,3 +501,75 @@
   }
 }
 
+
+/* Galaxy map legend */
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(140, 160, 200, 0.18);
+  font-size: 0.78rem;
+  color: #8aa0bd;
+}
+.map-legend .legend-item { display: inline-flex; align-items: center; gap: 0.35rem; }
+.map-legend .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.map-legend .legend-line { width: 16px; height: 0; border-top: 2px solid rgba(74, 158, 255, 0.7); display: inline-block; }
+
+/* Tutorial closing-choice "reveal" banner — overlays the galaxy map when the
+   player arrives from the golden path with a destination world to make for. */
+.galaxy-reveal-banner {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  max-width: min(440px, 86%);
+  padding: 0.9rem 1.25rem;
+  text-align: center;
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(20, 30, 54, 0.96), rgba(12, 20, 40, 0.96));
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 28px rgba(251, 191, 36, 0.12);
+  backdrop-filter: blur(4px);
+  animation: reveal-banner-in 0.5s cubic-bezier(0.2, 1.1, 0.4, 1);
+}
+.reveal-banner-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8aa0bd;
+  margin-bottom: 0.25rem;
+}
+.reveal-banner-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  background: linear-gradient(180deg, #ffe9a8, #fbbf24);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.reveal-banner-quest {
+  margin-top: 0.3rem;
+  font-size: 0.9rem;
+  color: #cfe0ff;
+}
+.reveal-banner-dismiss {
+  margin-top: 0.7rem;
+  padding: 0.35rem 1.1rem;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 8px;
+  background: rgba(251, 191, 36, 0.12);
+  color: #ffe9a8;
+  font-weight: 600;
+  cursor: pointer;
+}
+.reveal-banner-dismiss:hover { background: rgba(251, 191, 36, 0.2); }
+@keyframes reveal-banner-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-reveal-banner { animation: none; }
+}

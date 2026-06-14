@@ -1,6 +1,6 @@
 /**
  * Add Missing Travel Routes
- * Adds routes connecting utapau_system and felucia_system to the main network
+ * Adds routes connecting casmer_system and myssia_system to the main network
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
@@ -9,10 +9,10 @@ const TravelRoute = require('../models/TravelRoute')(sequelize);
 const { v4: uuidv4 } = require('uuid');
 
 const missingRoutes = [
-  { from: 'naboo_system', to: 'utapau_system', time: 4, cost: 200 },
-  { from: 'utapau_system', to: 'naboo_system', time: 4, cost: 200 },
-  { from: 'kashyyyk_system', to: 'felucia_system', time: 5, cost: 250 },
-  { from: 'felucia_system', to: 'kashyyyk_system', time: 5, cost: 250 },
+  { from: 'eloria_system', to: 'casmer_system', time: 4, cost: 200 },
+  { from: 'casmer_system', to: 'eloria_system', time: 4, cost: 200 },
+  { from: 'verdholm_system', to: 'myssia_system', time: 5, cost: 250 },
+  { from: 'myssia_system', to: 'verdholm_system', time: 5, cost: 250 },
 ];
 
 async function addMissingRoutes() {
@@ -30,7 +30,7 @@ async function addMissingRoutes() {
           id: uuidv4(),
           fromSystemId: routeData.from,
           toSystemId: routeData.to,
-          routeType: 'hyperlane',
+          routeType: 'foldlane',
           travelTime: routeData.time,
           cost: routeData.cost,
           isActive: true

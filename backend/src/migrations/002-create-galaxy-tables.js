@@ -205,8 +205,8 @@ module.exports = {
       },
       route_type: {
         type: Sequelize.STRING(50),
-        defaultValue: 'hyperlane',
-        comment: 'hyperlane, trade_route, secret_route, etc.'
+        defaultValue: 'foldlane',
+        comment: 'foldlane, trade_route, secret_route, etc.'
       },
       travel_time: {
         type: Sequelize.INTEGER,

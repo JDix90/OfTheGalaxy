@@ -1,0 +1,21 @@
+/* Navigation user cluster — give the email, character name, and Logout room to breathe */
+.main-navigation .nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.main-navigation .nav-user .user-email {
+  color: #8aa0bd;
+  font-size: 0.85rem;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.main-navigation .nav-user .user-info {
+  padding-left: 0.9rem;
+  border-left: 1px solid rgba(140, 160, 200, 0.25);
+  font-weight: 600;
+  color: #e3edff;
+  white-space: nowrap;
+}

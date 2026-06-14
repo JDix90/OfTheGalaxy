@@ -13,15 +13,15 @@ const CONTENT_DIR = path.join(__dirname, '../../../content');
 const questGiverNPCs = [
   {
     id: 'npc_village_elder',
-    file: path.join(CONTENT_DIR, 'factions/new_republic/npcs/twi_lek_village_elder.json')
+    file: path.join(CONTENT_DIR, 'factions/concord/npcs/sytheen_village_elder.json')
   },
   {
-    id: 'npc_twi_lek_informant',
-    file: path.join(CONTENT_DIR, 'factions/independent_investigators/npcs/twi_lek_informant.json')
+    id: 'npc_sytheen_informant',
+    file: path.join(CONTENT_DIR, 'factions/independent_investigators/npcs/sytheen_informant.json')
   },
   {
-    id: 'npc_smuggler_contact_ryloth',
-    file: path.join(CONTENT_DIR, 'factions/smugglers_guild/npcs/smuggler_contact_ryloth.json')
+    id: 'npc_smuggler_contact_sytha',
+    file: path.join(CONTENT_DIR, 'factions/drift_cartel/npcs/smuggler_contact_sytha.json')
   }
 ];
 
@@ -73,21 +73,21 @@ async function verifyAndSeed() {
       console.log('');
     }
     
-    // Also check for any NPCs on Ryloth
-    console.log('\nChecking all NPCs on Ryloth...');
+    // Also check for any NPCs on Sytha
+    console.log('\nChecking all NPCs on Sytha...');
     const Sequelize = require('sequelize');
     const rylothNPCs = await NPC.findAll({
       where: {
         [Sequelize.Op.and]: [
           Sequelize.where(
             Sequelize.fn('jsonb_extract_path_text', Sequelize.col('location'), 'planet'),
-            'ryloth'
+            'sytha'
           )
         ]
       }
     });
     
-    console.log(`Found ${rylothNPCs.length} NPCs on Ryloth:`);
+    console.log(`Found ${rylothNPCs.length} NPCs on Sytha:`);
     rylothNPCs.forEach(npc => {
       console.log(`  - ${npc.id}: ${npc.name} (${npc.npcType}) | Area: ${npc.location?.area || 'none'}`);
     });

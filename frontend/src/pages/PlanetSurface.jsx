@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { formatDisplayName } from '../utils/formatName';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
 import { useDiscoveryStore } from '../state/discoverySlice';
@@ -629,7 +630,7 @@ export default function PlanetSurface() {
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      needsFullRedraw = true; // Force full redraw on resize
+      needsFullRedraw = true; // Veil full redraw on resize
     }
 
     const ctx = canvas.getContext('2d');
@@ -827,7 +828,7 @@ export default function PlanetSurface() {
         // Show encounter dialog
         setEncounterDialog({
           isOpen: true,
-          enemies: result.enemies || ['stormtrooper'],
+          enemies: result.enemies || ['ironclad'],
           planetDangerLevel: result.planetDangerLevel || planet.dangerLevel || 1,
           enemyCount: result.enemies?.length || result.enemyCount || 1
         });
@@ -1213,7 +1214,7 @@ export default function PlanetSurface() {
       };
       setPlanet(updatedPlanet);
       
-      // Force redraw after state update
+      // Veil redraw after state update
       setTimeout(() => {
         requestAnimationFrame(() => {
           drawPlanetMap();
@@ -1255,11 +1256,14 @@ export default function PlanetSurface() {
       
       const loadedPlanet = planetResponse.data;
       
-      // Pre-load texture for this planet (async, doesn't block)
+      // Pre-load the planet's base texture, then repaint so the photographic
+      // ground layer appears without needing a manual interaction.
       if (loadedPlanet.id) {
-        assetManager.loadTexture(loadedPlanet.id).catch(err => {
-          console.debug(`[PlanetSurface] Texture pre-load failed for ${loadedPlanet.id}:`, err);
-        });
+        assetManager.loadTexture(loadedPlanet.id)
+          .then((img) => { if (img) markFullRedraw(); })
+          .catch(err => {
+            console.debug(`[PlanetSurface] Texture pre-load failed for ${loadedPlanet.id}:`, err);
+          });
       }
       
       // Generate map data if not present from backend
@@ -1382,7 +1386,7 @@ export default function PlanetSurface() {
           existingNPCs = Array.isArray(surfaceNPCsResponse.data) ? surfaceNPCsResponse.data : [];
         }
         
-        // Also get NPCs from other areas on the planet (like 'tann_province', 'lessu', etc.)
+        // Also get NPCs from other areas on the planet (like 'tann_province', 'sythmar', etc.)
         // Get all NPCs on the planet without area filter, then filter for surface-level areas
         try {
           const allPlanetNPCsResponse = await npcApi.getByLocation(planetId);
@@ -2469,8 +2473,15 @@ export default function PlanetSurface() {
           <div className="navigation-hint">
             <span className="hint-text">Use Arrow Keys or WASD to navigate</span>
           </div>
-          <button 
-            onClick={() => setFastTravelMenuOpen(true)} 
+          <button
+            onClick={() => navigate(`/game/planet3d/${planetId}`)}
+            className="fast-travel-button"
+            title="Walk this surface in real-time 3D (Phase 1)"
+          >
+            🌐 3D View
+          </button>
+          <button
+            onClick={() => setFastTravelMenuOpen(true)}
             className="fast-travel-button"
             title="Fast Travel"
           >
@@ -2752,9 +2763,9 @@ export default function PlanetSurface() {
                     onClick={() => setSelectedNPC(npc)}
                   >
                     <div className="npc-name">{npc.name}</div>
-                    <div className="npc-type">{npc.npcType || 'generic'}</div>
+                    <div className="npc-type">{formatDisplayName(npc.npcType) || 'Generic'}</div>
                     {npc.occupation && (
-                      <div className="npc-occupation">{npc.occupation}</div>
+                      <div className="npc-occupation">{formatDisplayName(npc.occupation)}</div>
                     )}
                   </div>
                 ))}

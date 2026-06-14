@@ -72,17 +72,17 @@ const CRAFTING_RECIPES = {
   },
 
   // Weapon Crafting
-  lightsaber_basic: {
-    id: 'lightsaber_basic',
-    name: 'Basic Lightsaber',
-    description: 'Craft a basic lightsaber using a crystal and materials.',
+  arcblade_basic: {
+    id: 'arcblade_basic',
+    name: 'Basic Arcblade',
+    description: 'Craft a basic arcblade using a crystal and materials.',
     category: RECIPE_CATEGORIES.WEAPON,
     result: {
-      itemId: 'lightsaber_01',
+      itemId: 'arcblade_01',
       quantity: 1
     },
     materials: {
-      'lightsaber_crystal': 1,
+      'arcblade_crystal': 1,
       'dantari_crystals': 3,
       'scrap_metal_01': 5,
       'energy_cell_01': 2
@@ -94,17 +94,17 @@ const CRAFTING_RECIPES = {
     },
     unlockLevel: 5
   },
-  blaster_custom: {
-    id: 'blaster_custom',
-    name: 'Custom Blaster Pistol',
-    description: 'Craft a custom blaster pistol with enhanced components.',
+  pulser_custom: {
+    id: 'pulser_custom',
+    name: 'Custom Pulser Pistol',
+    description: 'Craft a custom pulser pistol with enhanced components.',
     category: RECIPE_CATEGORIES.WEAPON,
     result: {
-      itemId: 'blaster_pistol_01',
+      itemId: 'pulser_pistol_01',
       quantity: 1
     },
     materials: {
-      'blaster_pistol_01': 1, // Base item
+      'pulser_pistol_01': 1, // Base item
       'energy_cell_01': 3,
       'scrap_metal_01': 2
     },
@@ -114,17 +114,17 @@ const CRAFTING_RECIPES = {
       level: 2
     }
   },
-  blaster_rifle_enhanced: {
-    id: 'blaster_rifle_enhanced',
-    name: 'Enhanced Blaster Rifle',
-    description: 'Enhance a blaster rifle with better components.',
+  pulser_rifle_enhanced: {
+    id: 'pulser_rifle_enhanced',
+    name: 'Enhanced Pulser Rifle',
+    description: 'Enhance a pulser rifle with better components.',
     category: RECIPE_CATEGORIES.WEAPON,
     result: {
-      itemId: 'blaster_rifle_01',
+      itemId: 'pulser_rifle_01',
       quantity: 1
     },
     materials: {
-      'blaster_rifle_01': 1,
+      'pulser_rifle_01': 1,
       'energy_cell_01': 5,
       'scrap_metal_01': 3
     },
@@ -178,7 +178,7 @@ const CRAFTING_RECIPES = {
   armor_beskar: {
     id: 'armor_beskar',
     name: 'Beskar Armor',
-    description: 'Craft Mandalorian armor from beskar ingots.',
+    description: 'Craft Ironkin armor from beskar ingots.',
     category: RECIPE_CATEGORIES.ARMOR,
     result: {
       itemId: 'armor_heavy_beskar',

@@ -33,7 +33,7 @@ describe('Combat API', () => {
         .send({
           characterId: character.id,
           encounterType: 'random',
-          enemies: ['stormtrooper']
+          enemies: ['ironclad']
         })
         .expect(200);
 
@@ -53,7 +53,7 @@ describe('Combat API', () => {
         .send({
           characterId: character.id,
           encounterType: 'random',
-          enemies: ['stormtrooper']
+          enemies: ['ironclad']
         })
         .expect(200);
 
@@ -64,7 +64,7 @@ describe('Combat API', () => {
         .send({
           characterId: character.id,
           encounterType: 'random',
-          enemies: ['stormtrooper']
+          enemies: ['ironclad']
         })
         .expect(200);
 
@@ -92,7 +92,7 @@ describe('Combat API', () => {
         .send({
           characterId: character.id,
           encounterType: 'random',
-          enemies: ['stormtrooper']
+          enemies: ['ironclad']
         });
       encounter = response.body.data;
     });
@@ -169,7 +169,7 @@ describe('Combat API', () => {
         .send({
           characterId: character.id,
           encounterType: 'random',
-          enemies: ['stormtrooper']
+          enemies: ['ironclad']
         });
       encounter = response.body.data;
     });

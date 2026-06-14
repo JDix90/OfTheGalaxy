@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { formatDisplayName } from '../../utils/formatName';
 import { useCharacterStore } from '../../state/characterSlice';
 import { useDiscoveryStore } from '../../state/discoverySlice';
 import achievementApi from '../../services/api/achievementApi';
@@ -234,7 +235,7 @@ export default function ExplorationJournal() {
                 {Object.entries(discoveriesByPlanet).map(([planetId, planetDiscoveries]) => (
                   (!selectedPlanet || selectedPlanet === planetId) && (
                     <div key={planetId} className="planet-group">
-                      <h3>{planetId}</h3>
+                      <h3>{formatDisplayName(planetId)}</h3>
                       <div className="discoveries-list">
                         {planetDiscoveries.map(discovery => (
                           <div key={discovery.id} className="discovery-item">

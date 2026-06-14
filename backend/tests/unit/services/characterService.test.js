@@ -80,8 +80,8 @@ describe('CharacterService', () => {
 
       const character = await characterService.createCharacter(user.id, characterData);
 
-      // Soldier starts on chandrila
-      expect(character.currentPlanet).toBe('chandrila');
+      // Soldier starts on solenne
+      expect(character.currentPlanet).toBe('solenne');
     });
 
     test('should set starting credits based on background', async () => {

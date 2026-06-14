@@ -5,7 +5,11 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// Default to a RELATIVE base so requests go same-origin through whatever Vite dev
+// proxy is active (vite.config.js proxies /api -> http://localhost:3001). This makes
+// the app work on any dev port (not just :5173, the only origin the backend CORS
+// allows). Production / split-host deployments set VITE_API_URL to an absolute URL.
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Create axios instance
 export const apiClient = axios.create({

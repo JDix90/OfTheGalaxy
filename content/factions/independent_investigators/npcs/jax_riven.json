@@ -5,7 +5,7 @@
   "occupation": "Former Compound Resident",
   "factionId": "independent_investigators",
   "location": {
-    "planet": "chandrila",
+    "planet": "solenne",
     "area": "refugee_settlement",
     "x": 125,
     "y": 90
@@ -20,7 +20,7 @@
       "confidant": "You're the only one I've told the whole story to. Thank you for listening."
     },
     "questRelated": {
-      "iia_main_01_compound_investigation": "I was a teenager when I arrived at Compound 7-Alpha. My family was killed in an Imperial raid, and I was taken. The compound... it wasn't just a detention facility. They were doing experiments. I don't know what, exactly, but I saw things. Things that still haunt me. I escaped, but many didn't. If you're investigating, I'll help. But be careful. The people who ran that place are still out there."
+      "iia_main_01_compound_investigation": "I was a teenager when I arrived at Compound 7-Alpha. My family was killed in a Dominion raid, and I was taken. The compound... it wasn't just a detention facility. They were doing experiments. I don't know what, exactly, but I saw things. Things that still haunt me. I escaped, but many didn't. If you're investigating, I'll help. But be careful. The people who ran that place are still out there."
     },
     "general": [
       "The compound took everything from me. But it didn't break me.",
@@ -49,7 +49,7 @@
     "eyes": "intense brown",
     "distinguishingFeatures": "Scar on right shoulder, haunted eyes, defensive posture, always alert"
   },
-  "biography": "Jax Riven was a teenager when he was taken to Compound 7-Alpha after his family was killed in an Imperial raid. He spent years in the compound, witnessing things that left him scarred both physically and emotionally. He's tough, resourceful, and has learned to fight to survive. He escaped the compound with Mira Kess and others, and now works with the Independent Investigators Alliance to expose what happened. He's a potential companion, offering combat skills and survival expertise, but he's also deeply traumatized and struggles with trust.",
+  "biography": "Jax Riven was a teenager when he was taken to Compound 7-Alpha after his family was killed in a Dominion raid. He spent years in the compound, witnessing things that left him scarred both physically and emotionally. He's tough, resourceful, and has learned to fight to survive. He escaped the compound with Mira Kess and others, and now works with the Independent Investigators Alliance to expose what happened. He's a potential companion, offering combat skills and survival expertise, but he's also deeply traumatized and struggles with trust.",
   "isAvailable": true,
   "personalityTraits": {
     "empathy": 50,

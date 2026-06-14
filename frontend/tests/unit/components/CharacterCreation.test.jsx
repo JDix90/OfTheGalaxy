@@ -43,9 +43,9 @@ let createCharacter;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  createCharacter = vi.fn().mockResolvedValue({ id: 'new-id', name: 'Test Character', currentPlanet: 'tatooine' });
+  createCharacter = vi.fn().mockResolvedValue({ id: 'new-id', name: 'Test Character', currentPlanet: 'gravenmoor' });
   useCharacterStore.mockReturnValue({ createCharacter, isLoading: false });
-  galaxyApi.getPlanet.mockResolvedValue({ success: true, data: { name: 'Tatooine', mapData: {} } });
+  galaxyApi.getPlanet.mockResolvedValue({ success: true, data: { name: 'Gravenmoor', mapData: {} } });
 });
 
 describe('CharacterCreation', () => {
@@ -75,9 +75,8 @@ describe('CharacterCreation', () => {
     fireEvent.click(screen.getByText('Pick Background'));
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
-    // Attributes + Appearance can always proceed.
-    fireEvent.click(screen.getByRole('button', { name: 'Next' })); // attributes -> appearance
-    fireEvent.click(screen.getByRole('button', { name: 'Next' })); // appearance -> confirm
+    // Attributes can always proceed.
+    fireEvent.click(screen.getByRole('button', { name: 'Next' })); // attributes -> confirm
 
     // Final step: set the name, then Create Character becomes enabled.
     fireEvent.click(screen.getByText('Set Name'));

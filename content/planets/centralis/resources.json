@@ -1,0 +1,32 @@
+{
+  "planetId": "centralis",
+  "resources": [
+    {
+      "id": "resource_political_favors",
+      "name": "Political Favors",
+      "type": "intangible_resource",
+      "rarity": "uncommon",
+      "description": "Favors owed by political figures. Can be called in for future assistance or used to influence decisions.",
+      "baseValue": 0,
+      "weight": 0,
+      "stackSize": 1,
+      "uses": ["quest_progression", "reputation_boost", "unlock_content"],
+      "locations": ["The Concord Assembly Building", "Political offices"]
+    },
+    {
+      "id": "resource_information",
+      "name": "Information",
+      "type": "intangible_resource",
+      "rarity": "varies",
+      "description": "Valuable information obtained from brokers, spies, or investigations. Can be traded or used in quests.",
+      "baseValue": 100,
+      "weight": 0,
+      "stackSize": 1,
+      "uses": ["quest_progression", "trade", "unlock_content"],
+      "locations": ["Underworld Sector U-Scru", "Information brokers"]
+    }
+  ]
+}
+
+
+

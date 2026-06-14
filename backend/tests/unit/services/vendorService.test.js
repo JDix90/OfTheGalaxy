@@ -25,7 +25,7 @@ describe('VendorService', () => {
       name: 'Test Vendor',
       npcType: 'vendor',
       factionId: 'independent_investigators',
-      planetId: 'chandrila',
+      planetId: 'solenne',
       location: { x: 50, y: 50, area: 'surface' },
       vendorInventory: [
         {
@@ -61,7 +61,7 @@ describe('VendorService', () => {
         name: 'Empty Vendor',
         npcType: 'vendor',
         factionId: 'independent_investigators',
-        planetId: 'chandrila',
+        planetId: 'solenne',
         location: { x: 50, y: 50, area: 'surface' }
       });
 

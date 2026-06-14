@@ -5,7 +5,7 @@
   "occupation": "Mine Foreman",
   "factionId": null,
   "location": {
-    "planet": "ryloth",
+    "planet": "sytha",
     "area": "mining_district",
     "x": 310,
     "y": 710
@@ -20,8 +20,8 @@
       "confidant": "Alright, you've proven yourself. The refugees... they came from a place called Compound 7-Alpha. The syndicate was paid to keep quiet about it. That's all I know."
     },
     "questRelated": {
-      "iia_ryloth_02_mines_investigation": "I don't know what you're talking about. We run a legitimate mining operation here. Now get out before I call security.",
-      "iia_ryloth_02_mines_investigation_confront": "You have the datapad? Fine. You want the truth? The refugees came from Compound 7-Alpha. The syndicate was paid to keep quiet about it. They took workers from here, sent them to that compound, and we were told to keep our mouths shut. I don't know what happened to them there, but I know it wasn't good. That's all I know. Now leave me alone—I've said too much already."
+      "iia_sytha_02_mines_investigation": "I don't know what you're talking about. We run a legitimate mining operation here. Now get out before I call security.",
+      "iia_sytha_02_mines_investigation_confront": "You have the datapad? Fine. You want the truth? The refugees came from Compound 7-Alpha. The syndicate was paid to keep quiet about it. They took workers from here, sent them to that compound, and we were told to keep our mouths shut. I don't know what happened to them there, but I know it wasn't good. That's all I know. Now leave me alone—I've said too much already."
     },
     "general": [
       "The mines are dangerous. You shouldn't be here.",
@@ -30,7 +30,7 @@
       "The syndicate pays well. That's all that matters."
     ]
   },
-  "quests": ["iia_ryloth_02_mines_investigation"],
+  "quests": ["iia_sytha_02_mines_investigation"],
   "vendorInventory": null,
   "companionAbilities": null,
   "companionStats": {
@@ -46,7 +46,7 @@
     "eyes": "brown",
     "distinguishingFeatures": "Scarred hands from mining work, cybernetic right arm"
   },
-  "biography": "Grakk Torr is the foreman of the Syndicate Mines on Ryloth. A hard man who's worked in mining his entire life, he's loyal to the syndicate that pays him well. He knows more about the Compound 7-Alpha connection than he lets on, but fear and greed keep him silent. He's not inherently evil, but he's made his choice, and he'll defend it.",
+  "biography": "Grakk Torr is the foreman of the Syndicate Mines on Sytha. A hard man who's worked in mining his entire life, he's loyal to the syndicate that pays him well. He knows more about the Compound 7-Alpha connection than he lets on, but fear and greed keep him silent. He's not inherently evil, but he's made his choice, and he'll defend it.",
   "isAvailable": true,
   "personalityTraits": {
     "empathy": 20,

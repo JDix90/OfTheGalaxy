@@ -175,8 +175,8 @@ class PersonalityService {
     if (profile.neuroticism < 30) traits.push('calm and emotionally stable');
 
     // Star Wars specific
-    if (profile.forceAlignment > 70) traits.push('strongly aligned with the Force');
-    if (profile.forceAlignment < 30) traits.push('distant from the Force');
+    if (profile.forceAlignment > 70) traits.push('strongly aligned with the Veil');
+    if (profile.forceAlignment < 30) traits.push('distant from the Veil');
     
     if (profile.authorityRespect > 70) traits.push('respectful of authority');
     if (profile.authorityRespect < 30) traits.push('rebellious and anti-authority');

@@ -564,7 +564,7 @@ class POIService {
     
     // Generate lore-accurate descriptions based on POI type
     const loreDescriptions = {
-      'temple': `The ${poiName} stands as an ancient monument to the Force. Its architecture reflects centuries of Jedi tradition, with towering spires reaching toward the sky. The interior is said to contain ancient holocrons and artifacts of great power. Many have sought to understand its mysteries, but few have uncovered its deepest secrets.`,
+      'temple': `The ${poiName} stands as an ancient monument to the Veil. Its architecture reflects centuries of Keeper tradition, with towering spires reaching toward the sky. The interior is said to contain ancient holocrons and artifacts of great power. Many have sought to understand its mysteries, but few have uncovered its deepest secrets.`,
       'government': `The ${poiName} serves as the seat of power on ${planetName}. Its imposing structure houses the planet's administrative offices and meeting chambers. The building's design reflects the authority and stability of the local government, with security measures visible throughout.`,
       'palace': `The ${poiName} is a magnificent structure that once served as the residence of ${planetName}'s ruling elite. Its opulent halls and grand architecture speak to a bygone era of wealth and influence. Though its original occupants may be gone, the building retains an air of regal authority.`,
       'spaceport': `The ${poiName} is a bustling hub of interstellar travel. Ships of all sizes dock here, from small freighters to massive capital ships. The constant flow of travelers and cargo makes this one of the busiest locations on ${planetName}. The facility includes landing pads, maintenance bays, and passenger terminals.`,
@@ -749,13 +749,13 @@ class POIService {
    */
   getEnemyTypesForPOI(poi) {
     const enemyMap = {
-      'danger': ['stormtrooper', 'pirate'],
-      'base': ['stormtrooper', 'imperial_officer'],
+      'danger': ['ironclad', 'pirate'],
+      'base': ['ironclad', 'dominion_officer'],
       'pirate': ['pirate', 'smuggler'],
       'hostile': ['bounty_hunter', 'thug']
     };
 
-    return enemyMap[poi.type] || ['stormtrooper'];
+    return enemyMap[poi.type] || ['ironclad'];
   }
 
   /**

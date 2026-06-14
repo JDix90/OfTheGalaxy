@@ -1,0 +1,46 @@
+.levelup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 8, 18, 0.7);
+  backdrop-filter: blur(3px);
+  animation: levelup-fade 0.2s ease-out;
+}
+.levelup-modal {
+  position: relative;
+  width: min(420px, 92vw);
+  padding: 2rem 2rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(180deg, #1a2540 0%, #0d1428 100%);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(251, 191, 36, 0.15);
+  animation: levelup-pop 0.35s cubic-bezier(0.2, 1.2, 0.4, 1);
+}
+.levelup-burst { font-size: 3rem; animation: levelup-spin 0.7s ease-out; }
+.levelup-title {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(180deg, #ffe9a8, #fbbf24);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.levelup-levels { display: flex; align-items: center; justify-content: center; gap: 0.75rem; font-size: 1.4rem; font-weight: 700; }
+.levelup-from { color: #8aa0bd; }
+.levelup-arrow { color: #fbbf24; }
+.levelup-to { color: #ffe9a8; font-size: 1.7rem; }
+.levelup-multi { color: #fbbf24; font-weight: 700; margin: 0.4rem 0 0; }
+.levelup-rewards { margin: 1.1rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.levelup-reward { display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #cfe0ff; font-size: 0.95rem; }
+.levelup-continue { min-width: 140px; }
+
+@keyframes levelup-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes levelup-pop { from { opacity: 0; transform: scale(0.85) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes levelup-spin { from { transform: rotate(-25deg) scale(0.5); opacity: 0; } to { transform: rotate(0) scale(1); opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .levelup-overlay, .levelup-modal, .levelup-burst { animation: none; }
+}

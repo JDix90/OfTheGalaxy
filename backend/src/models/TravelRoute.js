@@ -1,6 +1,6 @@
 /**
  * TravelRoute Model
- * Represents travel routes (hyperlanes) between star systems
+ * Represents travel routes (foldlanes) between star systems
  */
 
 const { DataTypes } = require('sequelize');
@@ -32,10 +32,10 @@ module.exports = (sequelize) => {
     },
     routeType: {
       type: DataTypes.STRING(50),
-      defaultValue: 'hyperlane',
+      defaultValue: 'foldlane',
       field: 'route_type',
       validate: {
-        isIn: [['hyperlane', 'trade_route', 'secret_route', 'military_route']]
+        isIn: [['foldlane', 'trade_route', 'secret_route', 'military_route']]
       }
     },
     travelTime: {

@@ -87,19 +87,19 @@ class AbilityService {
    */
   getAbilityInfo(abilityId) {
     const abilityInfo = {
-      force_insight: {
-        name: 'Force Insight',
-        description: 'Unlocks Force perception abilities',
+      veil_insight: {
+        name: 'Veil Insight',
+        description: 'Unlocks Veil perception abilities',
         category: 'force'
       },
       force_artifact_mastery: {
-        name: 'Force Artifact Mastery',
+        name: 'Veil Artifact Mastery',
         description: 'Unlocks artifact-related abilities',
         category: 'force'
       },
-      force_mastery: {
-        name: 'Force Mastery',
-        description: 'Unlocks advanced Force abilities',
+      veil_mastery: {
+        name: 'Veil Mastery',
+        description: 'Unlocks advanced Veil abilities',
         category: 'force'
       },
       weapon_mastery: {

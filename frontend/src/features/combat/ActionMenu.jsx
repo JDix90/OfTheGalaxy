@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useInventoryStore } from '../../state/inventorySlice';
 import { useCharacterStore } from '../../state/characterSlice';
 import { getAvailableCombatAbilities } from '../../utils/combatAbilities';
+import GameIcon from '../../components/common/GameIcon';
 import './ActionMenu.css';
 
 export default function ActionMenu({
@@ -104,7 +105,7 @@ export default function ActionMenu({
           onClick={handleAttack}
           disabled={isLoading || !selectedTarget || targets.length === 0}
         >
-          Attack
+          <GameIcon name="attack" size={16} /> Attack
         </button>
 
         <button
@@ -112,7 +113,7 @@ export default function ActionMenu({
           onClick={handleDefend}
           disabled={isLoading}
         >
-          Defend
+          <GameIcon name="defend" size={16} /> Defend
         </button>
 
         <div className="action-dropdown">
@@ -124,7 +125,7 @@ export default function ActionMenu({
             }}
             disabled={isLoading || medpacItems.length === 0}
           >
-            Use Item {showItemMenu ? '▼' : '▶'}
+            <GameIcon name="item" size={16} /> Use Item {showItemMenu ? '▼' : '▶'}
           </button>
           {showItemMenu && medpacItems.length > 0 && (
             <div className="dropdown-menu">
@@ -158,7 +159,7 @@ export default function ActionMenu({
             }}
             disabled={isLoading || availableAbilities.length === 0}
           >
-            Ability {showAbilityMenu ? '▼' : '▶'} {availableAbilities.length > 0 && `(${availableAbilities.length})`}
+            <GameIcon name="ability" size={16} /> Ability {showAbilityMenu ? '▼' : '▶'} {availableAbilities.length > 0 && `(${availableAbilities.length})`}
           </button>
           {showAbilityMenu && (
             <div className="dropdown-menu">
@@ -218,7 +219,7 @@ export default function ActionMenu({
           onClick={handleFlee}
           disabled={isLoading}
         >
-          Flee
+          <GameIcon name="flee" size={16} /> Flee
         </button>
       </div>
 

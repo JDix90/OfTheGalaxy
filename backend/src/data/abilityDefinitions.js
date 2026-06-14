@@ -34,10 +34,10 @@ const TARGET_TYPES = {
  */
 const ABILITY_DEFINITIONS = {
   // Item-Based Abilities
-  force_insight: {
-    id: 'force_insight',
-    name: 'Force Insight',
-    description: 'Use the Force to gain insight into your enemy, reducing their accuracy for 2 turns.',
+  veil_insight: {
+    id: 'veil_insight',
+    name: 'Veil Insight',
+    description: 'Use the Veil to gain insight into your enemy, reducing their accuracy for 2 turns.',
     type: ABILITY_TYPES.DEBUFF,
     targetType: TARGET_TYPES.ENEMY,
     cost: { stamina: 20 },
@@ -52,8 +52,8 @@ const ABILITY_DEFINITIONS = {
   },
   force_artifact_mastery: {
     id: 'force_artifact_mastery',
-    name: 'Force Artifact Mastery',
-    description: 'Channel ancient Force power through your artifact, dealing Force damage and restoring stamina.',
+    name: 'Veil Artifact Mastery',
+    description: 'Channel ancient Veil power through your artifact, dealing Veil damage and restoring stamina.',
     type: ABILITY_TYPES.DAMAGE,
     targetType: TARGET_TYPES.ENEMY,
     cost: { stamina: 30 },
@@ -62,7 +62,7 @@ const ABILITY_DEFINITIONS = {
       damage: {
         base: 25,
         type: 'force',
-        scaling: { forcePower: 0.5 } // 50% of Force Power as bonus damage
+        scaling: { forcePower: 0.5 } // 50% of Veil Power as bonus damage
       },
       selfHeal: {
         stamina: 15
@@ -70,10 +70,10 @@ const ABILITY_DEFINITIONS = {
     },
     source: 'item'
   },
-  force_mastery: {
-    id: 'force_mastery',
-    name: 'Force Mastery',
-    description: 'Unleash your mastery of the Force, dealing significant damage and stunning the target for 1 turn.',
+  veil_mastery: {
+    id: 'veil_mastery',
+    name: 'Veil Mastery',
+    description: 'Unleash your mastery of the Veil, dealing significant damage and stunning the target for 1 turn.',
     type: ABILITY_TYPES.DAMAGE,
     targetType: TARGET_TYPES.ENEMY,
     cost: { stamina: 40 },

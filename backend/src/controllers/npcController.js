@@ -334,9 +334,9 @@ class NPCController {
       // This handles NPCs from content files that have area set but no subMapId
       // Map common location names to area names
       const areaMap = {
-        'lessu': 'lessu',
-        'Lessu, the Capital City': 'lessu',
-        'Lessu': 'lessu',
+        'sythmar': 'sythmar',
+        'Sythmar, the Capital City': 'sythmar',
+        'Sythmar': 'sythmar',
         'tann_province': 'tann_province',
         'Tann Province': 'tann_province',
         'Refugee Settlement': 'tann_province'

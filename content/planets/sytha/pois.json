@@ -1,0 +1,81 @@
+{
+  "planetId": "sytha",
+  "pointsOfInterest": [
+    {
+      "id": "poi_sythmar_capital",
+      "name": "Sythmar, the Capital City",
+      "type": "city",
+      "description": "The capital city of Sytha, where the Sytheen government and Concord presence are centered. A mix of traditional Sytheen architecture and modern galactic structures.",
+      "location": {
+        "x": 500,
+        "y": 500,
+        "area": "sythmar"
+      },
+      "subMapType": "city"
+    },
+    {
+      "id": "poi_syndicate_mines",
+      "name": "The Syndicate Mines",
+      "type": "mine",
+      "description": "Dangerous mining operations controlled by criminal syndicates. The source of Ryll spice extraction and a key location in the Compound 7-Alpha investigation.",
+      "location": {
+        "x": 300,
+        "y": 700,
+        "area": "mining_district"
+      },
+      "subMapType": "mine",
+      "dangerLevel": 6
+    },
+    {
+      "id": "poi_abandoned_mine",
+      "name": "Abandoned Mine",
+      "type": "mine",
+      "description": "An old, abandoned mining operation that was shut down years ago. Now overrun with dangerous creatures and possibly hiding evidence of the Compound 7-Alpha connection.",
+      "location": {
+        "x": 350,
+        "y": 650,
+        "area": "mining_district"
+      },
+      "subMapType": "mine",
+      "dangerLevel": 5
+    },
+    {
+      "id": "poi_tann_province",
+      "name": "Tann Province",
+      "type": "wilderness",
+      "description": "A rural area of Sytha where refugee settlements and traditional Sytheen villages are located. The origin point for many Compound 7-Alpha refugees.",
+      "location": {
+        "x": 200,
+        "y": 300,
+        "area": "tann_province"
+      },
+      "subMapType": "wilderness"
+    },
+    {
+      "id": "poi_sythmar_cantina",
+      "name": "Sythmar Cantina",
+      "type": "cantina",
+      "description": "A bustling cantina in the capital city where smugglers, traders, and locals gather. A hub for information and shady deals.",
+      "location": {
+        "x": 520,
+        "y": 480,
+        "area": "sythmar"
+      },
+      "subMapType": "cantina"
+    },
+    {
+      "id": "poi_refugee_camp",
+      "name": "Refugee Settlement",
+      "type": "settlement",
+      "description": "A temporary settlement for refugees from Compound 7-Alpha and other displaced Sytheen. A place of hope and struggle.",
+      "location": {
+        "x": 180,
+        "y": 280,
+        "area": "tann_province"
+      },
+      "subMapType": "city"
+    }
+  ]
+}
+
+

@@ -537,26 +537,26 @@ class AIDialogueService {
     if (!factionId) return 'Unaffiliated';
     
     const displayNames = {
-      'galactic_republic': 'Galactic Republic',
-      'galactic_empire': 'Galactic Empire',
-      'rebel_alliance': 'Rebel Alliance',
-      'new_republic': 'New Republic',
-      'first_order': 'First Order',
-      'resistance': 'Resistance',
-      'jedi_order': 'Jedi Order',
-      'sith': 'Sith',
-      'mandalorians': 'Mandalorians',
-      'hutts': 'Hutts',
-      'black_sun': 'Black Sun',
-      'crimson_dawn': 'Crimson Dawn',
+      'old_concord': 'Old Concord',
+      'iron_dominion': 'Iron Dominion',
+      'free_worlds': 'Free Worlds',
+      'concord': 'Concord',
+      'ascendancy': 'Ascendancy',
+      'uprising': 'Uprising',
+      'keeper_order': 'Keeper Order',
+      'hollow': 'Hollow',
+      'ironkin': 'Ironkin',
+      'vorr': 'Vorr',
+      'umbra': 'Umbra',
+      'scarlet_tide': 'Scarlet Tide',
       'independent': 'Independent',
       'neutral': 'Neutral',
       'smugglers': 'Smugglers',
-      'bounty_hunters': 'Bounty Hunters',
-      'trade_federation': 'Trade Federation',
-      'separatists': 'Separatists',
-      'chiss_ascendancy': 'Chiss Ascendancy',
-      'hapes_consortium': 'Hapes Consortium'
+      'the_tally': 'Bounty Hunters',
+      'commerce_league': 'Commerce League',
+      'secession': 'Secessionists',
+      'vorne_ascendancy': 'Vorne Ascendancy',
+      'hesperan_consortium': 'Hesperan Consortium'
     };
 
     return displayNames[factionId] || factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

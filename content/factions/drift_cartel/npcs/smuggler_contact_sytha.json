@@ -1,0 +1,54 @@
+{
+  "id": "npc_smuggler_contact_sytha",
+  "name": "Zara Vex",
+  "species": "human",
+  "occupation": "Smuggler",
+  "factionId": "drift_cartel",
+  "location": {
+    "planet": "sytha",
+    "area": "sythmar",
+    "x": 525,
+    "y": 475
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "You look like someone who knows how to make credits. Interested in a business opportunity?",
+      "acquaintance": "Back for more work? Good, I've got something for you.",
+      "friend": "Hey, partner! Got a new job that might interest you.",
+      "confidant": "You're one of the few people I trust in this business. Here's a big opportunity..."
+    },
+    "questRelated": {
+      "sg_sytha_01_profitable_opportunity": "Ryll spice is worth a fortune in the right markets. The syndicate controls the mines, but there are independent producers in Tann Province who need someone to move their product. The Guild wants to establish a trade route. Interested? It's profitable, but dangerous. The syndicate doesn't like competition."
+    },
+    "general": [
+      "Spice trade is where the real credits are. Everything else is small-time.",
+      "The syndicate thinks they own Sytha. They're about to learn otherwise.",
+      "I've been running spice for ten years. I know every route in the Outer Rim.",
+      "The Guild needs people who aren't afraid to take risks. Are you one of them?"
+    ]
+  },
+  "quests": ["sg_sytha_01_profitable_opportunity"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "late 20s",
+    "build": "athletic",
+    "hair": "black, short",
+    "eyes": "brown",
+    "distinguishingFeatures": "Pilot's jacket, pulser at hip, confident smile"
+  },
+  "biography": "Zara Vex is a skilled smuggler and Guild member who specializes in spice trade routes. She's been operating on Sytha for several years, building connections with independent spice producers and establishing alternative routes to bypass the syndicate. She's ambitious, sees the profit potential in Sytha's spice trade, and isn't afraid to challenge the syndicate's monopoly. She's also pragmatic and knows when to fight and when to negotiate.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 40,
+    "formality": 20,
+    "humor": 60,
+    "trust": 45
+  }
+}
+
+
+

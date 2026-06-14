@@ -252,6 +252,23 @@
   margin-top: 0.5rem;
 }
 
+/* Standing / charisma / relationship price breakdown */
+.price-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+.price-line.subtle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+.price-line.subtle.mod-good span:last-child { color: #6ee79a; }
+.price-line.subtle.mod-bad span:last-child { color: #ff9b9b; }
+
 .transaction-actions {
   display: flex;
   gap: 1rem;
@@ -306,3 +323,36 @@
 }
 
 
+
+/* Transaction confirmation toast */
+.trade-toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  animation: trade-toast-in 0.25s ease-out;
+}
+.trade-toast-icon { font-size: 1.1rem; }
+.trade-toast-success {
+  background: #16361f;
+  color: #6ee79a;
+  border: 1px solid #2f7d4f;
+}
+.trade-toast-error {
+  background: #3a1d1d;
+  color: #ff9b9b;
+  border: 1px solid #8c3a3a;
+}
+@keyframes trade-toast-in {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}

@@ -13,14 +13,14 @@
  * - bonuses: Object with piece count as keys and bonus objects as values
  */
 const ITEM_SETS = {
-  imperial_set: {
-    id: 'imperial_set',
-    name: 'Imperial Set',
-    description: 'Equipment worn by Imperial personnel. Provides accuracy and defense bonuses.',
+  dominion_set: {
+    id: 'dominion_set',
+    name: 'Dominion Set',
+    description: 'Equipment worn by Dominion personnel. Provides accuracy and defense bonuses.',
     pieces: [
-      'blaster_rifle_01', // E-11 Blaster Rifle
-      'armor_heavy_imperial_standard', // Stormtrooper Armor
-      'imperial_commendation' // Imperial Commendation (accessory)
+      'pulser_rifle_01', // L-11 Pulser Rifle
+      'armor_heavy_dominion_standard', // Ironclad Armor
+      'dominion_commendation' // Dominion Commendation (accessory)
     ],
     bonuses: {
       2: {
@@ -34,24 +34,24 @@ const ITEM_SETS = {
       }
     }
   },
-  jedi_set: {
-    id: 'jedi_set',
-    name: 'Jedi Set',
-    description: 'Equipment used by Jedi. Enhances Force abilities and power.',
+  keeper_set: {
+    id: 'keeper_set',
+    name: 'Keeper Set',
+    description: 'Equipment used by Keeper. Enhances Veil abilities and power.',
     pieces: [
-      'lightsaber_01', // Lightsaber
-      'armor_light_jedi', // Jedi Robes
-      'jedi_artifact' // Jedi Artifact (accessory)
+      'arcblade_01', // Arcblade
+      'armor_light_keeper', // Keeper Robes
+      'keeper_artifact' // Keeper Artifact (accessory)
     ],
     bonuses: {
       2: {
-        forcePower: 10, // +10 Force Power
-        description: '2-piece: +10 Force Power'
+        forcePower: 10, // +10 Veil Power
+        description: '2-piece: +10 Veil Power'
       },
       3: {
-        forcePower: 20, // +20 Force Power
-        forceAbilityEffectiveness: 15, // +15% Force ability effectiveness
-        description: '3-piece: +20 Force Power, +15% Force ability effectiveness'
+        forcePower: 20, // +20 Veil Power
+        forceAbilityEffectiveness: 15, // +15% Veil ability effectiveness
+        description: '3-piece: +20 Veil Power, +15% Veil ability effectiveness'
       }
     }
   },
@@ -60,7 +60,7 @@ const ITEM_SETS = {
     name: 'Smuggler Set',
     description: 'Equipment favored by smugglers. Improves smuggling success and charisma.',
     pieces: [
-      'blaster_pistol_01', // Blaster Pistol
+      'pulser_pistol_01', // Pulser Pistol
       'armor_light_smuggler', // Smuggler's Vest
       'smuggler_badge' // Master Smuggler's Badge (accessory)
     ],
@@ -76,14 +76,14 @@ const ITEM_SETS = {
       }
     }
   },
-  mandalorian_set: {
-    id: 'mandalorian_set',
-    name: 'Mandalorian Set',
-    description: 'Mandalorian-crafted equipment. Provides significant combat bonuses.',
+  ironkin_set: {
+    id: 'ironkin_set',
+    name: 'Ironkin Set',
+    description: 'Ironkin-crafted equipment. Provides significant combat bonuses.',
     pieces: [
-      'blaster_pistol_mandalorian', // Mandalorian Blaster Pistol
+      'pulser_pistol_ironkin', // Ironkin Pulser Pistol
       'armor_heavy_beskar', // Beskar Armor
-      'krayt_pearl' // Krayt Dragon Pearl (Mandalorian accessory)
+      'wyrm_pearl' // Dune Wyrm Pearl (Ironkin accessory)
     ],
     bonuses: {
       2: {
@@ -104,7 +104,7 @@ const ITEM_SETS = {
     name: 'Corporate Sector Set',
     description: 'Equipment used by Corporate Sector Authority personnel. Provides intelligence and defense bonuses.',
     pieces: [
-      'blaster_rifle_corporate', // Czerka C-20 Blaster Rifle
+      'pulser_rifle_corporate', // Czerka C-20 Pulser Rifle
       'armor_medium_corporate', // Corporate Medium Armor
       'corporate_commendation' // Corporate Sector Commendation (accessory)
     ],
@@ -127,7 +127,7 @@ const ITEM_SETS = {
     name: 'Bounty Hunter Set',
     description: 'Equipment favored by bounty hunters. Provides combat and accuracy bonuses.',
     pieces: [
-      'blaster_pistol_bounty', // EE-3 Blaster Pistol
+      'pulser_pistol_bounty', // EE-3 Pulser Pistol
       'armor_medium_bounty', // Bounty Hunter Armor
       'bounty_hunter_badge' // Bounty Hunter's Badge (accessory)
     ],
@@ -150,7 +150,7 @@ const ITEM_SETS = {
     name: 'Outer Rim Settler Set',
     description: 'Equipment used by Outer Rim settlers. Provides survival and crafting bonuses.',
     pieces: [
-      'blaster_pistol_outer_rim', // Outer Rim Blaster Pistol
+      'pulser_pistol_outer_rim', // Outer Rim Pulser Pistol
       'armor_medium_outer_rim', // Outer Rim Settler Armor
       'outer_rim_commendation' // Outer Rim Settler's Commendation (accessory)
     ],

@@ -526,3 +526,36 @@ body:has(.inventory-overlay) .dialogue-interface {
     width: 100%;
   }
 }
+
+/* Golden-path closing CTA — "set course" payoff after the player picks where
+   the resonance fragment goes. Prominent, celebratory, leads to the galaxy map. */
+.dialogue-closing-cta {
+  padding: 0.85rem 1rem;
+  margin: 0.25rem 0.75rem 0;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.04));
+  text-align: center;
+  animation: closing-cta-in 0.35s ease-out;
+}
+.closing-cta-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fbbf24;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+.set-course-button {
+  width: 100%;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+}
+@keyframes closing-cta-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialogue-closing-cta { animation: none; }
+}

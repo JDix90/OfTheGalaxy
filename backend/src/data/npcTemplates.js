@@ -32,7 +32,7 @@ function getSeed(str) {
  */
 const planetTemplates = {
   desert: {
-    species: ['human', 'jawa', 'tusken_raider', 'rodian'],
+    species: ['human', 'skritcher', 'dune_nomad_raider', 'skarn'],
     speciesWeights: [0.4, 0.3, 0.2, 0.1],
     npcTypes: ['vendor', 'quest_giver', 'generic'],
     npcTypeWeights: [0.3, 0.2, 0.5],
@@ -41,7 +41,7 @@ const planetTemplates = {
     maxNPCs: 15
   },
   jungle: {
-    species: ['human', 'wookiee', 'ewok', 'trandoshan'],
+    species: ['human', 'ursk', 'brindle', 'skrag'],
     speciesWeights: [0.4, 0.2, 0.2, 0.2],
     npcTypes: ['quest_giver', 'companion', 'generic', 'vendor'],
     npcTypeWeights: [0.3, 0.1, 0.4, 0.2],
@@ -50,7 +50,7 @@ const planetTemplates = {
     maxNPCs: 20
   },
   urban: {
-    species: ['human', 'twilek', 'zabrak', 'bothan', 'mirialan'],
+    species: ['human', 'sytheen', 'karnaki', 'renai', 'jeharu'],
     speciesWeights: [0.5, 0.15, 0.1, 0.1, 0.15],
     npcTypes: ['vendor', 'quest_giver', 'generic', 'faction_leader'],
     npcTypeWeights: [0.3, 0.25, 0.4, 0.05],
@@ -59,7 +59,7 @@ const planetTemplates = {
     maxNPCs: 50
   },
   ocean: {
-    species: ['human', 'mon_calamari', 'quarren', 'gungan'],
+    species: ['human', 'sennari', 'dovrek', 'marrow'],
     speciesWeights: [0.3, 0.3, 0.2, 0.2],
     npcTypes: ['vendor', 'quest_giver', 'generic'],
     npcTypeWeights: [0.3, 0.2, 0.5],
@@ -68,7 +68,7 @@ const planetTemplates = {
     maxNPCs: 15
   },
   volcanic: {
-    species: ['human', 'zabrak', 'sullustan'],
+    species: ['human', 'karnaki', 'dell'],
     speciesWeights: [0.5, 0.3, 0.2],
     npcTypes: ['vendor', 'generic', 'quest_giver'],
     npcTypeWeights: [0.2, 0.6, 0.2],
@@ -77,7 +77,7 @@ const planetTemplates = {
     maxNPCs: 10
   },
   ice: {
-    species: ['human', 'wookiee', 'tauntaun_herder'],
+    species: ['human', 'ursk', 'ridgeback_herder'],
     speciesWeights: [0.6, 0.2, 0.2],
     npcTypes: ['vendor', 'quest_giver', 'generic'],
     npcTypeWeights: [0.3, 0.2, 0.5],
@@ -86,7 +86,7 @@ const planetTemplates = {
     maxNPCs: 10
   },
   barren: {
-    species: ['human', 'jawa', 'tusken_raider'],
+    species: ['human', 'skritcher', 'dune_nomad_raider'],
     speciesWeights: [0.4, 0.3, 0.3],
     npcTypes: ['vendor', 'generic', 'quest_giver'],
     npcTypeWeights: [0.2, 0.6, 0.2],
@@ -95,7 +95,7 @@ const planetTemplates = {
     maxNPCs: 8
   },
   terrestrial: {
-    species: ['human', 'twilek', 'zabrak', 'bothan'],
+    species: ['human', 'sytheen', 'karnaki', 'renai'],
     speciesWeights: [0.5, 0.2, 0.15, 0.15],
     npcTypes: ['vendor', 'quest_giver', 'generic', 'companion'],
     npcTypeWeights: [0.25, 0.25, 0.4, 0.1],
@@ -104,7 +104,7 @@ const planetTemplates = {
     maxNPCs: 25
   },
   gas_giant: {
-    species: ['human', 'sullustan'],
+    species: ['human', 'dell'],
     speciesWeights: [0.7, 0.3],
     npcTypes: ['vendor', 'generic'],
     npcTypeWeights: [0.3, 0.7],
@@ -218,74 +218,84 @@ const subMapTemplates = {
 /**
  * Name generators by species
  */
+const pick = (arr, rnd) => arr[Math.floor(rnd() * arr.length)];
+
 const nameGenerators = {
   human: (rnd) => {
-    const firstNames = ['Owen', 'Beru', 'Luke', 'Leia', 'Han', 'Lando', 'Wedge', 'Biggs', 'Jek', 'Porkins', 'Derek', 'Carlist', 'Mon', 'Bail', 'Padme', 'Anakin', 'Obi-Wan', 'Qui-Gon', 'Mace', 'Yoda'];
-    const lastNames = ['Lars', 'Organa', 'Solo', 'Calrissian', 'Antilles', 'Tarkin', 'Mothma', 'Rieekan', 'Skywalker', 'Kenobi', 'Jinn', 'Windu', 'Fett', 'Dameron', 'Rey'];
-    return `${firstNames[Math.floor(rnd() * firstNames.length)]} ${lastNames[Math.floor(rnd() * lastNames.length)]}`;
+    const firstNames = ['Kael', 'Renn', 'Soren', 'Mira', 'Dax', 'Tovan', 'Elin', 'Cass', 'Bram', 'Nyla', 'Jor', 'Vesa', 'Theo', 'Marek', 'Sela', 'Orin', 'Tamsin', 'Roen', 'Lira', 'Cael'];
+    const lastNames = ['Marn', 'Vance', 'Holt', 'Dray', 'Voss', 'Karr', 'Senne', 'Tarn', 'Reyes', 'Calder', 'Brenn', 'Adair', 'Mero', 'Locke', 'Faye'];
+    return `${pick(firstNames, rnd)} ${pick(lastNames, rnd)}`;
   },
-  jawa: (rnd) => {
+  skritcher: (rnd) => {
     const prefixes = ['Jek', 'Tek', 'Rek', 'Mek', 'Nek', 'Kek'];
-    const suffixes = ['-Tik', '-Tak', '-Tuk', '-Tik', '-Tuk', '-Tik'];
-    return `${prefixes[Math.floor(rnd() * prefixes.length)]}${suffixes[Math.floor(rnd() * suffixes.length)]}`;
+    const suffixes = ['-Tik', '-Tak', '-Tuk', '-Rek', '-Vik', '-Zuk'];
+    return `${pick(prefixes, rnd)}${pick(suffixes, rnd)}`;
   },
-  tusken_raider: (rnd) => {
-    const names = ['A\'Sharad', 'Krayt', 'Bantha', 'Sand', 'Dune', 'Krayt'];
-    return names[Math.floor(rnd() * names.length)];
+  dune_nomad_raider: (rnd) => {
+    const names = ['Vharn', 'Rok-Tann', 'Kessa', 'Tharn', "Ssk'rah", 'Vurek'];
+    return pick(names, rnd);
   },
-  wookiee: (rnd) => {
-    const names = ['Chewbacca', 'Tarfful', 'Lumpawaroo', 'Attichitcuk', 'Mallatobuck', 'Ralrracheen'];
-    return names[Math.floor(rnd() * names.length)];
+  ursk: (rnd) => {
+    const names = ['Grawl', 'Mohrrak', 'Brundwa', 'Korrtak', 'Throgg', 'Wulvane'];
+    return pick(names, rnd);
   },
-  ewok: (rnd) => {
-    const names = ['Wicket', 'Teebo', 'Logray', 'Chirpa', 'Kneesaa', 'Paploo'];
-    return names[Math.floor(rnd() * names.length)];
+  brindle: (rnd) => {
+    const names = ['Pip', 'Tobble', 'Nim', 'Brisk', 'Tully', 'Fenn'];
+    return pick(names, rnd);
   },
-  twilek: (rnd) => {
-    const names = ['Aayla', 'Bib', 'Cham', 'Hera', 'Orn', 'Ryl'];
-    return names[Math.floor(rnd() * names.length)];
+  sytheen: (rnd) => {
+    const names = ['Aeryn', 'Sora', 'Vael', 'Lysa', 'Niri', 'Tael'];
+    return pick(names, rnd);
   },
-  zabrak: (rnd) => {
-    const names = ['Darth', 'Maul', 'Eeth', 'Koth', 'Savage', 'Feral'];
-    return names[Math.floor(rnd() * names.length)];
+  karnaki: (rnd) => {
+    const names = ['Korr', 'Vahn', 'Draggo', 'Skahl', 'Tervek', 'Morrn'];
+    return pick(names, rnd);
   },
-  rodian: (rnd) => {
-    const names = ['Greedo', 'Navik', 'Neela', 'Wald', 'Reegesk'];
-    return names[Math.floor(rnd() * names.length)];
+  skarn: (rnd) => {
+    const names = ['Sresh', 'Vossk', 'Neeza', 'Greezl', 'Raskk'];
+    return pick(names, rnd);
   },
-  mon_calamari: (rnd) => {
-    const names = ['Ackbar', 'Tarpals', 'Tikkes', 'Meena', 'Lee-Char'];
-    return names[Math.floor(rnd() * names.length)];
+  vorne: (rnd) => {
+    const names = ['Vex', 'Sorath', 'Nuvar', 'Iress', 'Kaeril', 'Threll'];
+    return pick(names, rnd);
   },
-  quarren: (rnd) => {
-    const names = ['Tikkes', 'Dac', 'Quarren', 'Mon', 'Calamari'];
-    return names[Math.floor(rnd() * names.length)];
+  sethari: (rnd) => {
+    const names = ['Shaa', 'Resh', 'Sekka', 'Vurl', 'Tessan', 'Orla'];
+    return pick(names, rnd);
   },
-  gungan: (rnd) => {
-    const names = ['Jar', 'Jar', 'Binks', 'Boss', 'Nass', 'Roos', 'Tarpals'];
-    return names[Math.floor(rnd() * names.length)];
+  sennari: (rnd) => {
+    const names = ['Maren', 'Selka', 'Dorin', 'Lumeen', 'Vasha'];
+    return pick(names, rnd);
   },
-  bothan: (rnd) => {
-    const names = ['Borsk', 'Fey\'lya', 'Koth', 'Mel', 'Koth'];
-    return names[Math.floor(rnd() * names.length)];
+  dovrek: (rnd) => {
+    const names = ['Quell', 'Sevak', 'Tharessa', 'Vorlun', 'Dree'];
+    return pick(names, rnd);
   },
-  sullustan: (rnd) => {
-    const names = ['Nien', 'Nunb', 'Lando', 'Calrissian', 'Dengar'];
-    return names[Math.floor(rnd() * names.length)];
+  marrow: (rnd) => {
+    const names = ['Jabo', 'Tull', 'Nessa', 'Brullo', 'Pann', 'Roon'];
+    return pick(names, rnd);
   },
-  trandoshan: (rnd) => {
-    const names = ['Bossk', 'Cradossk', 'Dengar', 'Zuckuss'];
-    return names[Math.floor(rnd() * names.length)];
+  renai: (rnd) => {
+    const names = ['Velya', 'Konn', 'Mell', 'Drax', 'Sann'];
+    return pick(names, rnd);
   },
-  mirialan: (rnd) => {
-    const names = ['Luminara', 'Unduli', 'Barriss', 'Offee'];
-    return names[Math.floor(rnd() * names.length)];
+  dell: (rnd) => {
+    const names = ['Nevin', 'Brunn', 'Lassa', 'Corrin', 'Denn'];
+    return pick(names, rnd);
+  },
+  skrag: (rnd) => {
+    const names = ['Krassk', 'Vorgan', 'Dratt', 'Sesska', 'Hurokk'];
+    return pick(names, rnd);
+  },
+  jeharu: (rnd) => {
+    const names = ['Vela', 'Saru', 'Mirin', 'Ossa', 'Tann'];
+    return pick(names, rnd);
   },
   generic: (rnd) => {
     // Fallback for unknown species
     const names = ['Citizen', 'Local', 'Resident', 'Settler', 'Trader'];
     const numbers = Math.floor(rnd() * 999) + 1;
-    return `${names[Math.floor(rnd() * names.length)]} ${numbers}`;
+    return `${pick(names, rnd)} ${numbers}`;
   }
 };
 
@@ -376,7 +386,7 @@ function generateDialogue(npcType, species, occupation, rnd) {
     `I'm a ${occupation} here.`,
     `This place has its challenges.`,
     `Be careful out there.`,
-    `May the Force be with you.`
+    `May the Veil be with you.`
   ];
 
   return {

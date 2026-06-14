@@ -7,6 +7,7 @@ import React from 'react';
 import { useInventoryStore } from '../../state/inventorySlice';
 import { useCharacterStore } from '../../state/characterSlice';
 import { getSetDisplay, formatSetBonus } from '../../utils/itemSets';
+import { formatDisplayName } from '../../utils/formatName';
 import './EquipmentPanel.css';
 
 export default function EquipmentPanel({ equipped, setBonuses = {} }) {
@@ -50,7 +51,7 @@ export default function EquipmentPanel({ equipped, setBonuses = {} }) {
                 {item ? (
                   <>
                     <div className="equipped-item">
-                      <span className="item-name">{item.itemId}</span>
+                      <span className="item-name">{item.name || formatDisplayName(item.itemId)}</span>
                       {item.quantity > 1 && (
                         <span className="item-quantity">x{item.quantity}</span>
                       )}

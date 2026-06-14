@@ -9,7 +9,7 @@ async function regenerateDungeon() {
 
     // Delete the existing dungeon
     const deleted = await SubMap.destroy({
-      where: { id: 'tatooine_sarlacc_pit_dungeon' }
+      where: { id: 'gravenmoor_devourer_pit_dungeon' }
     });
     
     if (deleted > 0) {

@@ -30,7 +30,7 @@ class AssetManager {
 
   /**
    * Load a planet texture
-   * @param {string} planetId - Planet ID (e.g., 'tatooine')
+   * @param {string} planetId - Planet ID (e.g., 'gravenmoor')
    * @returns {Promise<Image|null>} Loaded image or null if failed
    */
   async loadTexture(planetId) {
@@ -168,7 +168,7 @@ class AssetManager {
 
   /**
    * Load an NPC sprite
-   * @param {string} npcType - NPC type (e.g., 'kinrath', 'twilek')
+   * @param {string} npcType - NPC type (e.g., 'venox', 'sytheen')
    * @returns {Promise<Image|null>} Loaded image or null if failed
    */
   async loadNPCSprite(npcType) {
@@ -293,7 +293,7 @@ class AssetManager {
 
   /**
    * Get loading state for an asset
-   * @param {string} assetKey - Asset key (e.g., 'texture:tatooine', 'poi:spaceport')
+   * @param {string} assetKey - Asset key (e.g., 'texture:gravenmoor', 'poi:spaceport')
    * @returns {string} Loading state: 'idle', 'loading', 'loaded', 'error'
    */
   getLoadingState(assetKey) {

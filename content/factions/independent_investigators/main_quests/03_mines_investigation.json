@@ -1,5 +1,5 @@
 {
-  "id": "iia_ryloth_02_mines_investigation",
+  "id": "iia_sytha_02_mines_investigation",
   "factionId": "independent_investigators",
   "questType": "main",
   "title": "Mines of Deception",
@@ -10,7 +10,7 @@
     "reputation": {
       "independent_investigators": 55
     },
-    "completedQuests": ["iia_ryloth_01_trail_begins"],
+    "completedQuests": ["iia_sytha_01_trail_begins"],
     "items": []
   },
   "objectives": [
@@ -19,7 +19,7 @@
       "type": "travel",
       "description": "Travel to the abandoned mine in the mining district",
       "location": {
-        "planet": "ryloth",
+        "planet": "sytha",
         "area": "mining_district"
       }
     },
@@ -62,11 +62,11 @@
         "quantity": 1
       }
     ],
-    "unlocks": ["iia_ryloth_03_refugee_liberation"]
+    "unlocks": ["iia_sytha_03_refugee_liberation"]
   },
   "questGiverId": "npc_refugee_leader",
   "startLocation": {
-    "planet": "ryloth",
+    "planet": "sytha",
     "area": "tann_province"
   },
   "estimatedTime": 75,

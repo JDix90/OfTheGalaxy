@@ -3,11 +3,11 @@
   "totalPlanets": 88,
   "planets": [
     {
-      "id": "ahch_to",
-      "name": "Ahch-To",
+      "id": "esh_vael",
+      "name": "Esh-Vael",
       "system": {
-        "id": "ahch_to_system",
-        "name": "Ahch-To System",
+        "id": "esh_vael_system",
+        "name": "Esh-Vael System",
         "region": "Unknown Regions",
         "coordinates": {
           "x": 95,
@@ -25,7 +25,7 @@
         "factionControl": null,
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Ahch-To is a ocean planet with a temperate climate.",
+        "description": "Esh-Vael is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -46,11 +46,11 @@
       "metadata": {}
     },
     {
-      "id": "ahch_to_moon",
-      "name": "Ahch-To Moon",
+      "id": "esh_vael_moon",
+      "name": "Esh-Vael Moon",
       "system": {
-        "id": "ahch_to_system",
-        "name": "Ahch-To System",
+        "id": "esh_vael_system",
+        "name": "Esh-Vael System",
         "region": "Unknown Regions",
         "coordinates": {
           "x": 95,
@@ -68,7 +68,7 @@
         "factionControl": null,
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Ahch-To Moon is a ocean planet with a temperate climate.",
+        "description": "Esh-Vael Moon is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -89,11 +89,11 @@
       "metadata": {}
     },
     {
-      "id": "alderaan",
-      "name": "Alderaan",
+      "id": "caelmore",
+      "name": "Caelmore",
       "system": {
-        "id": "alderaan_system",
-        "name": "Alderaan System",
+        "id": "caelmore_system",
+        "name": "Caelmore System",
         "region": "Core Worlds",
         "coordinates": {
           "x": 5,
@@ -108,16 +108,16 @@
         "dayLength": null,
         "yearLength": null,
         "population": 2000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Alderaan is a terrestrial planet with a temperate climate.",
+        "description": "Caelmore is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
           "Aldera",
-          "New Alderaan"
+          "New Caelmore"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -135,11 +135,11 @@
       "metadata": {}
     },
     {
-      "id": "alderaan_moon_1",
-      "name": "Alderaan Moon I",
+      "id": "caelmore_moon_1",
+      "name": "Caelmore Moon I",
       "system": {
-        "id": "alderaan_system",
-        "name": "Alderaan System",
+        "id": "caelmore_system",
+        "name": "Caelmore System",
         "region": "Core Worlds",
         "coordinates": {
           "x": 5,
@@ -157,7 +157,7 @@
         "factionControl": null,
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Alderaan Moon I is a terrestrial planet with a temperate climate.",
+        "description": "Caelmore Moon I is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -178,11 +178,11 @@
       "metadata": {}
     },
     {
-      "id": "ansion",
-      "name": "Ansion",
+      "id": "greyfield",
+      "name": "Greyfield",
       "system": {
-        "id": "ansion_system",
-        "name": "Ansion System",
+        "id": "greyfield_system",
+        "name": "Greyfield System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -7,
@@ -197,10 +197,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 600000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Ansion is a terrestrial planet with a temperate climate.",
+        "description": "Greyfield is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -223,11 +223,11 @@
       "metadata": {}
     },
     {
-      "id": "bespin",
-      "name": "Bespin",
+      "id": "cirruan",
+      "name": "Cirruan",
       "system": {
-        "id": "bespin_system",
-        "name": "Bespin System",
+        "id": "cirruan_system",
+        "name": "Cirruan System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 45,
@@ -245,7 +245,7 @@
         "factionControl": "independent",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Bespin is a gas_giant planet with a variable climate.",
+        "description": "Cirruan is a gas_giant planet with a variable climate.",
         "lore": null
       },
       "locations": {
@@ -268,11 +268,11 @@
       "metadata": {}
     },
     {
-      "id": "bespin_moon_1",
-      "name": "Bespin Moon I",
+      "id": "cirruan_moon_1",
+      "name": "Cirruan Moon I",
       "system": {
-        "id": "bespin_system",
-        "name": "Bespin System",
+        "id": "cirruan_system",
+        "name": "Cirruan System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 45,
@@ -290,7 +290,7 @@
         "factionControl": null,
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Bespin Moon I is a terrestrial planet with a variable climate.",
+        "description": "Cirruan Moon I is a terrestrial planet with a variable climate.",
         "lore": null
       },
       "locations": {
@@ -311,11 +311,11 @@
       "metadata": {}
     },
     {
-      "id": "bothawui",
-      "name": "Bothawui",
+      "id": "renqa",
+      "name": "Renqa",
       "system": {
-        "id": "bothawui_system",
-        "name": "Bothawui System",
+        "id": "renqa_system",
+        "name": "Renqa System",
         "region": "Inner Rim",
         "coordinates": {
           "x": -18,
@@ -330,10 +330,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 3000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Bothawui is a terrestrial planet with a temperate climate.",
+        "description": "Renqa is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -356,11 +356,11 @@
       "metadata": {}
     },
     {
-      "id": "bothawui_moon",
-      "name": "Bothawui Moon",
+      "id": "renqa_moon",
+      "name": "Renqa Moon",
       "system": {
-        "id": "bothawui_system",
-        "name": "Bothawui System",
+        "id": "renqa_system",
+        "name": "Renqa System",
         "region": "Inner Rim",
         "coordinates": {
           "x": -18,
@@ -375,10 +375,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 500000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Bothawui Moon is a terrestrial planet with a temperate climate.",
+        "description": "Renqa Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -401,11 +401,11 @@
       "metadata": {}
     },
     {
-      "id": "brentaal",
-      "name": "Brentaal",
+      "id": "tradewell",
+      "name": "Tradewell",
       "system": {
-        "id": "brentaal_system",
-        "name": "Brentaal System",
+        "id": "tradewell_system",
+        "name": "Tradewell System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -12,
@@ -420,15 +420,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1500000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Brentaal is a terrestrial planet with a temperate climate.",
+        "description": "Tradewell is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Brentaal City"
+          "Tradewell City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -437,7 +437,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Brentaal City"
+            "name": "Tradewell City"
           }
         ],
         "resources": []
@@ -446,11 +446,11 @@
       "metadata": {}
     },
     {
-      "id": "cato_neimoidia",
-      "name": "Cato Neimoidia",
+      "id": "vexhold",
+      "name": "Vexhold",
       "system": {
-        "id": "cato_neimoidia_system",
-        "name": "Cato Neimoidia System",
+        "id": "vexhold_system",
+        "name": "Vexhold System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 24,
@@ -468,12 +468,12 @@
         "factionControl": "independent",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Cato Neimoidia is a terrestrial planet with a temperate climate.",
+        "description": "Vexhold is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Cato Neimoidia City"
+          "Vexhold City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -482,7 +482,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Cato Neimoidia City"
+            "name": "Vexhold City"
           }
         ],
         "resources": []
@@ -491,11 +491,11 @@
       "metadata": {}
     },
     {
-      "id": "cato_neimoidia_moon",
-      "name": "Cato Neimoidia Moon",
+      "id": "vexhold_moon",
+      "name": "Vexhold Moon",
       "system": {
-        "id": "cato_neimoidia_system",
-        "name": "Cato Neimoidia System",
+        "id": "vexhold_system",
+        "name": "Vexhold System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 24,
@@ -513,7 +513,7 @@
         "factionControl": "independent",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Cato Neimoidia Moon is a terrestrial planet with a temperate climate.",
+        "description": "Vexhold Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -536,11 +536,11 @@
       "metadata": {}
     },
     {
-      "id": "chandrila",
-      "name": "Chandrila",
+      "id": "solenne",
+      "name": "Solenne",
       "system": {
-        "id": "chandrila_system",
-        "name": "Chandrila System",
+        "id": "solenne_system",
+        "name": "Solenne System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -5,
@@ -555,10 +555,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1200000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Chandrila is a terrestrial planet with a temperate climate.",
+        "description": "Solenne is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -581,11 +581,11 @@
       "metadata": {}
     },
     {
-      "id": "csilla",
-      "name": "Csilla",
+      "id": "vornhal",
+      "name": "Vornhal",
       "system": {
-        "id": "chiss_space_system",
-        "name": "Chiss Space System",
+        "id": "vorne_reaches_system",
+        "name": "Vorne Reaches System",
         "region": "Unknown Regions",
         "coordinates": {
           "x": 105,
@@ -600,10 +600,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 2500000000,
-        "factionControl": "chiss",
+        "factionControl": "vorne",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Csilla is a ice planet with a frozen climate.",
+        "description": "Vornhal is a ice planet with a frozen climate.",
         "lore": null
       },
       "locations": {
@@ -626,11 +626,11 @@
       "metadata": {}
     },
     {
-      "id": "naporar",
-      "name": "Naporar",
+      "id": "naveth",
+      "name": "Naveth",
       "system": {
-        "id": "chiss_space_system",
-        "name": "Chiss Space System",
+        "id": "vorne_reaches_system",
+        "name": "Vorne Reaches System",
         "region": "Unknown Regions",
         "coordinates": {
           "x": 105,
@@ -645,15 +645,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 500000000,
-        "factionControl": "chiss",
+        "factionControl": "vorne",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Naporar is a terrestrial planet with a temperate climate.",
+        "description": "Naveth is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Naporar City"
+          "Naveth City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -662,7 +662,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Naporar City"
+            "name": "Naveth City"
           }
         ],
         "resources": []
@@ -671,11 +671,11 @@
       "metadata": {}
     },
     {
-      "id": "commenor",
-      "name": "Commenor",
+      "id": "coriane",
+      "name": "Coriane",
       "system": {
-        "id": "commenor_system",
-        "name": "Commenor System",
+        "id": "coriane_system",
+        "name": "Coriane System",
         "region": "Core Worlds",
         "coordinates": {
           "x": 3,
@@ -690,15 +690,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 900000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Commenor is a terrestrial planet with a temperate climate.",
+        "description": "Coriane is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Commenor City"
+          "Coriane City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -707,7 +707,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Commenor City"
+            "name": "Coriane City"
           }
         ],
         "resources": []
@@ -716,11 +716,11 @@
       "metadata": {}
     },
     {
-      "id": "corellia",
-      "name": "Corellia",
+      "id": "drydock",
+      "name": "Drydock",
       "system": {
-        "id": "corellia_system",
-        "name": "Corellia System",
+        "id": "drydock_system",
+        "name": "Drydock System",
         "region": "Core Worlds",
         "coordinates": {
           "x": 0,
@@ -735,10 +735,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 3000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Corellia is a terrestrial planet with a temperate climate.",
+        "description": "Drydock is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -763,11 +763,11 @@
       "metadata": {}
     },
     {
-      "id": "drall",
-      "name": "Drall",
+      "id": "brae",
+      "name": "Brae",
       "system": {
-        "id": "corellia_system",
-        "name": "Corellia System",
+        "id": "drydock_system",
+        "name": "Drydock System",
         "region": "Core Worlds",
         "coordinates": {
           "x": 0,
@@ -782,10 +782,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 500000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Drall is a terrestrial planet with a temperate climate.",
+        "description": "Brae is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -808,11 +808,11 @@
       "metadata": {}
     },
     {
-      "id": "selonia",
-      "name": "Selonia",
+      "id": "mereth",
+      "name": "Mereth",
       "system": {
-        "id": "corellia_system",
-        "name": "Corellia System",
+        "id": "drydock_system",
+        "name": "Drydock System",
         "region": "Core Worlds",
         "coordinates": {
           "x": 0,
@@ -827,10 +827,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 100000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Selonia is a ocean planet with a temperate climate.",
+        "description": "Mereth is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -853,11 +853,11 @@
       "metadata": {}
     },
     {
-      "id": "coruscant",
-      "name": "Coruscant",
+      "id": "centralis",
+      "name": "Centralis",
       "system": {
-        "id": "coruscant_system",
-        "name": "Coruscant System",
+        "id": "centralis_system",
+        "name": "Centralis System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -10,
@@ -872,15 +872,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1000000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Coruscant is a urban planet with a temperate climate.",
+        "description": "Centralis is a urban planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Galactic City"
+          "Central Spire"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -889,144 +889,144 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Galactic City"
+            "name": "Central Spire"
           }
         ],
         "resources": []
       },
       "submaps": [
         {
-          "id": "coruscant_galactic_city_medical_center_medical_center",
-          "name": "Galactic City Medical Center Medical_center",
+          "id": "centralis_galactic_city_medical_center_medical_center",
+          "name": "Central Spire Medical Center Medical_center",
           "type": "medical_center",
           "template": "medium",
-          "parentLocationId": "Galactic City Medical Center",
+          "parentLocationId": "Central Spire Medical Center",
           "parentLocationType": "poi",
           "metadata": {
-            "lore": "A medical_center location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A medical_center location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "medical_center sub-map for Galactic City Medical Center on Coruscant",
+            "description": "medical_center sub-map for Central Spire Medical Center on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_senate_district_market_market",
-          "name": "Senate District Market Market",
+          "id": "centralis_senate_district_market_market",
+          "name": "Assembly District Market Market",
           "type": "market",
           "template": "medium",
-          "parentLocationId": "Senate District Market",
+          "parentLocationId": "Assembly District Market",
           "parentLocationType": "market",
           "metadata": {
-            "lore": "A market location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A market location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "market sub-map for Senate District Market on Coruscant",
+            "description": "market sub-map for Assembly District Market on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_jedi_temple_temple",
-          "name": "Jedi Temple Temple",
+          "id": "centralis_keeper_temple_temple",
+          "name": "Keeper Sanctum Temple",
           "type": "temple",
           "template": "medium",
-          "parentLocationId": "Jedi Temple",
+          "parentLocationId": "Keeper Sanctum",
           "parentLocationType": "poi",
           "metadata": {
-            "lore": "A temple location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A temple location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "temple sub-map for Jedi Temple on Coruscant",
+            "description": "temple sub-map for Keeper Sanctum on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_coco_town_markets_market",
-          "name": "CoCo Town Markets Market",
+          "id": "centralis_lowmarket_markets_market",
+          "name": "Lowmarket Markets Market",
           "type": "market",
           "template": "medium",
-          "parentLocationId": "CoCo Town Markets",
+          "parentLocationId": "Lowmarket Markets",
           "parentLocationType": "poi",
           "metadata": {
-            "lore": "A market location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A market location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "market sub-map for CoCo Town Markets on Coruscant",
+            "description": "market sub-map for Lowmarket Markets on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_senate_district_city",
-          "name": "Senate District City",
+          "id": "centralis_senate_district_city",
+          "name": "Assembly District City",
           "type": "city",
           "template": "medium",
-          "parentLocationId": "Senate District",
+          "parentLocationId": "Assembly District",
           "parentLocationType": "city",
           "metadata": {
-            "lore": "A city location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A city location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "city sub-map for Senate District on Coruscant",
+            "description": "city sub-map for Assembly District on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_uscru_district_city",
-          "name": "Uscru District City",
+          "id": "centralis_nightrun_district_city",
+          "name": "Nightrun District City",
           "type": "city",
           "template": "medium",
-          "parentLocationId": "Uscru District",
+          "parentLocationId": "Nightrun District",
           "parentLocationType": "city",
           "metadata": {
-            "lore": "A city location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A city location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "city sub-map for Uscru District on Coruscant",
+            "description": "city sub-map for Nightrun District on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_coco_town_city",
-          "name": "CoCo Town City",
+          "id": "centralis_lowmarket_city",
+          "name": "Lowmarket City",
           "type": "city",
           "template": "medium",
-          "parentLocationId": "CoCo Town",
+          "parentLocationId": "Lowmarket",
           "parentLocationType": "city",
           "metadata": {
-            "lore": "A city location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A city location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "city sub-map for CoCo Town on Coruscant",
+            "description": "city sub-map for Lowmarket on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_galactic_city_city",
-          "name": "Galactic City City",
+          "id": "centralis_galactic_city_city",
+          "name": "Central Spire City",
           "type": "city",
           "template": "medium",
-          "parentLocationId": "Galactic City",
+          "parentLocationId": "Central Spire",
           "parentLocationType": "city",
           "metadata": {
-            "lore": "A city location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A city location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "city sub-map for Galactic City on Coruscant",
+            "description": "city sub-map for Central Spire on Centralis",
             "restrictions": {}
           }
         },
         {
-          "id": "coruscant_galactic_senate_building_government",
-          "name": "Galactic Senate Building Government",
+          "id": "centralis_galactic_senate_building_government",
+          "name": "Concord Assembly Building Government",
           "type": "government",
           "template": "medium",
-          "parentLocationId": "Galactic Senate Building",
+          "parentLocationId": "Concord Assembly Building",
           "parentLocationType": "poi",
           "metadata": {
-            "lore": "A government location on Coruscant",
-            "faction": "new_republic",
+            "lore": "A government location on Centralis",
+            "faction": "concord",
             "dangerLevel": 1,
-            "description": "government sub-map for Galactic Senate Building on Coruscant",
+            "description": "government sub-map for Concord Assembly Building on Centralis",
             "restrictions": {}
           }
         }
@@ -1034,11 +1034,11 @@
       "metadata": {}
     },
     {
-      "id": "coruscant_moon",
-      "name": "Coruscant Moon",
+      "id": "centralis_moon",
+      "name": "Centralis Moon",
       "system": {
-        "id": "coruscant_system",
-        "name": "Coruscant System",
+        "id": "centralis_system",
+        "name": "Centralis System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -10,
@@ -1053,10 +1053,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 50000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Coruscant Moon is a terrestrial planet with a temperate climate.",
+        "description": "Centralis Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -1079,11 +1079,11 @@
       "metadata": {}
     },
     {
-      "id": "dac",
-      "name": "Dac",
+      "id": "dorrun",
+      "name": "Dorrun",
       "system": {
-        "id": "dac_system",
-        "name": "Dac System",
+        "id": "dorrun_system",
+        "name": "Dorrun System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 16,
@@ -1098,10 +1098,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 25000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Dac is a ocean planet with a temperate climate.",
+        "description": "Dorrun is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -1124,11 +1124,11 @@
       "metadata": {}
     },
     {
-      "id": "dagobah",
-      "name": "Dagobah",
+      "id": "mirefen",
+      "name": "Mirefen",
       "system": {
-        "id": "dagobah_system",
-        "name": "Dagobah System",
+        "id": "mirefen_system",
+        "name": "Mirefen System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 62,
@@ -1146,7 +1146,7 @@
         "factionControl": null,
         "dangerLevel": 6,
         "terrain": null,
-        "description": "Dagobah is a jungle planet with a tropical climate.",
+        "description": "Mirefen is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -1167,11 +1167,11 @@
       "metadata": {}
     },
     {
-      "id": "dagobah_moon",
-      "name": "Dagobah Moon",
+      "id": "mirefen_moon",
+      "name": "Mirefen Moon",
       "system": {
-        "id": "dagobah_system",
-        "name": "Dagobah System",
+        "id": "mirefen_system",
+        "name": "Mirefen System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 62,
@@ -1189,7 +1189,7 @@
         "factionControl": null,
         "dangerLevel": 7,
         "terrain": null,
-        "description": "Dagobah Moon is a jungle planet with a tropical climate.",
+        "description": "Mirefen Moon is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -1210,11 +1210,11 @@
       "metadata": {}
     },
     {
-      "id": "dantooine",
-      "name": "Dantooine",
+      "id": "caldon",
+      "name": "Caldon",
       "system": {
-        "id": "dantooine_system",
-        "name": "Dantooine System",
+        "id": "caldon_system",
+        "name": "Caldon System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 35,
@@ -1229,10 +1229,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 10000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Dantooine is a terrestrial planet with a temperate climate.",
+        "description": "Caldon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -1255,11 +1255,11 @@
       "metadata": {}
     },
     {
-      "id": "dathomir",
-      "name": "Dathomir",
+      "id": "mawthorn",
+      "name": "Mawthorn",
       "system": {
-        "id": "dathomir_system",
-        "name": "Dathomir System",
+        "id": "mawthorn_system",
+        "name": "Mawthorn System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 70,
@@ -1277,7 +1277,7 @@
         "factionControl": null,
         "dangerLevel": 8,
         "terrain": null,
-        "description": "Dathomir is a terrestrial planet with a variable climate.",
+        "description": "Mawthorn is a terrestrial planet with a variable climate.",
         "lore": null
       },
       "locations": {
@@ -1298,11 +1298,11 @@
       "metadata": {}
     },
     {
-      "id": "endor",
-      "name": "Endor",
+      "id": "verdance",
+      "name": "Verdance",
       "system": {
-        "id": "endor_system",
-        "name": "Endor System",
+        "id": "verdance_system",
+        "name": "Verdance System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 40,
@@ -1317,10 +1317,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 30000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Endor is a terrestrial planet with a temperate climate.",
+        "description": "Verdance is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -1341,11 +1341,11 @@
       "metadata": {}
     },
     {
-      "id": "endor_moon",
-      "name": "Endor Moon",
+      "id": "verdance_moon",
+      "name": "Verdance Moon",
       "system": {
-        "id": "endor_system",
-        "name": "Endor System",
+        "id": "verdance_system",
+        "name": "Verdance System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 40,
@@ -1363,7 +1363,7 @@
         "factionControl": null,
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Endor Moon is a terrestrial planet with a temperate climate.",
+        "description": "Verdance Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -1384,11 +1384,11 @@
       "metadata": {}
     },
     {
-      "id": "eriadu",
-      "name": "Eriadu",
+      "id": "greld",
+      "name": "Greld",
       "system": {
-        "id": "eriadu_system",
-        "name": "Eriadu System",
+        "id": "greld_system",
+        "name": "Greld System",
         "region": "Colonies",
         "coordinates": {
           "x": 8,
@@ -1403,15 +1403,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 22000000000,
-        "factionControl": "imperial_remnant",
+        "factionControl": "dominion_remnant",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Eriadu is a terrestrial planet with a temperate climate.",
+        "description": "Greld is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Eriadu City"
+          "Greld City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -1420,7 +1420,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Eriadu City"
+            "name": "Greld City"
           }
         ],
         "resources": []
@@ -1429,11 +1429,11 @@
       "metadata": {}
     },
     {
-      "id": "exegol",
-      "name": "Exegol",
+      "id": "nyxar",
+      "name": "Nyxar",
       "system": {
-        "id": "exegol_system",
-        "name": "Exegol System",
+        "id": "nyxar_system",
+        "name": "Nyxar System",
         "region": "Wild Space",
         "coordinates": {
           "x": 90,
@@ -1448,10 +1448,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 0,
-        "factionControl": "imperial_remnant",
+        "factionControl": "dominion_remnant",
         "dangerLevel": 10,
         "terrain": null,
-        "description": "Exegol is a barren planet with a variable climate.",
+        "description": "Nyxar is a barren planet with a variable climate.",
         "lore": null
       },
       "locations": {
@@ -1472,11 +1472,11 @@
       "metadata": {}
     },
     {
-      "id": "felucia",
-      "name": "Felucia",
+      "id": "myssia",
+      "name": "Myssia",
       "system": {
-        "id": "felucia_system",
-        "name": "Felucia System",
+        "id": "myssia_system",
+        "name": "Myssia System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 32,
@@ -1494,7 +1494,7 @@
         "factionControl": "independent",
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Felucia is a jungle planet with a tropical climate.",
+        "description": "Myssia is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -1515,11 +1515,11 @@
       "metadata": {}
     },
     {
-      "id": "felucia_moon",
-      "name": "Felucia Moon",
+      "id": "myssia_moon",
+      "name": "Myssia Moon",
       "system": {
-        "id": "felucia_system",
-        "name": "Felucia System",
+        "id": "myssia_system",
+        "name": "Myssia System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 32,
@@ -1537,7 +1537,7 @@
         "factionControl": null,
         "dangerLevel": 6,
         "terrain": null,
-        "description": "Felucia Moon is a jungle planet with a tropical climate.",
+        "description": "Myssia Moon is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -1558,11 +1558,11 @@
       "metadata": {}
     },
     {
-      "id": "fondor",
-      "name": "Fondor",
+      "id": "anvret",
+      "name": "Anvret",
       "system": {
-        "id": "fondor_system",
-        "name": "Fondor System",
+        "id": "anvret_system",
+        "name": "Anvret System",
         "region": "Colonies",
         "coordinates": {
           "x": -15,
@@ -1577,15 +1577,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 5000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Fondor is a terrestrial planet with a temperate climate.",
+        "description": "Anvret is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Fondor City"
+          "Anvret City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -1594,54 +1594,54 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Fondor City"
+            "name": "Anvret City"
           }
         ],
         "resources": []
       },
       "submaps": [
         {
-          "id": "fondor_fondor_city_1_city",
-          "name": "Fondor City 1 City",
+          "id": "anvret_anvret_city_1_city",
+          "name": "Anvret City 1 City",
           "type": "city",
           "template": "medium",
-          "parentLocationId": "Fondor City 1",
+          "parentLocationId": "Anvret City 1",
           "parentLocationType": "city",
           "metadata": {
-            "lore": "A city location on Fondor",
-            "faction": "new_republic",
+            "lore": "A city location on Anvret",
+            "faction": "concord",
             "dangerLevel": 2,
-            "description": "city sub-map for Fondor City 1 on Fondor",
+            "description": "city sub-map for Anvret City 1 on Anvret",
             "restrictions": {}
           }
         },
         {
-          "id": "fondor_fondor_city_2_city",
-          "name": "Fondor City 2 City",
+          "id": "anvret_anvret_city_2_city",
+          "name": "Anvret City 2 City",
           "type": "city",
           "template": "medium",
-          "parentLocationId": "Fondor City 2",
+          "parentLocationId": "Anvret City 2",
           "parentLocationType": "city",
           "metadata": {
-            "lore": "A city location on Fondor",
-            "faction": "new_republic",
+            "lore": "A city location on Anvret",
+            "faction": "concord",
             "dangerLevel": 2,
-            "description": "city sub-map for Fondor City 2 on Fondor",
+            "description": "city sub-map for Anvret City 2 on Anvret",
             "restrictions": {}
           }
         },
         {
-          "id": "fondor_fondor_city_5_city",
-          "name": "Fondor City 5 City",
+          "id": "anvret_anvret_city_5_city",
+          "name": "Anvret City 5 City",
           "type": "city",
           "template": "medium",
-          "parentLocationId": "Fondor City 5",
+          "parentLocationId": "Anvret City 5",
           "parentLocationType": "city",
           "metadata": {
-            "lore": "A city location on Fondor",
-            "faction": "new_republic",
+            "lore": "A city location on Anvret",
+            "faction": "concord",
             "dangerLevel": 2,
-            "description": "city sub-map for Fondor City 5 on Fondor",
+            "description": "city sub-map for Anvret City 5 on Anvret",
             "restrictions": {}
           }
         }
@@ -1649,11 +1649,11 @@
       "metadata": {}
     },
     {
-      "id": "geonosis_outer",
-      "name": "Geonosis Outer",
+      "id": "karrn_outer",
+      "name": "Karrn Outer",
       "system": {
-        "id": "geonosis_outer_system",
-        "name": "Geonosis Outer System",
+        "id": "karrn_outer_system",
+        "name": "Karrn Outer System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 52,
@@ -1671,7 +1671,7 @@
         "factionControl": "independent",
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Geonosis Outer is a desert planet with a arid climate.",
+        "description": "Karrn Outer is a desert planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -1694,11 +1694,11 @@
       "metadata": {}
     },
     {
-      "id": "geonosis",
-      "name": "Geonosis",
+      "id": "karrn",
+      "name": "Karrn",
       "system": {
-        "id": "geonosis_system",
-        "name": "Geonosis System",
+        "id": "karrn_system",
+        "name": "Karrn System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 35,
@@ -1716,7 +1716,7 @@
         "factionControl": "independent",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Geonosis is a desert planet with a arid climate.",
+        "description": "Karrn is a desert planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -1739,11 +1739,11 @@
       "metadata": {}
     },
     {
-      "id": "geonosis_moon",
-      "name": "Geonosis Moon",
+      "id": "karrn_moon",
+      "name": "Karrn Moon",
       "system": {
-        "id": "geonosis_system",
-        "name": "Geonosis System",
+        "id": "karrn_system",
+        "name": "Karrn System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 35,
@@ -1761,7 +1761,7 @@
         "factionControl": null,
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Geonosis Moon is a desert planet with a arid climate.",
+        "description": "Karrn Moon is a desert planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -1782,11 +1782,11 @@
       "metadata": {}
     },
     {
-      "id": "hoth",
-      "name": "Hoth",
+      "id": "rime",
+      "name": "Rime",
       "system": {
-        "id": "hoth_system",
-        "name": "Hoth System",
+        "id": "rime_system",
+        "name": "Rime System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 60,
@@ -1804,7 +1804,7 @@
         "factionControl": null,
         "dangerLevel": 6,
         "terrain": null,
-        "description": "Hoth is a ice planet with a frozen climate.",
+        "description": "Rime is a ice planet with a frozen climate.",
         "lore": null
       },
       "locations": {
@@ -1825,11 +1825,11 @@
       "metadata": {}
     },
     {
-      "id": "hoth_moon",
-      "name": "Hoth Moon",
+      "id": "rime_moon",
+      "name": "Rime Moon",
       "system": {
-        "id": "hoth_system",
-        "name": "Hoth System",
+        "id": "rime_system",
+        "name": "Rime System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 60,
@@ -1847,7 +1847,7 @@
         "factionControl": null,
         "dangerLevel": 7,
         "terrain": null,
-        "description": "Hoth Moon is a ice planet with a frozen climate.",
+        "description": "Rime Moon is a ice planet with a frozen climate.",
         "lore": null
       },
       "locations": {
@@ -1868,11 +1868,11 @@
       "metadata": {}
     },
     {
-      "id": "ilum",
-      "name": "Ilum",
+      "id": "kthala",
+      "name": "Kthala",
       "system": {
-        "id": "ilum_system",
-        "name": "Ilum System",
+        "id": "kthala_system",
+        "name": "Kthala System",
         "region": "Wild Space",
         "coordinates": {
           "x": 88,
@@ -1890,7 +1890,7 @@
         "factionControl": null,
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Ilum is a ice planet with a frozen climate.",
+        "description": "Kthala is a ice planet with a frozen climate.",
         "lore": null
       },
       "locations": {
@@ -1911,11 +1911,11 @@
       "metadata": {}
     },
     {
-      "id": "ilum_moon",
-      "name": "Ilum Moon",
+      "id": "kthala_moon",
+      "name": "Kthala Moon",
       "system": {
-        "id": "ilum_system",
-        "name": "Ilum System",
+        "id": "kthala_system",
+        "name": "Kthala System",
         "region": "Wild Space",
         "coordinates": {
           "x": 88,
@@ -1933,7 +1933,7 @@
         "factionControl": null,
         "dangerLevel": 6,
         "terrain": null,
-        "description": "Ilum Moon is a ice planet with a frozen climate.",
+        "description": "Kthala Moon is a ice planet with a frozen climate.",
         "lore": null
       },
       "locations": {
@@ -1954,11 +1954,11 @@
       "metadata": {}
     },
     {
-      "id": "ithor",
-      "name": "Ithor",
+      "id": "greenholt",
+      "name": "Greenholt",
       "system": {
-        "id": "ithor_system",
-        "name": "Ithor System",
+        "id": "greenholt_system",
+        "name": "Greenholt System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 22,
@@ -1973,10 +1973,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 0,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Ithor is a jungle planet with a tropical climate.",
+        "description": "Greenholt is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -1997,11 +1997,11 @@
       "metadata": {}
     },
     {
-      "id": "jakku",
-      "name": "Jakku",
+      "id": "talveen",
+      "name": "Talveen",
       "system": {
-        "id": "jakku_system",
-        "name": "Jakku System",
+        "id": "talveen_system",
+        "name": "Talveen System",
         "region": "Unknown Regions",
         "coordinates": {
           "x": 80,
@@ -2019,7 +2019,7 @@
         "factionControl": null,
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Jakku is a desert planet with a arid climate.",
+        "description": "Talveen is a desert planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -2042,11 +2042,11 @@
       "metadata": {}
     },
     {
-      "id": "kamino",
-      "name": "Kamino",
+      "id": "tethys",
+      "name": "Tethys",
       "system": {
-        "id": "kamino_system",
-        "name": "Kamino System",
+        "id": "tethys_system",
+        "name": "Tethys System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 75,
@@ -2064,7 +2064,7 @@
         "factionControl": null,
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Kamino is a ocean planet with a temperate climate.",
+        "description": "Tethys is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -2087,11 +2087,11 @@
       "metadata": {}
     },
     {
-      "id": "kamino_moon",
-      "name": "Kamino Moon",
+      "id": "tethys_moon",
+      "name": "Tethys Moon",
       "system": {
-        "id": "kamino_system",
-        "name": "Kamino System",
+        "id": "tethys_system",
+        "name": "Tethys System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 75,
@@ -2109,7 +2109,7 @@
         "factionControl": null,
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Kamino Moon is a ocean planet with a temperate climate.",
+        "description": "Tethys Moon is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -2130,11 +2130,11 @@
       "metadata": {}
     },
     {
-      "id": "kashyyyk",
-      "name": "Kashyyyk",
+      "id": "verdholm",
+      "name": "Verdholm",
       "system": {
-        "id": "kashyyyk_system",
-        "name": "Kashyyyk System",
+        "id": "verdholm_system",
+        "name": "Verdholm System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 25,
@@ -2149,10 +2149,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 45000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Kashyyyk is a jungle planet with a tropical climate.",
+        "description": "Verdholm is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -2176,11 +2176,11 @@
       "metadata": {}
     },
     {
-      "id": "kuat",
-      "name": "Kuat",
+      "id": "forgeline",
+      "name": "Forgeline",
       "system": {
-        "id": "kuat_system",
-        "name": "Kuat System",
+        "id": "forgeline_system",
+        "name": "Forgeline System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -8,
@@ -2195,16 +2195,16 @@
         "dayLength": null,
         "yearLength": null,
         "population": 8000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Kuat is a terrestrial planet with a temperate climate.",
+        "description": "Forgeline is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Kuat City",
-          "Kuat Drive Yards"
+          "Forgeline City",
+          "Forgeline Drive Yards"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -2213,7 +2213,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Kuat City"
+            "name": "Forgeline City"
           }
         ],
         "resources": []
@@ -2222,11 +2222,11 @@
       "metadata": {}
     },
     {
-      "id": "kuat_2",
-      "name": "Kuat II",
+      "id": "forgeline_2",
+      "name": "Forgeline II",
       "system": {
-        "id": "kuat_system",
-        "name": "Kuat System",
+        "id": "forgeline_system",
+        "name": "Forgeline System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -8,
@@ -2241,15 +2241,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 2000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Kuat II is a terrestrial planet with a temperate climate.",
+        "description": "Forgeline II is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Kuat II City"
+          "Forgeline II City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -2258,7 +2258,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Kuat II City"
+            "name": "Forgeline II City"
           }
         ],
         "resources": []
@@ -2267,11 +2267,11 @@
       "metadata": {}
     },
     {
-      "id": "kuat_moon",
-      "name": "Kuat Moon",
+      "id": "forgeline_moon",
+      "name": "Forgeline Moon",
       "system": {
-        "id": "kuat_system",
-        "name": "Kuat System",
+        "id": "forgeline_system",
+        "name": "Forgeline System",
         "region": "Core Worlds",
         "coordinates": {
           "x": -8,
@@ -2286,10 +2286,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 50000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Kuat Moon is a terrestrial planet with a temperate climate.",
+        "description": "Forgeline Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -2312,11 +2312,11 @@
       "metadata": {}
     },
     {
-      "id": "malastare",
-      "name": "Malastare",
+      "id": "dustram",
+      "name": "Dustram",
       "system": {
-        "id": "malastare_system",
-        "name": "Malastare System",
+        "id": "dustram_system",
+        "name": "Dustram System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 22,
@@ -2331,15 +2331,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 4000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Malastare is a terrestrial planet with a arid climate.",
+        "description": "Dustram is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Malastare City"
+          "Dustram City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -2348,7 +2348,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Malastare City"
+            "name": "Dustram City"
           }
         ],
         "resources": []
@@ -2357,11 +2357,11 @@
       "metadata": {}
     },
     {
-      "id": "malastare_moon",
-      "name": "Malastare Moon",
+      "id": "dustram_moon",
+      "name": "Dustram Moon",
       "system": {
-        "id": "malastare_system",
-        "name": "Malastare System",
+        "id": "dustram_system",
+        "name": "Dustram System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 22,
@@ -2376,10 +2376,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Malastare Moon is a terrestrial planet with a arid climate.",
+        "description": "Dustram Moon is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -2402,11 +2402,11 @@
       "metadata": {}
     },
     {
-      "id": "concord_dawn",
+      "id": "dawnmark",
       "name": "Concord Dawn",
       "system": {
-        "id": "mandalore_system",
-        "name": "Mandalore System",
+        "id": "veshkar_system",
+        "name": "Veshkar System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 55,
@@ -2421,7 +2421,7 @@
         "dayLength": null,
         "yearLength": null,
         "population": 500000,
-        "factionControl": "mandalorian",
+        "factionControl": "ironkin",
         "dangerLevel": 4,
         "terrain": null,
         "description": "Concord Dawn is a terrestrial planet with a arid climate.",
@@ -2447,11 +2447,11 @@
       "metadata": {}
     },
     {
-      "id": "mandalore",
-      "name": "Mandalore",
+      "id": "veshkar",
+      "name": "Veshkar",
       "system": {
-        "id": "mandalore_system",
-        "name": "Mandalore System",
+        "id": "veshkar_system",
+        "name": "Veshkar System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 55,
@@ -2466,10 +2466,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 4000000,
-        "factionControl": "mandalorian",
+        "factionControl": "ironkin",
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Mandalore is a terrestrial planet with a arid climate.",
+        "description": "Veshkar is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -2493,11 +2493,11 @@
       "metadata": {}
     },
     {
-      "id": "mon_cala",
-      "name": "Mon Cala",
+      "id": "thessmar",
+      "name": "Thessmar",
       "system": {
-        "id": "mon_cala_system",
-        "name": "Mon Cala System",
+        "id": "thessmar_system",
+        "name": "Thessmar System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 15,
@@ -2512,10 +2512,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 27000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Mon Cala is a ocean planet with a temperate climate.",
+        "description": "Thessmar is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -2539,11 +2539,11 @@
       "metadata": {}
     },
     {
-      "id": "mon_cala_moon",
-      "name": "Mon Cala Moon",
+      "id": "thessmar_moon",
+      "name": "Thessmar Moon",
       "system": {
-        "id": "mon_cala_system",
-        "name": "Mon Cala System",
+        "id": "thessmar_system",
+        "name": "Thessmar System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 15,
@@ -2558,10 +2558,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 50000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Mon Cala Moon is a ocean planet with a temperate climate.",
+        "description": "Thessmar Moon is a ocean planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -2584,11 +2584,11 @@
       "metadata": {}
     },
     {
-      "id": "mustafar",
-      "name": "Mustafar",
+      "id": "embervast",
+      "name": "Embervast",
       "system": {
-        "id": "mustafar_system",
-        "name": "Mustafar System",
+        "id": "embervast_system",
+        "name": "Embervast System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 65,
@@ -2603,10 +2603,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 20000,
-        "factionControl": "imperial_remnant",
+        "factionControl": "dominion_remnant",
         "dangerLevel": 9,
         "terrain": null,
-        "description": "Mustafar is a volcanic planet with a variable climate.",
+        "description": "Embervast is a volcanic planet with a variable climate.",
         "lore": null
       },
       "locations": {
@@ -2630,11 +2630,11 @@
       "metadata": {}
     },
     {
-      "id": "mygeeto",
-      "name": "Mygeeto",
+      "id": "glaiv",
+      "name": "Glaiv",
       "system": {
-        "id": "mygeeto_system",
-        "name": "Mygeeto System",
+        "id": "glaiv_system",
+        "name": "Glaiv System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 38,
@@ -2649,15 +2649,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 19000000,
-        "factionControl": "imperial_remnant",
+        "factionControl": "dominion_remnant",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Mygeeto is a ice planet with a frozen climate.",
+        "description": "Glaiv is a ice planet with a frozen climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Mygeeto City"
+          "Glaiv City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -2666,7 +2666,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Mygeeto City"
+            "name": "Glaiv City"
           }
         ],
         "resources": []
@@ -2675,11 +2675,11 @@
       "metadata": {}
     },
     {
-      "id": "mygeeto_moon",
-      "name": "Mygeeto Moon",
+      "id": "glaiv_moon",
+      "name": "Glaiv Moon",
       "system": {
-        "id": "mygeeto_system",
-        "name": "Mygeeto System",
+        "id": "glaiv_system",
+        "name": "Glaiv System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 38,
@@ -2697,7 +2697,7 @@
         "factionControl": null,
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Mygeeto Moon is a ice planet with a frozen climate.",
+        "description": "Glaiv Moon is a ice planet with a frozen climate.",
         "lore": null
       },
       "locations": {
@@ -2718,11 +2718,11 @@
       "metadata": {}
     },
     {
-      "id": "naboo",
-      "name": "Naboo",
+      "id": "eloria",
+      "name": "Eloria",
       "system": {
-        "id": "naboo_system",
-        "name": "Naboo System",
+        "id": "eloria_system",
+        "name": "Eloria System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 20,
@@ -2737,10 +2737,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 4500000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 1,
         "terrain": null,
-        "description": "Naboo is a terrestrial planet with a temperate climate.",
+        "description": "Eloria is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -2764,11 +2764,11 @@
       "metadata": {}
     },
     {
-      "id": "naboo_moon",
-      "name": "Naboo Moon",
+      "id": "eloria_moon",
+      "name": "Eloria Moon",
       "system": {
-        "id": "naboo_system",
-        "name": "Naboo System",
+        "id": "eloria_system",
+        "name": "Eloria System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 20,
@@ -2786,7 +2786,7 @@
         "factionControl": null,
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Naboo Moon is a terrestrial planet with a temperate climate.",
+        "description": "Eloria Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -2807,11 +2807,11 @@
       "metadata": {}
     },
     {
-      "id": "nar_shaddaa",
-      "name": "Nar Shaddaa",
+      "id": "sinkport",
+      "name": "Sinkport",
       "system": {
-        "id": "nar_shaddaa_system",
-        "name": "Nar Shaddaa System",
+        "id": "sinkport_system",
+        "name": "Sinkport System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 68,
@@ -2826,15 +2826,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 85000000000,
-        "factionControl": "hutt_cartel",
+        "factionControl": "vorr_cartel",
         "dangerLevel": 6,
         "terrain": null,
-        "description": "Nar Shaddaa is a urban planet with a variable climate.",
+        "description": "Sinkport is a urban planet with a variable climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Nar Shaddaa City"
+          "Sinkport City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -2843,7 +2843,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Nar Shaddaa City"
+            "name": "Sinkport City"
           }
         ],
         "resources": []
@@ -2852,11 +2852,11 @@
       "metadata": {}
     },
     {
-      "id": "nar_shaddaa_moon",
-      "name": "Nar Shaddaa Moon",
+      "id": "sinkport_moon",
+      "name": "Sinkport Moon",
       "system": {
-        "id": "nar_shaddaa_system",
-        "name": "Nar Shaddaa System",
+        "id": "sinkport_system",
+        "name": "Sinkport System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 68,
@@ -2871,10 +2871,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 50000000,
-        "factionControl": "hutt_cartel",
+        "factionControl": "vorr_cartel",
         "dangerLevel": 6,
         "terrain": null,
-        "description": "Nar Shaddaa Moon is a urban planet with a variable climate.",
+        "description": "Sinkport Moon is a urban planet with a variable climate.",
         "lore": null
       },
       "locations": {
@@ -2897,11 +2897,11 @@
       "metadata": {}
     },
     {
-      "id": "dxun",
-      "name": "Dxun",
+      "id": "drask",
+      "name": "Drask",
       "system": {
-        "id": "onderon_system",
-        "name": "Onderon System",
+        "id": "veluron_system",
+        "name": "Veluron System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 40,
@@ -2919,7 +2919,7 @@
         "factionControl": null,
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Dxun is a jungle planet with a tropical climate.",
+        "description": "Drask is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -2940,11 +2940,11 @@
       "metadata": {}
     },
     {
-      "id": "onderon",
-      "name": "Onderon",
+      "id": "veluron",
+      "name": "Veluron",
       "system": {
-        "id": "onderon_system",
-        "name": "Onderon System",
+        "id": "veluron_system",
+        "name": "Veluron System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 40,
@@ -2959,10 +2959,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 5000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Onderon is a jungle planet with a tropical climate.",
+        "description": "Veluron is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -2985,11 +2985,11 @@
       "metadata": {}
     },
     {
-      "id": "ord_mantell",
-      "name": "Ord Mantell",
+      "id": "ordwell",
+      "name": "Ordwell",
       "system": {
-        "id": "ord_mantell_system",
-        "name": "Ord Mantell System",
+        "id": "ordwell_system",
+        "name": "Ordwell System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 48,
@@ -3007,7 +3007,7 @@
         "factionControl": "independent",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Ord Mantell is a terrestrial planet with a temperate climate.",
+        "description": "Ordwell is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -3030,11 +3030,11 @@
       "metadata": {}
     },
     {
-      "id": "ord_mantell_moon",
-      "name": "Ord Mantell Moon",
+      "id": "ordwell_moon",
+      "name": "Ordwell Moon",
       "system": {
-        "id": "ord_mantell_system",
-        "name": "Ord Mantell System",
+        "id": "ordwell_system",
+        "name": "Ordwell System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 48,
@@ -3052,7 +3052,7 @@
         "factionControl": "independent",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Ord Mantell Moon is a terrestrial planet with a temperate climate.",
+        "description": "Ordwell Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -3075,11 +3075,11 @@
       "metadata": {}
     },
     {
-      "id": "rendili",
-      "name": "Rendili",
+      "id": "dolmark",
+      "name": "Dolmark",
       "system": {
-        "id": "rendili_system",
-        "name": "Rendili System",
+        "id": "dolmark_system",
+        "name": "Dolmark System",
         "region": "Colonies",
         "coordinates": {
           "x": 12,
@@ -3094,15 +3094,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1800000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Rendili is a terrestrial planet with a temperate climate.",
+        "description": "Dolmark is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Rendili City"
+          "Dolmark City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -3111,7 +3111,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Rendili City"
+            "name": "Dolmark City"
           }
         ],
         "resources": []
@@ -3120,11 +3120,11 @@
       "metadata": {}
     },
     {
-      "id": "rodia",
-      "name": "Rodia",
+      "id": "vashqa",
+      "name": "Vashqa",
       "system": {
-        "id": "rodia_system",
-        "name": "Rodia System",
+        "id": "vashqa_system",
+        "name": "Vashqa System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 18,
@@ -3139,10 +3139,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1300000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Rodia is a jungle planet with a tropical climate.",
+        "description": "Vashqa is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -3165,11 +3165,11 @@
       "metadata": {}
     },
     {
-      "id": "rodia_moon",
-      "name": "Rodia Moon",
+      "id": "vashqa_moon",
+      "name": "Vashqa Moon",
       "system": {
-        "id": "rodia_system",
-        "name": "Rodia System",
+        "id": "vashqa_system",
+        "name": "Vashqa System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 18,
@@ -3187,7 +3187,7 @@
         "factionControl": null,
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Rodia Moon is a jungle planet with a tropical climate.",
+        "description": "Vashqa Moon is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -3208,11 +3208,11 @@
       "metadata": {}
     },
     {
-      "id": "ryloth_deep",
-      "name": "Ryloth Deep",
+      "id": "sytha_deep",
+      "name": "Sytha Deep",
       "system": {
-        "id": "ryloth_deep_system",
-        "name": "Ryloth Deep System",
+        "id": "sytha_deep_system",
+        "name": "Sytha Deep System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 72,
@@ -3227,10 +3227,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 100000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Ryloth Deep is a terrestrial planet with a arid climate.",
+        "description": "Sytha Deep is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3253,11 +3253,11 @@
       "metadata": {}
     },
     {
-      "id": "ryloth_expansion",
-      "name": "Ryloth Expansion",
+      "id": "sytha_reach",
+      "name": "Sytha Reach",
       "system": {
-        "id": "ryloth_expansion_system",
-        "name": "Ryloth Expansion System",
+        "id": "sytha_reach_system",
+        "name": "Sytha Reach System",
         "region": "Expansion Region",
         "coordinates": {
           "x": 45,
@@ -3272,10 +3272,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 500000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Ryloth Expansion is a terrestrial planet with a arid climate.",
+        "description": "Sytha Reach is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3298,11 +3298,11 @@
       "metadata": {}
     },
     {
-      "id": "ryloth_outer",
-      "name": "Ryloth Outer",
+      "id": "sytha_verge",
+      "name": "Sytha Verge",
       "system": {
-        "id": "ryloth_outer_system",
-        "name": "Ryloth Outer System",
+        "id": "sytha_verge_system",
+        "name": "Sytha Verge System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 58,
@@ -3317,10 +3317,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 200000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Ryloth Outer is a terrestrial planet with a arid climate.",
+        "description": "Sytha Verge is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3343,11 +3343,11 @@
       "metadata": {}
     },
     {
-      "id": "ryloth",
-      "name": "Ryloth",
+      "id": "sytha",
+      "name": "Sytha",
       "system": {
-        "id": "ryloth_system",
-        "name": "Ryloth System",
+        "id": "sytha_system",
+        "name": "Sytha System",
         "region": "Expansion Region",
         "coordinates": {
           "x": 30,
@@ -3362,15 +3362,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1500000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Ryloth is a terrestrial planet with a arid climate.",
+        "description": "Sytha is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Lessu",
+          "Sythmar",
           "Kala'uun"
         ],
         "pointsOfInterest": [],
@@ -3380,7 +3380,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Lessu"
+            "name": "Sythmar"
           }
         ],
         "resources": []
@@ -3389,11 +3389,11 @@
       "metadata": {}
     },
     {
-      "id": "ryloth_unknown",
-      "name": "Ryloth Unknown",
+      "id": "sytha_fringe",
+      "name": "Sytha Fringe",
       "system": {
-        "id": "ryloth_unknown_system",
-        "name": "Ryloth Unknown System",
+        "id": "sytha_fringe_system",
+        "name": "Sytha Fringe System",
         "region": "Unknown Regions",
         "coordinates": {
           "x": 100,
@@ -3411,7 +3411,7 @@
         "factionControl": null,
         "dangerLevel": 6,
         "terrain": null,
-        "description": "Ryloth Unknown is a terrestrial planet with a arid climate.",
+        "description": "Sytha Fringe is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3432,11 +3432,11 @@
       "metadata": {}
     },
     {
-      "id": "ryloth_wild",
-      "name": "Ryloth Wild",
+      "id": "sytha_wilds",
+      "name": "Sytha Wilds",
       "system": {
-        "id": "ryloth_wild_system",
-        "name": "Ryloth Wild System",
+        "id": "sytha_wilds_system",
+        "name": "Sytha Wilds System",
         "region": "Wild Space",
         "coordinates": {
           "x": 85,
@@ -3454,7 +3454,7 @@
         "factionControl": null,
         "dangerLevel": 7,
         "terrain": null,
-        "description": "Ryloth Wild is a terrestrial planet with a arid climate.",
+        "description": "Sytha Wilds is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3475,11 +3475,11 @@
       "metadata": {}
     },
     {
-      "id": "saleucami",
-      "name": "Saleucami",
+      "id": "saldon",
+      "name": "Saldon",
       "system": {
-        "id": "saleucami_system",
-        "name": "Saleucami System",
+        "id": "saldon_system",
+        "name": "Saldon System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 26,
@@ -3497,12 +3497,12 @@
         "factionControl": "independent",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Saleucami is a terrestrial planet with a temperate climate.",
+        "description": "Saldon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Saleucami City"
+          "Saldon City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -3511,7 +3511,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Saleucami City"
+            "name": "Saldon City"
           }
         ],
         "resources": []
@@ -3520,11 +3520,11 @@
       "metadata": {}
     },
     {
-      "id": "saleucami_moon",
-      "name": "Saleucami Moon",
+      "id": "saldon_moon",
+      "name": "Saldon Moon",
       "system": {
-        "id": "saleucami_system",
-        "name": "Saleucami System",
+        "id": "saldon_system",
+        "name": "Saldon System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 26,
@@ -3542,7 +3542,7 @@
         "factionControl": null,
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Saleucami Moon is a terrestrial planet with a temperate climate.",
+        "description": "Saldon Moon is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -3563,11 +3563,11 @@
       "metadata": {}
     },
     {
-      "id": "scarif",
-      "name": "Scarif",
+      "id": "coralsec",
+      "name": "Coralsec",
       "system": {
-        "id": "scarif_system",
-        "name": "Scarif System",
+        "id": "coralsec_system",
+        "name": "Coralsec System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 45,
@@ -3582,10 +3582,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 0,
-        "factionControl": "imperial_remnant",
+        "factionControl": "dominion_remnant",
         "dangerLevel": 7,
         "terrain": null,
-        "description": "Scarif is a terrestrial planet with a tropical climate.",
+        "description": "Coralsec is a terrestrial planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -3606,11 +3606,11 @@
       "metadata": {}
     },
     {
-      "id": "sullust",
-      "name": "Sullust",
+      "id": "pyrren",
+      "name": "Pyrren",
       "system": {
-        "id": "sullust_system",
-        "name": "Sullust System",
+        "id": "pyrren_system",
+        "name": "Pyrren System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 10,
@@ -3625,16 +3625,16 @@
         "dayLength": null,
         "yearLength": null,
         "population": 10000000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Sullust is a volcanic planet with a variable climate.",
+        "description": "Pyrren is a volcanic planet with a variable climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
           "Plesstila",
-          "Sullust City"
+          "Pyrren City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -3652,11 +3652,11 @@
       "metadata": {}
     },
     {
-      "id": "sullust_moon",
-      "name": "Sullust Moon",
+      "id": "pyrren_moon",
+      "name": "Pyrren Moon",
       "system": {
-        "id": "sullust_system",
-        "name": "Sullust System",
+        "id": "pyrren_system",
+        "name": "Pyrren System",
         "region": "Inner Rim",
         "coordinates": {
           "x": 10,
@@ -3671,10 +3671,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Sullust Moon is a volcanic planet with a variable climate.",
+        "description": "Pyrren Moon is a volcanic planet with a variable climate.",
         "lore": null
       },
       "locations": {
@@ -3697,11 +3697,11 @@
       "metadata": {}
     },
     {
-      "id": "taris",
-      "name": "Taris",
+      "id": "highspire",
+      "name": "Highspire",
       "system": {
-        "id": "taris_system",
-        "name": "Taris System",
+        "id": "highspire_system",
+        "name": "Highspire System",
         "region": "Expansion Region",
         "coordinates": {
           "x": 42,
@@ -3719,7 +3719,7 @@
         "factionControl": "independent",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Taris is a urban planet with a temperate climate.",
+        "description": "Highspire is a urban planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -3743,11 +3743,11 @@
       "metadata": {}
     },
     {
-      "id": "tatooine",
-      "name": "Tatooine",
+      "id": "gravenmoor",
+      "name": "Gravenmoor",
       "system": {
-        "id": "tatooine_system",
-        "name": "Tatooine System",
+        "id": "gravenmoor_system",
+        "name": "Gravenmoor System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 50,
@@ -3762,16 +3762,16 @@
         "dayLength": null,
         "yearLength": null,
         "population": 200000,
-        "factionControl": "hutt_cartel",
+        "factionControl": "vorr_cartel",
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Tatooine is a desert planet with a arid climate.",
+        "description": "Gravenmoor is a desert planet with a arid climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Mos Eisley",
-          "Mos Espa",
+          "Greywell",
+          "Dustreach",
           "Anchorhead"
         ],
         "pointsOfInterest": [],
@@ -3781,7 +3781,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Mos Eisley"
+            "name": "Greywell"
           }
         ],
         "resources": []
@@ -3790,11 +3790,11 @@
       "metadata": {}
     },
     {
-      "id": "tatooine_moon",
-      "name": "Tatooine Moon",
+      "id": "gravenmoor_moon",
+      "name": "Gravenmoor Moon",
       "system": {
-        "id": "tatooine_system",
-        "name": "Tatooine System",
+        "id": "gravenmoor_system",
+        "name": "Gravenmoor System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 50,
@@ -3812,7 +3812,7 @@
         "factionControl": null,
         "dangerLevel": 5,
         "terrain": null,
-        "description": "Tatooine Moon is a desert planet with a arid climate.",
+        "description": "Gravenmoor Moon is a desert planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3833,11 +3833,11 @@
       "metadata": {}
     },
     {
-      "id": "telos",
-      "name": "Telos",
+      "id": "tellan",
+      "name": "Tellan",
       "system": {
-        "id": "telos_system",
-        "name": "Telos System",
+        "id": "tellan_system",
+        "name": "Tellan System",
         "region": "Expansion Region",
         "coordinates": {
           "x": 48,
@@ -3852,15 +3852,15 @@
         "dayLength": null,
         "yearLength": null,
         "population": 1000000,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Telos is a terrestrial planet with a temperate climate.",
+        "description": "Tellan is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
         "majorCities": [
-          "Telos City"
+          "Tellan City"
         ],
         "pointsOfInterest": [],
         "landingZones": [
@@ -3869,7 +3869,7 @@
             "y": 0,
             "id": "main",
             "area": "landing_zone",
-            "name": "Telos City"
+            "name": "Tellan City"
           }
         ],
         "resources": []
@@ -3878,11 +3878,11 @@
       "metadata": {}
     },
     {
-      "id": "utapau",
-      "name": "Utapau",
+      "id": "casmer",
+      "name": "Casmer",
       "system": {
-        "id": "utapau_system",
-        "name": "Utapau System",
+        "id": "casmer_system",
+        "name": "Casmer System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 28,
@@ -3900,7 +3900,7 @@
         "factionControl": "independent",
         "dangerLevel": 2,
         "terrain": null,
-        "description": "Utapau is a terrestrial planet with a arid climate.",
+        "description": "Casmer is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3923,11 +3923,11 @@
       "metadata": {}
     },
     {
-      "id": "utapau_moon",
-      "name": "Utapau Moon",
+      "id": "casmer_moon",
+      "name": "Casmer Moon",
       "system": {
-        "id": "utapau_system",
-        "name": "Utapau System",
+        "id": "casmer_system",
+        "name": "Casmer System",
         "region": "Mid Rim",
         "coordinates": {
           "x": 28,
@@ -3945,7 +3945,7 @@
         "factionControl": null,
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Utapau Moon is a terrestrial planet with a arid climate.",
+        "description": "Casmer Moon is a terrestrial planet with a arid climate.",
         "lore": null
       },
       "locations": {
@@ -3966,11 +3966,11 @@
       "metadata": {}
     },
     {
-      "id": "yavin_4",
-      "name": "Yavin 4",
+      "id": "selvora_4",
+      "name": "Selvora IV",
       "system": {
-        "id": "yavin_system",
-        "name": "Yavin System",
+        "id": "selvora_system",
+        "name": "Selvora System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 55,
@@ -3985,10 +3985,10 @@
         "dayLength": null,
         "yearLength": null,
         "population": 0,
-        "factionControl": "new_republic",
+        "factionControl": "concord",
         "dangerLevel": 3,
         "terrain": null,
-        "description": "Yavin 4 is a jungle planet with a tropical climate.",
+        "description": "Selvora IV is a jungle planet with a tropical climate.",
         "lore": null
       },
       "locations": {
@@ -4009,11 +4009,11 @@
       "metadata": {}
     },
     {
-      "id": "yavin_8",
-      "name": "Yavin 8",
+      "id": "selvora_8",
+      "name": "Selvora VIII",
       "system": {
-        "id": "yavin_system",
-        "name": "Yavin System",
+        "id": "selvora_system",
+        "name": "Selvora System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 55,
@@ -4031,7 +4031,7 @@
         "factionControl": null,
         "dangerLevel": 4,
         "terrain": null,
-        "description": "Yavin 8 is a terrestrial planet with a temperate climate.",
+        "description": "Selvora VIII is a terrestrial planet with a temperate climate.",
         "lore": null
       },
       "locations": {
@@ -4052,11 +4052,11 @@
       "metadata": {}
     },
     {
-      "id": "yavin_prime",
-      "name": "Yavin Prime",
+      "id": "selvora_prime",
+      "name": "Selvora",
       "system": {
-        "id": "yavin_system",
-        "name": "Yavin System",
+        "id": "selvora_system",
+        "name": "Selvora System",
         "region": "Outer Rim",
         "coordinates": {
           "x": 55,
@@ -4074,7 +4074,7 @@
         "factionControl": null,
         "dangerLevel": 8,
         "terrain": null,
-        "description": "Yavin Prime is a gas_giant planet with a variable climate.",
+        "description": "Selvora is a gas_giant planet with a variable climate.",
         "lore": null
       },
       "locations": {

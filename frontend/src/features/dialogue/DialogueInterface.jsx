@@ -4,14 +4,17 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { formatDisplayName } from '../../utils/formatName';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterSlice';
 import { npcApi } from '../../services/api/npcApi';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
+import { gameEventBus, GAME_EVENTS } from '../../services/gameEventBus';
 import { useConversationHistory } from '../../hooks/useConversationHistory';
 import NPCDetailsModal from '../../components/npc/NPCDetailsModal';
 import QuestOfferModal from '../../components/quest/QuestOfferModal';
+import GameIcon from '../../components/common/GameIcon';
 import ConversationTopics from '../../components/dialogue/ConversationTopics';
 import ConversationSearch from '../../components/dialogue/ConversationSearch';
 import './DialogueInterface.css';
@@ -21,26 +24,26 @@ const getFactionDisplayName = (factionId) => {
   if (!factionId) return 'Unaffiliated';
   
   const displayNames = {
-    'galactic_republic': 'Galactic Republic',
-    'galactic_empire': 'Galactic Empire',
-    'rebel_alliance': 'Rebel Alliance',
-    'new_republic': 'New Republic',
-    'first_order': 'First Order',
-    'resistance': 'Resistance',
-    'jedi_order': 'Jedi Order',
-    'sith': 'Sith',
-    'mandalorians': 'Mandalorians',
-    'hutts': 'Hutts',
-    'black_sun': 'Black Sun',
-    'crimson_dawn': 'Crimson Dawn',
+    'old_concord': 'Old Concord',
+    'iron_dominion': 'Iron Dominion',
+    'free_worlds': 'Free Worlds',
+    'concord': 'Concord',
+    'ascendancy': 'Ascendancy',
+    'uprising': 'Uprising',
+    'keeper_order': 'Keeper Order',
+    'hollow': 'Hollow',
+    'ironkin': 'Ironkin',
+    'vorr': 'Vorr',
+    'umbra': 'Umbra',
+    'scarlet_tide': 'Scarlet Tide',
     'independent': 'Independent',
     'neutral': 'Neutral',
     'smugglers': 'Smugglers',
-    'bounty_hunters': 'Bounty Hunters',
-    'trade_federation': 'Trade Federation',
-    'separatists': 'Separatists',
-    'chiss_ascendancy': 'Chiss Ascendancy',
-    'hapes_consortium': 'Hapes Consortium'
+    'the_tally': 'Bounty Hunters',
+    'commerce_league': 'Commerce League',
+    'secession': 'Secessionists',
+    'vorne_ascendancy': 'Vorne Ascendancy',
+    'hesperan_consortium': 'Hesperan Consortium'
   };
 
   return displayNames[factionId] || factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -58,6 +61,8 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
   const [fullNPCData, setFullNPCData] = useState(null);
   const [isQuestOfferModalOpen, setIsQuestOfferModalOpen] = useState(false);
   const [offeredQuestId, setOfferedQuestId] = useState(null);
+  // Golden-path closing fork: set once the player picks where the fragment goes.
+  const [closingDestination, setClosingDestination] = useState(null);
   const messagesEndRef = useRef(null);
   const dialogueRef = useRef(null);
   const inputRef = useRef(null);
@@ -718,6 +723,35 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
         }));
       }
 
+      // Surface any faction standing changes (rep toast + tier-up modal via ReputationHost)
+      if (Array.isArray(responseData.reputationChanges)) {
+        responseData.reputationChanges.forEach((change) => {
+          if (change && change.factionId && change.delta) {
+            gameEventBus.emit(GAME_EVENTS.REP_CHANGED, change);
+          }
+        });
+      }
+
+      // Golden-path closing fork: the player has chosen where to take the Veil
+      // resonance fragment. The backend has already applied the faction lean and
+      // spawned the first real quest — refresh the quest log so it shows up, and
+      // surface a "set course" CTA that routes to the galaxy map with a zoom
+      // payoff toward the destination world.
+      if (responseData.closingChoice && responseData.closingChoice.destinationPlanet) {
+        const cc = responseData.closingChoice;
+        try {
+          const { useQuestStore } = await import('../../state/questSlice');
+          useQuestStore.getState().loadActiveQuests(currentCharacter.id);
+        } catch (questErr) {
+          console.warn('[Dialogue] Failed to refresh quests after closing choice (non-fatal):', questErr.message);
+        }
+        setClosingDestination({
+          destinationPlanet: cc.destinationPlanet,
+          followOnQuestTitle: cc.followOnQuestTitle,
+          choice: cc.choice
+        });
+      }
+
       // Handle quest offer (mini-quest or regular quest)
       console.log('[Dialogue] Response data:', responseData);
       console.log('[Dialogue] Checking for combat intro - nextState:', responseData.nextState, 'isTutorial:', responseData.isTutorial);
@@ -837,6 +871,20 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
     }
   };
 
+  // Golden-path payoff: route the player to the galaxy map with a reveal/zoom
+  // toward the world they chose for the resonance fragment.
+  const handleSetCourse = () => {
+    if (!closingDestination) return;
+    navigate('/game/galaxy', {
+      state: {
+        revealPlanet: closingDestination.destinationPlanet,
+        fromTutorialClosing: true,
+        followOnQuestTitle: closingDestination.followOnQuestTitle
+      }
+    });
+    if (typeof onClose === 'function') onClose();
+  };
+
   const handleSuggestedResponseClick = async (suggestion) => {
     console.log('[Dialogue] Suggested response clicked:', { suggestion, hasAction: !!suggestion.action, action: suggestion.action });
     
@@ -934,8 +982,8 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
           <div className="npc-details">
             <h2>{npc.name}</h2>
             <div className="npc-meta">
-              <span className="npc-occupation">{npc.occupation || 'Citizen'}</span>
-              {npc.species && <span className="npc-species">• {npc.species}</span>}
+              <span className="npc-occupation">{formatDisplayName(npc.occupation) || 'Citizen'}</span>
+              {npc.species && <span className="npc-species">• {formatDisplayName(npc.species)}</span>}
               {npc.factionId && (
                 <span className="npc-faction" title={getFactionDisplayName(npc.factionId)}>
                   • {getFactionDisplayName(npc.factionId)}
@@ -1045,6 +1093,18 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {closingDestination && (
+        <div className="dialogue-closing-cta">
+          <div className="closing-cta-label">Your first quest awaits:</div>
+          <button className="btn-primary set-course-button" onClick={handleSetCourse}>
+            <GameIcon name="course" size={16} /> Set course for {closingDestination.destinationPlanet
+              ? closingDestination.destinationPlanet.charAt(0).toUpperCase() + closingDestination.destinationPlanet.slice(1)
+              : 'the Reach'}
+            {closingDestination.followOnQuestTitle ? ` — “${closingDestination.followOnQuestTitle}”` : ''}
+          </button>
         </div>
       )}
 

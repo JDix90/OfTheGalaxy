@@ -5,7 +5,7 @@
   "occupation": "Former Compound Resident",
   "factionId": "independent_investigators",
   "location": {
-    "planet": "chandrila",
+    "planet": "solenne",
     "area": "refugee_settlement",
     "x": 120,
     "y": 85
@@ -47,7 +47,7 @@
     "eyes": "brown",
     "distinguishingFeatures": "scar on left forearm"
   },
-  "biography": "Mira Kess spent most of her life in Compound 7-Alpha, an Imperial detention facility that held refugees from across the galaxy. She was just a child when she arrived, torn from her family during the chaos of the Galactic Civil War. The compound became her entire world—a place of fear, loss, and unexpected moments of human connection. After the compound's mysterious closure, Mira and other survivors were relocated to Chandrila. She now works with the Independent Investigators Alliance to uncover the truth about what happened at the compound and to help other survivors process their trauma.",
+  "biography": "Mira Kess spent most of her life in Compound 7-Alpha, a Dominion detention facility that held refugees from across the galaxy. She was just a child when she arrived, torn from her family during the chaos of the Severing War. The compound became her entire world—a place of fear, loss, and unexpected moments of human connection. After the compound's mysterious closure, Mira and other survivors were relocated to Solenne. She now works with the Independent Investigators Alliance to uncover the truth about what happened at the compound and to help other survivors process their trauma.",
   "isAvailable": true,
   "personalityTraits": {
     "empathy": 75,

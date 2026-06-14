@@ -25,21 +25,21 @@ export default function AbilitiesPanel({ abilities = [] }) {
 
   // Ability display information (matches backend abilityService.getAbilityInfo)
   const abilityInfo = {
-    force_insight: {
-      name: 'Force Insight',
-      description: 'Unlocks Force perception abilities',
+    veil_insight: {
+      name: 'Veil Insight',
+      description: 'Unlocks Veil perception abilities',
       icon: '👁️',
       category: 'force'
     },
     force_artifact_mastery: {
-      name: 'Force Artifact Mastery',
+      name: 'Veil Artifact Mastery',
       description: 'Unlocks artifact-related abilities',
       icon: '🔮',
       category: 'force'
     },
-    force_mastery: {
-      name: 'Force Mastery',
-      description: 'Unlocks advanced Force abilities',
+    veil_mastery: {
+      name: 'Veil Mastery',
+      description: 'Unlocks advanced Veil abilities',
       icon: '⚡',
       category: 'force'
     },
@@ -86,7 +86,7 @@ export default function AbilitiesPanel({ abilities = [] }) {
   });
 
   const categoryLabels = {
-    force: 'Force',
+    force: 'Veil',
     combat: 'Combat',
     utility: 'Utility',
     unknown: 'Other'

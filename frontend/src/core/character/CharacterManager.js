@@ -18,7 +18,7 @@ export class CharacterManager {
     this.attributePoints = characterData.attributePoints || 0;
     this.stats = characterData.stats || this.getDefaultStats();
     this.skills = characterData.skills || this.getDefaultSkills();
-    this.currentPlanet = characterData.currentPlanet || 'chandrila';
+    this.currentPlanet = characterData.currentPlanet || 'solenne';
     this.currentLocation = characterData.currentLocation || { x: 0, y: 0, area: 'landing_zone' };
     this.appearance = characterData.appearance || {};
     this.credits = characterData.credits || 1000;

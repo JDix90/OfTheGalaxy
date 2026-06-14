@@ -1,0 +1,59 @@
+{
+  "planetId": "caldon",
+  "pointsOfInterest": [
+    {
+      "id": "poi_keeper_enclave_ruins",
+      "name": "The Keeper Enclave Ruins",
+      "type": "temple",
+      "description": "The ancient ruins of a Keeper Enclave that existed thousands of years ago. A place of pilgrimage for Keeper Seekers and those drawn to the Veil.",
+      "location": {
+        "x": 400,
+        "y": 300,
+        "area": "enclave_region"
+      },
+      "subMapType": "temple",
+      "dangerLevel": 3
+    },
+    {
+      "id": "poi_venox_cave",
+      "name": "The Venox Cave",
+      "type": "wilderness",
+      "description": "A dangerous cave system inhabited by venox creatures. Contains valuable Veil-touched crystals but extremely dangerous.",
+      "location": {
+        "x": 500,
+        "y": 400,
+        "area": "wilderness"
+      },
+      "subMapType": "wilderness",
+      "dangerLevel": 5
+    },
+    {
+      "id": "poi_abandoned_rebel_base",
+      "name": "Abandoned Rebel Base",
+      "type": "base",
+      "description": "An early Free Worlds base that was abandoned after its discovery by the Iron Dominion. May still contain valuable intelligence.",
+      "location": {
+        "x": 600,
+        "y": 200,
+        "area": "base_region"
+      },
+      "subMapType": "base",
+      "dangerLevel": 4
+    },
+    {
+      "id": "poi_caldon_settlement",
+      "name": "Caldon Settlement",
+      "type": "settlement",
+      "description": "A peaceful agrarian settlement where those seeking a simple life away from the galactic core make their home.",
+      "location": {
+        "x": 300,
+        "y": 500,
+        "area": "settlement"
+      },
+      "subMapType": "city"
+    }
+  ]
+}
+
+
+

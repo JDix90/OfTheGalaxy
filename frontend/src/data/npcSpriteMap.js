@@ -4,15 +4,15 @@
  */
 
 export const npcSpriteMap = {
-  'kinrath': 'spr_npc_kinrath_128.png',
-  'tusken_raider': 'spr_npc_tusken_raider_128.png',
-  'tusken': 'spr_npc_tusken_raider_128.png',
-  'wookiee': 'spr_npc_wookiee_128.png',
-  'wookie': 'spr_npc_wookiee_128.png',
-  'twilek': 'spr_npc_twilek_128.png',
-  'twilek': 'spr_npc_twilek_128.png',
-  'stormtrooper': 'spr_npc_stormtrooper_128.png',
-  'storm_trooper': 'spr_npc_stormtrooper_128.png',
+  'venox': 'spr_npc_venox_128.png',
+  'dune_nomad_raider': 'spr_npc_dune_nomad_raider_128.png',
+  'dune_nomad': 'spr_npc_dune_nomad_raider_128.png',
+  'ursk': 'spr_npc_ursk_128.png',
+  'wookie': 'spr_npc_ursk_128.png',
+  'sytheen': 'spr_npc_sytheen_128.png',
+  'sytheen': 'spr_npc_sytheen_128.png',
+  'ironclad': 'spr_npc_ironclad_128.png',
+  'storm_trooper': 'spr_npc_ironclad_128.png',
 };
 
 /**

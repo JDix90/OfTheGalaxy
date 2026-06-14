@@ -13,38 +13,38 @@ const SPECIES = [
     description: 'Versatile and adaptable, humans are found throughout the galaxy.'
   },
   {
-    id: 'twilek',
-    name: "Twi'lek",
+    id: 'sytheen',
+    name: "Sytheen",
     description: 'Graceful and charismatic, known for their distinctive head-tails.'
   },
   {
-    id: 'rodian',
-    name: 'Rodian',
+    id: 'skarn',
+    name: 'Skarn',
     description: 'Keen-eyed hunters with exceptional perception.'
   },
   {
-    id: 'wookiee',
-    name: 'Wookiee',
-    description: 'Powerful and loyal, towering warriors from Kashyyyk.'
+    id: 'ursk',
+    name: 'Ursk',
+    description: 'Powerful and loyal, towering warriors from Verdholm.'
   },
   {
-    id: 'zabrak',
-    name: 'Zabrak',
+    id: 'karnaki',
+    name: 'Karnaki',
     description: 'Resilient and determined, with natural resistance to pain.'
   },
   {
-    id: 'togruta',
-    name: 'Togruta',
+    id: 'sethari',
+    name: 'Sethari',
     description: 'Intuitive and perceptive, with natural spatial awareness.'
   },
   {
-    id: 'mirialan',
-    name: 'Mirialan',
+    id: 'jeharu',
+    name: 'Jeharu',
     description: 'Spiritual and disciplined, guided by tradition.'
   },
   {
-    id: 'chiss',
-    name: 'Chiss',
+    id: 'vorne',
+    name: 'Vorne',
     description: 'Analytical and strategic, known for tactical brilliance.'
   }
 ];

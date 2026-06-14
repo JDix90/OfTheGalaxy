@@ -1,0 +1,60 @@
+{
+  "id": "npc_corrupt_senator",
+  "name": "Senator Vorin",
+  "species": "human",
+  "occupation": "Concord Senator",
+  "factionId": "concord",
+  "location": {
+    "planet": "centralis",
+    "area": "senate_district",
+    "x": 500,
+    "y": 500
+  },
+  "npcType": "enemy",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "I don't have time for this. State your business.",
+      "acquaintance": "You again. What do you want now?",
+      "friend": null,
+      "confidant": null
+    },
+    "questRelated": {
+      "nr_centralis_04_senate_exposure": "You think you can destroy me? You're a fool. I have connections, power, resources you can't imagine. The Corporate Sector owns half the Assembly, and they own me. You expose me, and you expose them. Do you really think you can take on the entire Corporate Sector? This is bigger than you realize. Walk away now, and I'll forget this ever happened."
+    },
+    "general": [
+      "Politics is about power. Those who have it, keep it. Those who don't, serve.",
+      "The Concord is just the Old Concord with better PR. Nothing really changes.",
+      "I serve the interests of my constituents. And my corporate sponsors.",
+      "You think corruption is a bug? It's a feature. Always has been.",
+      "The galaxy runs on credits. Everything else is just theater."
+    ]
+  },
+  "quests": ["nr_centralis_04_senate_exposure"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": {
+    "health": 100,
+    "damage": 15,
+    "defense": 10,
+    "specialization": "political"
+  },
+  "appearance": {
+    "age": "mid 50s",
+    "build": "well-fed, imposing",
+    "hair": "gray, styled",
+    "eyes": "cold blue",
+    "distinguishingFeatures": "Expensive senatorial robes, polished appearance, surrounded by aides and guards, arrogant demeanor"
+  },
+  "biography": "Senator Vorin is a corrupt Concord senator who represents a Core World. He's been taking bribes from the Corporate Sector, using his position to enrich himself and his corporate sponsors. He's intelligent, charismatic, and completely amoral. He believes that power and profit are the only things that matter, and he's built a network of corruption that extends throughout the Assembly. He represents the Torn Veil of the Concord—the corruption that threatens to undermine everything the Rebellion fought for.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 10,
+    "formality": 80,
+    "humor": 20,
+    "trust": 5
+  }
+}
+
+
+

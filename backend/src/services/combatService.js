@@ -97,7 +97,7 @@ class CombatService {
           if (randomEnemy && randomEnemy.id) {
             enemies = [randomEnemy.id];
           } else {
-            enemies = ['stormtrooper']; // Fallback
+            enemies = ['ironclad']; // Fallback
           }
         }
 
@@ -507,27 +507,27 @@ class CombatService {
     // Default equipment based on background
     const equipmentMap = {
       'smuggler': {
-        weapon: 'blaster_pistol_01',
+        weapon: 'pulser_pistol_01',
         armor: 'armor_light_01'
       },
       'soldier': {
-        weapon: 'blaster_rifle_01',
+        weapon: 'pulser_rifle_01',
         armor: 'armor_medium_01'
       },
       'bounty_hunter': {
-        weapon: 'blaster_rifle_01',
+        weapon: 'pulser_rifle_01',
         armor: 'armor_medium_01'
       },
       'merchant': {
-        weapon: 'blaster_pistol_01',
+        weapon: 'pulser_pistol_01',
         armor: 'armor_light_01'
       },
       'scholar': {
-        weapon: 'blaster_pistol_01',
+        weapon: 'pulser_pistol_01',
         armor: 'armor_light_01'
       },
       'civilian': {
-        weapon: 'blaster_pistol_01',
+        weapon: 'pulser_pistol_01',
         armor: null // No armor for civilians
       }
     };
@@ -832,7 +832,7 @@ class CombatService {
       return { ...c };
     });
     
-    // Force Sequelize to recognize the change in JSONB field by creating a new object reference
+    // Veil Sequelize to recognize the change in JSONB field by creating a new object reference
     encounter.setDataValue('combatants', JSON.parse(JSON.stringify(updatedCombatants)));
     encounter.changed('combatants', true); // Explicitly mark as changed
 
@@ -873,10 +873,10 @@ class CombatService {
       if (defender.type === 'droid' && attacker.combatModifiers.droidDamageBonus) {
         damageModifier += attacker.combatModifiers.droidDamageBonus;
       }
-      // Apply lightsaber bonus if weapon is lightsaber
+      // Apply arcblade bonus if weapon is arcblade
       if (attacker.combatModifiers.lightsaberDamageBonus) {
         const weapon = attacker.equippedItems?.find(item => item.equipmentSlot === 'weapon');
-        if (weapon && weapon.itemId && weapon.itemId.includes('lightsaber')) {
+        if (weapon && weapon.itemId && weapon.itemId.includes('arcblade')) {
           damageModifier += attacker.combatModifiers.lightsaberDamageBonus;
         }
       }
@@ -997,7 +997,7 @@ class CombatService {
     const index = combatants.findIndex(c => c.id === combatant.id);
     combatants[index] = combatant;
     
-    // Force Sequelize to recognize the change in JSONB field by creating a new object reference
+    // Veil Sequelize to recognize the change in JSONB field by creating a new object reference
     encounter.setDataValue('combatants', JSON.parse(JSON.stringify(combatants)));
 
     await encounter.save();
@@ -1152,7 +1152,7 @@ class CombatService {
     // Update the combatants array with the modified target
     combatants[targetIndex] = targetCombatant;
     
-    // Force Sequelize to recognize the change in JSONB field by creating a new object reference
+    // Veil Sequelize to recognize the change in JSONB field by creating a new object reference
     encounter.setDataValue('combatants', combatants);
     
     // Explicitly mark the field as changed to ensure Sequelize detects the update
@@ -1368,7 +1368,7 @@ class CombatService {
       }
     }
     
-    // Force Sequelize to recognize the change
+    // Veil Sequelize to recognize the change
     encounter.setDataValue('combatants', JSON.parse(JSON.stringify(combatantsArray)));
     encounter.changed('combatants', true);
 
@@ -1847,7 +1847,7 @@ class CombatService {
 
     // Only save if there were changes
     if (hasChanges) {
-      // Force Sequelize to recognize the change in JSONB field
+      // Veil Sequelize to recognize the change in JSONB field
       encounter.setDataValue('combatants', JSON.parse(JSON.stringify(combatants)));
       encounter.changed('combatants', true);
       await encounter.save();
@@ -2322,10 +2322,16 @@ class CombatService {
     }
 
     await t.commit();
+    // Enrich loot for the reward screen: display name + rarity (so the UI shows
+    // "Regen Patch (Rare)" with a rarity glow instead of a raw item id).
+    const enrichedLoot = loot.map((l) => {
+      const def = getItemDefinition(l.itemId);
+      return { ...l, name: def?.name || l.itemId, rarity: def?.rarity || 'common' };
+    });
     return {
       xp: totalXP,
       credits: totalCredits,
-      loot
+      loot: enrichedLoot
     };
     } catch (error) {
       await t.rollback();

@@ -1,0 +1,75 @@
+{
+  "id": "nr_centralis_03_underworld_connection",
+  "factionId": "concord",
+  "questType": "main",
+  "title": "Underworld Connections",
+  "description": "Silas Karr, an information broker in the underworld, claims to have information about Senator Vorin's corruption. He has records, witnesses, and evidence. But it'll cost you, and it's dangerous. The Corporate Sector doesn't like people poking around in their business. Still interested?",
+  "shortDescription": "Obtain evidence from underworld information broker",
+  "prerequisites": {
+    "level": 7,
+    "reputation": {
+      "concord": 30
+    },
+    "completedQuests": ["nr_centralis_01_whispers"],
+    "items": ["corruption_evidence"]
+  },
+  "objectives": [
+    {
+      "id": "meet_broker",
+      "type": "interact",
+      "description": "Meet with information broker Silas Karr in the underworld",
+      "target": "npc_info_broker"
+    },
+    {
+      "id": "negotiate_price",
+      "type": "custom",
+      "description": "Negotiate the price for the information (credits or favors)",
+      "target": "info_negotiation"
+    },
+    {
+      "id": "obtain_underworld_evidence",
+      "type": "collect",
+      "description": "Obtain underworld evidence",
+      "target": "underworld_evidence",
+      "count": 1
+    },
+    {
+      "id": "verify_evidence",
+      "type": "custom",
+      "description": "Verify the evidence is legitimate",
+      "target": "evidence_verification"
+    }
+  ],
+  "rewards": {
+    "xp": 1200,
+    "credits": 800,
+    "reputation": {
+      "concord": 40,
+      "drift_cartel": 20
+    },
+    "items": [
+      {
+        "itemId": "underworld_evidence",
+        "quantity": 1
+      },
+      {
+        "itemId": "valuable_info",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["nr_centralis_04_senate_exposure"]
+  },
+  "questGiverId": "npc_info_broker",
+  "startLocation": {
+    "planet": "centralis",
+    "area": "underworld"
+  },
+  "estimatedTime": 75,
+  "difficulty": "hard",
+  "isActive": true,
+  "chainId": "nr_centralis_corruption_chain",
+  "chainOrder": 2
+}
+
+
+

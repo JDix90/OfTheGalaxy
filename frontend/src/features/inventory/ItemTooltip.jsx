@@ -10,6 +10,7 @@ import { useCharacterStore } from '../../state/characterSlice';
 import { getRarityColor, getRarityName } from '../../utils/itemRarity';
 import { getEffectsDisplay } from '../../utils/effectDefinitions';
 import { getSetForItem } from '../../utils/itemSets';
+import { formatDisplayName } from '../../utils/formatName';
 import './ItemTooltip.css';
 
 export default function ItemTooltip({ item, position, onEquip, onClose }) {
@@ -62,7 +63,7 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
       onMouseLeave={(e) => e.stopPropagation()}
     >
       <div className="tooltip-header">
-        <h4>{item.name || item.itemId}</h4>
+        <h4>{item.name || formatDisplayName(item.itemId)}</h4>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {item.equipped && <span className="equipped-badge">Equipped</span>}
           {item.rarity && (
@@ -215,7 +216,7 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
               {item.factionId && (
                 <div className="faction-line">
                   <span>Faction:</span>
-                  <span className="faction-name">{item.factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                  <span className="faction-name">{formatDisplayName(item.factionId)}</span>
                 </div>
               )}
               {item.minReputationTier && (

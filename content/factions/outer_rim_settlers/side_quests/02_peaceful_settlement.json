@@ -1,9 +1,9 @@
 {
-  "id": "dantooine_side_02_peaceful_settlement",
+  "id": "caldon_side_02_peaceful_settlement",
   "factionId": "outer_rim_settlers",
   "questType": "side",
   "title": "A Peaceful Settlement",
-  "description": "Elder Mara, the leader of the Dantooine settlement, needs help with various tasks to keep the settlement running smoothly. The settlement is growing, and that brings challenges: establishing trade routes, mediating disputes, building infrastructure. They're not asking for handouts—they're asking for partnership. Can you help them?",
+  "description": "Elder Mara, the leader of the Caldon settlement, needs help with various tasks to keep the settlement running smoothly. The settlement is growing, and that brings challenges: establishing trade routes, mediating disputes, building infrastructure. They're not asking for handouts—they're asking for partnership. Can you help them?",
   "shortDescription": "Help the settlement with various tasks and challenges",
   "prerequisites": {
     "level": 3,
@@ -44,7 +44,7 @@
   },
   "questGiverId": "npc_settlement_leader",
   "startLocation": {
-    "planet": "dantooine",
+    "planet": "caldon",
     "area": "settlement"
   },
   "estimatedTime": 45,
