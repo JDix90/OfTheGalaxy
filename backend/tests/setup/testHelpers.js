@@ -55,7 +55,7 @@ async function createTestCharacter(userId, overrides = {}) {
     currentStamina: 50,
     maxStamina: 50,
     credits: 1000,
-    currentPlanet: 'chandrila',
+    currentPlanet: 'solenne',
     ...overrides
   });
 }
@@ -113,7 +113,7 @@ async function createTestNPC(overrides = {}) {
     name: 'Test NPC',
     npcType: 'quest_giver',
     factionId: 'independent_investigators',
-    planetId: 'chandrila',
+    planetId: 'solenne',
     location: { x: 50, y: 50, area: 'surface' },
     ...overrides
   });

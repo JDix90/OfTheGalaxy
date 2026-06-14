@@ -1,6 +1,6 @@
 /**
  * Phase 1 & Phase 2 Content Seeder
- * Seeds NPCs, Items, Quests, and Planet Data for Phase 1 planets (Ryloth, Tatooine, Dantooine, Coruscant)
+ * Seeds NPCs, Items, Quests, and Planet Data for Phase 1 planets (Sytha, Gravenmoor, Caldon, Centralis)
  * 
  * Usage: node backend/src/scripts/seed-phase1-content.js
  */
@@ -344,10 +344,10 @@ async function seedPhase1Content() {
     console.log('📝 Seeding NPCs...');
     const factions = [
       'independent_investigators',
-      'smugglers_guild',
-      'jedi_seekers',
-      'new_republic',
-      'imperial_remnant',
+      'drift_cartel',
+      'keeper_seekers',
+      'concord',
+      'dominion_remnant',
       'outer_rim_settlers'
     ];
 
@@ -394,7 +394,7 @@ async function seedPhase1Content() {
 
     // Update Planet Content
     console.log('🌍 Updating Planet Content...');
-    const phase1Planets = ['ryloth', 'tatooine', 'dantooine', 'coruscant', 'nar_shaddaa'];
+    const phase1Planets = ['sytha', 'gravenmoor', 'caldon', 'centralis', 'sinkport'];
     
     for (const planetId of phase1Planets) {
       console.log(`\n  Planet: ${planetId}`);

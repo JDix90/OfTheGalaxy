@@ -1,0 +1,44 @@
+/* Global toast host — stacked top-center notifications */
+.toast-host {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.app-toast {
+  pointer-events: auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  max-width: 90vw;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  animation: app-toast-in 0.25s ease-out;
+}
+.app-toast-icon { font-size: 1.1rem; line-height: 1; }
+.app-toast-message { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.app-toast-success { background: #16361f; color: #6ee79a; border: 1px solid #2f7d4f; }
+.app-toast-error   { background: #3a1d1d; color: #ff9b9b; border: 1px solid #8c3a3a; }
+.app-toast-info    { background: #16263f; color: #9ecbff; border: 1px solid #2f5a8c; }
+.app-toast-rep     { background: #2a2440; color: #cdb9ff; border: 1px solid #5a4a8c; }
+
+@keyframes app-toast-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-toast { animation: none; }
+}

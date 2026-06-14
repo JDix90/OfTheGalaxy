@@ -1,5 +1,5 @@
 {
-  "id": "iia_ryloth_04_syndicate_exposure",
+  "id": "iia_sytha_04_syndicate_exposure",
   "factionId": "independent_investigators",
   "questType": "main",
   "title": "Exposing the Syndicate",
@@ -10,7 +10,7 @@
     "reputation": {
       "independent_investigators": 145
     },
-    "completedQuests": ["iia_ryloth_03_refugee_liberation"],
+    "completedQuests": ["iia_sytha_03_refugee_liberation"],
     "items": ["mine_foreman_datapad", "refugee_gratitude"]
   },
   "objectives": [
@@ -44,7 +44,7 @@
     {
       "id": "expose_syndicate",
       "type": "custom",
-      "description": "Expose the syndicate's connection to Compound 7-Alpha (deliver evidence to New Republic or IIA)",
+      "description": "Expose the syndicate's connection to Compound 7-Alpha (deliver evidence to Concord or IIA)",
       "target": "syndicate_exposure"
     }
   ],
@@ -53,7 +53,7 @@
     "credits": 2000,
     "reputation": {
       "independent_investigators": 75,
-      "new_republic": 30
+      "concord": 30
     },
     "items": [
       {
@@ -69,8 +69,8 @@
   },
   "questGiverId": "npc_refugee_leader",
   "startLocation": {
-    "planet": "ryloth",
-    "area": "lessu"
+    "planet": "sytha",
+    "area": "sythmar"
   },
   "estimatedTime": 120,
   "difficulty": "very_hard",

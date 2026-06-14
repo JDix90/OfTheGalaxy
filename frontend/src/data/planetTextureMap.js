@@ -5,58 +5,58 @@
 
 export const planetTextureMap = {
   // Desert Worlds
-  'tatooine': 'tex_tatooine_dune_sea_base_2048.webp',
-  'geonosis': 'tex_geonosis_desert_base_2048.webp',
+  'gravenmoor': 'tex_gravenmoor_dune_sea_base_2048.webp',
+  'karrn': 'tex_karrn_desert_base_2048.webp',
 
   // Urban/Industrial Worlds
-  'coruscant': 'tex_coruscant_cityscape_base_2048.webp',
-  'nar_shaddaa': 'tex_nar_shaddaa_urban_base_2048.webp',
-  'eriadu': 'tex_eriadu_industrial_base_2048.webp',
-  'ord_mantell': 'tex_ord_mantell_junkyard_base_2048.webp',
+  'centralis': 'tex_centralis_cityscape_base_2048.webp',
+  'sinkport': 'tex_sinkport_urban_base_2048.webp',
+  'greld': 'tex_greld_industrial_base_2048.webp',
+  'ordwell': 'tex_ordwell_junkyard_base_2048.webp',
 
   // Forest/Jungle Worlds
-  'kashyyyk': 'tex_kashyyyk_forest_base_2048.webp',
-  'yavin': 'tex_yavin_jungle_base_2048.webp',
-  'yavin_4': 'tex_yavin_jungle_base_2048.webp',
-  'chandrila': 'tex_chandrila_forest_base_2048.webp',
-  'felucia': 'tex_felucia_fungal_base_2048.webp',
+  'verdholm': 'tex_verdholm_forest_base_2048.webp',
+  'selvora': 'tex_selvora_jungle_base_2048.webp',
+  'selvora_4': 'tex_selvora_jungle_base_2048.webp',
+  'solenne': 'tex_solenne_forest_base_2048.webp',
+  'myssia': 'tex_myssia_fungal_base_2048.webp',
 
   // Grassland/Plains Worlds
-  'dantooine': 'tex_dantooine_grasslands_base_2048.webp',
+  'caldon': 'tex_caldon_grasslands_base_2048.webp',
   'axxila': 'tex_axxila_plains_base_2048.webp',
 
   // Ice/Snow Worlds
-  'hoth': 'tex_hoth_ice_plains_base_2048.webp',
+  'rime': 'tex_rime_ice_plains_base_2048.webp',
 
   // Volcanic Worlds
-  'mustafar': 'tex_mustafar_lava_fields_base_2048.webp',
+  'embervast': 'tex_embervast_lava_fields_base_2048.webp',
 
   // Swamp/Dark Worlds
-  'dathomir': 'tex_dathomir_swamp_base_2048.webp',
+  'mawthorn': 'tex_mawthorn_swamp_base_2048.webp',
 
   // Ocean/Water Worlds
-  'mon_cala': 'tex_mon_cala_ocean_base_2048.webp',
-  'dac': 'tex_mon_cala_ocean_base_2048.webp', // Mon Cala is also known as Dac
+  'thessmar': 'tex_thessmar_ocean_base_2048.webp',
+  'dorrun': 'tex_thessmar_ocean_base_2048.webp', // Thessmar is also known as Dorrun
 
   // Unique/Special Worlds
-  'ryloth': 'tex_ryloth_twilight_base_2048.webp',
-  'bespin': 'tex_bespin_cloud_city_base_2048.webp',
-  'mandalore': 'tex_mandalore_wasteland_base_2048.webp',
+  'sytha': 'tex_sytha_twilight_base_2048.webp',
+  'cirruan': 'tex_cirruan_cloud_city_base_2048.webp',
+  'veshkar': 'tex_veshkar_wasteland_base_2048.webp',
 
   // Fallback mappings for planets without specific textures
   // These will use the closest matching texture
-  'corellia': 'tex_chandrila_forest_base_2048.webp', // Similar temperate world
-  'alderaan': 'tex_chandrila_forest_base_2048.webp', // Similar peaceful world
-  'naboo': 'tex_chandrila_forest_base_2048.webp', // Similar forest world
-  'endor': 'tex_kashyyyk_forest_base_2048.webp', // Similar forest world
-  'jakku': 'tex_tatooine_dune_sea_base_2048.webp', // Similar desert world
-  'ilum': 'tex_hoth_ice_plains_base_2048.webp', // Similar ice world
-  'mygeeto': 'tex_hoth_ice_plains_base_2048.webp', // Similar ice world
-  'sullust': 'tex_mustafar_lava_fields_base_2048.webp', // Similar volcanic world
-  'utapau': 'tex_ryloth_twilight_base_2048.webp', // Similar rocky world
-  'kamino': 'tex_mon_cala_ocean_base_2048.webp', // Similar ocean world
-  'crait': 'tex_mandalore_wasteland_base_2048.webp', // Similar wasteland
-  'jedha': 'tex_geonosis_desert_base_2048.webp', // Similar desert world
+  'drydock': 'tex_solenne_forest_base_2048.webp', // Similar temperate world
+  'caelmore': 'tex_solenne_forest_base_2048.webp', // Similar peaceful world
+  'eloria': 'tex_solenne_forest_base_2048.webp', // Similar forest world
+  'verdance': 'tex_verdholm_forest_base_2048.webp', // Similar forest world
+  'talveen': 'tex_gravenmoor_dune_sea_base_2048.webp', // Similar desert world
+  'kthala': 'tex_rime_ice_plains_base_2048.webp', // Similar ice world
+  'glaiv': 'tex_rime_ice_plains_base_2048.webp', // Similar ice world
+  'pyrren': 'tex_embervast_lava_fields_base_2048.webp', // Similar volcanic world
+  'casmer': 'tex_sytha_twilight_base_2048.webp', // Similar rocky world
+  'tethys': 'tex_thessmar_ocean_base_2048.webp', // Similar ocean world
+  'crait': 'tex_veshkar_wasteland_base_2048.webp', // Similar wasteland
+  'jedha': 'tex_karrn_desert_base_2048.webp', // Similar desert world
 };
 
 /**
@@ -66,33 +66,33 @@ export const planetTextureMap = {
  */
 export function getTextureMetadata(planetId) {
   const textureMetadata = {
-    'tatooine': {
-      filename: 'tex_tatooine_dune_sea_base_2048.webp',
+    'gravenmoor': {
+      filename: 'tex_gravenmoor_dune_sea_base_2048.webp',
       colorPalette: ['#C19A6B', '#D4A574'],
       description: 'Warm golden sand dunes'
     },
-    'coruscant': {
-      filename: 'tex_coruscant_cityscape_base_2048.webp',
+    'centralis': {
+      filename: 'tex_centralis_cityscape_base_2048.webp',
       colorPalette: ['#6B7280', '#4D88FF'],
       description: 'Futuristic city surface'
     },
-    'kashyyyk': {
-      filename: 'tex_kashyyyk_forest_base_2048.webp',
+    'verdholm': {
+      filename: 'tex_verdholm_forest_base_2048.webp',
       colorPalette: ['#228B22', '#3E2723'],
       description: 'Dense forest canopy'
     },
-    'hoth': {
-      filename: 'tex_hoth_ice_plains_base_2048.webp',
+    'rime': {
+      filename: 'tex_rime_ice_plains_base_2048.webp',
       colorPalette: ['#F0F8FF', '#B0E0E6'],
       description: 'Frozen ice plains'
     },
-    'mustafar': {
-      filename: 'tex_mustafar_lava_fields_base_2048.webp',
+    'embervast': {
+      filename: 'tex_embervast_lava_fields_base_2048.webp',
       colorPalette: ['#1C1C1C', '#FF6B35', '#DC143C'],
       description: 'Black obsidian with glowing lava'
     },
-    'dantooine': {
-      filename: 'tex_dantooine_grasslands_base_2048.webp',
+    'caldon': {
+      filename: 'tex_caldon_grasslands_base_2048.webp',
       colorPalette: ['#C2B280', '#7B845B'],
       description: 'Rolling grasslands'
     },

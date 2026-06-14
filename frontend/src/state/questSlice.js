@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import { questApi } from '../services/api/questApi';
 import { notify } from '../components/hud/NotificationCenter';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../services/tutorialEventBus';
+import { gameEventBus, GAME_EVENTS } from '../services/gameEventBus';
 
 export const useQuestStore = create((set, get) => ({
   // State
@@ -190,7 +191,16 @@ export const useQuestStore = create((set, get) => ({
             });
           }, 500);
         }
-        
+
+        // Surface faction standing consequences (rep toast + tier-up modal)
+        if (Array.isArray(result.reputationChanges)) {
+          result.reputationChanges.forEach((change) => {
+            if (change && change.factionId && change.delta) {
+              gameEventBus.emit(GAME_EVENTS.REP_CHANGED, change);
+            }
+          });
+        }
+
         // Update state to move quest from active to completed
         set((state) => ({
           activeQuests: state.activeQuests.filter(q => q.quest.id !== questId),
@@ -273,7 +283,16 @@ export const useQuestStore = create((set, get) => ({
             });
           }, 500);
         }
-        
+
+        // Surface faction standing consequences (rep toast + tier-up modal)
+        if (Array.isArray(result.reputationChanges)) {
+          result.reputationChanges.forEach((change) => {
+            if (change && change.factionId && change.delta) {
+              gameEventBus.emit(GAME_EVENTS.REP_CHANGED, change);
+            }
+          });
+        }
+
         // Reload character to update XP/credits
         // Use dynamic import to avoid circular dependency
         import('../services/api/characterApi').then(({ characterApi }) => {

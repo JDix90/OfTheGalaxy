@@ -211,3 +211,12 @@
 }
 
 
+
+/* Icon + label alignment for the action buttons (GameIcon) */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.action-btn .game-icon { flex-shrink: 0; }

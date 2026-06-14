@@ -31,7 +31,7 @@ const mockEncounter = {
   status: 'active',
   combatants: [
     { id: 'player-1', name: 'Test Character', type: 'player', stats: { health: 100, maxHealth: 100, stamina: 50, maxStamina: 50 } },
-    { id: 'enemy-1', name: 'Stormtrooper', type: 'enemy', stats: { health: 80, maxHealth: 80, stamina: 40, maxStamina: 40 } }
+    { id: 'enemy-1', name: 'Ironclad', type: 'enemy', stats: { health: 80, maxHealth: 80, stamina: 40, maxStamina: 40 } }
   ],
   turnOrder: ['player-1', 'enemy-1'],
   currentTurn: 0
@@ -67,7 +67,7 @@ describe('CombatView', () => {
   test('displays the combatants from the encounter', () => {
     renderWithProviders(<CombatView />);
     expect(screen.getByText('Test Character')).toBeInTheDocument();
-    expect(screen.getByText('Stormtrooper')).toBeInTheDocument();
+    expect(screen.getByText('Ironclad')).toBeInTheDocument();
   });
 
   test('renders the turn order', () => {

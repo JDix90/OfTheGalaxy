@@ -16,7 +16,7 @@ describe('enemy threat tiers', () => {
   });
 
   test('basics are normal, captains/hunters are elite', () => {
-    expect(getEnemyTemplate('stormtrooper').tier).toBe('normal');
+    expect(getEnemyTemplate('ironclad').tier).toBe('normal');
     expect(getEnemyTemplate('wild_animal').tier).toBe('normal');
     expect(getEnemyTemplate('pirate_captain').tier).toBe('elite');
     expect(getEnemyTemplate('bounty_hunter').tier).toBe('elite');
@@ -35,6 +35,6 @@ describe('enemy threat tiers', () => {
     expect(c.stats.dodgeChance).toBeGreaterThanOrEqual(0);
     expect(c.stats.dodgeChance).toBeLessThanOrEqual(0.15);
     // A normal-tier template still gets a tier label.
-    expect(combat.buildEnemyCombatant(getEnemyTemplate('stormtrooper')).tier).toBe('normal');
+    expect(combat.buildEnemyCombatant(getEnemyTemplate('ironclad')).tier).toBe('normal');
   });
 });

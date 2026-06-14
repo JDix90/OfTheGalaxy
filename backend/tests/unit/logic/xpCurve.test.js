@@ -19,7 +19,7 @@ describe('XP curve', () => {
 
   test('kills-to-level stays in the ~8-15 band for L3-L16 (basic enemy)', () => {
     for (const L of [3, 5, 8, 12, 16]) {
-      const xpPerKill = scaleEnemyForLevel(getEnemyTemplate('stormtrooper'), L, 'moderate').xpReward;
+      const xpPerKill = scaleEnemyForLevel(getEnemyTemplate('ironclad'), L, 'moderate').xpReward;
       const kills = xpToNext(L) / xpPerKill;
       expect(kills).toBeGreaterThanOrEqual(6);
       expect(kills).toBeLessThanOrEqual(16);
@@ -27,8 +27,8 @@ describe('XP curve', () => {
   });
 
   test('enemy XP scales faster than health (so leveling keeps pace)', () => {
-    const l1 = scaleEnemyForLevel(getEnemyTemplate('stormtrooper'), 1, 'moderate');
-    const l10 = scaleEnemyForLevel(getEnemyTemplate('stormtrooper'), 10, 'moderate');
+    const l1 = scaleEnemyForLevel(getEnemyTemplate('ironclad'), 1, 'moderate');
+    const l10 = scaleEnemyForLevel(getEnemyTemplate('ironclad'), 10, 'moderate');
     const xpRatio = l10.xpReward / l1.xpReward;
     const hpRatio = l10.stats.health / l1.stats.health;
     expect(xpRatio).toBeGreaterThan(hpRatio);

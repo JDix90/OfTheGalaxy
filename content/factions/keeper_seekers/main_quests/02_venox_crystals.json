@@ -1,0 +1,83 @@
+{
+  "id": "js_caldon_02_venox_crystals",
+  "factionId": "keeper_seekers",
+  "questType": "main",
+  "title": "The Venox Cave",
+  "description": "The ancient map fragment points to the Venox Cave, where Veil-touched Dantari crystals can be found. These crystals are essential for arcblade construction and Veil enhancements. But the cave is extremely dangerous—venox creatures guard it fiercely. Master Voss believes you're ready for this challenge, but warns that the cave will test both your combat skills and your connection to the Veil.",
+  "shortDescription": "Retrieve Dantari crystals from the dangerous Venox Cave",
+  "prerequisites": {
+    "level": 6,
+    "reputation": {
+      "keeper_seekers": 50
+    },
+    "completedQuests": ["js_caldon_01_enclave_call"],
+    "items": ["ancient_map_fragment"]
+  },
+  "objectives": [
+    {
+      "id": "travel_cave",
+      "type": "travel",
+      "description": "Travel to the Venox Cave",
+      "location": {
+        "planet": "caldon",
+        "area": "wilderness"
+      }
+    },
+    {
+      "id": "reach_cave_deep",
+      "type": "reach_depth",
+      "description": "Reach the deepest chamber of the Venox Cave where the crystals grow",
+      "target": "poi_venox_cave",
+      "depthZone": 3
+    },
+    {
+      "id": "defeat_venox_boss",
+      "type": "defeat_boss",
+      "description": "Defeat the Venox Matriarch guarding the crystal chamber",
+      "target": "poi_venox_cave"
+    },
+    {
+      "id": "collect_crystals",
+      "type": "collect",
+      "description": "Collect Dantari crystals from the cave (search defeated enemies or find in treasure caches)",
+      "target": "dantari_crystals",
+      "count": 3
+    },
+    {
+      "id": "make_choice",
+      "type": "custom",
+      "description": "Choose how to use the crystals (arcblade construction or Veil enhancement)",
+      "target": "crystal_choice"
+    }
+  ],
+  "rewards": {
+    "xp": 2000,
+    "credits": 1000,
+    "reputation": {
+      "keeper_seekers": 75
+    },
+    "items": [
+      {
+        "itemId": "dantari_crystals",
+        "quantity": 3
+      },
+      {
+        "itemId": "arcblade_crystal",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_keeper_seeker_mentor",
+  "startLocation": {
+    "planet": "caldon",
+    "area": "enclave_region"
+  },
+  "estimatedTime": 120,
+  "difficulty": "hard",
+  "isActive": true,
+  "chainId": "js_caldon_enclave_chain",
+  "chainOrder": 2
+}
+
+

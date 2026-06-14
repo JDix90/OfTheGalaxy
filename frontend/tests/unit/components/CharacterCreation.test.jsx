@@ -43,9 +43,9 @@ let createCharacter;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  createCharacter = vi.fn().mockResolvedValue({ id: 'new-id', name: 'Test Character', currentPlanet: 'tatooine' });
+  createCharacter = vi.fn().mockResolvedValue({ id: 'new-id', name: 'Test Character', currentPlanet: 'gravenmoor' });
   useCharacterStore.mockReturnValue({ createCharacter, isLoading: false });
-  galaxyApi.getPlanet.mockResolvedValue({ success: true, data: { name: 'Tatooine', mapData: {} } });
+  galaxyApi.getPlanet.mockResolvedValue({ success: true, data: { name: 'Gravenmoor', mapData: {} } });
 });
 
 describe('CharacterCreation', () => {

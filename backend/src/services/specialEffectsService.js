@@ -9,10 +9,10 @@ class SpecialEffectsService {
    */
   constructor() {
     this.effects = {
-      // Force Effects
-      force_enhancement: {
-        name: 'Force Enhancement',
-        description: 'Increases Force power by 10%',
+      // Veil Effects
+      veil_enhancement: {
+        name: 'Veil Enhancement',
+        description: 'Increases Veil power by 10%',
         type: 'stat_modifier',
         apply: (stats, value = 0.1) => {
           if (stats.forcePower) {
@@ -20,27 +20,27 @@ class SpecialEffectsService {
           }
         }
       },
-      force_mastery: {
-        name: 'Force Mastery',
-        description: 'Unlocks Force abilities',
+      veil_mastery: {
+        name: 'Veil Mastery',
+        description: 'Unlocks Veil abilities',
         type: 'ability_unlock',
         apply: (abilities) => {
-          if (!abilities.includes('force_mastery')) {
-            abilities.push('force_mastery');
+          if (!abilities.includes('veil_mastery')) {
+            abilities.push('veil_mastery');
           }
         }
       },
-      force_insight: {
-        name: 'Force Insight',
-        description: 'Improves Force perception',
+      veil_insight: {
+        name: 'Veil Insight',
+        description: 'Improves Veil perception',
         type: 'stat_modifier',
         apply: (stats, value = 5) => {
           stats.perception = (stats.perception || 0) + value;
         }
       },
-      lightsaber_mastery: {
-        name: 'Lightsaber Mastery',
-        description: '+10% damage with lightsabers',
+      arcblade_mastery: {
+        name: 'Arcblade Mastery',
+        description: '+10% damage with arcblades',
         type: 'combat_modifier',
         apply: (combatStats) => {
           combatStats.lightsaberDamageBonus = 0.1;
@@ -65,7 +65,7 @@ class SpecialEffectsService {
         }
       },
       energy_resistance: {
-        name: 'Energy Resistance',
+        name: 'Energy Uprising',
         description: '-20% energy damage taken',
         type: 'defense_modifier',
         apply: (defenseStats) => {
@@ -133,19 +133,19 @@ class SpecialEffectsService {
       },
       
       // Faction Effects
-      imperial_identification: {
-        name: 'Imperial Identification',
-        description: 'Recognized as Imperial (access benefits)',
+      dominion_identification: {
+        name: 'Dominion Identification',
+        description: 'Recognized as Dominion (access benefits)',
         type: 'faction',
         apply: (factionStatus) => {
-          factionStatus.imperial_remnant = {
+          factionStatus.dominion_remnant = {
             recognized: true,
             accessLevel: 'standard'
           };
         }
       },
-      mandalorian_craftsmanship: {
-        name: 'Mandalorian Craftsmanship',
+      ironkin_craftsmanship: {
+        name: 'Ironkin Craftsmanship',
         description: '+10% durability',
         type: 'durability_modifier',
         apply: (durabilityStats) => {
@@ -410,9 +410,9 @@ class SpecialEffectsService {
       finalDamage = Math.floor(finalDamage * (1 + modifiers.droidBonus));
     }
 
-    // Apply lightsaber bonus if weapon is lightsaber
+    // Apply arcblade bonus if weapon is arcblade
     const attackerWeapon = attackerItems.find(item => item.equipmentSlot === 'weapon');
-    if (attackerWeapon && attackerWeapon.itemId && attackerWeapon.itemId.includes('lightsaber') && modifiers.lightsaberBonus > 0) {
+    if (attackerWeapon && attackerWeapon.itemId && attackerWeapon.itemId.includes('arcblade') && modifiers.lightsaberBonus > 0) {
       finalDamage = Math.floor(finalDamage * (1 + modifiers.lightsaberBonus));
     }
 

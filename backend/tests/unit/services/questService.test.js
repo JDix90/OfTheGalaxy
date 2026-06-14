@@ -25,7 +25,7 @@ describe('QuestService', () => {
       name: 'Test Quest Giver',
       npcType: 'quest_giver',
       factionId: 'independent_investigators',
-      planetId: 'chandrila',
+      planetId: 'solenne',
       location: { x: 50, y: 50, area: 'surface' }
     });
 
@@ -136,7 +136,7 @@ describe('QuestService', () => {
         name: 'Empty NPC',
         npcType: 'vendor',
         factionId: 'independent_investigators',
-        planetId: 'chandrila',
+        planetId: 'solenne',
         location: { x: 50, y: 50, area: 'surface' }
       });
 

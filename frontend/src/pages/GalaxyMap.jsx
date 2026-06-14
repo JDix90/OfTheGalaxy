@@ -4,7 +4,9 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { prefersReducedMotion } from '../utils/motion';
+import GalaxyScene3D from '../components/galaxy/GalaxyScene3D';
 import { useCharacterStore } from '../state/characterSlice';
 import { useDiscoveryStore } from '../state/discoverySlice';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../services/tutorialTargetRegistry';
@@ -16,10 +18,19 @@ import { useOptimizedCanvas } from '../hooks/useOptimizedCanvas';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import HUD from '../components/hud/HUD';
+import { formatDisplayName } from '../utils/formatName';
 import './GalaxyMap.css';
 
 export default function GalaxyMap() {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Golden-path payoff: when the player enters from the tutorial closing choice,
+  // we zoom toward their chosen destination world and flag it with a banner.
+  const revealPlanet = location.state?.revealPlanet || null;
+  const revealQuestTitle = location.state?.followOnQuestTitle || null;
+  const [revealBanner, setRevealBanner] = useState(null); // { planetName, questTitle }
+  const revealDoneRef = useRef(false);
+  const revealAnimRef = useRef(null);
   const { currentCharacter, setCurrentCharacter, loadCharacter } = useCharacterStore();
   const { recordDiscovery } = useDiscoveryStore();
   const [mapData, setMapData] = useState(null);
@@ -114,9 +125,9 @@ export default function GalaxyMap() {
       'Outer Rim': 'rgba(100, 200, 255, 0.15)',
       'Unknown Regions': 'rgba(20, 20, 40, 0.3)',
       'Wild Space': 'rgba(50, 50, 80, 0.2)',
-      'Hutt Space': 'rgba(200, 50, 50, 0.2)',
+      'Vorr Space': 'rgba(200, 50, 50, 0.2)',
       'Corporate Sector': 'rgba(100, 150, 255, 0.15)',
-      'Bothan Space': 'rgba(200, 50, 50, 0.15)',
+      'Renai Space': 'rgba(200, 50, 50, 0.15)',
     };
     return regionColors[region] || 'rgba(100, 100, 150, 0.1)';
   };
@@ -414,7 +425,7 @@ export default function GalaxyMap() {
       canvas.height = containerHeight * dpr;
       canvas.style.width = `${containerWidth}px`;
       canvas.style.height = `${containerHeight}px`;
-      needsFullRedraw = true; // Force full redraw on resize
+      needsFullRedraw = true; // Veil full redraw on resize
     }
 
     const ctx = canvas.getContext('2d');
@@ -812,6 +823,97 @@ export default function GalaxyMap() {
     };
   }, [mapData, zoom, pan]);
 
+  /**
+   * Smoothly zoom + pan the map so a world coordinate sits centered, at a focal
+   * zoom level. Used for the tutorial closing-choice "reveal" payoff. The pan
+   * needed to center the target is recomputed each frame at the interpolating
+   * zoom (pan is an additive screen-space offset), so the target stays centered
+   * throughout the zoom-in. Respects reduce-motion.
+   */
+  const focusOnCoordinate = useCallback((target, targetZoom = 1.6, durationMs = 1300) => {
+    if (!mapData || !target) return;
+    const systems = (mapData.systems || []).map(s => s.coordinates).filter(Boolean);
+    if (systems.length === 0) return;
+    const minX = Math.min(...systems.map(c => c.x));
+    const maxX = Math.max(...systems.map(c => c.x));
+    const minY = Math.min(...systems.map(c => c.y));
+    const maxY = Math.max(...systems.map(c => c.y));
+    const rangeX = (maxX - minX) || 100;
+    const rangeY = (maxY - minY) || 100;
+    const padding = 50;
+    const container = containerRef.current || canvasRef.current?.parentElement;
+    if (!container) return;
+    const W = container.clientWidth || 800;
+    const H = container.clientHeight || 600;
+    const baseScale = Math.min((W - padding * 2) / rangeX, (H - padding * 2) / rangeY);
+
+    // Pan (no-zoom-dependence beyond scale) that centers `target` at zoom z.
+    const panForZoom = (z) => {
+      const scale = baseScale * z;
+      const baseOffX = (W - (maxX - minX) * scale) / 2 - minX * scale;
+      const baseOffY = (H - (maxY - minY) * scale) / 2 - minY * scale;
+      return { x: W / 2 - target.x * scale - baseOffX, y: H / 2 - target.y * scale - baseOffY };
+    };
+
+    if (revealAnimRef.current) cancelAnimationFrame(revealAnimRef.current);
+
+    if (prefersReducedMotion()) {
+      setZoom(targetZoom);
+      setPan(panForZoom(targetZoom));
+      return;
+    }
+
+    const z0 = zoom;
+    const startPan = pan;
+    const endPan = panForZoom(targetZoom);
+    // Tween a normalized progress with a perf.now()-free clock via rAF timestamps.
+    let startTs = null;
+    const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const step = (ts) => {
+      if (startTs === null) startTs = ts;
+      const raw = Math.min(1, (ts - startTs) / durationMs);
+      const e = easeInOut(raw);
+      const z = z0 + (targetZoom - z0) * e;
+      // Blend between the centering pan at the live zoom and the start pan so the
+      // motion eases from the player's current view into a centered focus.
+      const centered = panForZoom(z);
+      setZoom(z);
+      setPan({
+        x: startPan.x + (centered.x - startPan.x) * e,
+        y: startPan.y + (centered.y - startPan.y) * e
+      });
+      if (raw < 1) {
+        revealAnimRef.current = requestAnimationFrame(step);
+      } else {
+        setPan(endPan);
+        revealAnimRef.current = null;
+      }
+    };
+    revealAnimRef.current = requestAnimationFrame(step);
+  }, [mapData, zoom, pan]);
+
+  // Tutorial closing-choice reveal: once the map is loaded, zoom toward the
+  // destination world and surface a one-time banner. Runs exactly once.
+  useEffect(() => {
+    if (revealDoneRef.current || !revealPlanet || !mapData) return;
+    const systems = mapData.systems || [];
+    const sys = systems.find(s => (s.planets || []).some(p => p.id === revealPlanet || p.name?.toLowerCase() === revealPlanet));
+    if (!sys || !sys.coordinates) return;
+    revealDoneRef.current = true;
+    const planet = (sys.planets || []).find(p => p.id === revealPlanet || p.name?.toLowerCase() === revealPlanet);
+    setSelectedSystem(sys);
+    setRevealBanner({
+      planetName: planet?.name || formatDisplayName(revealPlanet),
+      questTitle: revealQuestTitle
+    });
+    // Let the map paint once, then animate the focus.
+    const t = setTimeout(() => focusOnCoordinate(sys.coordinates, 1.6, 1300), 350);
+    return () => clearTimeout(t);
+  }, [mapData, revealPlanet, revealQuestTitle, focusOnCoordinate]);
+
+  // Cleanup any in-flight reveal animation on unmount.
+  useEffect(() => () => { if (revealAnimRef.current) cancelAnimationFrame(revealAnimRef.current); }, []);
+
   const handleCanvasMouseDown = (e) => {
     if (!mapData) return;
 
@@ -1105,15 +1207,25 @@ export default function GalaxyMap() {
 
       <div className="galaxy-map-content">
         <div className="map-canvas-container" ref={containerRef}>
-          <canvas
-            ref={canvasRef}
-            onMouseDown={handleCanvasMouseDown}
-            onMouseMove={handleCanvasMouseMove}
-            onMouseUp={handleCanvasMouseUp}
-            onMouseLeave={handleCanvasMouseLeave}
-            className="galaxy-map-canvas"
-            style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+          <GalaxyScene3D
+            systems={mapData?.systems || []}
+            routes={mapData?.routes || []}
+            currentPlanetId={currentCharacter?.currentPlanet}
+            selectedSystemId={typeof selectedSystem === 'string' ? selectedSystem : selectedSystem?.id}
+            focusPlanetId={revealPlanet}
+            onSelectSystem={(system) => { setSelectedSystem(system.id); loadSystemDetails(system.id); }}
+            onHoverSystem={(system) => setHoveredSystem(system?.id || null)}
           />
+          {revealBanner && (
+            <div className="galaxy-reveal-banner" role="status">
+              <div className="reveal-banner-eyebrow">The Reach is open to you</div>
+              <div className="reveal-banner-title">Your destination: {revealBanner.planetName}</div>
+              {revealBanner.questTitle && (
+                <div className="reveal-banner-quest">“{revealBanner.questTitle}” is in your quest log.</div>
+              )}
+              <button className="reveal-banner-dismiss" onClick={() => setRevealBanner(null)}>Got it</button>
+            </div>
+          )}
         </div>
 
         <div className="map-sidebar">
@@ -1126,6 +1238,12 @@ export default function GalaxyMap() {
               <p className="stats-hint">
                 <small>Star systems contain planets. Click a system to see its planets, then click a planet to travel.</small>
               </p>
+              <div className="map-legend">
+                <span className="legend-item"><span className="legend-dot" style={{ background: '#22c55e' }} /> Current</span>
+                <span className="legend-item"><span className="legend-dot" style={{ background: '#2563eb' }} /> Selected</span>
+                <span className="legend-item"><span className="legend-dot" style={{ background: '#64748b' }} /> System</span>
+                <span className="legend-item"><span className="legend-line" /> Fold-lane</span>
+              </div>
             </div>
           )}
           
@@ -1141,7 +1259,7 @@ export default function GalaxyMap() {
               <div className="system-info">
                 <div className="info-row">
                   <span className="info-label">Faction:</span>
-                  <span className="info-value">{system.factionControl || 'Independent'}</span>
+                  <span className="info-value">{system.factionControl ? formatDisplayName(system.factionControl) : 'Independent'}</span>
                 </div>
                 <div className="info-row">
                   <span className="info-label">Danger Level:</span>
@@ -1150,7 +1268,7 @@ export default function GalaxyMap() {
                 {system.economyType && (
                   <div className="info-row">
                     <span className="info-label">Economy:</span>
-                    <span className="info-value">{system.economyType}</span>
+                    <span className="info-value">{formatDisplayName(system.economyType)}</span>
                   </div>
                 )}
                 {system.population && (

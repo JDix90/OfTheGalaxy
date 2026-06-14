@@ -1,0 +1,81 @@
+{
+  "id": "caldon_side_01_venox_menace",
+  "factionId": "outer_rim_settlers",
+  "questType": "side",
+  "title": "The Venox Menace",
+  "description": "Jorn Kess, a farmer in the Caldon settlement, is desperate for help. The venox creatures have been getting bolder, coming closer to the settlement and attacking farms. Last week, they attacked one of the farms, and the settlers are afraid. They're not fighters, but they can't just abandon their homes. Can you help clear out the venox nest?",
+  "shortDescription": "Clear out the venox nest threatening the settlement",
+  "prerequisites": {
+    "level": 4,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "speak_farmer",
+      "type": "interact",
+      "description": "Speak with farmer Jorn Kess about the venox problem",
+      "target": "npc_caldon_farmer"
+    },
+    {
+      "id": "locate_nest",
+      "type": "travel",
+      "description": "Locate the venox nest near the settlement",
+      "location": {
+        "planet": "caldon",
+        "area": "wilderness"
+      }
+    },
+    {
+      "id": "defeat_venox",
+      "type": "defeat",
+      "description": "Defeat the venox creatures in the nest",
+      "target": "venox",
+      "count": 8
+    },
+    {
+      "id": "clear_nest",
+      "type": "custom",
+      "description": "Clear out the venox nest completely",
+      "target": "nest_cleared"
+    },
+    {
+      "id": "return_to_farmer",
+      "type": "interact",
+      "description": "Return to Jorn Kess to report success",
+      "target": "npc_caldon_farmer"
+    }
+  ],
+  "rewards": {
+    "xp": 1000,
+    "credits": 500,
+    "reputation": {
+      "outer_rim_settlers": 40
+    },
+    "items": [
+      {
+        "itemId": "venox_eggs",
+        "quantity": 3
+      },
+      {
+        "itemId": "settler_gift",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_caldon_farmer",
+  "startLocation": {
+    "planet": "caldon",
+    "area": "settlement"
+  },
+  "estimatedTime": 60,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+
+

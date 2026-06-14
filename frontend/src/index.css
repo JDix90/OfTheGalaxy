@@ -297,3 +297,10 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* GameIcon (lucide) — align inline SVG icons with adjacent text */
+.game-icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+}

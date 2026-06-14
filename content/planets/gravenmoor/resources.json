@@ -1,0 +1,44 @@
+{
+  "planetId": "gravenmoor",
+  "resources": [
+    {
+      "id": "resource_wyrm_pearl",
+      "name": "Dune Wyrm Pearl",
+      "type": "resource",
+      "rarity": "legendary",
+      "description": "An extremely rare and valuable pearl from a wyrm dragon. Possesses unique properties and is worth a fortune.",
+      "baseValue": 10000,
+      "weight": 0.1,
+      "stackSize": 1,
+      "uses": ["trade", "crafting", "quest_item", "veil_enhancement"],
+      "locations": ["Sunder Wastes", "Dune Wyrm Lairs"]
+    },
+    {
+      "id": "resource_grazer_hide",
+      "name": "Grazer Hide",
+      "type": "resource",
+      "rarity": "common",
+      "description": "Tough hide from grazer creatures. Used in crafting armor and other goods.",
+      "baseValue": 25,
+      "weight": 1.5,
+      "stackSize": 20,
+      "uses": ["crafting", "trade"],
+      "locations": ["Desert regions", "Grazer herds"]
+    },
+    {
+      "id": "resource_dragon_bones",
+      "name": "Dune Wyrm Bones",
+      "type": "resource",
+      "rarity": "rare",
+      "description": "Bones from a wyrm dragon. Extremely valuable crafting material with unique properties.",
+      "baseValue": 500,
+      "weight": 3.0,
+      "stackSize": 10,
+      "uses": ["crafting", "trade"],
+      "locations": ["Dune Wyrm Lairs"]
+    }
+  ]
+}
+
+
+

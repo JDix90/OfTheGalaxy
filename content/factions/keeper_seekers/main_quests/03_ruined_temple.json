@@ -1,0 +1,94 @@
+{
+  "id": "js_centralis_01_ruined_temple",
+  "factionId": "keeper_seekers",
+  "questType": "main",
+  "title": "The Ruined Temple",
+  "description": "Scholar Tera Voss has been studying the Keeper Sanctum on Centralis for years. She believes there's an artifact still hidden within—something the Iron Dominion missed during their purge. The Temple is dangerous to enter, filled with traps and Dominion remnants, but she thinks you're meant to find it. Will you help her recover it?",
+  "shortDescription": "Recover a powerful artifact from the ruined Keeper Sanctum",
+  "prerequisites": {
+    "level": 7,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_scholar",
+      "type": "interact",
+      "description": "Meet with Scholar Tera Voss at the Temple District",
+      "target": "npc_keeper_scholar"
+    },
+    {
+      "id": "travel_temple",
+      "type": "travel",
+      "description": "Travel to the Keeper Sanctum ruins",
+      "location": {
+        "planet": "centralis",
+        "area": "temple_district"
+      }
+    },
+    {
+      "id": "reach_temple_sanctum",
+      "type": "reach_depth",
+      "description": "Reach the inner sanctum of the ruined temple where the artifact is hidden",
+      "target": "poi_keeper_temple",
+      "depthZone": 4
+    },
+    {
+      "id": "find_key",
+      "type": "collect",
+      "description": "Find the ancient key to the artifact chamber (search defeated enemies or find in hidden caches)",
+      "target": "ancient_key",
+      "count": 1
+    },
+    {
+      "id": "defeat_temple_guardian",
+      "type": "defeat_boss",
+      "description": "Defeat the ancient temple guardian protecting the artifact",
+      "target": "poi_keeper_temple"
+    },
+    {
+      "id": "recover_artifact",
+      "type": "collect",
+      "description": "Recover the Keeper artifact from the sanctum",
+      "target": "keeper_artifact",
+      "count": 1
+    },
+    {
+      "id": "make_choice",
+      "type": "custom",
+      "description": "Choose what to do with the artifact (return to scholar, keep it, or destroy it)",
+      "target": "artifact_choice"
+    }
+  ],
+  "rewards": {
+    "xp": 2500,
+    "credits": 2000,
+    "reputation": {
+      "keeper_seekers": 75
+    },
+    "items": [
+      {
+        "itemId": "keeper_artifact",
+        "quantity": 1
+      },
+      {
+        "itemId": "artifact_power",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_keeper_scholar",
+  "startLocation": {
+    "planet": "centralis",
+    "area": "temple_district"
+  },
+  "estimatedTime": 150,
+  "difficulty": "very_hard",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+

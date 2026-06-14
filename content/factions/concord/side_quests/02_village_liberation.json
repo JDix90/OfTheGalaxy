@@ -1,0 +1,83 @@
+{
+  "id": "sytha_side_01_village_liberation",
+  "factionId": "concord",
+  "questType": "side",
+  "title": "Village Liberation",
+  "description": "Elder Tala, leader of a Sytheen village in Tann Province, needs help. The criminal syndicate has been oppressing her village for too long—taking resources, intimidating her people, leaving them with nothing. The thugs are based in The Syndicate Mines, using it as their base of operations. The Concord says they'll help, but they need action now. Can you help drive out the syndicate thugs from their stronghold?",
+  "shortDescription": "Liberate a Sytheen village by clearing The Syndicate Mines",
+  "prerequisites": {
+    "level": 4,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "speak_elder",
+      "type": "interact",
+      "description": "Speak with Elder Tala about the village's situation and learn about The Syndicate Mines",
+      "target": "npc_village_elder"
+    },
+    {
+      "id": "travel_to_mines",
+      "type": "travel",
+      "description": "Travel to The Syndicate Mines where the thugs are based",
+      "location": {
+        "planet": "sytha",
+        "area": "mining_district"
+      }
+    },
+    {
+      "id": "clear_syndicate_mines",
+      "type": "clear_dungeon",
+      "description": "Clear The Syndicate Mines of all syndicate thugs",
+      "target": "poi_syndicate_mines",
+      "count": 0
+    },
+    {
+      "id": "defeat_mine_boss",
+      "type": "defeat_boss",
+      "description": "Defeat the syndicate boss controlling the mines",
+      "target": "poi_syndicate_mines"
+    },
+    {
+      "id": "recover_artifact",
+      "type": "collect",
+      "description": "Recover the stolen Sytheen cultural artifact from the mines",
+      "target": "sytheen_artifact",
+      "count": 1
+    },
+    {
+      "id": "return_to_elder",
+      "type": "interact",
+      "description": "Return to Elder Tala with news of the mines' liberation",
+      "target": "npc_village_elder"
+    }
+  ],
+  "rewards": {
+    "xp": 1200,
+    "credits": 800,
+    "reputation": {
+      "concord": 40,
+      "outer_rim_settlers": 30
+    },
+    "items": [
+      {
+        "itemId": "sytheen_artifact",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_village_elder",
+  "startLocation": {
+    "planet": "sytha",
+    "area": "tann_province"
+  },
+  "estimatedTime": 75,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+

@@ -131,15 +131,15 @@ class MiniQuestService {
     
     // Faction alignment modifiers
     const factionAlignment = {
-      'galactic_empire': -1,
-      'first_order': -1,
-      'sith': -2,
-      'hutts': -2,
-      'hutt_cartel': -2,
-      'rebel_alliance': 1,
-      'resistance': 1,
-      'jedi_order': 2,
-      'new_republic': 1
+      'iron_dominion': -1,
+      'ascendancy': -1,
+      'hollow': -2,
+      'vorr': -2,
+      'vorr_cartel': -2,
+      'free_worlds': 1,
+      'uprising': 1,
+      'keeper_order': 2,
+      'concord': 1
     };
     
     alignmentScore += factionAlignment[faction] || 0;

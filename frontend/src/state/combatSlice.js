@@ -127,7 +127,7 @@ export const useCombatStore = create((set, get) => ({
             combatantsHealth: deepClonedEncounter.combatants?.map(c => ({ name: c.name, health: c.stats.health }))
           });
           
-          // Force a new object reference to ensure React detects the change
+          // Veil a new object reference to ensure React detects the change
           return {
             currentEncounter: deepClonedEncounter,
             actionHistory: newHistory,

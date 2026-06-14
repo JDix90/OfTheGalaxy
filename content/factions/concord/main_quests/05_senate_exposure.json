@@ -1,0 +1,76 @@
+{
+  "id": "nr_centralis_04_senate_exposure",
+  "factionId": "concord",
+  "questType": "main",
+  "title": "Exposing the Assembly",
+  "description": "You have all the evidence you need to expose Senator Vorin. But he's powerful, connected, and won't go down without a fight. The Corporate Sector owns half the Assembly, and they own him. Exposing him means exposing them. This is bigger than you realized. But the truth must come out, and corruption must be exposed. The Concord's future depends on it.",
+  "shortDescription": "Confront and expose Senator Vorin in the Assembly",
+  "prerequisites": {
+    "level": 8,
+    "reputation": {
+      "concord": 70
+    },
+    "completedQuests": ["nr_centralis_03_underworld_connection"],
+    "items": ["corruption_evidence", "bribery_records", "underworld_evidence"]
+  },
+  "objectives": [
+    {
+      "id": "confront_senator",
+      "type": "interact",
+      "description": "Confront Senator Vorin with the evidence",
+      "target": "npc_corrupt_senator"
+    },
+    {
+      "id": "defeat_senator",
+      "type": "defeat",
+      "description": "Defeat Senator Vorin and his guards",
+      "target": "npc_corrupt_senator",
+      "count": 1
+    },
+    {
+      "id": "recover_assets",
+      "type": "collect",
+      "description": "Recover the senator's assets as evidence",
+      "target": "senator_assets",
+      "count": 1
+    },
+    {
+      "id": "present_evidence",
+      "type": "custom",
+      "description": "Present evidence to the Assembly (or keep it for yourself)",
+      "target": "senate_presentation"
+    }
+  ],
+  "rewards": {
+    "xp": 3000,
+    "credits": 5000,
+    "reputation": {
+      "concord": 100,
+      "corporate_sector": -50
+    },
+    "items": [
+      {
+        "itemId": "senate_commendation",
+        "quantity": 1
+      },
+      {
+        "itemId": "senator_assets",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_senator_aide",
+  "startLocation": {
+    "planet": "centralis",
+    "area": "senate_district"
+  },
+  "estimatedTime": 120,
+  "difficulty": "very_hard",
+  "isActive": true,
+  "chainId": "nr_centralis_corruption_chain",
+  "chainOrder": 3
+}
+
+
+

@@ -6,7 +6,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
-import { useCombatStore } from '../state/combatSlice';
 import { CharacterManager } from '../core/character/CharacterManager';
 import HUD from '../components/hud/HUD';
 import PauseMenu from '../features/menus/PauseMenu';
@@ -14,15 +13,14 @@ import CharacterSelector from '../components/CharacterSelector';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 import { useTutorial } from '../contexts/TutorialContext';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { formatDisplayName } from '../utils/formatName';
 import './GameWorld.css';
 
 export default function GameWorld() {
   const navigate = useNavigate();
   const { currentCharacter, setCurrentCharacter } = useCharacterStore();
-  const { startEncounter } = useCombatStore();
   const { isActive, startTutorial } = useTutorial();
   const [isPauseMenuOpen, setIsPauseMenuOpen] = useState(false);
-  const [combatLoading, setCombatLoading] = useState(false);
   const [isCharacterSelectorOpen, setIsCharacterSelectorOpen] = useState(false);
   const characterNameRef = useRef(null);
   
@@ -123,58 +121,6 @@ export default function GameWorld() {
     onMapOpen: () => window.location.href = '/game/galaxy'
   });
 
-  const handleTestCombat = async () => {
-    if (!currentCharacter) return;
-
-    setCombatLoading(true);
-    try {
-      // First, check if there's an active encounter
-      const { getActiveEncounter } = useCombatStore.getState();
-      const activeEncounter = await getActiveEncounter(currentCharacter.id);
-
-      if (activeEncounter && activeEncounter.id) {
-        // Resume existing encounter
-        console.log('Resuming existing encounter:', activeEncounter.id);
-        navigate(`/game/combat/${activeEncounter.id}`);
-        return;
-      }
-
-      // No active encounter, create a new one
-      console.log('Creating new combat encounter...');
-      const encounter = await startEncounter(
-        currentCharacter.id,
-        'random',
-        ['stormtrooper'] // Test with a stormtrooper
-      );
-
-      if (encounter && encounter.id) {
-        navigate(`/game/combat/${encounter.id}`);
-      }
-    } catch (error) {
-      console.error('Failed to start combat:', error);
-      
-      // Check if error is about existing encounter
-      if (error.message && (error.message.includes('already has an active') || error.message.includes('active combat'))) {
-        // Try to get and navigate to the active encounter
-        try {
-          const { getActiveEncounter } = useCombatStore.getState();
-          const activeEncounter = await getActiveEncounter(currentCharacter.id);
-          if (activeEncounter && activeEncounter.id) {
-            console.log('Found active encounter after error:', activeEncounter.id);
-            navigate(`/game/combat/${activeEncounter.id}`);
-            return;
-          }
-        } catch (err) {
-          console.error('Failed to get active encounter:', err);
-        }
-      }
-      
-      alert(`Failed to start combat: ${error.message || 'Unknown error'}`);
-    } finally {
-      setCombatLoading(false);
-    }
-  };
-
   if (!currentCharacter) {
     return null;
   }
@@ -218,10 +164,10 @@ export default function GameWorld() {
           <div className="welcome-message">
             <h2>Welcome to the Galaxy, {character.name}</h2>
             <p>
-              You are currently on <strong>{character.currentPlanet || 'an unknown planet'}</strong>.
+              You are currently on <strong>{character.currentPlanet ? formatDisplayName(character.currentPlanet) : 'an unknown world'}</strong>.
             </p>
             <p>
-              This is the main game interface. From here, you can:
+              This is your command hub. From here, you can:
             </p>
             <ul>
               <li>View and manage your quests</li>
@@ -229,11 +175,6 @@ export default function GameWorld() {
               <li>Interact with NPCs</li>
               <li>Manage your character and inventory</li>
             </ul>
-            <p className="note">
-              <strong>Note:</strong> This is the Phase 1 foundation. Full game features 
-              (galaxy map, NPC interactions, planet exploration) will be integrated 
-              with your existing codebase.
-            </p>
           </div>
 
           <div className="quick-actions">
@@ -243,37 +184,25 @@ export default function GameWorld() {
                 <span className="action-icon">📜</span>
                 <span className="action-label">Quest Log</span>
               </button>
-              
+
               <button className="action-card" onClick={() => window.location.href = '/game/galaxy'}>
                 <span className="action-icon">🗺️</span>
                 <span className="action-label">Galaxy Map</span>
               </button>
-              
+
               <button className="action-card" onClick={() => window.location.href = '/game/npcs'}>
                 <span className="action-icon">👥</span>
                 <span className="action-label">NPCs</span>
               </button>
-              
+
               <button className="action-card" onClick={() => window.location.href = '/game/inventory'}>
                 <span className="action-icon">🎒</span>
                 <span className="action-label">Inventory</span>
               </button>
-              
+
               <button className="action-card" onClick={() => window.location.href = '/game/factions'}>
                 <span className="action-icon">⚔️</span>
                 <span className="action-label">Factions</span>
-              </button>
-              
-              <button 
-                className="action-card test-combat-btn" 
-                onClick={handleTestCombat}
-                disabled={combatLoading || !character}
-                title="Test Combat System (Development Only)"
-              >
-                <span className="action-icon">⚔️</span>
-                <span className="action-label">
-                  {combatLoading ? 'Starting...' : 'Test Combat'}
-                </span>
               </button>
             </div>
           </div>

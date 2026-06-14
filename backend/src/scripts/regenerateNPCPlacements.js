@@ -123,8 +123,8 @@ async function main() {
     await sequelize.authenticate();
     console.log('✓ Database connected\n');
 
-    // Get planet ID from command line argument or default to Tatooine
-    const planetId = process.argv[2] || 'tatooine';
+    // Get planet ID from command line argument or default to Gravenmoor
+    const planetId = process.argv[2] || 'gravenmoor';
 
     if (planetId === 'all') {
       // Regenerate for all planets

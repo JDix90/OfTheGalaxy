@@ -268,7 +268,7 @@ class NPCGenerator {
     const requiredVendorCategories = ['medical', 'tech', 'communication', 'general'];
     const spawnedVendorCategories = new Set();
     const spawnedFactionVendors = [];
-    const gameFactions = ['imperial_remnant', 'new_republic', 'smugglers_guild', 'jedi_seekers', 'corporate_sector'];
+    const gameFactions = ['dominion_remnant', 'concord', 'drift_cartel', 'keeper_seekers', 'corporate_sector'];
     
     // For medical facility submaps, ensure at least 1 vendor
     const isMedicalFacility = subMapType === 'medical_center' || subMapType === 'hospital';
@@ -756,7 +756,7 @@ class NPCGenerator {
         // Medical vendors: medpacs, medical tools, medical scanners
         return item.id.startsWith('medpac_') || 
                item.id.startsWith('medical_') || 
-               item.id.startsWith('bacta_') ||
+               item.id.startsWith('regen_') ||
                item.id === 'stimpack_01' || item.id.startsWith('stimpack_');
       },
       tech: (item) => {

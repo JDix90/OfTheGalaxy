@@ -31,28 +31,28 @@ export function getParticleSpriteFilename(particleType) {
  */
 export const planetParticleMap = {
   // Desert worlds - sand particles
-  'tatooine': 'sand',
-  'geonosis': 'sand',
-  'jakku': 'sand',
+  'gravenmoor': 'sand',
+  'karrn': 'sand',
+  'talveen': 'sand',
 
   // Forest/jungle worlds - mist particles
-  'dantooine': 'mist',
-  'kashyyyk': 'mist',
-  'chandrila': 'mist',
-  'yavin': 'pollen',
-  'yavin_4': 'pollen',
+  'caldon': 'mist',
+  'verdholm': 'mist',
+  'solenne': 'mist',
+  'selvora': 'pollen',
+  'selvora_4': 'pollen',
 
   // Ice worlds - ice crystals
-  'hoth': 'ice_crystal',
-  'ilum': 'ice_crystal',
-  'mygeeto': 'ice_crystal',
+  'rime': 'ice_crystal',
+  'kthala': 'ice_crystal',
+  'glaiv': 'ice_crystal',
 
   // Volcanic worlds - embers
-  'mustafar': 'ember',
-  'sullust': 'ember',
+  'embervast': 'ember',
+  'pyrren': 'ember',
 
   // Alien worlds - pollen/spores
-  'felucia': 'pollen',
+  'myssia': 'pollen',
 };
 
 /**

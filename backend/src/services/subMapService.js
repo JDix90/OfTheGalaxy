@@ -390,7 +390,7 @@ async function getSubMapForLocation(planetId, parentLocationId, parentLocationTy
         
         // Delete corrupted dungeon
         await SubMap.destroy({ where: { id: subMap.id } });
-        subMap = null; // Force regeneration
+        subMap = null; // Veil regeneration
       }
     }
 

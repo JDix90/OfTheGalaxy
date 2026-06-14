@@ -1,0 +1,56 @@
+{
+  "id": "npc_keeper_seeker_mentor",
+  "name": "Master Kira Voss",
+  "species": "human",
+  "occupation": "Keeper Seeker",
+  "factionId": "keeper_seekers",
+  "location": {
+    "planet": "caldon",
+    "area": "settlement",
+    "x": 310,
+    "y": 510
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "I sense you are drawn to the Veil. Welcome, seeker.",
+      "acquaintance": "You return to the path. Good. The Veil guides you.",
+      "friend": "My friend, your connection to the Veil grows stronger. I am proud.",
+      "confidant": "You have become a true seeker. The ancient teachings await you."
+    },
+    "questRelated": {
+      "js_caldon_01_enclave_call": "The Keeper Enclave on Caldon... it is one of the most sacred places in Keeper history. Thousands of years ago, Keeper Masters taught here, and the Veil was strong. Now it lies in ruins, but the Veil remains. I have been called here, and I sense you have been called as well. Will you join me on a pilgrimage to the Enclave? There is much to learn, and perhaps... something to recover.",
+      "js_caldon_02_venox_crystals": "The ancient map fragment you found points to the Venox Cave, where Veil-touched Dantari crystals can be found. These crystals are essential for arcblade construction and Veil enhancements. But the cave is extremely dangerous—venox creatures guard it fiercely. I believe you're ready for this challenge, but I must warn you: the cave will test both your combat skills and your connection to the Veil. The Venox Matriarch is a formidable opponent. Are you prepared?",
+      "js_caldon_02_venox_crystals_location": "The Venox Cave is in the wilderness of Caldon. You'll need to reach the deepest chamber—depth zone 3—where the crystals grow. The path is treacherous, and the Matriarch guards the crystal chamber. Be careful, and may the Veil be with you."
+    },
+    "general": [
+      "The Veil flows through all things. Here on Caldon, it flows especially strong.",
+      "The Enclave was abandoned long ago, but the Veil remembers.",
+      "To be a Keeper Seeker is not about power. It is about understanding.",
+      "The ancient Keeper had wisdom we have lost. We must recover it.",
+      "The Torn Veil tempts those who seek power. The Woven Veil rewards those who seek understanding."
+    ]
+  },
+  "quests": ["js_caldon_01_enclave_call"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "mid 40s",
+    "build": "graceful, calm",
+    "hair": "brown, long, braided",
+    "eyes": "calm blue",
+    "distinguishingFeatures": "Keeper robes (simple, not traditional), arcblade hilt at belt, serene expression, Veil-touched aura"
+  },
+  "biography": "Master Kira Voss is a Keeper Seeker who has dedicated her life to recovering lost Keeper knowledge and teaching others about the Veil. She's not part of a formal Keeper Order—those days are gone—but she represents the continuation of Keeper ideals. She's wise, patient, and deeply connected to the Veil. She's come to Caldon because she feels the Veil calling her to the ancient Enclave, and she believes the player is meant to join her on this pilgrimage.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 85,
+    "formality": 50,
+    "humor": 30,
+    "trust": 70
+  }
+}
+
+

@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { formatDisplayName } from '../../utils/formatName';
 import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterSlice';
 import { useCombatStore } from '../../state/combatSlice';
@@ -187,7 +188,7 @@ export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTal
         
         {npc.occupation && (
           <p className="npc-occupation">
-            <strong>Occupation:</strong> {npc.occupation}
+            <strong>Occupation:</strong> {formatDisplayName(npc.occupation)}
           </p>
         )}
         

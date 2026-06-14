@@ -27,12 +27,12 @@ const ITEM_RARITIES = {
  */
 const itemDefinitions = {
   // Weapons
-  'blaster_pistol_01': {
-    id: 'blaster_pistol_01',
-    name: 'DL-44 Heavy Blaster Pistol',
+  'pulser_pistol_01': {
+    id: 'pulser_pistol_01',
+    name: 'VK-7 Heavy Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'A reliable heavy blaster pistol favored by smugglers and bounty hunters.',
+    description: 'A reliable heavy pulser pistol favored by smugglers and bounty hunters.',
     stats: {
       damage: 25,
       range: 30,
@@ -43,12 +43,12 @@ const itemDefinitions = {
     weight: 2.5,
     factionId: null
   },
-  'blaster_rifle_01': {
-    id: 'blaster_rifle_01',
-    name: 'E-11 Blaster Rifle',
+  'pulser_rifle_01': {
+    id: 'pulser_rifle_01',
+    name: 'L-11 Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Standard issue Imperial blaster rifle.',
+    description: 'Standard issue Dominion pulser rifle.',
     stats: {
       damage: 30,
       range: 50,
@@ -57,12 +57,12 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 450,
     weight: 4.0,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
-  'lightsaber_01': {
-    id: 'lightsaber_01',
-    name: 'Lightsaber',
+  'arcblade_01': {
+    id: 'arcblade_01',
+    name: 'Arcblade',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.LEGENDARY,
     description: 'An elegant weapon for a more civilized age.',
@@ -75,20 +75,20 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 10000,
     weight: 1.0,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'trusted',
-    specialEffects: ['force_enhancement', 'lightsaber_mastery']
+    specialEffects: ['veil_enhancement', 'arcblade_mastery']
   },
   
   // ========== PRIORITY 1: EXPANDED WEAPONS ==========
   
-  // Blaster Pistols - Common Tier
-  'blaster_pistol_imperial': {
-    id: 'blaster_pistol_imperial',
-    name: 'SE-14r Blaster Pistol',
+  // Pulser Pistols - Common Tier
+  'pulser_pistol_dominion': {
+    id: 'pulser_pistol_dominion',
+    name: 'SE-14r Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Standard issue Imperial sidearm. Reliable and accurate.',
+    description: 'Standard issue Dominion sidearm. Reliable and accurate.',
     stats: {
       damage: 23,
       range: 28,
@@ -97,15 +97,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 450,
     weight: 2.3,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
-  'blaster_pistol_rebel': {
-    id: 'blaster_pistol_rebel',
-    name: 'A-180 Blaster Pistol',
+  'pulser_pistol_rebel': {
+    id: 'pulser_pistol_rebel',
+    name: 'A-180 Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'New Republic standard issue blaster pistol. Versatile and dependable.',
+    description: 'Concord standard issue pulser pistol. Versatile and dependable.',
     stats: {
       damage: 24,
       range: 32,
@@ -114,17 +114,17 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 480,
     weight: 2.4,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
   
-  // Blaster Rifles - Common Tier
-  'blaster_rifle_generic': {
-    id: 'blaster_rifle_generic',
-    name: 'DC-15A Blaster Rifle',
+  // Pulser Rifles - Common Tier
+  'pulser_rifle_generic': {
+    id: 'pulser_rifle_generic',
+    name: 'DC-15A Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'A common blaster rifle found throughout the galaxy. No faction affiliation.',
+    description: 'A common pulser rifle found throughout the galaxy. No faction affiliation.',
     stats: {
       damage: 28,
       range: 45,
@@ -135,12 +135,12 @@ const itemDefinitions = {
     weight: 3.8,
     factionId: null
   },
-  'blaster_rifle_rebel': {
-    id: 'blaster_rifle_rebel',
-    name: 'A280 Blaster Rifle',
+  'pulser_rifle_rebel': {
+    id: 'pulser_rifle_rebel',
+    name: 'RK-9 Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'New Republic standard issue blaster rifle. Reliable and effective.',
+    description: 'Concord standard issue pulser rifle. Reliable and effective.',
     stats: {
       damage: 29,
       range: 48,
@@ -149,17 +149,17 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 420,
     weight: 3.9,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
   
   // Melee Weapons - Common Tier
-  'vibroblade': {
-    id: 'vibroblade',
-    name: 'Vibroblade',
+  'shock_blade': {
+    id: 'shock_blade',
+    name: 'Shock-blade',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'A basic vibroblade. Simple but effective in close combat.',
+    description: 'A basic shock_blade. Simple but effective in close combat.',
     stats: {
       damage: 20,
       range: 1,
@@ -170,12 +170,12 @@ const itemDefinitions = {
     weight: 1.5,
     factionId: null
   },
-  'vibroblade_imperial': {
-    id: 'vibroblade_imperial',
-    name: 'Imperial Vibroblade',
+  'shock_blade_dominion': {
+    id: 'shock_blade_dominion',
+    name: 'Dominion Shock-blade',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Standard issue Imperial vibroblade. Durable and reliable.',
+    description: 'Standard issue Dominion shock_blade. Durable and reliable.',
     stats: {
       damage: 21,
       range: 1,
@@ -184,17 +184,17 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 220,
     weight: 1.6,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
   
-  // Blaster Pistols - Uncommon Tier
-  'blaster_pistol_02': {
-    id: 'blaster_pistol_02',
-    name: 'DL-18 Blaster Pistol',
+  // Pulser Pistols - Uncommon Tier
+  'pulser_pistol_02': {
+    id: 'pulser_pistol_02',
+    name: 'DL-18 Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'An upgraded version of the DL-44. Improved accuracy and range.',
+    description: 'An upgraded version of the VK-7. Improved accuracy and range.',
     stats: {
       damage: 32,
       range: 35,
@@ -205,12 +205,12 @@ const itemDefinitions = {
     weight: 2.6,
     factionId: null
   },
-  'blaster_pistol_smuggler': {
-    id: 'blaster_pistol_smuggler',
-    name: 'DT-12 Blaster Pistol',
+  'pulser_pistol_smuggler': {
+    id: 'pulser_pistol_smuggler',
+    name: 'DT-12 Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'A compact blaster favored by smugglers. Easy to conceal and reliable.',
+    description: 'A compact pulser favored by smugglers. Easy to conceal and reliable.',
     stats: {
       damage: 28,
       range: 30,
@@ -219,12 +219,12 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 750,
     weight: 2.0,
-    factionId: 'smugglers_guild',
+    factionId: 'drift_cartel',
     minReputationTier: 'friendly'
   },
-  'blaster_pistol_corporate': {
-    id: 'blaster_pistol_corporate',
-    name: 'Czerka C-10 Blaster Pistol',
+  'pulser_pistol_corporate': {
+    id: 'pulser_pistol_corporate',
+    name: 'Czerka C-10 Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
     description: 'Corporate Sector security weapon. High damage, moderate accuracy.',
@@ -239,9 +239,9 @@ const itemDefinitions = {
     factionId: 'corporate_sector',
     minReputationTier: 'friendly'
   },
-  'blaster_pistol_bounty': {
-    id: 'blaster_pistol_bounty',
-    name: 'EE-3 Blaster Pistol',
+  'pulser_pistol_bounty': {
+    id: 'pulser_pistol_bounty',
+    name: 'EE-3 Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
     description: 'Popular among bounty hunters. Balanced stats and reliable performance.',
@@ -256,13 +256,13 @@ const itemDefinitions = {
     factionId: null
   },
   
-  // Blaster Rifles - Uncommon Tier
-  'blaster_rifle_02': {
-    id: 'blaster_rifle_02',
-    name: 'E-11 Enhanced Blaster Rifle',
+  // Pulser Rifles - Uncommon Tier
+  'pulser_rifle_02': {
+    id: 'pulser_rifle_02',
+    name: 'L-11 Enhanced Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Enhanced version of the standard E-11. Improved damage and accuracy.',
+    description: 'Enhanced version of the standard L-11. Improved damage and accuracy.',
     stats: {
       damage: 35,
       range: 55,
@@ -271,15 +271,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 900,
     weight: 4.2,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
-  'blaster_rifle_rebel_enhanced': {
-    id: 'blaster_rifle_rebel_enhanced',
-    name: 'A280 Enhanced Blaster Rifle',
+  'pulser_rifle_rebel_enhanced': {
+    id: 'pulser_rifle_rebel_enhanced',
+    name: 'RK-9 Enhanced Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Enhanced New Republic blaster rifle. Improved range and accuracy.',
+    description: 'Enhanced Concord pulser rifle. Improved range and accuracy.',
     stats: {
       damage: 33,
       range: 58,
@@ -288,12 +288,12 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 850,
     weight: 4.0,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
-  'blaster_rifle_corporate': {
-    id: 'blaster_rifle_corporate',
-    name: 'Czerka C-20 Blaster Rifle',
+  'pulser_rifle_corporate': {
+    id: 'pulser_rifle_corporate',
+    name: 'Czerka C-20 Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
     description: 'Corporate Sector security rifle. High damage output.',
@@ -308,8 +308,8 @@ const itemDefinitions = {
     factionId: 'corporate_sector',
     minReputationTier: 'friendly'
   },
-  'blaster_rifle_scout': {
-    id: 'blaster_rifle_scout',
+  'pulser_rifle_scout': {
+    id: 'pulser_rifle_scout',
     name: 'Scout Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
@@ -347,7 +347,7 @@ const itemDefinitions = {
     name: 'Rebel Vibrosword',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'New Republic vibrosword. Lightweight and effective.',
+    description: 'Concord vibrosword. Lightweight and effective.',
     stats: {
       damage: 29,
       range: 1,
@@ -356,7 +356,7 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 420,
     weight: 1.9,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
   'vibroknife': {
@@ -376,13 +376,13 @@ const itemDefinitions = {
     factionId: null
   },
   
-  // Blaster Pistols - Rare Tier
-  'blaster_pistol_03': {
-    id: 'blaster_pistol_03',
-    name: 'DL-44 Custom Blaster Pistol',
+  // Pulser Pistols - Rare Tier
+  'pulser_pistol_03': {
+    id: 'pulser_pistol_03',
+    name: 'VK-7 Custom Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A custom-tuned DL-44. Maximum performance for the discerning shooter.',
+    description: 'A custom-tuned VK-7. Maximum performance for the discerning shooter.',
     stats: {
       damage: 40,
       range: 38,
@@ -393,12 +393,12 @@ const itemDefinitions = {
     weight: 2.7,
     factionId: null
   },
-  'blaster_pistol_imperial_elite': {
-    id: 'blaster_pistol_imperial_elite',
-    name: 'SE-14r Elite Blaster Pistol',
+  'pulser_pistol_dominion_elite': {
+    id: 'pulser_pistol_dominion_elite',
+    name: 'SE-14r Elite Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite Imperial sidearm. Issued to officers and special forces.',
+    description: 'Elite Dominion sidearm. Issued to officers and special forces.',
     stats: {
       damage: 38,
       range: 35,
@@ -407,15 +407,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 1400,
     weight: 2.4,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'friendly'
   },
-  'blaster_pistol_rebel_elite': {
-    id: 'blaster_pistol_rebel_elite',
-    name: 'A-180 Modified Blaster Pistol',
+  'pulser_pistol_rebel_elite': {
+    id: 'pulser_pistol_rebel_elite',
+    name: 'A-180 Modified Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Modified New Republic blaster. Enhanced for special operations.',
+    description: 'Modified Concord pulser. Enhanced for special operations.',
     stats: {
       damage: 39,
       range: 36,
@@ -424,15 +424,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 1450,
     weight: 2.5,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'friendly'
   },
-  'blaster_pistol_mandalorian': {
-    id: 'blaster_pistol_mandalorian',
-    name: 'Westar-35 Blaster Pistol',
+  'pulser_pistol_ironkin': {
+    id: 'pulser_pistol_ironkin',
+    name: 'Westar-35 Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Mandalorian blaster pistol. Exceptional craftsmanship and power.',
+    description: 'Ironkin pulser pistol. Exceptional craftsmanship and power.',
     stats: {
       damage: 42,
       range: 40,
@@ -442,16 +442,16 @@ const itemDefinitions = {
     value: 2000,
     weight: 2.6,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship']
+    specialEffects: ['ironkin_craftsmanship']
   },
   
-  // Blaster Rifles - Rare Tier
-  'blaster_rifle_03': {
-    id: 'blaster_rifle_03',
-    name: 'E-11 Elite Blaster Rifle',
+  // Pulser Rifles - Rare Tier
+  'pulser_rifle_03': {
+    id: 'pulser_rifle_03',
+    name: 'L-11 Elite Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite version of the E-11. Maximum Imperial firepower.',
+    description: 'Elite version of the L-11. Maximum Dominion firepower.',
     stats: {
       damage: 40,
       range: 60,
@@ -460,15 +460,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 1800,
     weight: 4.5,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'friendly'
   },
-  'blaster_rifle_rebel_elite': {
-    id: 'blaster_rifle_rebel_elite',
-    name: 'A280 Elite Blaster Rifle',
+  'pulser_rifle_rebel_elite': {
+    id: 'pulser_rifle_rebel_elite',
+    name: 'RK-9 Elite Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite New Republic blaster rifle. Superior range and accuracy.',
+    description: 'Elite Concord pulser rifle. Superior range and accuracy.',
     stats: {
       damage: 38,
       range: 62,
@@ -477,15 +477,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 1700,
     weight: 4.3,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'friendly'
   },
-  'blaster_rifle_mandalorian': {
-    id: 'blaster_rifle_mandalorian',
-    name: 'Mandalorian Blaster Rifle',
+  'pulser_rifle_ironkin': {
+    id: 'pulser_rifle_ironkin',
+    name: 'Ironkin Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Mandalorian-crafted blaster rifle. Exceptional quality and power.',
+    description: 'Ironkin-crafted pulser rifle. Exceptional quality and power.',
     stats: {
       damage: 42,
       range: 58,
@@ -495,14 +495,14 @@ const itemDefinitions = {
     value: 2200,
     weight: 4.2,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship']
+    specialEffects: ['ironkin_craftsmanship']
   },
-  'blaster_rifle_heavy': {
-    id: 'blaster_rifle_heavy',
-    name: 'Heavy Blaster Rifle',
+  'pulser_rifle_heavy': {
+    id: 'pulser_rifle_heavy',
+    name: 'Heavy Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A heavy blaster rifle. High damage but slower rate of fire.',
+    description: 'A heavy pulser rifle. High damage but slower rate of fire.',
     stats: {
       damage: 45,
       range: 55,
@@ -513,9 +513,9 @@ const itemDefinitions = {
     weight: 5.5,
     factionId: null
   },
-  'blaster_rifle_precision': {
-    id: 'blaster_rifle_precision',
-    name: 'Precision Blaster Rifle',
+  'pulser_rifle_precision': {
+    id: 'pulser_rifle_precision',
+    name: 'Precision Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
     description: 'A precision-engineered rifle. High accuracy and range.',
@@ -531,12 +531,12 @@ const itemDefinitions = {
   },
   
   // Heavy Weapons - Rare Tier
-  'heavy_blaster': {
-    id: 'heavy_blaster',
-    name: 'Heavy Blaster',
+  'heavy_pulser': {
+    id: 'heavy_pulser',
+    name: 'Heavy Pulser',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A heavy blaster weapon. High damage but lower accuracy.',
+    description: 'A heavy pulser weapon. High damage but lower accuracy.',
     stats: {
       damage: 55,
       range: 40,
@@ -547,12 +547,12 @@ const itemDefinitions = {
     weight: 8.0,
     factionId: null
   },
-  'heavy_blaster_imperial': {
-    id: 'heavy_blaster_imperial',
-    name: 'RT-97C Heavy Blaster',
+  'heavy_pulser_dominion': {
+    id: 'heavy_pulser_dominion',
+    name: 'RT-97C Heavy Pulser',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Imperial heavy blaster. Devastating firepower.',
+    description: 'Dominion heavy pulser. Devastating firepower.',
     stats: {
       damage: 58,
       range: 42,
@@ -561,15 +561,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 2200,
     weight: 8.5,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'friendly'
   },
-  'heavy_blaster_rebel': {
-    id: 'heavy_blaster_rebel',
-    name: 'T-21 Heavy Blaster',
+  'heavy_pulser_rebel': {
+    id: 'heavy_pulser_rebel',
+    name: 'T-21 Heavy Pulser',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'New Republic heavy blaster. Powerful and reliable.',
+    description: 'Concord heavy pulser. Powerful and reliable.',
     stats: {
       damage: 56,
       range: 41,
@@ -578,7 +578,7 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 2100,
     weight: 8.2,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'friendly'
   },
   
@@ -599,12 +599,12 @@ const itemDefinitions = {
     weight: 6.0,
     factionId: null
   },
-  'sniper_rifle_imperial': {
-    id: 'sniper_rifle_imperial',
-    name: 'E-11s Sniper Rifle',
+  'sniper_rifle_dominion': {
+    id: 'sniper_rifle_dominion',
+    name: 'L-11s Sniper Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Imperial sniper variant. Maximum range and precision.',
+    description: 'Dominion sniper variant. Maximum range and precision.',
     stats: {
       damage: 62,
       range: 105,
@@ -613,7 +613,7 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 2400,
     weight: 6.2,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'friendly'
   },
   
@@ -666,12 +666,12 @@ const itemDefinitions = {
     weight: 4.5,
     factionId: null
   },
-  'vibrosword_mandalorian': {
-    id: 'vibrosword_mandalorian',
-    name: 'Mandalorian Vibrosword',
+  'vibrosword_ironkin': {
+    id: 'vibrosword_ironkin',
+    name: 'Ironkin Vibrosword',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Mandalorian-crafted vibrosword. Exceptional craftsmanship.',
+    description: 'Ironkin-crafted vibrosword. Exceptional craftsmanship.',
     stats: {
       damage: 42,
       range: 1,
@@ -681,16 +681,16 @@ const itemDefinitions = {
     value: 2000,
     weight: 2.2,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship']
+    specialEffects: ['ironkin_craftsmanship']
   },
   
-  // Blaster Pistols - Epic Tier
-  'blaster_pistol_legendary': {
-    id: 'blaster_pistol_legendary',
-    name: 'DL-44 Masterwork Blaster Pistol',
+  // Pulser Pistols - Epic Tier
+  'pulser_pistol_legendary': {
+    id: 'pulser_pistol_legendary',
+    name: 'VK-7 Masterwork Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'A masterwork DL-44. The pinnacle of blaster pistol craftsmanship.',
+    description: 'A masterwork VK-7. The pinnacle of pulser pistol craftsmanship.',
     stats: {
       damage: 50,
       range: 45,
@@ -702,12 +702,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['masterwork_quality']
   },
-  'blaster_pistol_imperial_master': {
-    id: 'blaster_pistol_imperial_master',
-    name: 'SE-14r Master Blaster Pistol',
+  'pulser_pistol_dominion_master': {
+    id: 'pulser_pistol_dominion_master',
+    name: 'SE-14r Master Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted Imperial sidearm. The finest Imperial weaponry.',
+    description: 'Master-crafted Dominion sidearm. The finest Dominion weaponry.',
     stats: {
       damage: 48,
       range: 42,
@@ -716,15 +716,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 4800,
     weight: 2.5,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'trusted'
   },
-  'blaster_pistol_rebel_master': {
-    id: 'blaster_pistol_rebel_master',
-    name: 'A-180 Master Blaster Pistol',
+  'pulser_pistol_rebel_master': {
+    id: 'pulser_pistol_rebel_master',
+    name: 'A-180 Master Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted New Republic blaster. Exceptional quality.',
+    description: 'Master-crafted Concord pulser. Exceptional quality.',
     stats: {
       damage: 49,
       range: 43,
@@ -733,15 +733,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 4900,
     weight: 2.6,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'trusted'
   },
-  'blaster_pistol_bespin': {
-    id: 'blaster_pistol_bespin',
-    name: 'Bespin Special Blaster Pistol',
+  'pulser_pistol_cirruan': {
+    id: 'pulser_pistol_cirruan',
+    name: 'Cirruan Special Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'A unique blaster from Bespin. Rare and powerful.',
+    description: 'A unique pulser from Cirruan. Rare and powerful.',
     stats: {
       damage: 47,
       range: 44,
@@ -753,7 +753,7 @@ const itemDefinitions = {
     factionId: null
   },
   
-  // Blaster Rifles - Epic Tier
+  // Pulser Rifles - Epic Tier
   'sniper_rifle_elite': {
     id: 'sniper_rifle_elite',
     name: 'Elite Sniper Rifle',
@@ -770,12 +770,12 @@ const itemDefinitions = {
     weight: 6.5,
     factionId: null
   },
-  'blaster_rifle_imperial_master': {
-    id: 'blaster_rifle_imperial_master',
-    name: 'E-11 Master Blaster Rifle',
+  'pulser_rifle_dominion_master': {
+    id: 'pulser_rifle_dominion_master',
+    name: 'L-11 Master Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted Imperial rifle. The finest Imperial weaponry.',
+    description: 'Master-crafted Dominion rifle. The finest Dominion weaponry.',
     stats: {
       damage: 48,
       range: 65,
@@ -784,15 +784,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 5500,
     weight: 4.8,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'trusted'
   },
-  'blaster_rifle_rebel_master': {
-    id: 'blaster_rifle_rebel_master',
-    name: 'A280 Master Blaster Rifle',
+  'pulser_rifle_rebel_master': {
+    id: 'pulser_rifle_rebel_master',
+    name: 'RK-9 Master Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted New Republic rifle. Exceptional quality.',
+    description: 'Master-crafted Concord rifle. Exceptional quality.',
     stats: {
       damage: 46,
       range: 68,
@@ -801,15 +801,15 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 5400,
     weight: 4.6,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'trusted'
   },
-  'blaster_rifle_ancient': {
-    id: 'blaster_rifle_ancient',
-    name: 'Ancient Blaster Rifle',
+  'pulser_rifle_ancient': {
+    id: 'pulser_rifle_ancient',
+    name: 'Ancient Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'An ancient blaster rifle. Rare find with unique properties.',
+    description: 'An ancient pulser rifle. Rare find with unique properties.',
     stats: {
       damage: 50,
       range: 70,
@@ -822,12 +822,12 @@ const itemDefinitions = {
   },
   
   // Heavy Weapons - Epic Tier
-  'heavy_blaster_elite': {
-    id: 'heavy_blaster_elite',
-    name: 'Elite Heavy Blaster',
+  'heavy_pulser_elite': {
+    id: 'heavy_pulser_elite',
+    name: 'Elite Heavy Pulser',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'An elite heavy blaster. Maximum firepower.',
+    description: 'An elite heavy pulser. Maximum firepower.',
     stats: {
       damage: 70,
       range: 45,
@@ -838,12 +838,12 @@ const itemDefinitions = {
     weight: 9.0,
     factionId: null
   },
-  'repeating_blaster': {
-    id: 'repeating_blaster',
-    name: 'Repeating Blaster',
+  'repeating_pulser': {
+    id: 'repeating_pulser',
+    name: 'Repeating Pulser',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'A repeating blaster. High rate of fire and damage.',
+    description: 'A repeating pulser. High rate of fire and damage.',
     stats: {
       damage: 65,
       range: 50,
@@ -872,12 +872,12 @@ const itemDefinitions = {
   },
   
   // Sniper Rifles - Epic Tier
-  'sniper_rifle_mandalorian': {
-    id: 'sniper_rifle_mandalorian',
-    name: 'Mandalorian Sniper Rifle',
+  'sniper_rifle_ironkin': {
+    id: 'sniper_rifle_ironkin',
+    name: 'Ironkin Sniper Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Mandalorian-crafted sniper rifle. Exceptional precision.',
+    description: 'Ironkin-crafted sniper rifle. Exceptional precision.',
     stats: {
       damage: 78,
       range: 125,
@@ -887,7 +887,7 @@ const itemDefinitions = {
     value: 7000,
     weight: 6.8,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship']
+    specialEffects: ['ironkin_craftsmanship']
   },
   'sniper_rifle_ancient': {
     id: 'sniper_rifle_ancient',
@@ -939,9 +939,9 @@ const itemDefinitions = {
     weight: 2.5,
     factionId: null
   },
-  'force_pike': {
-    id: 'force_pike',
-    name: 'Force Pike',
+  'veil_pike': {
+    id: 'veil_pike',
+    name: 'Veil Pike',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
     description: 'A rare force pike. Extended reach and electrical damage.',
@@ -957,12 +957,12 @@ const itemDefinitions = {
   },
   
   // Special Weapons - Epic Tier
-  'ion_blaster': {
-    id: 'ion_blaster',
-    name: 'Ion Blaster',
+  'ion_pulser': {
+    id: 'ion_pulser',
+    name: 'Ion Pulser',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'An ion blaster. Extra effective against droids and electronic systems.',
+    description: 'An ion pulser. Extra effective against droids and electronic systems.',
     stats: {
       damage: 45,
       range: 35,
@@ -974,12 +974,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['ion_damage', 'droid_bonus']
   },
-  'stun_blaster': {
-    id: 'stun_blaster',
-    name: 'Stun Blaster',
+  'stun_pulser': {
+    id: 'stun_pulser',
+    name: 'Stun Pulser',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'A stun blaster. Non-lethal but effective.',
+    description: 'A stun pulser. Non-lethal but effective.',
     stats: {
       damage: 20,
       range: 30,
@@ -1010,12 +1010,12 @@ const itemDefinitions = {
   },
   
   // Legendary Weapons
-  'blaster_pistol_han_solo': {
-    id: 'blaster_pistol_han_solo',
-    name: 'Han Solo\'s DL-44',
+  'pulser_pistol_vetch': {
+    id: 'pulser_pistol_vetch',
+    name: 'Rann Vetch\'s VK-7',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'The legendary blaster pistol of Han Solo. A piece of galactic history.',
+    description: 'The legendary pulser pistol of Rann Vetch. A piece of galactic history.',
     stats: {
       damage: 55,
       range: 50,
@@ -1027,12 +1027,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['legendary_weapon', 'luck_bonus']
   },
-  'blaster_pistol_ancient': {
-    id: 'blaster_pistol_ancient',
-    name: 'Ancient Blaster Pistol',
+  'pulser_pistol_ancient': {
+    id: 'pulser_pistol_ancient',
+    name: 'Ancient Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'An ancient blaster pistol. Rare find with unique properties.',
+    description: 'An ancient pulser pistol. Rare find with unique properties.',
     stats: {
       damage: 58,
       range: 52,
@@ -1043,12 +1043,12 @@ const itemDefinitions = {
     weight: 2.6,
     factionId: null
   },
-  'blaster_rifle_legendary': {
-    id: 'blaster_rifle_legendary',
-    name: 'Legendary Blaster Rifle',
+  'pulser_rifle_legendary': {
+    id: 'pulser_rifle_legendary',
+    name: 'Legendary Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'A legendary blaster rifle. The pinnacle of weaponry.',
+    description: 'A legendary pulser rifle. The pinnacle of weaponry.',
     stats: {
       damage: 65,
       range: 80,
@@ -1060,12 +1060,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['legendary_weapon']
   },
-  'blaster_rifle_force_enhanced': {
-    id: 'blaster_rifle_force_enhanced',
-    name: 'Force-Enhanced Blaster Rifle',
+  'pulser_rifle_force_enhanced': {
+    id: 'pulser_rifle_force_enhanced',
+    name: 'Veil-Enhanced Pulser Rifle',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'A blaster rifle enhanced with the Force. Unique and powerful.',
+    description: 'A pulser rifle enhanced with the Veil. Unique and powerful.',
     stats: {
       damage: 60,
       range: 75,
@@ -1075,9 +1075,9 @@ const itemDefinitions = {
     equipmentSlot: 'weapon',
     value: 25000,
     weight: 5.0,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'allied',
-    specialEffects: ['force_enhancement', 'legendary_weapon']
+    specialEffects: ['veil_enhancement', 'legendary_weapon']
   },
   'legendary_heavy_weapon': {
     id: 'legendary_heavy_weapon',
@@ -1135,7 +1135,7 @@ const itemDefinitions = {
     name: 'Darksaber',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'The legendary Darksaber. A unique Mandalorian weapon.',
+    description: 'The legendary Darksaber. A unique Ironkin weapon.',
     stats: {
       damage: 65,
       range: 2,
@@ -1146,7 +1146,7 @@ const itemDefinitions = {
     value: 40000,
     weight: 1.2,
     factionId: null,
-    specialEffects: ['legendary_weapon', 'force_enhancement', 'mandalorian_craftsmanship']
+    specialEffects: ['legendary_weapon', 'veil_enhancement', 'ironkin_craftsmanship']
   },
   'ancient_weapon': {
     id: 'ancient_weapon',
@@ -1216,12 +1216,12 @@ const itemDefinitions = {
   // ========== PRIORITY 1: EXPANDED ARMORS ==========
   
   // Light Armor - Common Tier
-  'armor_light_imperial': {
-    id: 'armor_light_imperial',
-    name: 'Imperial Light Armor',
+  'armor_light_dominion': {
+    id: 'armor_light_dominion',
+    name: 'Dominion Light Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Light armor worn by Imperial personnel. Standard issue.',
+    description: 'Light armor worn by Dominion personnel. Standard issue.',
     stats: {
       defense: 12,
       mobility: 3
@@ -1229,7 +1229,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 350,
     weight: 5.5,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
   'armor_light_rebel': {
@@ -1237,7 +1237,7 @@ const itemDefinitions = {
     name: 'Rebel Light Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Light armor used by New Republic forces. Flexible and durable.',
+    description: 'Light armor used by Concord forces. Flexible and durable.',
     stats: {
       defense: 11,
       mobility: 6
@@ -1245,17 +1245,17 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 320,
     weight: 4.8,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
   
   // Medium Armor - Common Tier
-  'armor_medium_imperial': {
-    id: 'armor_medium_imperial',
-    name: 'Imperial Medium Armor',
+  'armor_medium_dominion': {
+    id: 'armor_medium_dominion',
+    name: 'Dominion Medium Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Medium armor for Imperial troops. Good balance of protection and mobility.',
+    description: 'Medium armor for Dominion troops. Good balance of protection and mobility.',
     stats: {
       defense: 22,
       mobility: -1
@@ -1263,7 +1263,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 450,
     weight: 11.0,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
   'armor_medium_rebel': {
@@ -1271,7 +1271,7 @@ const itemDefinitions = {
     name: 'Rebel Medium Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Medium armor used by New Republic forces. Balanced protection.',
+    description: 'Medium armor used by Concord forces. Balanced protection.',
     stats: {
       defense: 21,
       mobility: 2
@@ -1279,17 +1279,17 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 420,
     weight: 10.5,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
   
   // Heavy Armor - Common Tier
-  'armor_heavy_imperial': {
-    id: 'armor_heavy_imperial',
-    name: 'Imperial Heavy Armor',
+  'armor_heavy_dominion': {
+    id: 'armor_heavy_dominion',
+    name: 'Dominion Heavy Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Heavy armor for Imperial troops. Maximum protection.',
+    description: 'Heavy armor for Dominion troops. Maximum protection.',
     stats: {
       defense: 33,
       mobility: -4
@@ -1297,7 +1297,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 480,
     weight: 19.0,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
   
@@ -1330,7 +1330,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 550,
     weight: 4.5,
-    factionId: 'smugglers_guild',
+    factionId: 'drift_cartel',
     minReputationTier: 'friendly'
   },
   'armor_light_corporate': {
@@ -1428,12 +1428,12 @@ const itemDefinitions = {
     factionId: 'outer_rim_settlers',
     minReputationTier: 'friendly'
   },
-  'blaster_pistol_outer_rim': {
-    id: 'blaster_pistol_outer_rim',
-    name: 'Outer Rim Blaster Pistol',
+  'pulser_pistol_outer_rim': {
+    id: 'pulser_pistol_outer_rim',
+    name: 'Outer Rim Pulser Pistol',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'A reliable blaster pistol favored by Outer Rim settlers. Built for harsh conditions.',
+    description: 'A reliable pulser pistol favored by Outer Rim settlers. Built for harsh conditions.',
     stats: {
       damage: 28,
       range: 32,
@@ -1477,12 +1477,12 @@ const itemDefinitions = {
     weight: 21.0,
     factionId: null
   },
-  'armor_heavy_imperial_standard': {
-    id: 'armor_heavy_imperial_standard',
-    name: 'Stormtrooper Armor',
+  'armor_heavy_dominion_standard': {
+    id: 'armor_heavy_dominion_standard',
+    name: 'Ironclad Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Standard issue Stormtrooper armor. Iconic white plating with good protection.',
+    description: 'Standard issue Ironclad armor. Iconic white plating with good protection.',
     stats: {
       defense: 25,
       mobility: -2
@@ -1490,16 +1490,16 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 800,
     weight: 15.0,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null,
-    specialEffects: ['imperial_identification']
+    specialEffects: ['dominion_identification']
   },
   'armor_heavy_rebel': {
     id: 'armor_heavy_rebel',
     name: 'Rebel Heavy Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Heavy armor used by New Republic forces. Strong protection.',
+    description: 'Heavy armor used by Concord forces. Strong protection.',
     stats: {
       defense: 37,
       mobility: -3
@@ -1507,7 +1507,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 850,
     weight: 20.5,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
   'armor_heavy_corporate': {
@@ -1543,12 +1543,12 @@ const itemDefinitions = {
     weight: 6.0,
     factionId: null
   },
-  'armor_light_imperial_elite': {
-    id: 'armor_light_imperial_elite',
-    name: 'Imperial Scout Armor',
+  'armor_light_dominion_elite': {
+    id: 'armor_light_dominion_elite',
+    name: 'Dominion Scout Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite Imperial scout armor. High mobility and protection.',
+    description: 'Elite Dominion scout armor. High mobility and protection.',
     stats: {
       defense: 18,
       mobility: 8
@@ -1556,7 +1556,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 1200,
     weight: 5.8,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'friendly'
   },
   'armor_light_rebel_elite': {
@@ -1564,7 +1564,7 @@ const itemDefinitions = {
     name: 'Rebel Scout Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite New Republic scout armor. Superior mobility.',
+    description: 'Elite Concord scout armor. Superior mobility.',
     stats: {
       defense: 17,
       mobility: 11
@@ -1572,15 +1572,15 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 1100,
     weight: 5.5,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'friendly'
   },
-  'armor_light_mandalorian': {
-    id: 'armor_light_mandalorian',
-    name: 'Mandalorian Light Armor',
+  'armor_light_ironkin': {
+    id: 'armor_light_ironkin',
+    name: 'Ironkin Light Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Light armor crafted by Mandalorian artisans. Exceptional quality.',
+    description: 'Light armor crafted by Ironkin artisans. Exceptional quality.',
     stats: {
       defense: 22,
       mobility: 8
@@ -1589,14 +1589,14 @@ const itemDefinitions = {
     value: 1500,
     weight: 5.5,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship']
+    specialEffects: ['ironkin_craftsmanship']
   },
-  'armor_light_jedi': {
-    id: 'armor_light_jedi',
-    name: 'Jedi Robes',
+  'armor_light_keeper': {
+    id: 'armor_light_keeper',
+    name: 'Keeper Robes',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Traditional Jedi robes. Light protection with Force enhancement.',
+    description: 'Traditional Keeper robes. Light protection with Veil enhancement.',
     stats: {
       defense: 18,
       mobility: 12,
@@ -1605,9 +1605,9 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 1200,
     weight: 3.0,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'friendly',
-    specialEffects: ['force_enhancement']
+    specialEffects: ['veil_enhancement']
   },
   
   // Medium Armor - Rare Tier
@@ -1626,12 +1626,12 @@ const itemDefinitions = {
     weight: 12.5,
     factionId: null
   },
-  'armor_medium_imperial_elite': {
-    id: 'armor_medium_imperial_elite',
-    name: 'Imperial Elite Armor',
+  'armor_medium_dominion_elite': {
+    id: 'armor_medium_dominion_elite',
+    name: 'Dominion Elite Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite Imperial medium armor. Superior protection.',
+    description: 'Elite Dominion medium armor. Superior protection.',
     stats: {
       defense: 32,
       mobility: 1
@@ -1639,7 +1639,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 2000,
     weight: 13.0,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'friendly'
   },
   'armor_medium_rebel_elite': {
@@ -1647,7 +1647,7 @@ const itemDefinitions = {
     name: 'Rebel Elite Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite New Republic medium armor. Superior protection and mobility.',
+    description: 'Elite Concord medium armor. Superior protection and mobility.',
     stats: {
       defense: 31,
       mobility: 4
@@ -1655,15 +1655,15 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 1900,
     weight: 12.8,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'friendly'
   },
-  'armor_medium_mandalorian': {
-    id: 'armor_medium_mandalorian',
-    name: 'Mandalorian Medium Armor',
+  'armor_medium_ironkin': {
+    id: 'armor_medium_ironkin',
+    name: 'Ironkin Medium Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Mandalorian-crafted medium armor. Exceptional quality.',
+    description: 'Ironkin-crafted medium armor. Exceptional quality.',
     stats: {
       defense: 33,
       mobility: 2
@@ -1672,14 +1672,14 @@ const itemDefinitions = {
     value: 2500,
     weight: 12.0,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship']
+    specialEffects: ['ironkin_craftsmanship']
   },
-  'armor_medium_jedi': {
-    id: 'armor_medium_jedi',
-    name: 'Jedi Knight Robes',
+  'armor_medium_keeper': {
+    id: 'armor_medium_keeper',
+    name: 'Keeper Knight Robes',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Robes worn by Jedi Knights. Enhanced protection with Force properties.',
+    description: 'Robes worn by Keeper Knights. Enhanced protection with Veil properties.',
     stats: {
       defense: 25,
       mobility: 8,
@@ -1688,9 +1688,9 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 2200,
     weight: 4.0,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'friendly',
-    specialEffects: ['force_enhancement']
+    specialEffects: ['veil_enhancement']
   },
   
   // Heavy Armor - Rare Tier
@@ -1709,12 +1709,12 @@ const itemDefinitions = {
     weight: 22.0,
     factionId: null
   },
-  'armor_heavy_imperial_elite': {
-    id: 'armor_heavy_imperial_elite',
-    name: 'Stormtrooper Elite Armor',
+  'armor_heavy_dominion_elite': {
+    id: 'armor_heavy_dominion_elite',
+    name: 'Ironclad Elite Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite Stormtrooper armor. Enhanced protection and durability.',
+    description: 'Elite Ironclad armor. Enhanced protection and durability.',
     stats: {
       defense: 40,
       mobility: -3
@@ -1722,16 +1722,16 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 2400,
     weight: 21.5,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'friendly',
-    specialEffects: ['imperial_identification']
+    specialEffects: ['dominion_identification']
   },
   'armor_heavy_rebel_elite': {
     id: 'armor_heavy_rebel_elite',
     name: 'Rebel Heavy Elite Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Elite New Republic heavy armor. Superior protection.',
+    description: 'Elite Concord heavy armor. Superior protection.',
     stats: {
       defense: 41,
       mobility: -2
@@ -1739,15 +1739,15 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 2400,
     weight: 21.0,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'friendly'
   },
-  'armor_heavy_mandalorian': {
-    id: 'armor_heavy_mandalorian',
-    name: 'Mandalorian Heavy Armor',
+  'armor_heavy_ironkin': {
+    id: 'armor_heavy_ironkin',
+    name: 'Ironkin Heavy Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Mandalorian-crafted heavy armor. Exceptional protection.',
+    description: 'Ironkin-crafted heavy armor. Exceptional protection.',
     stats: {
       defense: 44,
       mobility: -2
@@ -1756,14 +1756,14 @@ const itemDefinitions = {
     value: 2400,
     weight: 20.0,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship']
+    specialEffects: ['ironkin_craftsmanship']
   },
   'armor_heavy_beskar': {
     id: 'armor_heavy_beskar',
     name: 'Beskar Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Mandalorian armor forged from beskar. Exceptional protection.',
+    description: 'Ironkin armor forged from beskar. Exceptional protection.',
     stats: {
       defense: 42,
       mobility: -3
@@ -1792,12 +1792,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['masterwork_quality']
   },
-  'armor_light_imperial_master': {
-    id: 'armor_light_imperial_master',
-    name: 'Imperial Master Light Armor',
+  'armor_light_dominion_master': {
+    id: 'armor_light_dominion_master',
+    name: 'Dominion Master Light Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted Imperial light armor. The finest Imperial protection.',
+    description: 'Master-crafted Dominion light armor. The finest Dominion protection.',
     stats: {
       defense: 26,
       mobility: 12
@@ -1805,7 +1805,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 3500,
     weight: 6.2,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'trusted'
   },
   'armor_light_rebel_master': {
@@ -1813,7 +1813,7 @@ const itemDefinitions = {
     name: 'Rebel Master Light Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted New Republic light armor. Exceptional quality.',
+    description: 'Master-crafted Concord light armor. Exceptional quality.',
     stats: {
       defense: 25,
       mobility: 14
@@ -1821,7 +1821,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 3400,
     weight: 6.0,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'trusted'
   },
   'armor_light_ancient': {
@@ -1857,12 +1857,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['masterwork_quality']
   },
-  'armor_medium_imperial_master': {
-    id: 'armor_medium_imperial_master',
-    name: 'Imperial Master Medium Armor',
+  'armor_medium_dominion_master': {
+    id: 'armor_medium_dominion_master',
+    name: 'Dominion Master Medium Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted Imperial medium armor. The finest Imperial protection.',
+    description: 'Master-crafted Dominion medium armor. The finest Dominion protection.',
     stats: {
       defense: 40,
       mobility: 3
@@ -1870,7 +1870,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 4500,
     weight: 14.0,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'trusted'
   },
   'armor_medium_rebel_master': {
@@ -1878,7 +1878,7 @@ const itemDefinitions = {
     name: 'Rebel Master Medium Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted New Republic medium armor. Exceptional quality.',
+    description: 'Master-crafted Concord medium armor. Exceptional quality.',
     stats: {
       defense: 39,
       mobility: 5
@@ -1886,7 +1886,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 4400,
     weight: 13.8,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'trusted'
   },
   'armor_medium_ancient': {
@@ -1922,12 +1922,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['masterwork_quality']
   },
-  'armor_heavy_imperial_master': {
-    id: 'armor_heavy_imperial_master',
-    name: 'Imperial Master Heavy Armor',
+  'armor_heavy_dominion_master': {
+    id: 'armor_heavy_dominion_master',
+    name: 'Dominion Master Heavy Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted Imperial heavy armor. The finest Imperial protection.',
+    description: 'Master-crafted Dominion heavy armor. The finest Dominion protection.',
     stats: {
       defense: 50,
       mobility: -3
@@ -1935,7 +1935,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 5500,
     weight: 23.5,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: 'trusted'
   },
   'armor_heavy_rebel_master': {
@@ -1943,7 +1943,7 @@ const itemDefinitions = {
     name: 'Rebel Master Heavy Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Master-crafted New Republic heavy armor. Exceptional quality.',
+    description: 'Master-crafted Concord heavy armor. Exceptional quality.',
     stats: {
       defense: 49,
       mobility: -2
@@ -1951,7 +1951,7 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 5400,
     weight: 23.0,
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: 'trusted'
   },
   'armor_heavy_ancient': {
@@ -2039,10 +2039,10 @@ const itemDefinitions = {
   },
   'armor_light_force_enhanced': {
     id: 'armor_light_force_enhanced',
-    name: 'Force-Enhanced Robes',
+    name: 'Veil-Enhanced Robes',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'Robes enhanced with the Force. Ultimate Jedi protection.',
+    description: 'Robes enhanced with the Veil. Ultimate Keeper protection.',
     stats: {
       defense: 32,
       mobility: 18,
@@ -2051,9 +2051,9 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 20000,
     weight: 4.5,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'allied',
-    specialEffects: ['force_mastery', 'jedi_enhancement', 'legendary_armor']
+    specialEffects: ['veil_mastery', 'keeper_enhancement', 'legendary_armor']
   },
   'armor_medium_legendary': {
     id: 'armor_medium_legendary',
@@ -2073,10 +2073,10 @@ const itemDefinitions = {
   },
   'armor_medium_force_enhanced': {
     id: 'armor_medium_force_enhanced',
-    name: 'Force-Enhanced Medium Armor',
+    name: 'Veil-Enhanced Medium Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'Medium armor enhanced with the Force. Ultimate Jedi protection.',
+    description: 'Medium armor enhanced with the Veil. Ultimate Keeper protection.',
     stats: {
       defense: 42,
       mobility: 12,
@@ -2085,9 +2085,9 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 25000,
     weight: 5.0,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'allied',
-    specialEffects: ['force_mastery', 'jedi_enhancement', 'legendary_armor']
+    specialEffects: ['veil_mastery', 'keeper_enhancement', 'legendary_armor']
   },
   'armor_heavy_legendary': {
     id: 'armor_heavy_legendary',
@@ -2110,7 +2110,7 @@ const itemDefinitions = {
     name: 'Pure Beskar Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'Armor forged from pure beskar. The ultimate Mandalorian protection.',
+    description: 'Armor forged from pure beskar. The ultimate Ironkin protection.',
     stats: {
       defense: 50,
       mobility: 0
@@ -2121,12 +2121,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['pure_beskar', 'energy_resistance', 'legendary_armor']
   },
-  'armor_mandalorian_legendary': {
-    id: 'armor_mandalorian_legendary',
-    name: 'Legendary Mandalorian Armor',
+  'armor_ironkin_legendary': {
+    id: 'armor_ironkin_legendary',
+    name: 'Legendary Ironkin Armor',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'Legendary Mandalorian armor. The pinnacle of Mandalorian craftsmanship.',
+    description: 'Legendary Ironkin armor. The pinnacle of Ironkin craftsmanship.',
     stats: {
       defense: 55,
       mobility: 3
@@ -2135,14 +2135,14 @@ const itemDefinitions = {
     value: 35000,
     weight: 22.0,
     factionId: null,
-    specialEffects: ['mandalorian_craftsmanship', 'legendary_armor']
+    specialEffects: ['ironkin_craftsmanship', 'legendary_armor']
   },
-  'armor_jedi_master': {
-    id: 'armor_jedi_master',
-    name: 'Jedi Master Robes',
+  'armor_keeper_master': {
+    id: 'armor_keeper_master',
+    name: 'Keeper Master Robes',
     type: ITEM_TYPES.ARMOR,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'Robes worn by Jedi Masters. Infused with the Force.',
+    description: 'Robes worn by Keeper Masters. Infused with the Veil.',
     stats: {
       defense: 30,
       mobility: 15,
@@ -2151,9 +2151,9 @@ const itemDefinitions = {
     equipmentSlot: 'armor',
     value: 25000,
     weight: 4.0,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'allied',
-    specialEffects: ['force_mastery', 'jedi_enhancement', 'legendary_armor']
+    specialEffects: ['veil_mastery', 'keeper_enhancement', 'legendary_armor']
   },
   'armor_ancient_artifact': {
     id: 'armor_ancient_artifact',
@@ -2253,12 +2253,12 @@ const itemDefinitions = {
     value: 800,
     weight: 0.7
   },
-  'bacta_patch': {
-    id: 'bacta_patch',
-    name: 'Bacta Patch',
+  'regen_patch': {
+    id: 'regen_patch',
+    name: 'Regen Patch',
     type: ITEM_TYPES.CONSUMABLE,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A bacta-infused patch. Instantly restores significant health.',
+    description: 'A regen-infused patch. Instantly restores significant health.',
     stats: {
       healthRestore: 150,
       useSpeed: 'instant'
@@ -2268,12 +2268,12 @@ const itemDefinitions = {
   },
   
   // Medpacs - Epic Tier
-  'bacta_tank': {
-    id: 'bacta_tank',
-    name: 'Bacta Tank Treatment',
+  'regen_tank': {
+    id: 'regen_tank',
+    name: 'Regen Tank Treatment',
     type: ITEM_TYPES.CONSUMABLE,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'A full bacta tank treatment. Completely restores health to maximum.',
+    description: 'A full regen tank treatment. Completely restores health to maximum.',
     stats: {
       healthRestore: 999,
       useSpeed: 'instant',
@@ -2282,12 +2282,12 @@ const itemDefinitions = {
     value: 3000,
     weight: 1.0
   },
-  'kolto_injection': {
-    id: 'kolto_injection',
-    name: 'Kolto Injection',
+  'hexol_injection': {
+    id: 'hexol_injection',
+    name: 'Hexol Injection',
     type: ITEM_TYPES.CONSUMABLE,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'A powerful kolto injection. Restores massive amounts of health.',
+    description: 'A powerful hexol injection. Restores massive amounts of health.',
     stats: {
       healthRestore: 250
     },
@@ -2561,12 +2561,12 @@ const itemDefinitions = {
     factionId: null,
     specialEffects: ['data_analysis']
   },
-  'datapad_jedi': {
-    id: 'datapad_jedi',
-    name: 'Jedi Datapad',
+  'datapad_keeper': {
+    id: 'datapad_keeper',
+    name: 'Keeper Datapad',
     type: ITEM_TYPES.ACCESSORY,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A datapad enhanced with Force-sensitive technology. Improves Force perception.',
+    description: 'A datapad enhanced with Veil-touched technology. Improves Veil perception.',
     stats: {
       intelligence: 8,
       forcePower: 3
@@ -2574,9 +2574,9 @@ const itemDefinitions = {
     equipmentSlot: 'accessory',
     value: 1000,
     weight: 0.6,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'friendly',
-    specialEffects: ['force_insight']
+    specialEffects: ['veil_insight']
   },
   
   // Comlinks - Uncommon Tier
@@ -2691,10 +2691,10 @@ const itemDefinitions = {
   },
   'scanner_force': {
     id: 'scanner_force',
-    name: 'Force Scanner',
+    name: 'Veil Scanner',
     type: ITEM_TYPES.ACCESSORY,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A scanner enhanced with Force-sensitive technology. Detects Force signatures.',
+    description: 'A scanner enhanced with Veil-touched technology. Detects Veil signatures.',
     stats: {
       perception: 8,
       forcePower: 2
@@ -2702,9 +2702,9 @@ const itemDefinitions = {
     equipmentSlot: 'accessory',
     value: 1200,
     weight: 0.6,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'friendly',
-    specialEffects: ['force_detection']
+    specialEffects: ['veil_detection']
   },
   
   // Special Accessories - Rare Tier
@@ -2932,12 +2932,12 @@ const itemDefinitions = {
     weight: 1.5,
     factionId: null
   },
-  'bacta_applicator': {
-    id: 'bacta_applicator',
-    name: 'Bacta Applicator',
+  'regen_applicator': {
+    id: 'regen_applicator',
+    name: 'Regen Applicator',
     type: ITEM_TYPES.ACCESSORY,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A specialized tool for applying bacta treatments. Enables instant healing.',
+    description: 'A specialized tool for applying regen treatments. Enables instant healing.',
     stats: {
       medical: 15
     },
@@ -2998,13 +2998,13 @@ const itemDefinitions = {
     specialEffects: ['master_craftsmanship']
   },
   
-  // ========== PHASE 1 QUEST ITEMS - RYLOTH ==========
+  // ========== PHASE 1 QUEST ITEMS - SYTHA ==========
   'ryll_spice_sample': {
     id: 'ryll_spice_sample',
     name: 'Ryll Spice Sample',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'A sample of Ryll spice from Ryloth mines. Evidence in the Compound 7-Alpha investigation.',
+    description: 'A sample of Ryll spice from Sytha mines. Evidence in the Compound 7-Alpha investigation.',
     value: 150,
     weight: 0.5,
     stackSize: 1
@@ -3037,7 +3037,7 @@ const itemDefinitions = {
     name: 'Syndicate Leader\'s Bounty',
     type: ITEM_TYPES.WEAPON,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Custom blaster taken from syndicate leader. High damage, unique appearance.',
+    description: 'Custom pulser taken from syndicate leader. High damage, unique appearance.',
     stats: {
       damage: 40,
       range: 35,
@@ -3052,7 +3052,7 @@ const itemDefinitions = {
     name: 'Corporate Intelligence',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Intelligence about Corporate Sector operations on Ryloth.',
+    description: 'Intelligence about Corporate Sector operations on Sytha.',
     value: 0,
     weight: 0.2,
     stackSize: 1
@@ -3070,15 +3070,15 @@ const itemDefinitions = {
     equipmentSlot: 'accessory',
     value: 800,
     weight: 0.1,
-    factionId: 'smugglers_guild',
+    factionId: 'drift_cartel',
     minReputationTier: 'friendly'
   },
-  'imperial_commendation': {
-    id: 'imperial_commendation',
-    name: 'Imperial Commendation',
+  'dominion_commendation': {
+    id: 'dominion_commendation',
+    name: 'Dominion Commendation',
     type: ITEM_TYPES.ACCESSORY,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Commendation for service to the Imperial Remnant. Provides accuracy and defense bonuses.',
+    description: 'Commendation for service to the Dominion Remnant. Provides accuracy and defense bonuses.',
     stats: {
       accuracy: 3,
       defense: 2
@@ -3086,7 +3086,7 @@ const itemDefinitions = {
     equipmentSlot: 'accessory',
     value: 800,
     weight: 0.1,
-    factionId: 'imperial_remnant',
+    factionId: 'dominion_remnant',
     minReputationTier: null
   },
   'bounty_hunter_badge': {
@@ -3136,8 +3136,8 @@ const itemDefinitions = {
     factionId: 'outer_rim_settlers',
     minReputationTier: 'friendly'
   },
-  'twi_lek_artifact': {
-    id: 'twi_lek_artifact',
+  'sytheen_artifact': {
+    id: 'sytheen_artifact',
     name: 'Twi\'lek Cultural Artifact',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.UNCOMMON,
@@ -3157,13 +3157,13 @@ const itemDefinitions = {
     stackSize: 1
   },
   
-  // ========== PHASE 1 QUEST ITEMS - TATOOINE ==========
-  'krayt_report': {
-    id: 'krayt_report',
-    name: 'Krayt Dragon Sighting Report',
+  // ========== PHASE 1 QUEST ITEMS - GRAVENMOOR ==========
+  'wyrm_report': {
+    id: 'wyrm_report',
+    name: 'Dune Wyrm Sighting Report',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Report of recent krayt dragon sightings in the Jundland Wastes.',
+    description: 'Report of recent wyrm dragon sightings in the Sunder Wastes.',
     value: 0,
     weight: 0.1,
     stackSize: 1
@@ -3173,34 +3173,34 @@ const itemDefinitions = {
     name: 'Dragon Scale Fragment',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Fragment from a krayt dragon, proves encounter. Can be used in crafting.',
+    description: 'Fragment from a wyrm dragon, proves encounter. Can be used in crafting.',
     value: 300,
     weight: 0.5,
     stackSize: 5
   },
-  'krayt_pearl': {
-    id: 'krayt_pearl',
-    name: 'Krayt Dragon Pearl',
+  'wyrm_pearl': {
+    id: 'wyrm_pearl',
+    name: 'Dune Wyrm Pearl',
     type: ITEM_TYPES.ACCESSORY,
     rarity: ITEM_RARITIES.LEGENDARY,
-    description: 'Legendary pearl from a krayt dragon, extremely valuable. Possesses unique Force properties.',
+    description: 'Legendary pearl from a wyrm dragon, extremely valuable. Possesses unique Veil properties.',
     stats: {
       forcePower: 20,
       damage: 10,
-      specialEffects: ['force_enhancement']
+      specialEffects: ['veil_enhancement']
     },
     equipmentSlot: 'accessory',
     value: 10000,
     weight: 0.1,
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'friendly'
   },
   'dragon_bones': {
     id: 'dragon_bones',
-    name: 'Krayt Dragon Bones',
+    name: 'Dune Wyrm Bones',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Bones from a krayt dragon. Extremely valuable crafting material with unique properties.',
+    description: 'Bones from a wyrm dragon. Extremely valuable crafting material with unique properties.',
     value: 500,
     weight: 3.0,
     stackSize: 10
@@ -3242,44 +3242,44 @@ const itemDefinitions = {
       maneuverability: 120
     }
   },
-  'skywalker_datapad': {
-    id: 'skywalker_datapad',
-    name: 'Skywalker Family Datapad',
+  'marn_datapad': {
+    id: 'marn_datapad',
+    name: 'Marn Family Datapad',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Datapad from Lars Homestead, contains Skywalker history.',
+    description: 'Datapad from Marn Homestead, contains Marn history.',
     value: 300,
     weight: 0.3,
     stackSize: 1
   },
-  'hutt_treasure': {
-    id: 'hutt_treasure',
-    name: 'Hutt Treasure',
+  'vorr_treasure': {
+    id: 'vorr_treasure',
+    name: 'Vorr Treasure',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Treasure recovered from Jabba\'s Palace. High value, can be sold or kept.',
+    description: 'Treasure recovered from Vorga\'s Palace. High value, can be sold or kept.',
     value: 5000,
     weight: 10.0,
     stackSize: 1
   },
   
-  // ========== PHASE 1 QUEST ITEMS - DANTOOINE ==========
+  // ========== PHASE 1 QUEST ITEMS - CALDON ==========
   'ancient_map_fragment': {
     id: 'ancient_map_fragment',
     name: 'Ancient Map Fragment',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Fragment of ancient Jedi map leading to hidden temples.',
+    description: 'Fragment of ancient Keeper map leading to hidden temples.',
     value: 0,
     weight: 0.1,
     stackSize: 1
   },
   'holocron_fragment': {
     id: 'holocron_fragment',
-    name: 'Jedi Holocron Fragment',
+    name: 'Keeper Holocron Fragment',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Fragment of ancient Jedi Holocron. Contains Force knowledge.',
+    description: 'Fragment of ancient Keeper Holocron. Contains Veil knowledge.',
     value: 1000,
     weight: 0.2,
     stackSize: 1,
@@ -3292,30 +3292,30 @@ const itemDefinitions = {
     name: 'Dantari Crystals',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Force-sensitive crystals from Dantooine. Used in lightsaber construction and Force enhancements.',
+    description: 'Veil-touched crystals from Caldon. Used in arcblade construction and Veil enhancements.',
     value: 800,
     weight: 0.3,
     stackSize: 5
   },
-  'jedi_teaching': {
-    id: 'jedi_teaching',
-    name: 'Ancient Jedi Teaching',
+  'keeper_teaching': {
+    id: 'keeper_teaching',
+    name: 'Ancient Keeper Teaching',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Ancient Force teaching received from Enclave. Unlocks permanent Force ability.',
+    description: 'Ancient Veil teaching received from Enclave. Unlocks permanent Veil ability.',
     value: 0,
     weight: 0,
     stackSize: 1,
     stats: {
-      permanentAbility: 'force_insight'
+      permanentAbility: 'veil_insight'
     }
   },
-  'lightsaber_crystal': {
-    id: 'lightsaber_crystal',
-    name: 'Lightsaber Crystal',
+  'arcblade_crystal': {
+    id: 'arcblade_crystal',
+    name: 'Arcblade Crystal',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Crystal for lightsaber construction. Obtained through light side choices.',
+    description: 'Crystal for arcblade construction. Obtained through Woven Veil choices.',
     value: 2000,
     weight: 0.1,
     stackSize: 1
@@ -3350,37 +3350,37 @@ const itemDefinitions = {
     weight: 0.5,
     stackSize: 1
   },
-  'imperial_report': {
-    id: 'imperial_report',
-    name: 'Imperial Activity Report',
+  'dominion_report': {
+    id: 'dominion_report',
+    name: 'Dominion Activity Report',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Report of Imperial Remnant activity on Dantooine.',
+    description: 'Report of Dominion Remnant activity on Caldon.',
     value: 0,
     weight: 0.2,
     stackSize: 1
   },
   'nr_commendation': {
     id: 'nr_commendation',
-    name: 'New Republic Commendation',
+    name: 'Concord Commendation',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Commendation for service to New Republic. Provides reputation bonus.',
+    description: 'Commendation for service to Concord. Provides reputation bonus.',
     value: 0,
     weight: 0.2,
     stackSize: 1,
     stats: {
       reputationBonus: 20
     },
-    factionId: 'new_republic',
+    factionId: 'concord',
     minReputationTier: null
   },
-  'kinrath_eggs': {
-    id: 'kinrath_eggs',
-    name: 'Kinrath Eggs',
+  'venox_eggs': {
+    id: 'venox_eggs',
+    name: 'Venox Eggs',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Eggs from kinrath creatures. Used in alchemy and crafting.',
+    description: 'Eggs from venox creatures. Used in alchemy and crafting.',
     value: 200,
     weight: 0.5,
     stackSize: 10
@@ -3396,7 +3396,7 @@ const itemDefinitions = {
     stackSize: 1
   },
   
-  // ========== PHASE 1 QUEST ITEMS - CORUSCANT ==========
+  // ========== PHASE 1 QUEST ITEMS - CENTRALIS ==========
   'corruption_evidence': {
     id: 'corruption_evidence',
     name: 'Corruption Evidence',
@@ -3429,10 +3429,10 @@ const itemDefinitions = {
   },
   'senate_commendation': {
     id: 'senate_commendation',
-    name: 'Senate Commendation',
+    name: 'Assembly Commendation',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Commendation from Senate for exposing corruption. Provides reputation bonus.',
+    description: 'Commendation from Assembly for exposing corruption. Provides reputation bonus.',
     value: 0,
     weight: 0.2,
     stackSize: 1,
@@ -3455,7 +3455,7 @@ const itemDefinitions = {
     name: 'Temple Map Fragment',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Map fragment of Jedi Temple layout.',
+    description: 'Map fragment of Keeper Sanctum layout.',
     value: 0,
     weight: 0.1,
     stackSize: 1
@@ -3465,17 +3465,17 @@ const itemDefinitions = {
     name: 'Ancient Key',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Ancient key to artifact chamber in Jedi Temple.',
+    description: 'Ancient key to artifact chamber in Keeper Sanctum.',
     value: 0,
     weight: 0.1,
     stackSize: 1
   },
-  'jedi_artifact': {
-    id: 'jedi_artifact',
-    name: 'Jedi Artifact',
+  'keeper_artifact': {
+    id: 'keeper_artifact',
+    name: 'Keeper Artifact',
     type: ITEM_TYPES.ACCESSORY,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Powerful artifact from Jedi Temple. Possesses significant Force power.',
+    description: 'Powerful artifact from Keeper Sanctum. Possesses significant Veil power.',
     value: 15000,
     weight: 1.0,
     stats: {
@@ -3484,16 +3484,16 @@ const itemDefinitions = {
       charisma: 5
     },
     equipmentSlot: 'accessory',
-    factionId: 'jedi_seekers',
+    factionId: 'keeper_seekers',
     minReputationTier: 'allied',
-    specialEffects: ['force_mastery', 'force_enhancement']
+    specialEffects: ['veil_mastery', 'veil_enhancement']
   },
   'artifact_power': {
     id: 'artifact_power',
     name: 'Artifact Power',
     type: ITEM_TYPES.QUEST_ITEM,
     rarity: ITEM_RARITIES.EPIC,
-    description: 'Power gained from artifact. Unlocks permanent Force ability.',
+    description: 'Power gained from artifact. Unlocks permanent Veil ability.',
     value: 0,
     weight: 0,
     stackSize: 1,
@@ -3536,13 +3536,13 @@ const itemDefinitions = {
   },
   
   // ========== PLANET RESOURCES ==========
-  // Ryloth Resources
+  // Sytha Resources
   'resource_ryll_spice': {
     id: 'resource_ryll_spice',
     name: 'Ryll Spice',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'A valuable spice native to Ryloth, highly sought after in galactic trade. The primary export of the planet.',
+    description: 'A valuable spice native to Sytha, highly sought after in galactic trade. The primary export of the planet.',
     value: 150,
     weight: 0.5,
     stackSize: 100
@@ -3552,28 +3552,28 @@ const itemDefinitions = {
     name: 'Doonium',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'A durable metal ore found in Ryloth\'s mines. Used in ship construction and industrial applications.',
+    description: 'A durable metal ore found in Sytha\'s mines. Used in ship construction and industrial applications.',
     value: 50,
     weight: 2.0,
     stackSize: 50
   },
-  // Tatooine Resources
-  'resource_krayt_pearl': {
-    id: 'resource_krayt_pearl',
-    name: 'Krayt Dragon Pearl',
+  // Gravenmoor Resources
+  'resource_wyrm_pearl': {
+    id: 'resource_wyrm_pearl',
+    name: 'Dune Wyrm Pearl',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.RARE,
-    description: 'A rare and valuable pearl from a Krayt Dragon. Extremely valuable and sought after.',
+    description: 'A rare and valuable pearl from a Dune Wyrm. Extremely valuable and sought after.',
     value: 5000,
     weight: 0.1,
     stackSize: 1
   },
-  'resource_bantha_hide': {
-    id: 'resource_bantha_hide',
-    name: 'Bantha Hide',
+  'resource_grazer_hide': {
+    id: 'resource_grazer_hide',
+    name: 'Grazer Hide',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.COMMON,
-    description: 'Tough hide from a bantha. Used in crafting and leatherworking.',
+    description: 'Tough hide from a grazer. Used in crafting and leatherworking.',
     value: 30,
     weight: 1.5,
     stackSize: 20
@@ -3583,33 +3583,33 @@ const itemDefinitions = {
     name: 'Dragon Bones',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Bones from a Krayt Dragon. Used in crafting and as decorative materials.',
+    description: 'Bones from a Dune Wyrm. Used in crafting and as decorative materials.',
     value: 200,
     weight: 3.0,
     stackSize: 10
   },
-  // Dantooine Resources
+  // Caldon Resources
   'resource_dantari_crystals': {
     id: 'resource_dantari_crystals',
     name: 'Dantari Crystals',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.RARE,
-    description: 'Force-sensitive crystals found in the Kinrath Cave. Possess unique properties and are highly sought after by Jedi Seekers.',
+    description: 'Veil-touched crystals found in the Venox Cave. Possess unique properties and are highly sought after by Keeper Seekers.',
     value: 800,
     weight: 0.3,
     stackSize: 5
   },
-  'resource_kinrath_eggs': {
-    id: 'resource_kinrath_eggs',
-    name: 'Kinrath Eggs',
+  'resource_venox_eggs': {
+    id: 'resource_venox_eggs',
+    name: 'Venox Eggs',
     type: ITEM_TYPES.RESOURCE,
     rarity: ITEM_RARITIES.UNCOMMON,
-    description: 'Eggs from kinrath creatures. Used in alchemy and crafting, though dangerous to obtain.',
+    description: 'Eggs from venox creatures. Used in alchemy and crafting, though dangerous to obtain.',
     value: 200,
     weight: 0.5,
     stackSize: 10
   },
-  // Coruscant Resources
+  // Centralis Resources
   'resource_political_favors': {
     id: 'resource_political_favors',
     name: 'Political Favors',

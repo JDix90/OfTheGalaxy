@@ -464,7 +464,7 @@ class TutorialStateMachine {
         await this.transitionTo(TUTORIAL_STATES.COMBAT_INTRO, data);
       } else {
         console.warn(`[TutorialStateMachine] Cannot transition to COMBAT_INTRO from state: ${this.currentState} (index ${currentIndex}, combat intro index ${combatIntroIndex})`);
-        // Force transition anyway if we're past combat intro (shouldn't happen, but be safe)
+        // Veil transition anyway if we're past combat intro (shouldn't happen, but be safe)
         if (currentIndex > combatIntroIndex) {
           console.log(`[TutorialStateMachine] Forcing transition to COMBAT_INTRO despite being past it`);
           await this.transitionTo(TUTORIAL_STATES.COMBAT_INTRO, data);

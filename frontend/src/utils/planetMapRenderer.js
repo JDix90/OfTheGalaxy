@@ -35,6 +35,12 @@ export function renderPlanetMap(ctx, width, height, planet, mapData, zoom = 1, p
   ctx.scale(zoom, zoom);
   ctx.translate(-centerX, -centerY);
 
+  // Photographic biome ground: draw the planet's base texture (loaded via
+  // assetManager) as the bottom layer when available. It replaces the flat
+  // gradient base and gives each world a distinct, recognisable surface; the
+  // procedural biome detail + tile terrain still layer on top for navigation.
+  const baseTexture = getPlanetBaseTexture(planet);
+
   // Enhanced procedural terrain system with biome-aware rendering
   // If we have Nav-Mesh biome data, render terrain per biome
   // Otherwise, use planet-wide procedural terrain
@@ -44,28 +50,35 @@ export function renderPlanetMap(ctx, width, height, planet, mapData, zoom = 1, p
       polygon: poly.vertices,
       terrainType: poly.terrainType
     }));
-    
-    // First, draw base planet-wide gradient background
-    drawTerrainBase(ctx, width, height, planet, mapData.terrain);
-    
+
+    // First, draw base planet-wide gradient background (or the photo texture)
+    if (baseTexture) drawPlanetBaseTexture(ctx, width, height, baseTexture);
+    else drawTerrainBase(ctx, width, height, planet, mapData.terrain);
+
     // Then render biome-specific terrain patterns on top
     renderBiomeTerrain(ctx, width, height, biomes, planet, mapData.terrain, { x: pan.x, y: pan.y, zoom: zoom });
-    
+
     // Finally, draw biome overlays (borders, visual indicators)
     renderBiomes(ctx, width, height, biomes, { x: pan.x, y: pan.y, zoom: zoom });
   } else if (mapData.biomes && mapData.biomes.length > 0) {
     // Use mapData biomes if available
-    drawTerrainBase(ctx, width, height, planet, mapData.terrain);
+    if (baseTexture) drawPlanetBaseTexture(ctx, width, height, baseTexture);
+    else drawTerrainBase(ctx, width, height, planet, mapData.terrain);
     renderBiomeTerrain(ctx, width, height, mapData.biomes, planet, mapData.terrain, { x: pan.x, y: pan.y, zoom: zoom });
     renderBiomes(ctx, width, height, mapData.biomes, { x: pan.x, y: pan.y, zoom: zoom });
   } else {
     // Fallback: planet-wide procedural terrain (no biome data)
-    drawTerrain(ctx, width, height, planet, mapData.terrain);
+    if (baseTexture) drawPlanetBaseTexture(ctx, width, height, baseTexture);
+    else drawTerrain(ctx, width, height, planet, mapData.terrain);
   }
 
-  // Draw tile-based terrain for all planets (classic RPG-style visual navigation system)
+  // Draw tile-based terrain for all planets (classic RPG-style visual navigation
+  // system). When a photo base texture is present, draw the tiles slightly
+  // translucent so the biome ground reads through between paths/structures.
   if (mapData.tileMap) {
+    if (baseTexture) ctx.globalAlpha = 0.72;
     drawTileMapTerrainByPlanetType(ctx, width, height, mapData, planet, zoom, pan);
+    ctx.globalAlpha = 1;
   } else if (planet.navMesh && planet.navMesh.polygons && planet.navMesh.polygons.length > 0) {
     // Fallback to NavMesh visualization
     drawNavMeshPathways(ctx, width, height, planet.navMesh, planet, mapData);
@@ -104,6 +117,41 @@ export function renderPlanetMap(ctx, width, height, planet, mapData, zoom = 1, p
     drawPathPreview(ctx, width, height, pathPreview);
   }
 
+  ctx.restore();
+}
+
+/**
+ * Get the planet's loaded base biome texture from the assetManager cache, kicking
+ * off the (async) load on first miss so a later frame can pick it up. Returns the
+ * decoded image when ready, else null (callers fall back to the gradient base).
+ */
+function getPlanetBaseTexture(planet) {
+  const id = planet?.id;
+  if (!id) return null;
+  const cached = assetManager.textureCache.get(id) || assetManager.textureCache.get(id.toLowerCase());
+  if (cached && cached.complete) return cached;
+  if (!assetManager.textureCache.has(id)) {
+    assetManager.loadTexture(id).catch(() => {});
+  }
+  return null;
+}
+
+/**
+ * Tile the planet's base texture across the map area as the photographic ground
+ * layer. Tiling (rather than a single stretched copy) keeps the seamless texture
+ * crisp and undistorted at any map aspect ratio.
+ */
+function drawPlanetBaseTexture(ctx, width, height, texture) {
+  const tile = 512;
+  ctx.save();
+  for (let y = 0; y < height; y += tile) {
+    for (let x = 0; x < width; x += tile) {
+      ctx.drawImage(texture, x, y, tile, tile);
+    }
+  }
+  // Subtle dark vignette so POI sprites + labels stay legible on busy textures.
+  ctx.fillStyle = 'rgba(8, 12, 24, 0.28)';
+  ctx.fillRect(0, 0, width, height);
   ctx.restore();
 }
 
@@ -1344,7 +1392,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
   const random = seededRandom(seed);
 
   const terrainStyles = {
-    // Urban/Industrial Planets (Coruscant, Nar Shaddaa, etc.)
+    // Urban/Industrial Planets (Centralis, Sinkport, etc.)
     urban_sprawl: {
       baseColor: '#1a1a2e',
       gradient: ['#0a0a1a', '#1a1a2e', '#2a2a3e'],
@@ -1353,7 +1401,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'metallic'
     },
     
-    // Temperate Terrestrial Planets (Corellia, Alderaan, Chandrila, etc.)
+    // Temperate Terrestrial Planets (Drydock, Caelmore, Solenne, etc.)
     temperate_plains: {
       baseColor: '#3d6b1f',
       gradient: ['#2d5016', '#3d6b1f', '#4a7c2a', '#5a8c3a'],
@@ -1362,7 +1410,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'grass'
     },
     
-    // Desert Planets (Tatooine, Geonosis, Jakku, etc.)
+    // Desert Planets (Gravenmoor, Karrn, Talveen, etc.)
     desert: {
       baseColor: '#d4a574',
       gradient: ['#c49464', '#d4a574', '#e4b584', '#f4c594'],
@@ -1371,7 +1419,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'sand'
     },
     
-    // Arid Plains (Ryloth, Utapau, etc.)
+    // Arid Plains (Sytha, Casmer, etc.)
     arid_plains: {
       baseColor: '#9b8365',
       gradient: ['#8b7355', '#9b8365', '#ab9375', '#bba385'],
@@ -1380,7 +1428,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'rock'
     },
     
-    // Jungle Planets (Kashyyyk, Felucia, Endor, etc.)
+    // Jungle Planets (Verdholm, Myssia, Verdance, etc.)
     jungle: {
       baseColor: '#1a4d2e',
       gradient: ['#0a3d1e', '#1a4d2e', '#2d5f3f', '#3d6f4f'],
@@ -1389,7 +1437,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'foliage'
     },
     
-    // Tropical Forest (Naboo, Scarif, etc.)
+    // Tropical Forest (Eloria, Coralsec, etc.)
     tropical_forest: {
       baseColor: '#2d5f3f',
       gradient: ['#1a4d2e', '#2d5f3f', '#3d6f4f', '#4d7f5f'],
@@ -1398,7 +1446,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'palm_trees'
     },
     
-    // Ocean Worlds (Kamino, Mon Cala/Dac, etc.)
+    // Ocean Worlds (Tethys, Thessmar/Dorrun, etc.)
     ocean: {
       baseColor: '#1a5d7e',
       gradient: ['#0a4d6e', '#1a5d7e', '#2a6d8e', '#3a7d9e'],
@@ -1407,7 +1455,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'water'
     },
     
-    // Tropical Ocean (Scarif beaches, etc.)
+    // Tropical Ocean (Coralsec beaches, etc.)
     tropical_ocean: {
       baseColor: '#2a7d9e',
       gradient: ['#1a6d8e', '#2a7d9e', '#3a8dae', '#4a9dbe'],
@@ -1416,7 +1464,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'tropical_water'
     },
     
-    // Ice/Frozen Planets (Hoth, Ilum, Mygeeto, etc.)
+    // Ice/Frozen Planets (Rime, Kthala, Glaiv, etc.)
     ice: {
       baseColor: '#b2dfdb',
       gradient: ['#a0cfcb', '#b2dfdb', '#c2efeb', '#d2fffb'],
@@ -1434,7 +1482,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'frozen_ground'
     },
     
-    // Volcanic Planets (Mustafar, Sullust, etc.)
+    // Volcanic Planets (Embervast, Pyrren, etc.)
     volcanic: {
       baseColor: '#3d2a2a',
       gradient: ['#2d1a1a', '#3d2a2a', '#4d3a3a', '#5d4a4a'],
@@ -1443,7 +1491,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'lava'
     },
     
-    // Lava Fields (Mustafar surface)
+    // Lava Fields (Embervast surface)
     lava_field: {
       baseColor: '#4d1a1a',
       gradient: ['#3d0a0a', '#4d1a1a', '#5d2a2a', '#6d3a3a'],
@@ -1452,7 +1500,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'lava_pools'
     },
     
-    // Forest Worlds (Endor, etc.)
+    // Forest Worlds (Verdance, etc.)
     forest: {
       baseColor: '#2d5f3f',
       gradient: ['#1b4332', '#2d5f3f', '#40916c', '#50a17c'],
@@ -1461,7 +1509,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'trees'
     },
     
-    // Swamp/Marsh (Dagobah, Naboo swamps, etc.)
+    // Swamp/Marsh (Mirefen, Eloria swamps, etc.)
     swamp: {
       baseColor: '#3d5f4f',
       gradient: ['#2d4f3f', '#3d5f4f', '#4d6f5f', '#5d7f6f'],
@@ -1479,7 +1527,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'stone'
     },
     
-    // Mountainous (Alderaan mountains, etc.)
+    // Mountainous (Caelmore mountains, etc.)
     mountainous: {
       baseColor: '#5a5a4a',
       gradient: ['#4a4a3a', '#5a5a4a', '#6a6a5a', '#7a7a6a'],
@@ -1488,7 +1536,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'rocky'
     },
     
-    // Canyon (Utapau sinkholes, etc.)
+    // Canyon (Casmer sinkholes, etc.)
     canyon: {
       baseColor: '#8b7355',
       gradient: ['#7b6345', '#8b7355', '#9b8365', '#ab9375'],
@@ -1515,7 +1563,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'mixed'
     },
     
-    // Crystal Caves (Ilum, etc.)
+    // Crystal Caves (Kthala, etc.)
     crystal_caves: {
       baseColor: '#4a3a5a',
       gradient: ['#3a2a4a', '#4a3a5a', '#5a4a6a', '#6a5a7a'],
@@ -1524,7 +1572,7 @@ function drawTerrain(ctx, width, height, planet, terrainType) {
       texture: 'crystalline'
     },
     
-    // Toxic (Nar Shaddaa lower levels, etc.)
+    // Toxic (Sinkport lower levels, etc.)
     toxic: {
       baseColor: '#4a5a3a',
       gradient: ['#3a4a2a', '#4a5a3a', '#5a6a4a', '#6a7a5a'],
@@ -1595,27 +1643,27 @@ function getTerrainTypeFromPlanet(planet) {
   
   // Lore-accurate mapping for specific planets
   const specificPlanets = {
-    'coruscant': 'urban_sprawl',
-    'tatooine': 'desert',
-    'geonosis': 'desert',
-    'jakku': 'desert',
-    'kashyyyk': 'jungle',
-    'felucia': 'jungle',
-    'endor': 'forest',
-    'naboo': 'tropical_forest',
-    'scarif': 'tropical_ocean',
-    'kamino': 'ocean',
+    'centralis': 'urban_sprawl',
+    'gravenmoor': 'desert',
+    'karrn': 'desert',
+    'talveen': 'desert',
+    'verdholm': 'jungle',
+    'myssia': 'jungle',
+    'verdance': 'forest',
+    'eloria': 'tropical_forest',
+    'coralsec': 'tropical_ocean',
+    'tethys': 'ocean',
     'mon cala': 'ocean',
-    'dac': 'ocean',
-    'hoth': 'ice',
-    'ilum': 'ice',
-    'mygeeto': 'ice',
-    'mustafar': 'lava_field',
-    'sullust': 'volcanic',
-    'dagobah': 'swamp',
-    'utapau': 'canyon',
-    'ryloth': 'arid_plains',
-    'bespin': 'gas_giant',
+    'dorrun': 'ocean',
+    'rime': 'ice',
+    'kthala': 'ice',
+    'glaiv': 'ice',
+    'embervast': 'lava_field',
+    'pyrren': 'volcanic',
+    'mirefen': 'swamp',
+    'casmer': 'canyon',
+    'sytha': 'arid_plains',
+    'cirruan': 'gas_giant',
     'crait': 'barren',
     'jedha': 'barren'
   };
@@ -1664,7 +1712,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
   
   switch (pattern) {
     case 'urban_grid':
-      // Coruscant-style city grid
+      // Centralis-style city grid
       ctx.strokeStyle = 'rgba(100, 150, 200, 0.3)';
       ctx.lineWidth = 1;
       const gridSize = 50;
@@ -1720,7 +1768,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'sand_dunes':
-      // Tatooine-style desert dunes - scaled for overview map
+      // Gravenmoor-style desert dunes - scaled for overview map
       ctx.globalAlpha = 0.5;
       // Larger dune shapes (fewer, bigger for overview scale)
       for (let i = 0; i < Math.floor((width * height) / 10000); i++) {
@@ -1747,7 +1795,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'rocky_arid':
-      // Ryloth/Utapau-style rocky terrain - scaled for overview map
+      // Sytha/Casmer-style rocky terrain - scaled for overview map
       ctx.globalAlpha = 0.45;
       // Larger rock formations (fewer, bigger for overview)
       for (let i = 0; i < Math.floor((width * height) / 6000); i++) {
@@ -1776,7 +1824,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'dense_jungle':
-      // Kashyyyk/Felucia-style jungle - scaled for overview map
+      // Verdholm/Myssia-style jungle - scaled for overview map
       ctx.globalAlpha = 0.5;
       // Larger foliage clusters (fewer, bigger for overview)
       for (let i = 0; i < Math.floor((width * height) / 5000); i++) {
@@ -1801,7 +1849,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'tropical_vegetation':
-      // Naboo/Scarif-style tropical
+      // Eloria/Coralsec-style tropical
       ctx.globalAlpha = 0.5;
       // Palm-like shapes
       for (let i = 0; i < 100; i++) {
@@ -1829,7 +1877,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'ocean_waves':
-      // Kamino/Mon Cala-style ocean - scaled for overview map
+      // Tethys/Thessmar-style ocean - scaled for overview map
       ctx.globalAlpha = 0.6;
       ctx.strokeStyle = baseColor;
       ctx.lineWidth = 2.5; // Thicker waves for overview
@@ -1858,7 +1906,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'tropical_waves':
-      // Scarif-style tropical ocean
+      // Coralsec-style tropical ocean
       ctx.globalAlpha = 0.6;
       // Lighter, more turquoise waves
       ctx.strokeStyle = 'rgba(50, 150, 180, 0.5)';
@@ -1884,7 +1932,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'ice_sheet':
-      // Hoth/Ilum-style ice - scaled for overview map
+      // Rime/Kthala-style ice - scaled for overview map
       ctx.globalAlpha = 0.5;
       // Larger ice cracks (fewer, more visible)
       ctx.strokeStyle = 'rgba(150, 200, 220, 0.4)';
@@ -1943,7 +1991,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'lava_flows':
-      // Mustafar/Sullust-style volcanic - scaled for overview map
+      // Embervast/Pyrren-style volcanic - scaled for overview map
       ctx.globalAlpha = 0.6;
       // Larger lava rivers (fewer, thicker)
       ctx.strokeStyle = '#ff4444';
@@ -1977,7 +2025,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'molten_lava':
-      // Mustafar surface - more intense
+      // Embervast surface - more intense
       ctx.globalAlpha = 0.8;
       // Bright lava pools
       for (let i = 0; i < 30; i++) {
@@ -2005,7 +2053,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'temperate_forest':
-      // Endor-style forest
+      // Verdance-style forest
       ctx.globalAlpha = 0.5;
       // Tree clusters
       for (let i = 0; i < 150; i++) {
@@ -2027,7 +2075,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'swamp_marsh':
-      // Dagobah-style swamp
+      // Mirefen-style swamp
       ctx.globalAlpha = 0.6;
       // Muddy water patches
       for (let i = 0; i < 60; i++) {
@@ -2071,7 +2119,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'mountain_peaks':
-      // Alderaan-style mountains
+      // Caelmore-style mountains
       ctx.globalAlpha = 0.6;
       // Mountain shapes
       for (let i = 0; i < 30; i++) {
@@ -2089,7 +2137,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'canyon_walls':
-      // Utapau-style canyons
+      // Casmer-style canyons
       ctx.globalAlpha = 0.5;
       // Layered rock walls
       for (let i = 0; i < 40; i++) {
@@ -2108,7 +2156,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'gas_clouds':
-      // Bespin-style gas giant
+      // Cirruan-style gas giant
       ctx.globalAlpha = 0.6;
       // Swirling cloud patterns
       for (let i = 0; i < 50; i++) {
@@ -2153,7 +2201,7 @@ function drawTerrainPattern(ctx, width, height, pattern, baseColor, texture, ran
       break;
 
     case 'crystal_formations':
-      // Ilum-style crystals
+      // Kthala-style crystals
       ctx.globalAlpha = 0.7;
       // Crystal shapes
       for (let i = 0; i < 60; i++) {

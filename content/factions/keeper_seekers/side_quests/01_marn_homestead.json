@@ -1,0 +1,77 @@
+{
+  "id": "gravenmoor_side_01_marn_homestead",
+  "factionId": "keeper_seekers",
+  "questType": "side",
+  "title": "The Marn Homestead",
+  "description": "Professor Aris Thorne, a historian fascinated by the Marn legacy, wants to investigate the abandoned Marn Homestead. It's one of the most significant historical sites on Gravenmoor—the place where Dav Marn grew up. The local authorities won't allow official exploration, but if someone were to investigate independently, the professor would pay well for any historical artifacts or information found.",
+  "shortDescription": "Investigate the Marn Homestead for historical artifacts",
+  "prerequisites": {
+    "level": 3,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_historian",
+      "type": "interact",
+      "description": "Speak with Professor Aris Thorne about the Marn Homestead",
+      "target": "npc_local_historian"
+    },
+    {
+      "id": "travel_homestead",
+      "type": "travel",
+      "description": "Travel to the Marn Homestead",
+      "location": {
+        "planet": "gravenmoor",
+        "area": "sunder_wastes"
+      }
+    },
+    {
+      "id": "investigate_homestead",
+      "type": "discover",
+      "description": "Investigate the homestead for historical artifacts",
+      "evidenceId": "evidence_marn_homestead"
+    },
+    {
+      "id": "recover_datapad",
+      "type": "collect",
+      "description": "Recover Marn family datapad",
+      "target": "marn_datapad",
+      "count": 1
+    },
+    {
+      "id": "return_to_historian",
+      "type": "deliver",
+      "description": "Return the datapad to Professor Thorne",
+      "target": "npc_local_historian"
+    }
+  ],
+  "rewards": {
+    "xp": 800,
+    "credits": 500,
+    "reputation": {
+      "keeper_seekers": 25
+    },
+    "items": [
+      {
+        "itemId": "marn_datapad",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_local_historian",
+  "startLocation": {
+    "planet": "gravenmoor",
+    "area": "greywell"
+  },
+  "estimatedTime": 60,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+
+

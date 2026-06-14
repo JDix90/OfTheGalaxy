@@ -12,27 +12,27 @@ const getFactionDisplayName = (factionId) => {
   if (!factionId) return 'Unaffiliated';
   
   const displayNames = {
-    'galactic_republic': 'Galactic Republic',
-    'galactic_empire': 'Galactic Empire',
-    'rebel_alliance': 'Rebel Alliance',
-    'new_republic': 'New Republic',
-    'first_order': 'First Order',
-    'resistance': 'Resistance',
-    'jedi_order': 'Jedi Order',
-    'sith': 'Sith',
-    'mandalorians': 'Mandalorians',
-    'hutts': 'Hutts',
-    'hutt_cartel': 'Hutt Cartel',
-    'black_sun': 'Black Sun',
-    'crimson_dawn': 'Crimson Dawn',
+    'old_concord': 'Old Concord',
+    'iron_dominion': 'Iron Dominion',
+    'free_worlds': 'Free Worlds',
+    'concord': 'Concord',
+    'ascendancy': 'Ascendancy',
+    'uprising': 'Uprising',
+    'keeper_order': 'Keeper Order',
+    'hollow': 'Hollow',
+    'ironkin': 'Ironkin',
+    'vorr': 'Vorr',
+    'vorr_cartel': 'Vorr Cartel',
+    'umbra': 'Umbra',
+    'scarlet_tide': 'Scarlet Tide',
     'independent': 'Independent',
     'neutral': 'Neutral',
     'smugglers': 'Smugglers',
-    'bounty_hunters': 'Bounty Hunters',
-    'trade_federation': 'Trade Federation',
-    'separatists': 'Separatists',
-    'chiss_ascendancy': 'Chiss Ascendancy',
-    'hapes_consortium': 'Hapes Consortium'
+    'the_tally': 'Bounty Hunters',
+    'commerce_league': 'Commerce League',
+    'secession': 'Secessionists',
+    'vorne_ascendancy': 'Vorne Ascendancy',
+    'hesperan_consortium': 'Hesperan Consortium'
   };
 
   return displayNames[factionId] || factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -46,7 +46,7 @@ const getPersonalityTraitLabel = (trait, value) => {
     agreeableness: value > 70 ? 'Warm & Cooperative' : value < 30 ? 'Competitive & Skeptical' : 'Balanced',
     conscientiousness: value > 70 ? 'Organized & Reliable' : value < 30 ? 'Spontaneous & Flexible' : 'Balanced',
     neuroticism: value > 70 ? 'Anxious & Reactive' : value < 30 ? 'Calm & Stable' : 'Balanced',
-    forceAlignment: value > 70 ? 'Force-Aligned' : value < 30 ? 'Force-Distant' : 'Neutral',
+    forceAlignment: value > 70 ? 'Veil-Aligned' : value < 30 ? 'Veil-Distant' : 'Neutral',
     authorityRespect: value > 70 ? 'Respectful of Authority' : value < 30 ? 'Rebellious' : 'Neutral',
     riskTolerance: value > 70 ? 'Bold & Risk-Taking' : value < 30 ? 'Cautious & Risk-Averse' : 'Balanced',
     directness: value > 70 ? 'Direct & Straightforward' : value < 30 ? 'Subtle & Indirect' : 'Balanced'

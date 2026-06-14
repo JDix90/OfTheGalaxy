@@ -5,8 +5,8 @@
   "occupation": "Syndicate Leader",
   "factionId": null,
   "location": {
-    "planet": "ryloth",
-    "area": "lessu",
+    "planet": "sytha",
+    "area": "sythmar",
     "x": 580,
     "y": 420
   },
@@ -20,16 +20,16 @@
       "confidant": "You've made a mistake coming here. This ends now."
     },
     "questRelated": {
-      "iia_ryloth_04_syndicate_exposure": "So, you think you can expose me? You're a fool. The syndicate has connections throughout the galaxy. The Empire paid us well to keep quiet about Compound 7-Alpha, and we'll be paid even more to silence you. This ends now."
+      "iia_sytha_04_syndicate_exposure": "So, you think you can expose me? You're a fool. The syndicate has connections throughout the galaxy. The Iron Dominion paid us well to keep quiet about Compound 7-Alpha, and we'll be paid even more to silence you. This ends now."
     },
     "general": [
       "Business is business. I don't make the rules, I just profit from them.",
-      "The New Republic? They're weak. They can't stop us.",
+      "The Concord? They're weak. They can't stop us.",
       "You meddle in things you don't understand. That will be your undoing.",
       "The galaxy runs on credits and fear. I provide both."
     ]
   },
-  "quests": ["iia_ryloth_04_syndicate_exposure"],
+  "quests": ["iia_sytha_04_syndicate_exposure"],
   "vendorInventory": null,
   "companionAbilities": null,
   "companionStats": {
@@ -45,7 +45,7 @@
     "eyes": "cold blue",
     "distinguishingFeatures": "Expensive clothing, cybernetic left eye, always surrounded by guards"
   },
-  "biography": "Vorak Kresh is the ruthless leader of the criminal syndicate that controls Ryloth's mining operations. A former Imperial officer who turned to crime after the Empire's fall, he's built a profitable operation through intimidation, bribery, and violence. He has connections to the Imperial Remnant and has been paid handsomely to keep quiet about Compound 7-Alpha. He's intelligent, cruel, and will stop at nothing to protect his interests.",
+  "biography": "Vorak Kresh is the ruthless leader of the criminal syndicate that controls Sytha's mining operations. A former Dominion officer who turned to crime after the Iron Dominion's fall, he's built a profitable operation through intimidation, bribery, and violence. He has connections to the Dominion Remnant and has been paid handsomely to keep quiet about Compound 7-Alpha. He's intelligent, cruel, and will stop at nothing to protect his interests.",
   "isAvailable": true,
   "personalityTraits": {
     "empathy": 10,

@@ -61,35 +61,31 @@ export default function InventoryGrid({ items }) {
     // - Inventory is closed (useEffect watching inventory overlay)
   };
 
-  const handleSlotClick = async (item, event) => {
+  const handleSlotClick = (item, event) => {
     if (!item || !currentCharacter) return;
 
-    // Show tooltip on click (for consumables and other items)
-    // This allows the player to see item info and use the "Use" button
+    // Single click ONLY opens the item's detail panel. The player then chooses
+    // an action from the tooltip (Equip / Use / Unequip) — nothing is equipped or
+    // consumed implicitly, so clicking is always safe and inspectable first.
     setHoveredItem(item);
     setHoverPosition({
       x: event.clientX,
       y: event.clientY
     });
+  };
 
-    const itemType = item.itemType || item.type || 'misc';
-    
-    // Don't auto-use consumables on click - let the tooltip's "Use" button handle it
-    // Clicking on an item should just show the tooltip with item info and action buttons
-    // If item is equippable and not already equipped, equip it (double-click behavior)
+  // Double-click is a power-user shortcut: equip an equippable item directly.
+  const handleSlotEquipShortcut = async (item) => {
+    if (!item || !currentCharacter) return;
     if (item.equipmentSlot && !item.equipped) {
       try {
         await equipItem(currentCharacter.id, item.itemId, item.equipmentSlot);
-        // Reload inventory to update UI
         await loadInventory(currentCharacter.id);
-        // Clear hovered item to refresh tooltip
         setHoveredItem(null);
       } catch (error) {
         console.error('Failed to equip item:', error);
       }
     }
-    // For consumables, clicking just shows the tooltip (no auto-use)
-    // The tooltip will have a "Use" button that the player can click
   };
 
   const handleSlotContextMenu = async (item, event) => {
@@ -129,6 +125,7 @@ export default function InventoryGrid({ items }) {
             onHover={handleSlotHover}
             onLeave={handleSlotLeave}
             onClick={handleSlotClick}
+            onEquipShortcut={handleSlotEquipShortcut}
             onContextMenu={handleSlotContextMenu}
           />
         ))}

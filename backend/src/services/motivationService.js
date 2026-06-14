@@ -69,22 +69,22 @@ class MotivationService {
     }
     
     // Faction-based goals
-    if (factionId === 'rebel_alliance' || factionId === 'resistance') {
+    if (factionId === 'free_worlds' || factionId === 'uprising') {
       return rnd() > 0.5 ? 'freedom' : 'revenge';
     }
-    if (factionId === 'galactic_empire' || factionId === 'first_order') {
+    if (factionId === 'iron_dominion' || factionId === 'ascendancy') {
       return rnd() > 0.5 ? 'power' : 'duty';
     }
-    if (factionId === 'jedi_order') {
+    if (factionId === 'keeper_order') {
       return rnd() > 0.5 ? 'knowledge' : 'duty';
     }
-    if (factionId === 'sith') {
+    if (factionId === 'hollow') {
       return rnd() > 0.5 ? 'power' : 'revenge';
     }
-    if (factionId === 'hutts' || factionId === 'hutt_cartel') {
+    if (factionId === 'vorr' || factionId === 'vorr_cartel') {
       return 'wealth';
     }
-    if (factionId === 'mandalorians') {
+    if (factionId === 'ironkin') {
       return rnd() > 0.5 ? 'duty' : 'honor';
     }
     
@@ -121,11 +121,11 @@ class MotivationService {
         'Establish a profitable operation in this sector'
       ],
       knowledge: [
-        'Learn more about the Force and ancient Jedi teachings',
-        'Discover the secrets of the Sith and dark side powers',
+        'Learn more about the Veil and ancient Keeper teachings',
+        'Discover the secrets of the Hollow and Torn Veil powers',
         'Study the history and cultures of the galaxy',
         'Uncover lost technologies and ancient artifacts',
-        'Understand the true nature of the Force'
+        'Understand the true nature of the Veil'
       ],
       revenge: [
         'Find and confront those who wronged my family',
@@ -142,7 +142,7 @@ class MotivationService {
         'Carry out my mission with unwavering dedication'
       ],
       freedom: [
-        'Help liberate this sector from Imperial control',
+        'Help liberate this sector from Dominion control',
         'Fight for the freedom of oppressed peoples',
         'Break free from the chains of tyranny',
         'Support the cause of liberty and justice',
@@ -157,7 +157,7 @@ class MotivationService {
       ],
       honor: [
         'Uphold the honor of my clan and traditions',
-        'Prove myself worthy of Mandalorian heritage',
+        'Prove myself worthy of Ironkin heritage',
         'Restore honor to my family name',
         'Live by the warrior code and ancient ways',
         'Earn respect through honorable actions'
@@ -310,7 +310,7 @@ class MotivationService {
    */
   generateFears(npcData, rnd) {
     const allFears = [
-      'imperial_discovery',
+      'dominion_discovery',
       'losing_family',
       'starvation',
       'being_betrayed',
@@ -325,10 +325,10 @@ class MotivationService {
     ];
     
     // Faction-specific fears
-    if (npcData.factionId === 'rebel_alliance' || npcData.factionId === 'resistance') {
-      allFears.push('imperial_capture', 'torture', 'execution');
+    if (npcData.factionId === 'free_worlds' || npcData.factionId === 'uprising') {
+      allFears.push('dominion_capture', 'torture', 'execution');
     }
-    if (npcData.factionId === 'galactic_empire' || npcData.factionId === 'first_order') {
+    if (npcData.factionId === 'iron_dominion' || npcData.factionId === 'ascendancy') {
       allFears.push('rebellion', 'insubordination', 'failure');
     }
     
@@ -368,23 +368,23 @@ class MotivationService {
     ];
     
     // Faction-specific values
-    if (npcData.factionId === 'rebel_alliance' || npcData.factionId === 'resistance') {
-      allValues.push({ name: 'resistance', importance: 0.9 });
+    if (npcData.factionId === 'free_worlds' || npcData.factionId === 'uprising') {
+      allValues.push({ name: 'uprising', importance: 0.9 });
       allValues.push({ name: 'hope', importance: 0.8 });
     }
-    if (npcData.factionId === 'galactic_empire' || npcData.factionId === 'first_order') {
+    if (npcData.factionId === 'iron_dominion' || npcData.factionId === 'ascendancy') {
       allValues.push({ name: 'order', importance: 0.9 });
       allValues.push({ name: 'discipline', importance: 0.8 });
     }
-    if (npcData.factionId === 'jedi_order') {
+    if (npcData.factionId === 'keeper_order') {
       allValues.push({ name: 'balance', importance: 0.9 });
       allValues.push({ name: 'wisdom', importance: 0.8 });
     }
-    if (npcData.factionId === 'sith') {
+    if (npcData.factionId === 'hollow') {
       allValues.push({ name: 'passion', importance: 0.9 });
       allValues.push({ name: 'strength', importance: 0.8 });
     }
-    if (npcData.factionId === 'mandalorians') {
+    if (npcData.factionId === 'ironkin') {
       allValues.push({ name: 'honor', importance: 0.95 });
       allValues.push({ name: 'strength', importance: 0.8 });
     }

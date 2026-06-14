@@ -522,9 +522,13 @@ class QuestService {
     
     // Mark quest as completed
     await questProgress.complete();
-    
+
     // Award rewards
     const rewards = await this.awardRewards(characterId, quest.rewards);
+
+    // Faction standing changes from this quest's consequences (for rep toast /
+    // tier-up UI). Populated below when the quest carries reputationChanges.
+    const reputationChanges = [];
     
     // Phase 2: Update NPC trust and emotional state if quest has NPC giver
     // Phase 3: Track quest completed event in conversation history
@@ -580,15 +584,27 @@ class QuestService {
               await relationship.save();
             }
             
-            // Apply reputation consequences
+            // Apply reputation consequences via the central path so the client
+            // can surface a rep toast / tier-up moment.
             const consequences = quest.miniQuestData.consequences || {};
             if (consequences.reputationChanges) {
               const factionService = require('./factionService');
               for (const [factionId, change] of Object.entries(consequences.reputationChanges)) {
                 if (change !== 0 && factionId) {
                   try {
-                    await factionService.updateReputation(characterId, factionId, change);
-                    console.log(`[Mini-Quest] Updated reputation for ${factionId}: ${change > 0 ? '+' : ''}${change}`);
+                    const result = await factionService.applyReputationChange(
+                      characterId, factionId, change, { reason: `quest:${questId}` }
+                    );
+                    reputationChanges.push({
+                      factionId: result.factionId,
+                      factionName: factionService.getFactionProfile(factionId)?.name || factionId,
+                      delta: result.delta,
+                      oldTier: result.oldTier,
+                      newTier: result.newTier,
+                      tierChanged: result.tierChanged,
+                      total: result.total
+                    });
+                    console.log(`[Mini-Quest] ${factionId} ${result.oldTier}->${result.newTier} (${change > 0 ? '+' : ''}${change})`);
                   } catch (error) {
                     console.error(`[Mini-Quest] Error updating reputation for ${factionId}:`, error);
                   }
@@ -613,6 +629,7 @@ class QuestService {
       questProgress,
       quest,
       rewards,
+      reputationChanges,
       nextQuest: nextQuest ? {
         id: nextQuest.id,
         title: nextQuest.title,
@@ -911,27 +928,18 @@ class QuestService {
         const tutorialService = require('./tutorialService');
         const tutorialConfig = tutorialService.getTutorialConfigForBackground(character.background);
         
-        // Update objectives with character-specific NPC name
+        // Point the objectives at THIS character's guide NPC (target/location) for
+        // completion logic, but keep the visible description background-neutral so
+        // every surface that shows the quest agrees. The in-world tutorial overlay
+        // names the specific guide NPC; the quest log stays generic and consistent.
         if (questData.objectives && Array.isArray(questData.objectives)) {
           questData.objectives = questData.objectives.map(obj => {
             if (obj.id === 'tutorial_move') {
-              return {
-                ...obj,
-                description: `Move to ${tutorialConfig.npcName}`,
-                target: tutorialConfig.npcLocation
-              };
+              return { ...obj, description: 'Move to your dockside contact', target: tutorialConfig.npcLocation };
             } else if (obj.id === 'tutorial_talk') {
-              return {
-                ...obj,
-                description: `Talk to ${tutorialConfig.npcName}`,
-                target: tutorialConfig.npcId
-              };
+              return { ...obj, description: 'Talk to your dockside contact', target: tutorialConfig.npcId };
             } else if (obj.id === 'tutorial_return') {
-              return {
-                ...obj,
-                description: `Return to ${tutorialConfig.npcName}`,
-                target: tutorialConfig.npcId
-              };
+              return { ...obj, description: 'Return to your dockside contact', target: tutorialConfig.npcId };
             }
             return obj;
           });

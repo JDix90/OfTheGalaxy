@@ -6,13 +6,13 @@
 // Species attribute bonuses
 export const SPECIES_BONUSES = {
   human: { strength: 1, intelligence: 1, charisma: 1 },
-  wookiee: { strength: 3, endurance: 2, intelligence: -1, charisma: -1 },
-  twilek: { charisma: 2, agility: 2, strength: -1 },
-  rodian: { perception: 2, agility: 2, endurance: -1 },
-  zabrak: { endurance: 2, strength: 2, charisma: -1 },
-  togruta: { perception: 2, intelligence: 2, strength: -1 },
-  mirialan: { agility: 2, perception: 2, endurance: -1 },
-  chiss: { intelligence: 2, perception: 2, strength: -1 }
+  ursk: { strength: 3, endurance: 2, intelligence: -1, charisma: -1 },
+  sytheen: { charisma: 2, agility: 2, strength: -1 },
+  skarn: { perception: 2, agility: 2, endurance: -1 },
+  karnaki: { endurance: 2, strength: 2, charisma: -1 },
+  sethari: { perception: 2, intelligence: 2, strength: -1 },
+  jeharu: { agility: 2, perception: 2, endurance: -1 },
+  vorne: { intelligence: 2, perception: 2, strength: -1 }
 };
 
 // Background attribute bonuses

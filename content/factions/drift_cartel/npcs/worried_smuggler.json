@@ -1,0 +1,54 @@
+{
+  "id": "npc_worried_smuggler",
+  "name": "Dex Rinn",
+  "species": "human",
+  "occupation": "Smuggler",
+  "factionId": "drift_cartel",
+  "location": {
+    "planet": "sytha",
+    "area": "sythmar",
+    "x": 510,
+    "y": 490
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "Have you seen my friend? He was supposed to be back by now...",
+      "acquaintance": "Still no word from him. I'm really worried.",
+      "friend": "Thanks for helping me look. I owe you one.",
+      "confidant": "You found him. I'll never forget this. If you ever need anything, just ask."
+    },
+    "questRelated": {
+      "sytha_side_02_lost_runner": "My friend, Jax, he's a spice runner. He was supposed to make a delivery two days ago, but he never came back. The route goes through the desert between here and Tann Province. It's dangerous out there—Dune Nomads, syndicate patrols, sandstorms. Can you help me find him? I'll pay you well, and you can keep whatever cargo he was carrying if... if he didn't make it."
+    },
+    "general": [
+      "Jax is like a brother to me. I can't just abandon him.",
+      "The desert is unforgiving. Every hour counts.",
+      "If the syndicate got him... I don't want to think about it.",
+      "We smugglers stick together. That's the code."
+    ]
+  },
+  "quests": ["sytha_side_02_lost_runner"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "mid 30s",
+    "build": "average",
+    "hair": "brown, unkempt",
+    "eyes": "worried brown",
+    "distinguishingFeatures": "Nervous demeanor, constantly checking chrono, worn clothing"
+  },
+  "biography": "Dex Rinn is a smuggler who's been working the Sytha spice routes with his friend Jax for years. They're not big-time operators, just trying to make a living. When Jax goes missing, Dex is desperate to find him, willing to pay whatever it takes. He's loyal, worried, and represents the human side of the smuggling business—not all smugglers are cold-hearted profit-seekers.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 70,
+    "formality": 30,
+    "humor": 20,
+    "trust": 60
+  }
+}
+
+
+

@@ -3,6 +3,8 @@
  * Renders sub-maps (cities, buildings, interiors) on canvas
  */
 
+import { assetManager } from '../services/assetManager';
+
 /**
  * Render a sub-map on canvas
  */
@@ -724,11 +726,29 @@ function drawPointsOfInterest(ctx, width, height, pois, hoveredPOI, layout) {
 
     const isHovered = hoveredPOI && hoveredPOI.id === poi.id;
 
-    // Draw POI marker
-    ctx.fillStyle = isHovered ? '#fbbf24' : '#60a5fa';
-    ctx.beginPath();
-    ctx.arc(x, y, isHovered ? 6 : 5, 0, Math.PI * 2);
-    ctx.fill();
+    // Prefer the building sprite (loaded via assetManager); fall back to a marker
+    // dot if the sprite isn't available. The cache is read synchronously here and
+    // the async load is kicked off once per type so a later frame can pick it up.
+    const sprite = poi.type ? assetManager.spriteCache.get(`poi:${poi.type}`) : null;
+    if (!sprite && poi.type && !assetManager.spriteCache.has(`poi:${poi.type}`)) {
+      assetManager.loadPOISprite(poi.type).catch(() => {});
+    }
+
+    let labelY = y - 8;
+    if (sprite && sprite.complete) {
+      const size = isHovered ? 40 : 34;
+      ctx.save();
+      ctx.globalAlpha = isHovered ? 1 : 0.96;
+      ctx.drawImage(sprite, x - size / 2, y - size / 2, size, size);
+      ctx.restore();
+      labelY = y - size / 2 - 2;
+    } else {
+      // Fallback marker dot
+      ctx.fillStyle = isHovered ? '#fbbf24' : '#60a5fa';
+      ctx.beginPath();
+      ctx.arc(x, y, isHovered ? 6 : 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     // Draw label
     if (isHovered || poi.name) {
@@ -738,7 +758,7 @@ function drawPointsOfInterest(ctx, width, height, pois, hoveredPOI, layout) {
       ctx.textBaseline = 'bottom';
       ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
       ctx.shadowBlur = 2;
-      ctx.fillText(poi.name, x, y - 8);
+      ctx.fillText(poi.name, x, labelY);
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
     }

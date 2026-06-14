@@ -3,7 +3,7 @@
   "factionId": "independent_investigators",
   "questType": "main",
   "title": "Echoes from Compound 7-Alpha",
-  "description": "A group of refugees from the mysterious Compound 7-Alpha have arrived at the settlement on Chandrila. Their stories hint at something far darker than a simple Imperial detention facility. Investigate their past and uncover the truth about what happened at the compound.",
+  "description": "A group of refugees from the mysterious Compound 7-Alpha have arrived at the settlement on Solenne. Their stories hint at something far darker than a simple Dominion detention facility. Investigate their past and uncover the truth about what happened at the compound.",
   "shortDescription": "Investigate the refugees from Compound 7-Alpha",
   "prerequisites": {
     "level": 1,
@@ -48,7 +48,7 @@
   },
   "questGiverId": "npc_coordinator_valen",
   "startLocation": {
-    "planet": "chandrila",
+    "planet": "solenne",
     "area": "refugee_settlement"
   },
   "estimatedTime": 45,

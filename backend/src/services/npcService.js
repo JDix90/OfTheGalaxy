@@ -253,7 +253,10 @@ class NPCService {
           questType: 'tutorial',
           suggestedResponses: tutorialDialogue.suggestedResponses || [],
           isTutorial: true,
-          nextState: tutorialDialogue.nextState
+          nextState: tutorialDialogue.nextState,
+          // Golden-path closing fork (faction lean + onward destination)
+          closingChoice: tutorialDialogue.closingChoice || null,
+          reputationChanges: tutorialDialogue.reputationChanges || []
         };
         
         console.log(`[NPC Service] Returning tutorial dialogue response with nextState:`, responseData.nextState);
@@ -531,23 +534,33 @@ class NPCService {
       );
       
       // Small faction reputation gain for quest interactions
+      const questReputationChanges = [];
       if (npc.factionId) {
         try {
-          console.log(`[Faction] Quest interaction - updating reputation for faction ${npc.factionId} by 2 points`);
-          const updatedRep = await factionService.updateReputation(characterId, npc.factionId, 2);
-          console.log(`[Faction] Updated reputation: ${updatedRep.reputation} (tier: ${updatedRep.tier})`);
+          const change = await factionService.applyReputationChange(
+            characterId, npc.factionId, 2, { reason: 'quest-dialogue' }
+          );
+          questReputationChanges.push({
+            factionId: change.factionId,
+            factionName: factionService.getFactionProfile(npc.factionId)?.name || npc.factionId,
+            delta: change.delta,
+            oldTier: change.oldTier,
+            newTier: change.newTier,
+            tierChanged: change.tierChanged,
+            total: change.total
+          });
+          console.log(`[Faction] quest-dialogue ${npc.factionId} ${change.oldTier}->${change.newTier} (+${change.delta})`);
         } catch (error) {
           console.error(`[Faction] Failed to update faction reputation for ${npc.factionId}:`, error.message);
           console.error(error.stack);
         }
-      } else {
-        console.log(`[Faction] Quest NPC ${npc.id} (${npc.name}) has no factionId`);
       }
-      
+
       return {
         response: questResponse,
         relationshipLevel: relationship.relationshipLevel,
-        relationshipTier: relationship.getRelationshipTier()
+        relationshipTier: relationship.getRelationshipTier(),
+        reputationChanges: questReputationChanges
       };
     }
     
@@ -1042,15 +1055,28 @@ class NPCService {
     await npc.save();
     
     // Update faction reputation if NPC has a faction
-    // Small reputation gain (1-2 points) for positive interactions
+    // Small reputation gain (1-2 points) for positive interactions.
+    // Routed through the central applyReputationChange so the client can surface
+    // a rep toast / tier-up moment (returned in reputationChanges below).
+    const reputationChanges = [];
     if (npc.factionId && relationshipIncrease > 0) {
       try {
         // Convert relationship increase to faction reputation (scaled down)
         // 1 relationship point = 0.5 faction reputation points
         const factionRepIncrease = Math.max(1, Math.floor(relationshipIncrease * 0.5));
-        console.log(`[Faction] Updating reputation for faction ${npc.factionId} by ${factionRepIncrease} points`);
-        const updatedRep = await factionService.updateReputation(characterId, npc.factionId, factionRepIncrease);
-        console.log(`[Faction] Updated reputation: ${updatedRep.reputation} (tier: ${updatedRep.tier})`);
+        const change = await factionService.applyReputationChange(
+          characterId, npc.factionId, factionRepIncrease, { reason: 'dialogue' }
+        );
+        reputationChanges.push({
+          factionId: change.factionId,
+          factionName: factionService.getFactionProfile(npc.factionId)?.name || npc.factionId,
+          delta: change.delta,
+          oldTier: change.oldTier,
+          newTier: change.newTier,
+          tierChanged: change.tierChanged,
+          total: change.total
+        });
+        console.log(`[Faction] ${npc.factionId} ${change.oldTier}->${change.newTier} (+${change.delta})`);
       } catch (error) {
         // Log but don't fail the dialogue if faction update fails
         console.error(`[Faction] Failed to update faction reputation for ${npc.factionId}:`, error.message);
@@ -1101,6 +1127,8 @@ class NPCService {
       relationshipLevel: relationship.relationshipLevel,
       relationshipTier: relationship.getRelationshipTier(),
       relationshipIncrease,
+      // Faction standing changes from this interaction (for rep toast / tier-up UI)
+      reputationChanges,
       // Include quest offer data if detected from AI response
       // Only set offerQuest to true if we have a valid questId
       offerQuest: hasValidQuestOffer ? true : false,

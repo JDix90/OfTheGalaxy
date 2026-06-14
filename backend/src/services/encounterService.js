@@ -128,20 +128,20 @@ class EncounterService {
     const planetType = planet.planetType;
     
     // Default enemy pool
-    const defaultEnemies = ['stormtrooper', 'pirate', 'bounty_hunter'];
+    const defaultEnemies = ['ironclad', 'pirate', 'bounty_hunter'];
     
     // Faction-specific enemies
-    if (factionControl === 'empire' || factionControl === 'first_order') {
-      return ['stormtrooper', 'imperial_officer', 'bounty_hunter'];
-    } else if (factionControl === 'rebel_alliance' || factionControl === 'resistance') {
+    if (factionControl === 'empire' || factionControl === 'ascendancy') {
+      return ['ironclad', 'dominion_officer', 'bounty_hunter'];
+    } else if (factionControl === 'free_worlds' || factionControl === 'uprising') {
       return ['pirate', 'smuggler', 'bounty_hunter'];
-    } else if (factionControl === 'hutt_cartel') {
+    } else if (factionControl === 'vorr_cartel') {
       return ['pirate', 'bounty_hunter', 'criminal'];
     }
     
     // Planet type specific enemies
     if (planetType === 'urban') {
-      return ['stormtrooper', 'bounty_hunter', 'criminal'];
+      return ['ironclad', 'bounty_hunter', 'criminal'];
     } else if (planetType === 'desert' || planetType === 'barren') {
       return ['pirate', 'bounty_hunter', 'smuggler'];
     }

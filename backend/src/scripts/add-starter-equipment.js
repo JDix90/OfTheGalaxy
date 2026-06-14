@@ -113,13 +113,13 @@ async function addStarterEquipment(characterName) {
  */
 function getStarterItemsForBackground(background) {
   const backgrounds = {
-    smuggler: ['blaster_pistol_01', 'armor_light_01', 'medpac_01'],
+    smuggler: ['pulser_pistol_01', 'armor_light_01', 'medpac_01'],
     scholar: ['datapad_01', 'armor_light_01', 'medpac_01'],
-    soldier: ['blaster_rifle_01', 'armor_medium_01', 'medpac_01', 'stimpack_01'],
-    medic: ['blaster_pistol_01', 'armor_light_01', 'medpac_01', 'medpac_01'],
-    engineer: ['blaster_pistol_01', 'armor_light_01', 'medpac_01'],
-    diplomat: ['blaster_pistol_01', 'armor_light_01', 'comlink_01', 'medpac_01'],
-    pilot: ['blaster_pistol_01', 'armor_light_01', 'medpac_01']
+    soldier: ['pulser_rifle_01', 'armor_medium_01', 'medpac_01', 'stimpack_01'],
+    medic: ['pulser_pistol_01', 'armor_light_01', 'medpac_01', 'medpac_01'],
+    engineer: ['pulser_pistol_01', 'armor_light_01', 'medpac_01'],
+    diplomat: ['pulser_pistol_01', 'armor_light_01', 'comlink_01', 'medpac_01'],
+    pilot: ['pulser_pistol_01', 'armor_light_01', 'medpac_01']
   };
 
   // Default to smuggler items if background not found

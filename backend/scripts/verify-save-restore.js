@@ -35,12 +35,12 @@ function assert(cond, msg) {
       species: 'human',
       background: 'soldier',
       stats: { strength: 10, agility: 10, intelligence: 10, charisma: 10, perception: 10, endurance: 10 },
-      currentPlanet: 'tatooine',
+      currentPlanet: 'gravenmoor',
       credits: 100,
       level: 1,
       xp: 0
     });
-    await PlayerInventory.create({ characterId: character.id, itemId: 'blaster_pistol', quantity: 1, equipped: true, equipmentSlot: 'weapon' });
+    await PlayerInventory.create({ characterId: character.id, itemId: 'pulser_pistol', quantity: 1, equipped: true, equipmentSlot: 'weapon' });
 
     // --- save the pristine state ---
     await saveService.createSave(user.id, character.id, SLOT, 'probe');
@@ -50,10 +50,10 @@ function assert(cond, msg) {
     character.credits = 999;
     character.level = 5;
     character.xp = 1234;
-    character.currentPlanet = 'coruscant';
+    character.currentPlanet = 'centralis';
     await character.save();
     await PlayerInventory.create({ characterId: character.id, itemId: 'medkit', quantity: 7 });
-    console.log('Mutated: credits=999 level=5 planet=coruscant, added 7x medkit');
+    console.log('Mutated: credits=999 level=5 planet=centralis, added 7x medkit');
 
     // --- restore ---
     const result = await saveService.restoreSave(user.id, SLOT);
@@ -64,11 +64,11 @@ function assert(cond, msg) {
     assert(restored.credits === 100, `credits rolled back to 100 (got ${restored.credits})`);
     assert(restored.level === 1, `level rolled back to 1 (got ${restored.level})`);
     assert(restored.xp === 0, `xp rolled back to 0 (got ${restored.xp})`);
-    assert(restored.currentPlanet === 'tatooine', `planet rolled back to tatooine (got ${restored.currentPlanet})`);
+    assert(restored.currentPlanet === 'gravenmoor', `planet rolled back to gravenmoor (got ${restored.currentPlanet})`);
 
     const inv = await PlayerInventory.findAll({ where: { characterId: character.id } });
     assert(inv.length === 1, `inventory restored to 1 item (got ${inv.length})`);
-    assert(inv[0].itemId === 'blaster_pistol', `the restored item is blaster_pistol (got ${inv[0].itemId})`);
+    assert(inv[0].itemId === 'pulser_pistol', `the restored item is pulser_pistol (got ${inv[0].itemId})`);
     assert(inv[0].equipped === true, 'restored item kept its equipped flag');
 
     console.log('\n✅ Save/restore round-trip PASSED');

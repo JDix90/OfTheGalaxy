@@ -1,0 +1,53 @@
+{
+  "id": "npc_vorr_lieutenant",
+  "name": "Grakka the Vorr",
+  "species": "vorr",
+  "occupation": "Vorr Lieutenant",
+  "factionId": null,
+  "location": {
+    "planet": "gravenmoor",
+    "area": "dune_sea",
+    "x": 610,
+    "y": 210
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "Ah, a new face. You seek profit, yes? I have opportunity for you.",
+      "acquaintance": "You return. Good. I have more work for you.",
+      "friend": "My friend, you serve me well. I reward loyalty handsomely.",
+      "confidant": "You are trusted. I share with you great opportunity."
+    },
+    "questRelated": {
+      "gravenmoor_side_02_vorga_legacy": "Vorga's Palace... it sits empty now, but it is not empty of value. My master's treasures remain within, protected by traps and guardians. I offer you a deal: enter the palace, recover the treasures, and bring them to me. I will pay you well—30% of the value. But be warned: the palace is dangerous. Many have tried. Few have succeeded. Do you have the courage?"
+    },
+    "general": [
+      "Vorga was great Vorr. His legacy must be preserved... and profited from.",
+      "The palace holds many secrets. And many credits.",
+      "I reward those who serve me well. Betray me, and you will regret it.",
+      "The Vorr Cartel remembers its friends. And its enemies.",
+      "Profit is the only true loyalty. Everything else is sentiment."
+    ]
+  },
+  "quests": ["gravenmoor_side_02_vorga_legacy"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "middle-aged (for a Vorr)",
+    "build": "large (Vorr physique)",
+    "hair": "n/a",
+    "eyes": "yellow",
+    "distinguishingFeatures": "Traditional Vorr appearance, expensive jewelry, surrounded by guards and servants"
+  },
+  "biography": "Grakka is a Vorr lieutenant who has taken over some of Vorga's former operations on Gravenmoor. He's ambitious, greedy, and sees opportunity in Vorga's abandoned palace. He's not as powerful as Vorga was, but he's building his own criminal empire. He's pragmatic—he'll work with anyone who can make him credits, but he's also ruthless and will eliminate anyone who becomes a threat. He represents the continuation of Vorr power on Gravenmoor.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 15,
+    "formality": 40,
+    "humor": 30,
+    "trust": 20
+  }
+}
+

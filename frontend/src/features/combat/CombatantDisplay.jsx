@@ -13,7 +13,8 @@ export default function CombatantDisplay({
   isCompanion = false,
   isCurrentTurn = false,
   isSelected = false,
-  onSelect = null
+  onSelect = null,
+  shake = false
 }) {
   if (!combatant) return null;
 
@@ -30,8 +31,9 @@ export default function CombatantDisplay({
 
   return (
     <div
-      className={`combatant-display ${combatantType} ${isCurrentTurn ? 'current-turn' : ''} ${isSelected ? 'selected' : ''}`}
+      className={`combatant-display ${combatantType} ${isCurrentTurn ? 'current-turn' : ''} ${isSelected ? 'selected' : ''} ${shake ? 'hit-shake' : ''}`}
       onClick={handleClick}
+      data-combatant-id={combatant.id}
       data-tutorial-target={combatantType === 'enemy' ? 'combat-enemy-combatant' : undefined}
     >
       <div className="combatant-header">

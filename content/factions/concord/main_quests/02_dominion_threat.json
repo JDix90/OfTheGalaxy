@@ -1,0 +1,78 @@
+{
+  "id": "nr_caldon_04_dominion_threat",
+  "factionId": "concord",
+  "questType": "main",
+  "title": "Dominion Remnant Threat",
+  "description": "The intelligence recovered from the base reveals that Dominion Remnant forces are operating on Caldon. Commander Thorne, a Remnant commander, has been trying to recover the same intelligence. The Concord cannot allow the Remnant to gain this information. You must confront Commander Thorne and stop the Remnant operation.",
+  "shortDescription": "Confront and stop the Dominion Remnant operation on Caldon",
+  "prerequisites": {
+    "level": 7,
+    "reputation": {
+      "concord": 50
+    },
+    "completedQuests": ["nr_caldon_01_abandoned_base"],
+    "items": ["rebel_datapads"]
+  },
+  "objectives": [
+    {
+      "id": "investigate_remnant",
+      "type": "discover",
+      "description": "Investigate Dominion Remnant activity",
+      "evidenceId": "evidence_remnant_activity"
+    },
+    {
+      "id": "obtain_report",
+      "type": "collect",
+      "description": "Obtain Dominion activity report",
+      "target": "dominion_report",
+      "count": 1
+    },
+    {
+      "id": "confront_commander",
+      "type": "interact",
+      "description": "Confront Commander Thorne",
+      "target": "npc_dominion_commander_caldon"
+    },
+    {
+      "id": "defeat_commander",
+      "type": "defeat",
+      "description": "Defeat Commander Thorne and his forces",
+      "target": "npc_dominion_commander_caldon",
+      "count": 1
+    },
+    {
+      "id": "secure_area",
+      "type": "custom",
+      "description": "Secure the area and ensure Remnant forces are driven out",
+      "target": "area_secured"
+    }
+  ],
+  "rewards": {
+    "xp": 2500,
+    "credits": 2000,
+    "reputation": {
+      "concord": 75,
+      "dominion_remnant": -50
+    },
+    "items": [
+      {
+        "itemId": "dominion_report",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_nr_intel_officer",
+  "startLocation": {
+    "planet": "caldon",
+    "area": "base_region"
+  },
+  "estimatedTime": 120,
+  "difficulty": "very_hard",
+  "isActive": true,
+  "chainId": "nr_caldon_base_chain",
+  "chainOrder": 2
+}
+
+
+

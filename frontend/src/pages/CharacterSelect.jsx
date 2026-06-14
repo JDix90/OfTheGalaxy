@@ -6,6 +6,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
+import { formatDisplayName } from '../utils/formatName';
+import './CharacterSelect.css';
 
 export default function CharacterSelect() {
   const navigate = useNavigate();
@@ -57,7 +59,12 @@ export default function CharacterSelect() {
         <div className="character-list">
           {characters.length === 0 ? (
             <div className="no-characters">
-              <p>No characters found. Create your first character to begin.</p>
+              <div className="no-characters-icon">🧑‍🚀</div>
+              <h2>Begin your journey</h2>
+              <p>You don't have any characters yet. Create one to set out into the Severed Reach.</p>
+              <button onClick={handleCreateNew} className="btn-primary btn-large">
+                Create Your First Character
+              </button>
             </div>
           ) : (
             characters.map((char) => (
@@ -69,10 +76,10 @@ export default function CharacterSelect() {
                 <div className="character-info">
                   <h3>{char.name}</h3>
                   <p className="character-details">
-                    Level {char.level} {char.species} {char.background}
+                    Level {char.level} · {formatDisplayName(char.species)} {formatDisplayName(char.background)}
                   </p>
                   <p className="character-location">
-                    {char.currentPlanet || 'Unknown Location'}
+                    {char.currentPlanet ? formatDisplayName(char.currentPlanet) : 'Unknown Location'}
                   </p>
                 </div>
 

@@ -280,14 +280,14 @@ class TutorialService {
         {
           id: 'tutorial_move',
           type: 'move',
-          description: `Move to ${tutorialConfig.npcName}`,
+          description: 'Move to your dockside contact',
           target: tutorialConfig.npcLocation,
           radius: 2
         },
         {
           id: 'tutorial_talk',
           type: 'interact',
-          description: `Talk to ${tutorialConfig.npcName}`,
+          description: 'Talk to your dockside contact',
           target: tutorialConfig.npcId
         },
         {
@@ -325,7 +325,7 @@ class TutorialService {
         {
           id: 'tutorial_return',
           type: 'interact',
-          description: `Return to ${tutorialConfig.npcName}`,
+          description: 'Return to your dockside contact',
           target: tutorialConfig.npcId
         }
       ],
@@ -347,14 +347,27 @@ class TutorialService {
       }
     });
     
-    // If quest already existed, update it to ensure it's active and has correct questType
+    // If quest already existed, ensure it's active AND correct any step text that
+    // may have been baked in from a different character's background. The tutorial
+    // quest is a single shared record, so its step text must stay background-neutral
+    // (the in-world tutorial overlay names the specific guide NPC). This repairs
+    // pre-existing records that hardcoded one background's NPC name.
     if (!created) {
+      const NEUTRAL = {
+        tutorial_move: 'Move to your dockside contact',
+        tutorial_talk: 'Talk to your dockside contact',
+        tutorial_return: 'Return to your dockside contact'
+      };
+      const neutralized = (tutorialQuest.objectives || []).map(o =>
+        NEUTRAL[o.id] ? { ...o, description: NEUTRAL[o.id] } : o
+      );
       await tutorialQuest.update({
         isActive: true,
-        questType: 'tutorial'
+        questType: 'tutorial',
+        objectives: neutralized
       });
     }
-    
+
     return tutorialQuest;
   }
   
@@ -362,66 +375,18 @@ class TutorialService {
    * Get tutorial configuration based on character background
    */
   getTutorialConfigForBackground(background) {
-    const configs = {
-      smuggler: {
-        npcId: 'npc_tutorial_dockmaster_jax',
-        npcName: 'Dockmaster Jax',
-        npcLocation: { x: 52, y: 48 },
-        combatEnemyId: 'enemy_tutorial_customs_drone',
-        vendorId: 'npc_tutorial_vendor_jax',
-        factionId: 'smugglers_alliance'
-      },
-      scholar: {
-        npcId: 'npc_tutorial_archivist_tera',
-        npcName: 'Archivist Tera',
-        npcLocation: { x: 48, y: 52 },
-        combatEnemyId: 'enemy_tutorial_data_scavenger',
-        vendorId: 'npc_tutorial_vendor_tera',
-        factionId: 'jedi_scholars'
-      },
-      soldier: {
-        npcId: 'npc_tutorial_sergeant_kael',
-        npcName: 'Sergeant Kael',
-        npcLocation: { x: 50, y: 50 },
-        combatEnemyId: 'enemy_tutorial_training_droid',
-        vendorId: 'npc_tutorial_vendor_kael',
-        factionId: 'republic_military'
-      },
-      medic: {
-        npcId: 'npc_tutorial_medic_voss',
-        npcName: 'Medic Voss',
-        npcLocation: { x: 49, y: 51 },
-        combatEnemyId: 'enemy_tutorial_hostile_patient',
-        vendorId: 'npc_tutorial_vendor_voss',
-        factionId: 'medical_corps'
-      },
-      engineer: {
-        npcId: 'npc_tutorial_tech_rynn',
-        npcName: 'Tech Specialist Rynn',
-        npcLocation: { x: 51, y: 49 },
-        combatEnemyId: 'enemy_tutorial_security_droid',
-        vendorId: 'npc_tutorial_vendor_rynn',
-        factionId: 'tech_guild'
-      },
-      diplomat: {
-        npcId: 'npc_tutorial_ambassador_lira',
-        npcName: 'Ambassador Lira',
-        npcLocation: { x: 47, y: 53 },
-        combatEnemyId: 'enemy_tutorial_assassin',
-        vendorId: 'npc_tutorial_vendor_lira',
-        factionId: 'diplomatic_corps'
-      },
-      pilot: {
-        npcId: 'npc_tutorial_flight_controller_dex',
-        npcName: 'Flight Controller Dex',
-        npcLocation: { x: 53, y: 47 },
-        combatEnemyId: 'enemy_tutorial_rogue_pilot',
-        vendorId: 'npc_tutorial_vendor_dex',
-        factionId: 'pilots_guild'
-      }
+    // #16: the onboarding guide is unified to Dockmaster Jax for every
+    // background. Background still flavors starting planet/credits/skills
+    // elsewhere; the guide, vendor, and training encounter are shared so the
+    // authored golden path stays a single, memorable experience.
+    return {
+      npcId: 'npc_tutorial_dockmaster_jax',
+      npcName: 'Dockmaster Jax',
+      npcLocation: { x: 52, y: 48 },
+      combatEnemyId: 'enemy_tutorial_customs_drone',
+      vendorId: 'npc_tutorial_vendor_jax',
+      factionId: 'drift_alliance'
     };
-    
-    return configs[background] || configs.smuggler;
   }
   
   /**
@@ -656,65 +621,30 @@ class TutorialService {
    * Get tutorial greeting based on background and species
    */
   getTutorialGreeting(background, species) {
-    const greetings = {
-      smuggler: {
-        default: "Hey there, newcomer. Name's Jax. Looks like you're trying to make your way in the galaxy. I can help you get started, for a price... or maybe just some goodwill.",
-        twilek: "Ah, a fellow Twi'lek. Good to see more of our kind making their way. I'm Jax, and I can help you get started here."
-      },
-      scholar: {
-        default: "Greetings. I am Archivist Tera. I see you have an interest in knowledge. Perhaps I can assist you in your journey.",
-        human: "Welcome, fellow scholar. I am Archivist Tera. I sense you seek knowledge. Let me guide you."
-      },
-      soldier: {
-        default: "At ease, recruit. I'm Sergeant Kael. You look like you know how to handle yourself. Let's get you oriented.",
-        human: "Welcome, soldier. I'm Sergeant Kael. I'll make sure you're ready for what's out there."
-      }
-      // ... more backgrounds
-    };
-    
-    const bgGreetings = greetings[background] || greetings.smuggler;
-    return bgGreetings[species] || bgGreetings.default || "Welcome. I can help you get started.";
+    // Unified to Dockmaster Jax. The live conversation runs through
+    // tutorialDialogueService's authored Jax tree; this is the baked fallback.
+    return "Welcome to Solenne. Dockmaster Jax — I run these landing bays. New face, empty pockets, that look like the galaxy already owes you. I know the type. Stick with me and I'll make sure your first week isn't your last.";
   }
-  
+
   /**
-   * Get tutorial quest offer dialogue
+   * Get tutorial quest offer dialogue (unified: Dockmaster Jax)
    */
   getTutorialQuestOffer(background) {
-    const offers = {
-      smuggler: "I've got a simple job for you. There's a customs drone that's been acting up. Take it out, and I'll show you the ropes. Interested?",
-      scholar: "I have a task that will help you learn the basics. A data scavenger has been stealing information. Deal with them, and I'll guide you further.",
-      soldier: "I need you to complete a training exercise. It's a live-fire certification - nothing too dangerous, but good practice. Ready?",
-      medic: "There's a medical emergency that needs handling. A hostile patient needs to be subdued. This will teach you the basics of combat and healing.",
-      engineer: "A security droid has malfunctioned. I need you to deactivate it. This will be good practice for what's ahead.",
-      diplomat: "There's a political threat that needs addressing. An assassin has been spotted. Handle this, and I'll introduce you to the diplomatic corps.",
-      pilot: "A rogue pilot has been causing trouble. Take care of them, and I'll show you how to navigate the galaxy."
-    };
-    
-    return offers[background] || offers.smuggler;
+    return "Call it 'Dockside Initiation' — nothing glamorous, but it'll teach you the four things that keep a drifter alive: how to move, how to fight, how to patch yourself up, and how to drive a bargain. There's a training drone warmed up and waiting. You in?";
   }
-  
+
   /**
-   * Get tutorial quest accept dialogue
+   * Get tutorial quest accept dialogue (unified: Dockmaster Jax)
    */
   getTutorialQuestAccept(background) {
-    return "Excellent! Follow your quest objectives. I'll be here when you're done.";
+    return "Good. It's on your slate — check the quest log up in your HUD if you lose the thread. Find your footing first, then let's see how you handle that drone.";
   }
-  
+
   /**
-   * Get tutorial quest complete dialogue
+   * Get tutorial quest complete dialogue (unified: Dockmaster Jax)
    */
   getTutorialQuestComplete(background) {
-    const completions = {
-      smuggler: "Well done! You've learned the basics. Here's your reward. Now you're ready to explore the galaxy on your own. Good luck!",
-      scholar: "Excellent work! You've demonstrated the fundamentals. Here are your rewards. The galaxy is full of knowledge waiting to be discovered.",
-      soldier: "Outstanding! You've passed your certification. Here's your reward. You're ready for real missions now.",
-      medic: "Good work! You've handled the emergency well. Here are your rewards. You're ready to help others across the galaxy.",
-      engineer: "Perfect! You've shown technical competence. Here are your rewards. The galaxy needs more like you.",
-      diplomat: "Well handled! You've shown diplomatic skill. Here are your rewards. The galaxy needs peacemakers.",
-      pilot: "Excellent! You've proven yourself capable. Here are your rewards. The stars are yours to explore."
-    };
-    
-    return completions[background] || completions.smuggler;
+    return "There it is — you've got the basics down, and you're still breathing. That puts you ahead of most who pass through here. Take your reward, and keep your eyes open out there. The Reach is wider and stranger than it looks.";
   }
 }
 

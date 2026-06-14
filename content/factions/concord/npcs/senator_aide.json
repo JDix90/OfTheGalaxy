@@ -1,0 +1,55 @@
+{
+  "id": "npc_senator_aide",
+  "name": "Marcus Vale",
+  "species": "human",
+  "occupation": "Senator's Aide",
+  "factionId": "concord",
+  "location": {
+    "planet": "centralis",
+    "area": "senate_district",
+    "x": 505,
+    "y": 505
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "I need to speak with you. Privately. It's urgent.",
+      "acquaintance": "You've proven trustworthy. I have more information.",
+      "friend": "My friend, you're the only one I can trust with this.",
+      "confidant": "I'm putting my career on the line here. But it's the right thing to do."
+    },
+    "questRelated": {
+      "nr_centralis_01_whispers": "I work for Senator Vorin. He's... he's corrupt. I've seen things—bribes, kickbacks, deals with the Corporate Sector. I can't prove it alone, but I know it's true. The Concord is supposed to be better than the Iron Dominion, but people like Vorin are making it just as bad. I need someone to investigate, someone who can't be bought or intimidated. Will you help me expose him?"
+    },
+    "general": [
+      "I came to Centralis to make a difference. Now I'm not sure I can.",
+      "The Assembly is supposed to represent the people. But some senators only represent themselves.",
+      "I've seen how power corrupts. It's not pretty.",
+      "The Concord needs to be better. We can't let corruption take root.",
+      "I'm risking everything by coming forward. But it's the right thing to do."
+    ]
+  },
+  "quests": ["nr_centralis_01_whispers"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "late 20s",
+    "build": "average, nervous",
+    "hair": "brown, neat",
+    "eyes": "worried brown",
+    "distinguishingFeatures": "Assembly aide uniform, constantly checking surroundings, nervous demeanor, datapad"
+  },
+  "biography": "Marcus Vale is a young, idealistic aide who works for Senator Vorin. He came to Centralis full of hope, wanting to serve the Concord. But working for Vorin has shown him the Torn Veil of politics—corruption, bribery, and abuse of power. He's torn between loyalty to his job and his conscience. He's finally decided to act, but he needs help. He represents the struggle between idealism and reality in the Concord.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 70,
+    "formality": 60,
+    "humor": 20,
+    "trust": 50
+  }
+}
+
+
+

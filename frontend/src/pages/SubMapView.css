@@ -10,7 +10,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  /* Extra top padding so the title/controls clear the fixed HUD widgets
+     (Health/Stamina top-left, Credits/Level/XP top-right) overlaying this bar. */
+  padding: 3.25rem 2rem 1rem;
   background: #16213e;
   border-bottom: 2px solid #0f3460;
   position: relative;
@@ -177,3 +179,23 @@
   background: #ef4444;
 }
 
+
+/* NPC marker legend (sub-map) */
+.submap-npc-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(10, 16, 32, 0.82);
+  border: 1px solid rgba(90, 120, 200, 0.25);
+  border-radius: 8px;
+  font-size: 0.72rem;
+  color: #cfe0ff;
+  pointer-events: none;
+}
+.submap-npc-legend .legend-item { display: inline-flex; align-items: center; gap: 0.3rem; }
+.submap-npc-legend .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }

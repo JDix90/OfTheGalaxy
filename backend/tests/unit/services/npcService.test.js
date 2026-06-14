@@ -21,7 +21,7 @@ describe('NPCService', () => {
       name: 'Test NPC',
       npcType: 'quest_giver',
       factionId: 'independent_investigators',
-      planetId: 'chandrila',
+      planetId: 'solenne',
       location: { x: 50, y: 50, area: 'surface' },
       personality: {
         traits: ['friendly', 'helpful']
@@ -31,7 +31,7 @@ describe('NPCService', () => {
 
   describe('getNPCsByLocation', () => {
     test('should get NPCs at specific location', async () => {
-      const npcs = await npcService.getNPCsByLocation('chandrila', {
+      const npcs = await npcService.getNPCsByLocation('solenne', {
         x: 50,
         y: 50,
         area: 'surface'
@@ -43,7 +43,7 @@ describe('NPCService', () => {
     });
 
     test('should return empty array if no NPCs at location', async () => {
-      const npcs = await npcService.getNPCsByLocation('chandrila', {
+      const npcs = await npcService.getNPCsByLocation('solenne', {
         x: 10,
         y: 10,
         area: 'surface'
@@ -68,7 +68,7 @@ describe('NPCService', () => {
         name: 'New NPC',
         npcType: 'vendor',
         factionId: 'independent_investigators',
-        planetId: 'chandrila',
+        planetId: 'solenne',
         location: { x: 50, y: 50, area: 'surface' }
       });
 

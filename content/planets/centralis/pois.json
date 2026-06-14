@@ -1,0 +1,58 @@
+{
+  "planetId": "centralis",
+  "pointsOfInterest": [
+    {
+      "id": "poi_keeper_temple",
+      "name": "The Keeper Sanctum (Ruined)",
+      "type": "temple",
+      "description": "The ancient Keeper Sanctum, now in ruins after the Iron Dominion's purge. Still holds secrets and artifacts for those brave enough to explore.",
+      "location": {
+        "x": 500,
+        "y": 300,
+        "area": "temple_district"
+      },
+      "subMapType": "temple",
+      "dangerLevel": 4
+    },
+    {
+      "id": "poi_senate_building",
+      "name": "The Concord Assembly Building",
+      "type": "government",
+      "description": "The seat of the Concord government. A place of political intrigue, corruption, and power.",
+      "location": {
+        "x": 500,
+        "y": 500,
+        "area": "senate_district"
+      },
+      "subMapType": "government"
+    },
+    {
+      "id": "poi_underworld_nightrun",
+      "name": "Underworld Sector U-Scru",
+      "type": "danger",
+      "description": "The dangerous lower levels of Centralis. A lawless zone where information brokers, criminals, and outcasts operate.",
+      "location": {
+        "x": 300,
+        "y": 800,
+        "area": "underworld"
+      },
+      "subMapType": "danger",
+      "dangerLevel": 7
+    },
+    {
+      "id": "poi_galactic_city",
+      "name": "Central Spire",
+      "type": "city",
+      "description": "The main city district of Centralis, home to the wealthy and powerful. A stark contrast to the underworld below.",
+      "location": {
+        "x": 500,
+        "y": 400,
+        "area": "galactic_city"
+      },
+      "subMapType": "city"
+    }
+  ]
+}
+
+
+

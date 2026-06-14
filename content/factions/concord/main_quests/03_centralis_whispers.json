@@ -1,0 +1,69 @@
+{
+  "id": "nr_centralis_01_whispers",
+  "factionId": "concord",
+  "questType": "main",
+  "title": "Whispers of Corruption",
+  "description": "Marcus Vale, a senator's aide, has come forward with disturbing information. Senator Vorin, the senator he works for, is corrupt—taking bribes, making deals with the Corporate Sector, and using his position for personal gain. Marcus can't prove it alone, but he knows it's true. The Concord is supposed to be better than the Iron Dominion, but people like Vorin are making it just as bad. Will you help expose him?",
+  "shortDescription": "Investigate and expose corrupt Senator Vorin",
+  "prerequisites": {
+    "level": 6,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_aide",
+      "type": "interact",
+      "description": "Meet with Marcus Vale, the senator's aide",
+      "target": "npc_senator_aide"
+    },
+    {
+      "id": "gather_initial_evidence",
+      "type": "collect",
+      "description": "Gather initial evidence of corruption",
+      "target": "corruption_evidence",
+      "count": 1
+    },
+    {
+      "id": "investigate_senator",
+      "type": "discover",
+      "description": "Investigate Senator Vorin's activities",
+      "evidenceId": "evidence_senator_corruption"
+    },
+    {
+      "id": "find_bribery_records",
+      "type": "collect",
+      "description": "Find bribery records",
+      "target": "bribery_records",
+      "count": 1
+    }
+  ],
+  "rewards": {
+    "xp": 1000,
+    "credits": 500,
+    "reputation": {
+      "concord": 30
+    },
+    "items": [
+      {
+        "itemId": "corruption_evidence",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["nr_centralis_03_underworld_connection"]
+  },
+  "questGiverId": "npc_senator_aide",
+  "startLocation": {
+    "planet": "centralis",
+    "area": "senate_district"
+  },
+  "estimatedTime": 60,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": "nr_centralis_corruption_chain",
+  "chainOrder": 1
+}
+
+
+

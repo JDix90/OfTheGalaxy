@@ -270,10 +270,10 @@ class DialogueTemplateService {
             score += 5;
           }
         }
-        if (intent.type === 'jedi_info' && (template.category === 'faction_info' || template.topics.includes('jedi'))) {
-          score += 10; // High priority for Jedi questions
+        if (intent.type === 'keeper_info' && (template.category === 'faction_info' || template.topics.includes('keeper'))) {
+          score += 10; // High priority for Keeper questions
         }
-        if (intent.type === 'sith_info' && (template.category === 'faction_info' || template.topics.includes('sith'))) {
+        if (intent.type === 'hollow_info' && (template.category === 'faction_info' || template.topics.includes('hollow'))) {
           score += 10;
         }
         if (intent.type === 'resources' && template.topics.includes('resources')) {
@@ -396,38 +396,38 @@ class DialogueTemplateService {
     }
     
     // Specific entity questions (check next for precision)
-    // Jedi-related
-    if (message.match(/\b(jedi|jedi order|force|lightsaber|temple)\b/)) {
+    // Keeper-related
+    if (message.match(/\b(keeper|keeper order|force|arcblade|temple)\b/)) {
       return { 
-        type: 'jedi_info', 
-        topics: ['jedi', 'faction', 'lore'],
-        keywords: ['jedi', 'jedi order', 'force', 'lightsaber', 'temple'],
+        type: 'keeper_info', 
+        topics: ['keeper', 'faction', 'lore'],
+        keywords: ['keeper', 'keeper order', 'force', 'arcblade', 'temple'],
         priority: 10
       };
     }
     
-    // Sith-related
-    if (message.match(/\b(sith|dark side|sith lord)\b/)) {
+    // Hollow-related
+    if (message.match(/\b(hollow|Torn Veil|hollow lord)\b/)) {
       return { 
-        type: 'sith_info', 
-        topics: ['sith', 'faction', 'lore'],
-        keywords: ['sith', 'dark side'],
+        type: 'hollow_info', 
+        topics: ['hollow', 'faction', 'lore'],
+        keywords: ['hollow', 'Torn Veil'],
         priority: 10
       };
     }
     
     // Specific faction mentions
     const factionKeywords = {
-      'galactic_republic': ['republic', 'galactic republic'],
-      'galactic_empire': ['empire', 'galactic empire', 'imperial'],
-      'rebel_alliance': ['rebel', 'alliance', 'rebellion'],
-      'new_republic': ['new republic'],
-      'first_order': ['first order'],
-      'resistance': ['resistance'],
-      'mandalorians': ['mandalorian', 'mandalore'],
-      'hutts': ['hutt', 'hutts'],
-      'black_sun': ['black sun'],
-      'crimson_dawn': ['crimson dawn'],
+      'old_concord': ['old concord'],
+      'iron_dominion': ['dominion', 'iron dominion'],
+      'free_worlds': ['free worlds', 'free world'],
+      'concord': ['concord'],
+      'ascendancy': ['ascendancy'],
+      'uprising': ['uprising'],
+      'ironkin': ['ironkin', 'veshkar'],
+      'vorr': ['vorr'],
+      'umbra': ['umbra'],
+      'scarlet_tide': ['scarlet tide'],
       'neutral': ['neutral', 'unaffiliated']
     };
     
@@ -455,7 +455,7 @@ class DialogueTemplateService {
     }
     
     // Planet overview questions
-    if (message.match(/\b(tell me about|what about|what is|describe|tell me)\b.*\b(planet|world|coruscant|tatooine|ryloth|dantooine|naboo)\b/i)) {
+    if (message.match(/\b(tell me about|what about|what is|describe|tell me)\b.*\b(planet|world|centralis|gravenmoor|sytha|caldon|eloria)\b/i)) {
       return { 
         type: 'planet_overview', 
         topics: ['planet', 'overview', 'general'],
@@ -757,26 +757,26 @@ class DialogueTemplateService {
     if (!factionId) return 'Unaffiliated';
     
     const displayNames = {
-      'galactic_republic': 'Galactic Republic',
-      'galactic_empire': 'Galactic Empire',
-      'rebel_alliance': 'Rebel Alliance',
-      'new_republic': 'New Republic',
-      'first_order': 'First Order',
-      'resistance': 'Resistance',
-      'jedi_order': 'Jedi Order',
-      'sith': 'Sith',
-      'mandalorians': 'Mandalorians',
-      'hutts': 'Hutts',
-      'black_sun': 'Black Sun',
-      'crimson_dawn': 'Crimson Dawn',
+      'old_concord': 'Old Concord',
+      'iron_dominion': 'Iron Dominion',
+      'free_worlds': 'Free Worlds',
+      'concord': 'Concord',
+      'ascendancy': 'Ascendancy',
+      'uprising': 'Uprising',
+      'keeper_order': 'Keeper Order',
+      'hollow': 'Hollow',
+      'ironkin': 'Ironkin',
+      'vorr': 'Vorr',
+      'umbra': 'Umbra',
+      'scarlet_tide': 'Scarlet Tide',
       'independent': 'Independent',
       'neutral': 'Neutral',
       'smugglers': 'Smugglers',
-      'bounty_hunters': 'Bounty Hunters',
-      'trade_federation': 'Trade Federation',
-      'separatists': 'Separatists',
-      'chiss_ascendancy': 'Chiss Ascendancy',
-      'hapes_consortium': 'Hapes Consortium'
+      'the_tally': 'Bounty Hunters',
+      'commerce_league': 'Commerce League',
+      'secession': 'Secessionists',
+      'vorne_ascendancy': 'Vorne Ascendancy',
+      'hesperan_consortium': 'Hesperan Consortium'
     };
 
     return displayNames[factionId] || factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

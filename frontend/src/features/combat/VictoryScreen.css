@@ -174,3 +174,23 @@
   }
 }
 
+
+/* --- #17A loot rarity reveal --- */
+.reward-loot .loot-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  margin: 0.2rem;
+  border: 1px solid;
+  border-radius: 6px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+}
+.loot-reveal { animation: loot-reveal-in 0.45s cubic-bezier(0.2, 1.1, 0.4, 1) both; }
+.loot-rarity-tag { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; opacity: 0.9; }
+@keyframes loot-reveal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .loot-reveal { animation: none; } }

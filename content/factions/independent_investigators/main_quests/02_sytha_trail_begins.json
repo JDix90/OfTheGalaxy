@@ -1,0 +1,75 @@
+{
+  "id": "iia_sytha_01_trail_begins",
+  "factionId": "independent_investigators",
+  "questType": "main",
+  "title": "The Trail Begins",
+  "description": "Following the refugees' stories, you've learned that many came from Sytha, specifically Tann Province. The informant Keth Varr in Sythmar has information about the connection between the mines and Compound 7-Alpha. Travel to Sytha and investigate the trail that leads back to the compound.",
+  "shortDescription": "Follow the trail to Sytha and investigate the connection to Compound 7-Alpha",
+  "prerequisites": {
+    "level": 3,
+    "reputation": {
+      "independent_investigators": 25
+    },
+    "completedQuests": ["iia_main_01_compound_investigation"],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "travel_sytha",
+      "type": "travel",
+      "description": "Travel to Sytha",
+      "location": {
+        "planet": "sytha",
+        "area": "sythmar"
+      }
+    },
+    {
+      "id": "meet_informant",
+      "type": "interact",
+      "description": "Speak with Keth Varr, the information broker in Sythmar",
+      "target": "npc_sytheen_informant"
+    },
+    {
+      "id": "discover_tann_connection",
+      "type": "discover",
+      "description": "Learn about the connection between Tann Province and Compound 7-Alpha",
+      "evidenceId": "evidence_tann_compound_connection"
+    },
+    {
+      "id": "investigate_refugee_settlement",
+      "type": "travel",
+      "description": "Visit the refugee settlement in Tann Province",
+      "location": {
+        "planet": "sytha",
+        "area": "tann_province"
+      }
+    }
+  ],
+  "rewards": {
+    "xp": 750,
+    "credits": 300,
+    "reputation": {
+      "independent_investigators": 30
+    },
+    "items": [
+      {
+        "itemId": "ryll_spice_sample",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["iia_sytha_02_mines_investigation"]
+  },
+  "questGiverId": "npc_sytheen_informant",
+  "startLocation": {
+    "planet": "sytha",
+    "area": "sythmar"
+  },
+  "estimatedTime": 60,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": "iia_main_chain",
+  "chainOrder": 2
+}
+
+
+

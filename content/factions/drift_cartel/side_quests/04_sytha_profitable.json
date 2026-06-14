@@ -1,0 +1,76 @@
+{
+  "id": "sg_sytha_01_profitable_opportunity",
+  "factionId": "drift_cartel",
+  "questType": "side",
+  "title": "A Profitable Opportunity",
+  "description": "Zara Vex, a smuggler operating on Sytha, sees an opportunity. Ryll spice is worth a fortune in the right markets, and the syndicate controls the mines. But there are independent producers in Tann Province who need someone to move their product. The Guild wants to establish a trade route. Interested? It's profitable, but dangerous. The syndicate doesn't like competition.",
+  "shortDescription": "Establish a spice trade route bypassing the syndicate",
+  "prerequisites": {
+    "level": 5,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_smuggler",
+      "type": "interact",
+      "description": "Meet with Zara Vex in Sythmar",
+      "target": "npc_smuggler_contact_sytha"
+    },
+    {
+      "id": "contact_producers",
+      "type": "travel",
+      "description": "Contact independent spice producers in Tann Province",
+      "location": {
+        "planet": "sytha",
+        "area": "tann_province"
+      }
+    },
+    {
+      "id": "negotiate_deal",
+      "type": "custom",
+      "description": "Negotiate a deal with the producers",
+      "target": "spice_deal"
+    },
+    {
+      "id": "establish_route",
+      "type": "custom",
+      "description": "Establish the trade route (avoid syndicate patrols)",
+      "target": "trade_route"
+    },
+    {
+      "id": "complete_first_run",
+      "type": "custom",
+      "description": "Complete the first successful spice run",
+      "target": "first_run"
+    }
+  ],
+  "rewards": {
+    "xp": 1500,
+    "credits": 3000,
+    "reputation": {
+      "drift_cartel": 60
+    },
+    "items": [
+      {
+        "itemId": "smuggler_badge",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_smuggler_contact_sytha",
+  "startLocation": {
+    "planet": "sytha",
+    "area": "sythmar"
+  },
+  "estimatedTime": 90,
+  "difficulty": "hard",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+
+

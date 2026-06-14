@@ -1,0 +1,55 @@
+{
+  "id": "npc_nr_intel_officer",
+  "name": "Commander Elena Rost",
+  "species": "human",
+  "occupation": "Concord Intelligence Officer",
+  "factionId": "concord",
+  "location": {
+    "planet": "caldon",
+    "area": "settlement",
+    "x": 305,
+    "y": 505
+  },
+  "npcType": "quest_giver",
+  "isCompanion": false,
+  "dialogue": {
+    "greeting": {
+      "stranger": "I'm Commander Rost, Concord Intelligence. I need to speak with you.",
+      "acquaintance": "You've proven reliable. I have another mission for you.",
+      "friend": "My friend, you've become one of my most trusted operatives. Thank you.",
+      "confidant": "I trust you completely. This mission is critical to the Concord's security."
+    },
+    "questRelated": {
+      "nr_caldon_01_abandoned_base": "We've received intelligence that the abandoned Rebel base on Caldon may still contain classified information from the early days of the Alliance. The Iron Dominion discovered the base during the war, but we believe some data was never recovered. The base is dangerous—old security systems, possible Dominion traps, maybe even Dominion Remnant activity. But the intelligence could be invaluable. Will you help us recover it?",
+      "nr_caldon_01_abandoned_base_return": "Excellent work! This intelligence is exactly what we needed. The datapads contain information about early Alliance operations and Dominion movements. This will help us understand the Iron Dominion's tactics and potentially prevent future threats. The Concord thanks you for your service. Here are your rewards."
+    },
+    "general": [
+      "The early Alliance took risks that the Concord can't afford. But we can learn from their courage.",
+      "Intelligence work isn't glamorous, but it's essential. We prevent wars before they start.",
+      "The Dominion Remnant is still out there. We can't let our guard down.",
+      "Every piece of intelligence we recover helps us understand our enemies better.",
+      "The base was abandoned in a hurry. There's no telling what was left behind."
+    ]
+  },
+  "quests": ["nr_caldon_01_abandoned_base"],
+  "vendorInventory": null,
+  "companionAbilities": null,
+  "companionStats": null,
+  "appearance": {
+    "age": "early 30s",
+    "build": "athletic, professional",
+    "hair": "black, short, practical",
+    "eyes": "brown, sharp",
+    "distinguishingFeatures": "Concord uniform, datapad, professional demeanor, observant eyes"
+  },
+  "biography": "Commander Elena Rost is a dedicated Concord Intelligence officer who specializes in recovering lost Alliance intelligence and countering Dominion Remnant operations. She's professional, mission-focused, and deeply committed to the Concord's ideals. She's not cold—she cares about her people—but she's pragmatic and knows that intelligence work requires difficult choices. She represents the Concord's ongoing struggle to secure the galaxy while maintaining its values.",
+  "isAvailable": true,
+  "personalityTraits": {
+    "empathy": 50,
+    "formality": 70,
+    "humor": 20,
+    "trust": 55
+  }
+}
+
+

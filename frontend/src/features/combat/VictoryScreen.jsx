@@ -3,15 +3,19 @@
  * Displays victory or defeat screen with rewards
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterSlice';
 import { useCombatStore } from '../../state/combatSlice';
 import { useQuestStore } from '../../state/questSlice';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
+import { gameEventBus, GAME_EVENTS } from '../../services/gameEventBus';
+import { getRarityColor, getRarityClass, getRarityName } from '../../utils/itemRarity';
+import { formatDisplayName } from '../../utils/formatName';
+import LevelUpModal from '../../components/character/LevelUpModal';
 import './VictoryScreen.css';
 
-export default function VictoryScreen({ status, encounter, onClose, returnLocation: propReturnLocation }) {
+export default function VictoryScreen({ status, encounter, onClose, returnLocation: propReturnLocation, preCombatLevel }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentCharacter, setCurrentCharacter } = useCharacterStore();
@@ -20,6 +24,11 @@ export default function VictoryScreen({ status, encounter, onClose, returnLocati
   const [rewards, setRewards] = useState(null);
   const [updatedCharacter, setUpdatedCharacter] = useState(null); // Store updated character for navigation
   const [isLoadingCharacter, setIsLoadingCharacter] = useState(true); // Track character reload
+  const [levelUpInfo, setLevelUpInfo] = useState(null); // { fromLevel, toLevel, skillPoints, attributePoints }
+  // Prefer the level snapshotted by CombatView at combat start. The store's
+  // currentCharacter may already be incremented by the kill-reward reload in
+  // combatSlice.executeAction, so it is an unreliable source here.
+  const preCombatLevelRef = useRef(preCombatLevel ?? currentCharacter?.level ?? 1);
 
   useEffect(() => {
     // Emit combat ended event for tutorial tracking
@@ -88,6 +97,19 @@ export default function VictoryScreen({ status, encounter, onClose, returnLocati
               setCurrentCharacter(updated);
               setUpdatedCharacter(updated); // Store for navigation
               setIsLoadingCharacter(false);
+
+              // #17A: celebrate a level-up gained from this fight's XP
+              const fromLevel = preCombatLevelRef.current;
+              if (status === 'won' && updated.level > fromLevel) {
+                const info = {
+                  fromLevel,
+                  toLevel: updated.level,
+                  skillPoints: updated.skillPoints || 0,
+                  attributePoints: updated.attributePoints || 0
+                };
+                setLevelUpInfo(info);
+                gameEventBus.emit(GAME_EVENTS.COMBAT_LEVEL_UP, info);
+              }
               
               // Reload active quests to check for completions (especially for dungeon quests)
               if (updated.id) {
@@ -258,11 +280,21 @@ export default function VictoryScreen({ status, encounter, onClose, returnLocati
                   <div className="reward-item">
                     <span className="reward-label">Loot:</span>
                     <div className="reward-loot">
-                      {rewards.loot.map((item, index) => (
-                        <span key={index} className="loot-item">
-                          {item.itemId} x{item.quantity}
-                        </span>
-                      ))}
+                      {rewards.loot.map((item, index) => {
+                        const rarity = item.rarity || 'common';
+                        const showcase = rarity === 'epic' || rarity === 'legendary' || rarity === 'rare';
+                        return (
+                          <span
+                            key={index}
+                            className={`loot-item loot-reveal ${getRarityClass(rarity)}`}
+                            style={{ color: getRarityColor(rarity), borderColor: getRarityColor(rarity), boxShadow: showcase ? `0 0 14px ${getRarityColor(rarity)}66` : 'none' }}
+                            title={`${getRarityName(rarity)} item`}
+                          >
+                            {item.name || formatDisplayName(item.itemId)}{item.quantity > 1 ? ` ×${item.quantity}` : ''}
+                            {showcase && <span className="loot-rarity-tag">{getRarityName(rarity)}!</span>}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -306,6 +338,16 @@ export default function VictoryScreen({ status, encounter, onClose, returnLocati
           Continue
         </button>
       </div>
+
+      {levelUpInfo && (
+        <LevelUpModal
+          fromLevel={levelUpInfo.fromLevel}
+          toLevel={levelUpInfo.toLevel}
+          skillPoints={levelUpInfo.skillPoints}
+          attributePoints={levelUpInfo.attributePoints}
+          onClose={() => setLevelUpInfo(null)}
+        />
+      )}
     </div>
   );
 }

@@ -518,7 +518,7 @@ class QuestDependencyService {
    */
   selectRandomSpecies(planet, rnd = Math.random) {
     // Common species across the galaxy
-    const commonSpecies = ['human', 'twilek', 'rodian', 'zabrak', 'togruta', 'mirialan'];
+    const commonSpecies = ['human', 'sytheen', 'skarn', 'karnaki', 'sethari', 'jeharu'];
     return commonSpecies[Math.floor(rnd() * commonSpecies.length)];
   }
 

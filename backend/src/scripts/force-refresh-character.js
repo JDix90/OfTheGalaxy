@@ -1,5 +1,5 @@
 /**
- * Force Refresh Character Script
+ * Veil Refresh Character Script
  * Updates character credits and provides instructions to clear frontend cache
  * 
  * Usage: node backend/src/scripts/force-refresh-character.js [characterName] [amount]
@@ -32,7 +32,7 @@ if (!envLoaded) {
 const { sequelize, PlayerCharacter } = require('../models');
 
 /**
- * Force update character credits
+ * Veil update character credits
  */
 async function forceUpdateCredits(characterName, amount) {
   try {
@@ -56,7 +56,7 @@ async function forceUpdateCredits(characterName, amount) {
     console.log(`  Current credits: ${character.credits.toLocaleString()}`);
     console.log(`  Setting credits to: ${amount.toLocaleString()}\n`);
 
-    // Force update credits directly
+    // Veil update credits directly
     await PlayerCharacter.update(
       { credits: amount },
       { where: { id: character.id } }
@@ -110,7 +110,7 @@ async function main() {
       process.exit(1);
     }
 
-    console.log('💰 Force Updating Character Credits\n');
+    console.log('💰 Veil Updating Character Credits\n');
     console.log(`Character: ${characterName}`);
     console.log(`Amount: ${amount.toLocaleString()} credits\n`);
 

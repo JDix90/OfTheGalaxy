@@ -11,7 +11,7 @@ const BACKGROUNDS = [
     id: 'smuggler',
     name: 'Smuggler',
     description: 'You made your living on the edge of the law, running cargo and avoiding authorities.',
-    startingPlanet: 'Nar Shaddaa',
+    startingPlanet: 'Sinkport',
     startingCredits: 2000,
     skills: 'Stealth, Piloting'
   },
@@ -19,7 +19,7 @@ const BACKGROUNDS = [
     id: 'scholar',
     name: 'Scholar',
     description: 'You devoted your life to knowledge and understanding the mysteries of the galaxy.',
-    startingPlanet: 'Coruscant',
+    startingPlanet: 'Centralis',
     startingCredits: 1500,
     skills: 'Technical, Diplomacy'
   },
@@ -27,7 +27,7 @@ const BACKGROUNDS = [
     id: 'soldier',
     name: 'Soldier',
     description: 'You served in military forces, trained in combat and discipline.',
-    startingPlanet: 'Chandrila',
+    startingPlanet: 'Solenne',
     startingCredits: 1000,
     skills: 'Combat, Survival'
   },
@@ -35,7 +35,7 @@ const BACKGROUNDS = [
     id: 'medic',
     name: 'Medic',
     description: 'You dedicated yourself to healing and helping others in need.',
-    startingPlanet: 'Chandrila',
+    startingPlanet: 'Solenne',
     startingCredits: 1200,
     skills: 'Survival, Diplomacy'
   },
@@ -43,7 +43,7 @@ const BACKGROUNDS = [
     id: 'engineer',
     name: 'Engineer',
     description: 'You have a talent for building, repairing, and understanding technology.',
-    startingPlanet: 'Corellia',
+    startingPlanet: 'Drydock',
     startingCredits: 1300,
     skills: 'Technical, Survival'
   },
@@ -51,7 +51,7 @@ const BACKGROUNDS = [
     id: 'diplomat',
     name: 'Diplomat',
     description: 'You excel at negotiation and navigating complex social situations.',
-    startingPlanet: 'Naboo',
+    startingPlanet: 'Eloria',
     startingCredits: 2500,
     skills: 'Diplomacy, Technical'
   },
@@ -59,7 +59,7 @@ const BACKGROUNDS = [
     id: 'pilot',
     name: 'Pilot',
     description: 'You feel most at home in a cockpit, navigating the stars.',
-    startingPlanet: 'Corellia',
+    startingPlanet: 'Drydock',
     startingCredits: 1800,
     skills: 'Technical, Combat'
   }

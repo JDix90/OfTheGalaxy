@@ -10,7 +10,6 @@ import { galaxyApi } from '../../services/api/galaxyApi';
 import SpeciesSelection from './steps/SpeciesSelection';
 import BackgroundSelection from './steps/BackgroundSelection';
 import AttributeAllocation from './steps/AttributeAllocation';
-import AppearanceCustomization from './steps/AppearanceCustomization';
 import NameAndConfirm from './steps/NameAndConfirm';
 import './CharacterCreation.css';
 
@@ -18,7 +17,6 @@ const STEPS = [
   { id: 'species', title: 'Choose Species', component: SpeciesSelection },
   { id: 'background', title: 'Choose Background', component: BackgroundSelection },
   { id: 'attributes', title: 'Allocate Attributes', component: AttributeAllocation },
-  { id: 'appearance', title: 'Customize Appearance', component: AppearanceCustomization },
   { id: 'confirm', title: 'Name & Confirm', component: NameAndConfirm }
 ];
 
@@ -155,9 +153,7 @@ export default function CharacterCreation() {
         return characterData.background !== null;
       case 2: // Attributes
         return true; // Can always proceed from attributes
-      case 3: // Appearance
-        return true; // Can always proceed from appearance
-      case 4: // Name
+      case 3: // Name & Confirm
         return characterData.name.trim().length >= 2;
       default:
         return false;

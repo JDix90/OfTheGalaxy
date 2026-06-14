@@ -5,8 +5,8 @@
  */
 
 const factionProfiles = {
-  galactic_republic: {
-    name: 'Galactic Republic',
+  old_concord: {
+    name: 'Old Concord',
     personality: {
       authorityRespect: 85,
       agreeableness: 70,
@@ -39,8 +39,8 @@ const factionProfiles = {
     }
   },
 
-  galactic_empire: {
-    name: 'Galactic Empire',
+  iron_dominion: {
+    name: 'Iron Dominion',
     personality: {
       authorityRespect: 95,
       agreeableness: 30,
@@ -52,7 +52,7 @@ const factionProfiles = {
     rhetoric: {
       commonPhrases: [
         'order and security',
-        'imperial might',
+        'dominion might',
         'the Emperor\'s will',
         'strength through unity',
         'peace through power'
@@ -73,8 +73,8 @@ const factionProfiles = {
     }
   },
 
-  rebel_alliance: {
-    name: 'Rebel Alliance',
+  free_worlds: {
+    name: 'Free Worlds',
     personality: {
       authorityRespect: 20,
       agreeableness: 75,
@@ -98,7 +98,7 @@ const factionProfiles = {
     dialogueStyle: {
       formality: 'low',
       tone: 'passionate',
-      topics: ['freedom', 'resistance', 'hope', 'justice', 'rebellion']
+      topics: ['freedom', 'uprising', 'hope', 'justice', 'rebellion']
     },
     relationshipModifiers: {
       neutral: { trustBonus: 5, suspicionLevel: 0.4 },
@@ -107,8 +107,8 @@ const factionProfiles = {
     }
   },
 
-  new_republic: {
-    name: 'New Republic',
+  concord: {
+    name: 'Concord',
     personality: {
       authorityRespect: 70,
       agreeableness: 75,
@@ -141,8 +141,8 @@ const factionProfiles = {
     }
   },
 
-  jedi_order: {
-    name: 'Jedi Order',
+  keeper_order: {
+    name: 'Keeper Order',
     personality: {
       authorityRespect: 60,
       agreeableness: 80,
@@ -153,9 +153,9 @@ const factionProfiles = {
     },
     rhetoric: {
       commonPhrases: [
-        'may the Force be with you',
+        'may the Veil be with you',
         'peace and knowledge',
-        'the will of the Force',
+        'the will of the Veil',
         'wisdom and patience',
         'balance in all things'
       ],
@@ -166,7 +166,7 @@ const factionProfiles = {
     dialogueStyle: {
       formality: 'high',
       tone: 'wise',
-      topics: ['the Force', 'wisdom', 'peace', 'balance', 'knowledge']
+      topics: ['the Veil', 'wisdom', 'peace', 'balance', 'knowledge']
     },
     relationshipModifiers: {
       neutral: { trustBonus: 10, suspicionLevel: 0.2 },
@@ -175,8 +175,8 @@ const factionProfiles = {
     }
   },
 
-  sith: {
-    name: 'Sith',
+  hollow: {
+    name: 'Hollow',
     personality: {
       authorityRespect: 50,
       agreeableness: 20,
@@ -189,7 +189,7 @@ const factionProfiles = {
       commonPhrases: [
         'power through passion',
         'strength and dominance',
-        'the dark side',
+        'the Torn Veil',
         'unlimited power',
         'peace is a lie'
       ],
@@ -200,7 +200,7 @@ const factionProfiles = {
     dialogueStyle: {
       formality: 'high',
       tone: 'intimidating',
-      topics: ['power', 'strength', 'dominance', 'the dark side', 'passion']
+      topics: ['power', 'strength', 'dominance', 'the Torn Veil', 'passion']
     },
     relationshipModifiers: {
       neutral: { trustBonus: -15, suspicionLevel: 0.6 },
@@ -209,8 +209,8 @@ const factionProfiles = {
     }
   },
 
-  mandalorians: {
-    name: 'Mandalorians',
+  ironkin: {
+    name: 'Ironkin',
     personality: {
       authorityRespect: 40,
       agreeableness: 50,
@@ -225,7 +225,7 @@ const factionProfiles = {
         'honor and strength',
         'clan and family',
         'warrior\'s code',
-        'mandalorian honor'
+        'ironkin honor'
       ],
       formalAddress: false,
       respectTitles: false,
@@ -243,8 +243,8 @@ const factionProfiles = {
     }
   },
 
-  hutts: {
-    name: 'Hutts',
+  vorr: {
+    name: 'Vorr',
     personality: {
       authorityRespect: 30,
       agreeableness: 20,
@@ -311,7 +311,7 @@ const factionProfiles = {
     }
   },
 
-  bounty_hunters: {
+  the_tally: {
     name: 'Bounty Hunters',
     personality: {
       authorityRespect: 25,

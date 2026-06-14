@@ -1,0 +1,69 @@
+{
+  "id": "sg_gravenmoor_01_wyrm_legend",
+  "factionId": "drift_cartel",
+  "questType": "main",
+  "title": "The Dune Wyrm Legend",
+  "description": "An old moisture farmer tells you of a legendary wyrm dragon in the Sunder Wastes—bigger and more dangerous than any seen before. It's been attacking moisture farms, leaving nothing but bones. Some say it's protecting something valuable. Others say it's just old and angry. Either way, someone needs to deal with it. Are you that someone?",
+  "shortDescription": "Investigate the legendary wyrm dragon in the Sunder Wastes",
+  "prerequisites": {
+    "level": 5,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "speak_farmer",
+      "type": "interact",
+      "description": "Speak with the old moisture farmer about the wyrm dragon",
+      "target": "npc_old_farmer"
+    },
+    {
+      "id": "obtain_report",
+      "type": "collect",
+      "description": "Obtain the wyrm dragon sighting report",
+      "target": "wyrm_report",
+      "count": 1
+    },
+    {
+      "id": "investigate_wastes",
+      "type": "travel",
+      "description": "Travel to the Sunder Wastes to investigate",
+      "location": {
+        "planet": "gravenmoor",
+        "area": "sunder_wastes"
+      }
+    },
+    {
+      "id": "find_dragon_lair",
+      "type": "discover",
+      "description": "Find the wyrm dragon's lair",
+      "evidenceId": "evidence_dragon_lair"
+    }
+  ],
+  "rewards": {
+    "xp": 1000,
+    "credits": 500,
+    "reputation": {
+      "drift_cartel": 30
+    },
+    "items": [
+      {
+        "itemId": "wyrm_report",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["sg_gravenmoor_02_preparation"]
+  },
+  "questGiverId": "npc_old_farmer",
+  "startLocation": {
+    "planet": "gravenmoor",
+    "area": "greywell"
+  },
+  "estimatedTime": 60,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": "sg_gravenmoor_wyrm_chain",
+  "chainOrder": 1
+}
+

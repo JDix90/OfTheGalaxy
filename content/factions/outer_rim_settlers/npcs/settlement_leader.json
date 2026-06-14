@@ -5,7 +5,7 @@
   "occupation": "Settlement Leader",
   "factionId": "outer_rim_settlers",
   "location": {
-    "planet": "dantooine",
+    "planet": "caldon",
     "area": "settlement",
     "x": 300,
     "y": 500
@@ -20,17 +20,17 @@
       "confidant": "You understand what we're building here. That means everything to us."
     },
     "questRelated": {
-      "dantooine_side_02_peaceful_settlement": "Our settlement is growing, and that brings challenges. We need to establish trade routes, mediate disputes, and build infrastructure. We're not asking for handouts—we're asking for partnership. Can you help us? There are tasks that need doing, and we could use someone with your skills. In return, you'll have a place here, and our gratitude."
+      "caldon_side_02_peaceful_settlement": "Our settlement is growing, and that brings challenges. We need to establish trade routes, mediate disputes, and build infrastructure. We're not asking for handouts—we're asking for partnership. Can you help us? There are tasks that need doing, and we could use someone with your skills. In return, you'll have a place here, and our gratitude."
     },
     "general": [
       "We came here to build something new. Something better.",
       "The settlement is proof that people can work together, regardless of where they came from.",
-      "We don't need the New Republic or the Empire. We just need each other.",
+      "We don't need the Concord or the Iron Dominion. We just need each other.",
       "Every person who joins us makes us stronger.",
       "This is our home. We'll protect it, and we'll help anyone who helps us."
     ]
   },
-  "quests": ["dantooine_side_02_peaceful_settlement"],
+  "quests": ["caldon_side_02_peaceful_settlement"],
   "vendorInventory": null,
   "companionAbilities": null,
   "companionStats": null,
@@ -41,7 +41,7 @@
     "eyes": "wise blue",
     "distinguishingFeatures": "Traditional settler clothing, walking staff, warm smile, community leader presence"
   },
-  "biography": "Elder Mara is the leader of the Dantooine settlement, a community of refugees, settlers, and those seeking a simpler life. She's wise, compassionate, and has a vision of a community where people work together for the common good. She's not naive—she knows the galaxy is dangerous—but she believes in the power of community and cooperation. She represents the Outer Rim Settlers' ideals of independence, self-sufficiency, and mutual support.",
+  "biography": "Elder Mara is the leader of the Caldon settlement, a community of refugees, settlers, and those seeking a simpler life. She's wise, compassionate, and has a vision of a community where people work together for the common good. She's not naive—she knows the galaxy is dangerous—but she believes in the power of community and cooperation. She represents the Outer Rim Settlers' ideals of independence, self-sufficiency, and mutual support.",
   "isAvailable": true,
   "personalityTraits": {
     "empathy": 90,

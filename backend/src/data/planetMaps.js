@@ -6,128 +6,128 @@
 
 const planetMaps = {
   // ========== CORE WORLDS ==========
-  coruscant: {
+  centralis: {
     terrain: 'urban_sprawl',
     mapLayout: {
       type: 'urban',
       districts: [
-        { name: 'Galactic City', x: 50, y: 50, type: 'capital', size: 'large' },
-        { name: 'Uscru District', x: 30, y: 40, type: 'entertainment', size: 'medium' },
-        { name: 'CoCo Town', x: 70, y: 60, type: 'industrial', size: 'medium' },
-        { name: 'Senate District', x: 50, y: 30, type: 'government', size: 'large' },
-        { name: 'Jedi Temple', x: 40, y: 20, type: 'temple', size: 'medium' }
+        { name: 'Central Spire', x: 50, y: 50, type: 'capital', size: 'large' },
+        { name: 'Nightrun District', x: 30, y: 40, type: 'entertainment', size: 'medium' },
+        { name: 'Lowmarket', x: 70, y: 60, type: 'industrial', size: 'medium' },
+        { name: 'Assembly District', x: 50, y: 30, type: 'government', size: 'large' },
+        { name: 'Keeper Sanctum', x: 40, y: 20, type: 'temple', size: 'medium' }
       ]
     },
     pointsOfInterest: [
-      { name: 'Galactic Senate Building', x: 50, y: 30, type: 'government', description: 'The seat of galactic government' },
-      { name: 'Jedi Temple', x: 40, y: 20, type: 'temple', description: 'Ancient Jedi stronghold' },
-      { name: 'Uscru Entertainment District', x: 30, y: 40, type: 'entertainment', description: 'Nightlife and entertainment hub' },
-      { name: 'CoCo Town Markets', x: 70, y: 60, type: 'market', description: 'Major trading district' },
-      { name: 'Coruscant Underworld', x: 20, y: 80, type: 'danger', description: 'Dangerous lower levels' },
-      { name: 'Galactic City Spaceport', x: 50, y: 50, type: 'spaceport', description: 'Main spaceport and landing facility' },
-      { name: 'Galactic City Medical Center', x: 48, y: 52, type: 'medical_center', description: 'State-of-the-art medical facility' },
-      { name: 'Senate District Medical Bay', x: 52, y: 32, type: 'medical_center', description: 'Government medical facility' }
+      { name: 'Concord Assembly Building', x: 50, y: 30, type: 'government', description: 'The seat of galactic government' },
+      { name: 'Keeper Sanctum', x: 40, y: 20, type: 'temple', description: 'Ancient Keeper stronghold' },
+      { name: 'Nightrun Entertainment District', x: 30, y: 40, type: 'entertainment', description: 'Nightlife and entertainment hub' },
+      { name: 'Lowmarket Markets', x: 70, y: 60, type: 'market', description: 'Major trading district' },
+      { name: 'Centralis Underworld', x: 20, y: 80, type: 'danger', description: 'Dangerous lower levels' },
+      { name: 'Central Spire Spaceport', x: 50, y: 50, type: 'spaceport', description: 'Main spaceport and landing facility' },
+      { name: 'Central Spire Medical Center', x: 48, y: 52, type: 'medical_center', description: 'State-of-the-art medical facility' },
+      { name: 'Assembly District Medical Bay', x: 52, y: 32, type: 'medical_center', description: 'Government medical facility' }
     ],
     markets: [
-      { name: 'Galactic City Market', x: 50, y: 50, type: 'general', description: 'General goods and services' },
-      { name: 'CoCo Town Bazaar', x: 70, y: 60, type: 'trade', description: 'Intergalactic trading hub' },
-      { name: 'Uscru Street Vendors', x: 30, y: 40, type: 'street', description: 'Local vendors and crafts' }
+      { name: 'Central Spire Market', x: 50, y: 50, type: 'general', description: 'General goods and services' },
+      { name: 'Lowmarket Bazaar', x: 70, y: 60, type: 'trade', description: 'Intergalactic trading hub' },
+      { name: 'Nightrun Street Vendors', x: 30, y: 40, type: 'street', description: 'Local vendors and crafts' }
     ],
     fastTravelPoints: [
-      { id: 'galactic_city_spaceport', name: 'Galactic City Spaceport', x: 50, y: 50, type: 'spaceport', description: 'Main spaceport' },
-      { id: 'senate_district', name: 'Senate District', x: 50, y: 30, type: 'government', description: 'Government district' }
+      { id: 'galactic_city_spaceport', name: 'Central Spire Spaceport', x: 50, y: 50, type: 'spaceport', description: 'Main spaceport' },
+      { id: 'senate_district', name: 'Assembly District', x: 50, y: 30, type: 'government', description: 'Government district' }
     ],
     medicalCenters: [
-      { name: 'Galactic City Medical Center', x: 48, y: 52, type: 'medical_center', description: 'State-of-the-art medical facility' },
-      { name: 'Senate District Medical Bay', x: 52, y: 32, type: 'medical_center', description: 'Government medical facility' }
+      { name: 'Central Spire Medical Center', x: 48, y: 52, type: 'medical_center', description: 'State-of-the-art medical facility' },
+      { name: 'Assembly District Medical Bay', x: 52, y: 32, type: 'medical_center', description: 'Government medical facility' }
     ]
   },
 
-  naboo: {
+  eloria: {
     terrain: 'temperate_plains',
     mapLayout: {
       type: 'terrestrial',
       regions: [
         { name: 'Theed', x: 50, y: 40, type: 'capital', size: 'large', description: 'Royal capital city' },
-        { name: 'Otoh Gunga', x: 30, y: 70, type: 'underwater', size: 'medium', description: 'Gungan underwater city' },
+        { name: 'Otoh Gunga', x: 30, y: 70, type: 'underwater', size: 'medium', description: 'Marrow underwater city' },
         { name: 'Lake Paonga', x: 30, y: 70, type: 'water', size: 'large', description: 'Vast freshwater lake' },
-        { name: 'Plains of Naboo', x: 60, y: 50, type: 'grassland', size: 'large', description: 'Rolling green plains' },
-        { name: 'Swamp of Naboo', x: 20, y: 80, type: 'swamp', size: 'medium', description: 'Marshland region' }
+        { name: 'Plains of Eloria', x: 60, y: 50, type: 'grassland', size: 'large', description: 'Rolling green plains' },
+        { name: 'Swamp of Eloria', x: 20, y: 80, type: 'swamp', size: 'medium', description: 'Marshland region' }
       ]
     },
     pointsOfInterest: [
       { name: 'Theed Royal Palace', x: 50, y: 40, type: 'palace', description: 'Royal residence and government center' },
-      { name: 'Otoh Gunga', x: 30, y: 70, type: 'city', description: 'Gungan underwater city' },
-      { name: 'Naboo Plains', x: 60, y: 50, type: 'landscape', description: 'Beautiful rolling plains' },
-      { name: 'Naboo Swamp', x: 20, y: 80, type: 'wilderness', description: 'Dense marshland' },
-      { name: 'Naboo Spaceport', x: 55, y: 45, type: 'spaceport', description: 'Main landing facility' }
+      { name: 'Otoh Gunga', x: 30, y: 70, type: 'city', description: 'Marrow underwater city' },
+      { name: 'Eloria Plains', x: 60, y: 50, type: 'landscape', description: 'Beautiful rolling plains' },
+      { name: 'Eloria Swamp', x: 20, y: 80, type: 'wilderness', description: 'Dense marshland' },
+      { name: 'Eloria Spaceport', x: 55, y: 45, type: 'spaceport', description: 'Main landing facility' }
     ],
     markets: [
       { name: 'Theed Market Square', x: 50, y: 40, type: 'general', description: 'Royal city marketplace' },
-      { name: 'Gungan Trading Post', x: 30, y: 70, type: 'specialty', description: 'Gungan goods and crafts' }
+      { name: 'Marrow Trading Post', x: 30, y: 70, type: 'specialty', description: 'Marrow goods and crafts' }
     ],
     medicalCenters: [
       { name: 'Theed Medical Center', x: 48, y: 42, type: 'medical_center', description: 'Royal medical facility' }
     ]
   },
 
-  tatooine: {
+  gravenmoor: {
     terrain: 'desert',
     mapLayout: {
       type: 'desert',
       settlements: [
-        { name: 'Mos Eisley', x: 40, y: 50, type: 'spaceport', size: 'large', description: 'Wretched hive of scum and villainy' },
-        { name: 'Mos Espa', x: 60, y: 40, type: 'settlement', size: 'medium', description: 'Podracing hub' },
+        { name: 'Greywell', x: 40, y: 50, type: 'spaceport', size: 'large', description: 'Wretched hive of scum and villainy' },
+        { name: 'Dustreach', x: 60, y: 40, type: 'settlement', size: 'medium', description: 'Podracing hub' },
         { name: 'Anchorhead', x: 30, y: 60, type: 'settlement', size: 'small', description: 'Moisture farming community' },
-        { name: 'Jundland Wastes', x: 50, y: 70, type: 'desert', size: 'large', description: 'Dangerous desert region' },
+        { name: 'Sunder Wastes', x: 50, y: 70, type: 'desert', size: 'large', description: 'Dangerous desert region' },
         { name: 'Dune Sea', x: 70, y: 80, type: 'desert', size: 'huge', description: 'Endless sand dunes' }
       ]
     },
     pointsOfInterest: [
-      { name: 'Mos Eisley Cantina', x: 40, y: 50, type: 'cantina', description: 'Famous watering hole' },
-      { name: 'Mos Espa Podracing Arena', x: 60, y: 40, type: 'arena', description: 'Podracing track' },
-      { name: 'Jabba\'s Palace', x: 25, y: 30, type: 'palace', description: 'Hutt crime lord stronghold' },
-      { name: 'Lars Homestead', x: 35, y: 55, type: 'homestead', description: 'Moisture farm' },
-      { name: 'Sarlacc Pit', x: 20, y: 25, type: 'danger', description: 'Ancient creature pit' },
-      { name: 'Mos Eisley Medical Facility', x: 42, y: 52, type: 'medical_center', description: 'Basic medical services' }
+      { name: 'Greywell Cantina', x: 40, y: 50, type: 'cantina', description: 'Famous watering hole' },
+      { name: 'Dustreach Podracing Arena', x: 60, y: 40, type: 'arena', description: 'Podracing track' },
+      { name: 'Vorga\'s Palace', x: 25, y: 30, type: 'palace', description: 'Vorr crime lord stronghold' },
+      { name: 'Marn Homestead', x: 35, y: 55, type: 'homestead', description: 'Moisture farm' },
+      { name: 'Devourer Pit', x: 20, y: 25, type: 'danger', description: 'Ancient creature pit' },
+      { name: 'Greywell Medical Facility', x: 42, y: 52, type: 'medical_center', description: 'Basic medical services' }
     ],
     markets: [
-      { name: 'Mos Eisley Market', x: 40, y: 50, type: 'general', description: 'Black market goods' },
-      { name: 'Jabba\'s Trading Post', x: 25, y: 30, type: 'criminal', description: 'Hutt-controlled market' },
-      { name: 'Mos Espa Bazaar', x: 60, y: 40, type: 'trade', description: 'Podracing parts and supplies' }
+      { name: 'Greywell Market', x: 40, y: 50, type: 'general', description: 'Black market goods' },
+      { name: 'Vorga\'s Trading Post', x: 25, y: 30, type: 'criminal', description: 'Vorr-controlled market' },
+      { name: 'Dustreach Bazaar', x: 60, y: 40, type: 'trade', description: 'Podracing parts and supplies' }
     ],
     medicalCenters: [
-      { name: 'Mos Eisley Medical Facility', x: 42, y: 52, type: 'medical_center', description: 'Basic medical services' }
+      { name: 'Greywell Medical Facility', x: 42, y: 52, type: 'medical_center', description: 'Basic medical services' }
     ]
   },
 
-  kashyyyk: {
+  verdholm: {
     terrain: 'jungle',
     mapLayout: {
       type: 'jungle',
       locations: [
-        { name: 'Kachirho', x: 50, y: 50, type: 'city', size: 'large', description: 'Wookiee tree city' },
-        { name: 'Rwookrrorro', x: 30, y: 35, type: 'city', size: 'medium', description: 'Wookiee settlement' },
+        { name: 'Kachirho', x: 50, y: 50, type: 'city', size: 'large', description: 'Ursk tree city' },
+        { name: 'Rwookrrorro', x: 30, y: 35, type: 'city', size: 'medium', description: 'Ursk settlement' },
         { name: 'Shadowlands', x: 25, y: 75, type: 'jungle', size: 'huge', description: 'Dangerous lower levels' },
         { name: 'Wroshyr Trees', x: 65, y: 45, type: 'forest', size: 'huge', description: 'Massive ancient trees' }
       ]
     },
     pointsOfInterest: [
-      { name: 'Kachirho Tree City', x: 50, y: 50, type: 'city', description: 'Wookiee capital city in the trees' },
+      { name: 'Kachirho Tree City', x: 50, y: 50, type: 'city', description: 'Ursk capital city in the trees' },
       { name: 'Shadowlands', x: 25, y: 75, type: 'danger', description: 'Dark, dangerous jungle floor' },
       { name: 'Wroshyr Grove', x: 70, y: 40, type: 'landscape', description: 'Ancient tree grove' }
     ],
     markets: [
-      { name: 'Kachirho Trading Post', x: 52, y: 48, type: 'general', description: 'Wookiee goods and crafts' }
+      { name: 'Kachirho Trading Post', x: 52, y: 48, type: 'general', description: 'Ursk goods and crafts' }
     ]
   },
 
-  hoth: {
+  rime: {
     terrain: 'ice',
     mapLayout: {
       type: 'ice',
       locations: [
-        { name: 'Echo Base', x: 50, y: 50, type: 'base', size: 'medium', description: 'Rebel Alliance base' },
+        { name: 'Echo Base', x: 50, y: 50, type: 'base', size: 'medium', description: 'Free Worlds base' },
         { name: 'Ice Plains', x: 50, y: 50, type: 'ice', size: 'huge', description: 'Frozen wasteland' },
         { name: 'Wampa Cave', x: 30, y: 40, type: 'cave', size: 'small', description: 'Dangerous creature lair' }
       ]
@@ -139,7 +139,7 @@ const planetMaps = {
     markets: []
   },
 
-  bespin: {
+  cirruan: {
     terrain: 'gas_giant',
     mapLayout: {
       type: 'gas_giant',
@@ -158,25 +158,25 @@ const planetMaps = {
     ]
   },
 
-  endor: {
+  verdance: {
     terrain: 'forest',
     mapLayout: {
       type: 'forest',
       locations: [
-        { name: 'Ewok Village', x: 50, y: 50, type: 'village', size: 'medium', description: 'Ewok tree village' },
+        { name: 'Brindle Village', x: 50, y: 50, type: 'village', size: 'medium', description: 'Brindle tree village' },
         { name: 'Forest', x: 50, y: 50, type: 'forest', size: 'huge', description: 'Dense forest moon' }
       ]
     },
     pointsOfInterest: [
-      { name: 'Ewok Village', x: 50, y: 50, type: 'village', description: 'Ewok settlement' },
+      { name: 'Brindle Village', x: 50, y: 50, type: 'village', description: 'Brindle settlement' },
       { name: 'Death Star II Wreckage', x: 40, y: 30, type: 'wreckage', description: 'Destroyed battle station' }
     ],
     markets: [
-      { name: 'Ewok Trading Post', x: 50, y: 50, type: 'specialty', description: 'Ewok crafts and goods' }
+      { name: 'Brindle Trading Post', x: 50, y: 50, type: 'specialty', description: 'Brindle crafts and goods' }
     ]
   },
 
-  mustafar: {
+  embervast: {
     terrain: 'volcanic',
     mapLayout: {
       type: 'volcanic',
@@ -189,7 +189,7 @@ const planetMaps = {
     pointsOfInterest: [
       { name: 'Mining Facility', x: 50, y: 50, type: 'industrial', description: 'Lava mining operation' },
       { name: 'Lava Falls', x: 60, y: 40, type: 'landscape', description: 'Spectacular lava cascade' },
-      { name: 'Vader\'s Castle', x: 30, y: 30, type: 'fortress', description: 'Sith Lord stronghold' }
+      { name: 'Korrth\'s Castle', x: 30, y: 30, type: 'fortress', description: 'Hollow Lord stronghold' }
     ],
     markets: [
       { name: 'Mining Outpost Market', x: 50, y: 50, type: 'industrial', description: 'Mining equipment and supplies' }
@@ -197,12 +197,12 @@ const planetMaps = {
   },
 
   // ========== OUTER RIM - SMUGGLER'S MOON ==========
-  nar_shaddaa: {
+  sinkport: {
     terrain: 'urban_sprawl',
     mapLayout: {
       type: 'urban',
       districts: [
-        { name: 'Nar Shaddaa City', x: 50, y: 50, type: 'capital', size: 'large', description: 'The main urban center of the Smuggler\'s Moon' },
+        { name: 'Sinkport City', x: 50, y: 50, type: 'capital', size: 'large', description: 'The main urban center of the Smuggler\'s Moon' },
         { name: 'Entertainment District', x: 35, y: 40, type: 'entertainment', size: 'large', description: 'Neon-lit district of casinos, clubs, and vices' },
         { name: 'Upper Levels', x: 70, y: 30, type: 'residential', size: 'medium', description: 'Wealthy districts where the elite reside' },
         { name: 'Lower Levels', x: 15, y: 75, type: 'industrial', size: 'large', description: 'Dangerous underbelly of the moon' },
@@ -210,20 +210,20 @@ const planetMaps = {
       ]
     },
     pointsOfInterest: [
-      { name: 'Nar Shaddaa City Spaceport', x: 48, y: 48, type: 'spaceport', description: 'Main spaceport where ships from across the galaxy dock' },
-      { name: 'Nar Shaddaa City', x: 50, y: 50, type: 'city', description: 'The sprawling urban center of the Smuggler\'s Moon' },
-      { name: 'Nar Shaddaa City Medical Center', x: 52, y: 48, type: 'medical_center', description: 'Main medical facility' },
+      { name: 'Sinkport City Spaceport', x: 48, y: 48, type: 'spaceport', description: 'Main spaceport where ships from across the galaxy dock' },
+      { name: 'Sinkport City', x: 50, y: 50, type: 'city', description: 'The sprawling urban center of the Smuggler\'s Moon' },
+      { name: 'Sinkport City Medical Center', x: 52, y: 48, type: 'medical_center', description: 'Main medical facility' },
       { name: 'The Entertainment District', x: 30, y: 35, type: 'entertainment', description: 'Neon-soaked district of casinos and nightlife' },
-      { name: 'Black Sun Casino', x: 28, y: 34, type: 'entertainment', description: 'Opulent casino owned by the Black Sun crime syndicate' },
+      { name: 'Umbra Casino', x: 28, y: 34, type: 'entertainment', description: 'Opulent casino owned by the Umbra crime syndicate' },
       { name: 'The Red Light District', x: 32, y: 36, type: 'entertainment', description: 'District where every vice is available for a price' },
-      { name: 'Hutt Palace Complex', x: 75, y: 25, type: 'palace', description: 'Massive complex controlled by the Hutt Cartel' },
+      { name: 'Vorr Palace Complex', x: 75, y: 25, type: 'palace', description: 'Massive complex controlled by the Vorr Cartel' },
       { name: 'The Velvet Room', x: 72, y: 28, type: 'cantina', description: 'Upscale cantina where the wealthy and powerful gather' },
       { name: 'The Data Vault', x: 68, y: 30, type: 'base', description: 'Information broker\'s headquarters where secrets are bought and sold' },
       { name: 'Bounty Hunter\'s Guild Hall', x: 60, y: 42, type: 'base', description: 'Official headquarters of the Bounty Hunter\'s Guild' },
-      { name: 'Krayt\'s Arsenal', x: 55, y: 52, type: 'market', description: 'Well-stocked weapons dealer with connections to every major arms manufacturer' },
+      { name: 'Wyrm\'s Arsenal', x: 55, y: 52, type: 'market', description: 'Well-stocked weapons dealer with connections to every major arms manufacturer' },
       { name: 'Tech Bazaar', x: 50, y: 54, type: 'market', description: 'Bustling market specializing in technology, droids, and cybernetics' },
       { name: 'Stellar Ship Chandlery', x: 45, y: 56, type: 'market', description: 'Massive ship parts and equipment dealer' },
-      { name: 'The Lower Levels', x: 15, y: 75, type: 'danger', description: 'Dark, dangerous underbelly of Nar Shaddaa' },
+      { name: 'The Lower Levels', x: 15, y: 75, type: 'danger', description: 'Dark, dangerous underbelly of Sinkport' },
       { name: 'The Smuggler\'s Den', x: 20, y: 72, type: 'cantina', description: 'Notorious cantina where smugglers and outlaws gather' },
       { name: 'The Black Market', x: 18, y: 68, type: 'market', description: 'Illegal trading hub for contraband and stolen goods' },
       { name: 'The Spice Den', x: 22, y: 70, type: 'cantina', description: 'Seedy establishment where spice is consumed openly' },
@@ -233,20 +233,20 @@ const planetMaps = {
       { name: 'Gang Territory', x: 10, y: 80, type: 'danger', description: 'Section controlled by rival gangs with constant turf wars' }
     ],
     markets: [
-      { name: 'Nar Shaddaa City Market', x: 50, y: 50, type: 'general', description: 'General goods and services market' },
+      { name: 'Sinkport City Market', x: 50, y: 50, type: 'general', description: 'General goods and services market' },
       { name: 'The Black Market', x: 25, y: 65, type: 'black_market', description: 'Illegal trading hub for contraband' },
-      { name: 'Krayt\'s Arsenal', x: 55, y: 55, type: 'weapons', description: 'Weapons and combat equipment dealer' },
+      { name: 'Wyrm\'s Arsenal', x: 55, y: 55, type: 'weapons', description: 'Weapons and combat equipment dealer' },
       { name: 'Stellar Ship Chandlery', x: 45, y: 60, type: 'ship_parts', description: 'Ship parts and equipment' },
       { name: 'Tech Bazaar', x: 50, y: 58, type: 'technology', description: 'Technology, droids, and cybernetics' },
       { name: 'Entertainment District Vendors', x: 35, y: 40, type: 'street', description: 'Street vendors selling various goods' }
     ],
     fastTravelPoints: [
-      { id: 'nar_shaddaa_spaceport', name: 'Nar Shaddaa City Spaceport', x: 48, y: 52, type: 'spaceport', description: 'Main spaceport' },
+      { id: 'sinkport_spaceport', name: 'Sinkport City Spaceport', x: 48, y: 52, type: 'spaceport', description: 'Main spaceport' },
       { id: 'entertainment_district', name: 'Entertainment District', x: 35, y: 40, type: 'entertainment', description: 'Casinos and nightlife hub' },
-      { id: 'hutt_palace', name: 'Hutt Palace Complex', x: 70, y: 30, type: 'palace', description: 'Hutt Cartel headquarters' }
+      { id: 'vorr_palace', name: 'Vorr Palace Complex', x: 70, y: 30, type: 'palace', description: 'Vorr Cartel headquarters' }
     ],
     medicalCenters: [
-      { name: 'Nar Shaddaa City Medical Center', x: 52, y: 48, type: 'medical_center', description: 'Main medical facility' },
+      { name: 'Sinkport City Medical Center', x: 52, y: 48, type: 'medical_center', description: 'Main medical facility' },
       { name: 'Back Alley Clinic', x: 22, y: 69, type: 'medical_center', description: 'Discrete lower-level clinic' }
     ]
   },

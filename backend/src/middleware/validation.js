@@ -38,7 +38,7 @@ const validateCharacterCreation = [
     .withMessage('Name can only contain letters, numbers, spaces, hyphens, and apostrophes'),
   
   body('species')
-    .isIn(['human', 'twilek', 'rodian', 'wookiee', 'zabrak', 'togruta', 'mirialan', 'chiss'])
+    .isIn(['human', 'sytheen', 'skarn', 'ursk', 'karnaki', 'sethari', 'jeharu', 'vorne'])
     .withMessage('Invalid species'),
   
   body('background')

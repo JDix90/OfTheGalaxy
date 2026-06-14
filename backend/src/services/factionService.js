@@ -13,7 +13,66 @@ const {
   getRelationshipModifiers
 } = require('../config/factionProfiles');
 
+// Canonical low→high ordering of reputation tiers. This is the single source of
+// truth for tier comparison (gating) and indexing; calculateTier()/getTierInfo()
+// must stay consistent with it.
+const TIER_ORDER = ['hated', 'hostile', 'unfriendly', 'neutral', 'friendly', 'honored', 'exalted'];
+
+// Vendor price modifier per tier (signed): positive = discount on buy / bonus on
+// sell; negative = surcharge on buy / penalty on sell. Standing visibly changes
+// what you pay. Mirrors the tier ladder above.
+const TIER_PRICE_MODIFIER = {
+  exalted: 0.10,
+  honored: 0.06,
+  friendly: 0.03,
+  neutral: 0,
+  unfriendly: -0.05,
+  hostile: -0.12,
+  hated: -0.20
+};
+
 class FactionService {
+  /**
+   * Canonical low→high tier ordering (for gating comparisons).
+   * @returns {string[]}
+   */
+  get tierOrder() {
+    return TIER_ORDER;
+  }
+
+  /**
+   * Compare two tiers. Returns negative if a < b, 0 if equal, positive if a > b.
+   * Unknown tiers sort as lowest.
+   * @param {string} a
+   * @param {string} b
+   * @returns {number}
+   */
+  compareTiers(a, b) {
+    return TIER_ORDER.indexOf(a) - TIER_ORDER.indexOf(b);
+  }
+
+  /**
+   * True if `tier` meets or exceeds `requiredTier` in the canonical ladder.
+   * @param {string} tier - Player's current tier
+   * @param {string} requiredTier - Minimum required tier
+   * @returns {boolean}
+   */
+  meetsTier(tier, requiredTier) {
+    const have = TIER_ORDER.indexOf(tier);
+    const need = TIER_ORDER.indexOf(requiredTier);
+    if (have === -1 || need === -1) return false;
+    return have >= need;
+  }
+
+  /**
+   * Signed vendor price modifier for a reputation tier.
+   * @param {string} tier - Reputation tier
+   * @returns {number} Signed fraction (e.g. +0.06 discount, -0.12 surcharge)
+   */
+  getPriceModifier(tier) {
+    return TIER_PRICE_MODIFIER[tier] || 0;
+  }
+
   /**
    * Update reputation for a character with a faction
    * @param {string} characterId - Character UUID
@@ -47,6 +106,53 @@ class FactionService {
     }
 
     return reputation;
+  }
+
+  /**
+   * Central path for applying a reputation change. Wraps updateReputation but
+   * captures the before/after tier so callers can surface "You are now Honored
+   * with the Concord" tier-up moments and rep toasts. Route all gameplay rep
+   * mutations (dialogue, quests, consequences) through this.
+   * @param {string} characterId
+   * @param {string} factionId
+   * @param {number} delta - Reputation change (signed)
+   * @param {Object} [opts]
+   * @param {string} [opts.reason] - Optional reason tag (for logs/telemetry)
+   * @returns {Promise<Object>} { factionId, delta, oldTier, newTier, tierChanged, reputation, total }
+   */
+  async applyReputationChange(characterId, factionId, delta, opts = {}) {
+    if (!factionId || !delta) {
+      // No-op: still report current standing so callers can render a stable shape.
+      const current = await this.getReputation(characterId, factionId);
+      return {
+        factionId,
+        delta: 0,
+        oldTier: current.tier,
+        newTier: current.tier,
+        tierChanged: false,
+        total: current.reputation,
+        reputation: current
+      };
+    }
+
+    const before = await this.getReputation(characterId, factionId);
+    const oldTier = before.tier;
+    const reputation = await this.updateReputation(characterId, factionId, delta);
+    const newTier = reputation.tier;
+
+    if (opts.reason) {
+      console.log(`[FactionService] rep ${delta > 0 ? '+' : ''}${delta} with ${factionId} (${opts.reason}): ${oldTier} -> ${newTier}`);
+    }
+
+    return {
+      factionId,
+      delta,
+      oldTier,
+      newTier,
+      tierChanged: oldTier !== newTier,
+      total: reputation.reputation,
+      reputation
+    };
   }
 
   /**

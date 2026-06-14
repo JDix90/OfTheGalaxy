@@ -120,7 +120,7 @@ async function seedIIAContent() {
       occupation: 'Alliance Coordinator',
       factionId: 'independent_investigators',
       location: {
-        planet: 'chandrila',
+        planet: 'solenne',
         area: 'refugee_settlement',
         x: 90,
         y: 70
@@ -140,12 +140,12 @@ async function seedIIAContent() {
         },
         general: [
           'The Alliance archives only tell part of the story. Survivors tell the rest.',
-          'Every survivor from Compound 7-Alpha is a datapoint the Empire wanted erased.'
+          'Every survivor from Compound 7-Alpha is a datapoint the Iron Dominion wanted erased.'
         ]
       },
       quests: [questJson.id],
       biography:
-        'Coordinator Valen oversees Independent Investigators operations on Chandrila, focusing on refugee testimony and war crime documentation.',
+        'Coordinator Valen oversees Independent Investigators operations on Solenne, focusing on refugee testimony and war crime documentation.',
       isAvailable: true
     };
 
@@ -157,7 +157,7 @@ async function seedIIAContent() {
       occupation: 'Former Compound Resident',
       factionId: 'independent_investigators',
       location: {
-        planet: 'chandrila',
+        planet: 'solenne',
         area: 'refugee_settlement',
         x: 140,
         y: 95

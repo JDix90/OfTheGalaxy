@@ -22,13 +22,13 @@ export default function NameAndConfirm({ characterData, onUpdate }) {
   const getSpeciesName = (id) => {
     const species = {
       human: 'Human',
-      twilek: "Twi'lek",
-      rodian: 'Rodian',
-      wookiee: 'Wookiee',
-      zabrak: 'Zabrak',
-      togruta: 'Togruta',
-      mirialan: 'Mirialan',
-      chiss: 'Chiss'
+      sytheen: "Sytheen",
+      skarn: 'Skarn',
+      ursk: 'Ursk',
+      karnaki: 'Karnaki',
+      sethari: 'Sethari',
+      jeharu: 'Jeharu',
+      vorne: 'Vorne'
     };
     return species[id] || id;
   };

@@ -4,8 +4,8 @@
  */
 
 const enemyTemplates = {
-  stormtrooper: {
-    name: 'Stormtrooper',
+  ironclad: {
+    name: 'Ironclad',
     level: 1,
     tier: 'normal',
     stats: {
@@ -16,17 +16,17 @@ const enemyTemplates = {
       attack: 22,
       defense: 10,
       speed: 12,
-      accuracy: 64 // Stormtroopers still miss a fair bit
+      accuracy: 64 // Ironclads still miss a fair bit
     },
     equipment: {
-      weapon: { itemId: 'blaster_rifle_01', damage: 20 },
-      armor: { itemId: 'armor_heavy_imperial_standard', defense: 15 }
+      weapon: { itemId: 'pulser_rifle_01', damage: 20 },
+      armor: { itemId: 'armor_heavy_dominion_standard', defense: 15 }
     },
     lootTable: [
-      { itemId: 'blaster_rifle_01', chance: 0.1, quantity: 1 },
-      { itemId: 'blaster_pistol_imperial', chance: 0.15, quantity: 1 },
-      { itemId: 'armor_light_imperial', chance: 0.08, quantity: 1 },
-      { itemId: 'armor_medium_imperial', chance: 0.05, quantity: 1 },
+      { itemId: 'pulser_rifle_01', chance: 0.1, quantity: 1 },
+      { itemId: 'pulser_pistol_dominion', chance: 0.15, quantity: 1 },
+      { itemId: 'armor_light_dominion', chance: 0.08, quantity: 1 },
+      { itemId: 'armor_medium_dominion', chance: 0.05, quantity: 1 },
       { itemId: 'credits', chance: 1.0, quantity: 50 }
     ],
     xpReward: 25,
@@ -34,8 +34,8 @@ const enemyTemplates = {
     faction: 'empire'
   },
 
-  stormtrooper_sergeant: {
-    name: 'Stormtrooper Sergeant',
+  ironclad_sergeant: {
+    name: 'Ironclad Sergeant',
     level: 3,
     tier: 'veteran',
     stats: {
@@ -49,15 +49,15 @@ const enemyTemplates = {
       accuracy: 70
     },
     equipment: {
-      weapon: { itemId: 'blaster_rifle_02', damage: 25 },
-      armor: { itemId: 'armor_heavy_imperial_standard', defense: 20 }
+      weapon: { itemId: 'pulser_rifle_02', damage: 25 },
+      armor: { itemId: 'armor_heavy_dominion_standard', defense: 20 }
     },
     lootTable: [
-      { itemId: 'blaster_rifle_01', chance: 0.2, quantity: 1 },
-      { itemId: 'blaster_rifle_02', chance: 0.15, quantity: 1 },
-      { itemId: 'blaster_pistol_imperial_elite', chance: 0.1, quantity: 1 },
-      { itemId: 'armor_medium_imperial', chance: 0.12, quantity: 1 },
-      { itemId: 'armor_heavy_imperial_standard', chance: 0.08, quantity: 1 },
+      { itemId: 'pulser_rifle_01', chance: 0.2, quantity: 1 },
+      { itemId: 'pulser_rifle_02', chance: 0.15, quantity: 1 },
+      { itemId: 'pulser_pistol_dominion_elite', chance: 0.1, quantity: 1 },
+      { itemId: 'armor_medium_dominion', chance: 0.12, quantity: 1 },
+      { itemId: 'armor_heavy_dominion_standard', chance: 0.08, quantity: 1 },
       { itemId: 'credits', chance: 1.0, quantity: 100 }
     ],
     xpReward: 50,
@@ -80,14 +80,14 @@ const enemyTemplates = {
       accuracy: 65
     },
     equipment: {
-      weapon: { itemId: 'blaster_pistol_01', damage: 18 },
+      weapon: { itemId: 'pulser_pistol_01', damage: 18 },
       armor: { itemId: 'leather_armor', defense: 10 }
     },
     lootTable: [
-      { itemId: 'blaster_pistol_01', chance: 0.15, quantity: 1 },
-      { itemId: 'blaster_pistol_bounty', chance: 0.1, quantity: 1 },
+      { itemId: 'pulser_pistol_01', chance: 0.15, quantity: 1 },
+      { itemId: 'pulser_pistol_bounty', chance: 0.1, quantity: 1 },
       { itemId: 'armor_light_01', chance: 0.08, quantity: 1 },
-      { itemId: 'vibroblade', chance: 0.12, quantity: 1 },
+      { itemId: 'shock_blade', chance: 0.12, quantity: 1 },
       { itemId: 'credits', chance: 1.0, quantity: 75 }
     ],
     xpReward: 35,
@@ -110,11 +110,11 @@ const enemyTemplates = {
       accuracy: 65
     },
     equipment: {
-      weapon: { itemId: 'blaster_pistol_01', damage: 22 },
+      weapon: { itemId: 'pulser_pistol_01', damage: 22 },
       armor: { itemId: 'leather_armor', defense: 12 }
     },
     lootTable: [
-      { itemId: 'blaster_pistol_01', chance: 0.1, quantity: 1 },
+      { itemId: 'pulser_pistol_01', chance: 0.1, quantity: 1 },
       { itemId: 'credits', chance: 1.0, quantity: 80 }
     ],
     xpReward: 40,
@@ -137,11 +137,11 @@ const enemyTemplates = {
       accuracy: 75
     },
     equipment: {
-      weapon: { itemId: 'blaster_rifle_01', damage: 30 },
+      weapon: { itemId: 'pulser_rifle_01', damage: 30 },
       armor: { itemId: 'reinforced_armor', defense: 25 }
     },
     lootTable: [
-      { itemId: 'blaster_rifle_01', chance: 0.3, quantity: 1 },
+      { itemId: 'pulser_rifle_01', chance: 0.3, quantity: 1 },
       { itemId: 'credits', chance: 1.0, quantity: 200 }
     ],
     xpReward: 100,
@@ -164,7 +164,7 @@ const enemyTemplates = {
       accuracy: 80
     },
     equipment: {
-      weapon: { itemId: 'blaster_pistol_01', damage: 15 },
+      weapon: { itemId: 'pulser_pistol_01', damage: 15 },
       armor: { itemId: 'droid_armor', defense: 25 }
     },
     lootTable: [
@@ -191,11 +191,11 @@ const enemyTemplates = {
       accuracy: 80
     },
     equipment: {
-      weapon: { itemId: 'blaster_rifle_01', damage: 28 },
+      weapon: { itemId: 'pulser_rifle_01', damage: 28 },
       armor: { itemId: 'bounty_hunter_armor', defense: 22 }
     },
     lootTable: [
-      { itemId: 'blaster_rifle_01', chance: 0.25, quantity: 1 },
+      { itemId: 'pulser_rifle_01', chance: 0.25, quantity: 1 },
       { itemId: 'credits', chance: 1.0, quantity: 150 }
     ],
     xpReward: 75,
@@ -309,9 +309,9 @@ function scaleEnemyForLevel(enemyTemplate, playerLevel, difficulty = 'moderate')
  */
 function getEnemiesByDifficulty(difficulty) {
   const difficultyTiers = {
-    easy: ['wild_animal', 'stormtrooper', 'droid_security'],
-    moderate: ['pirate', 'syndicate_thug', 'stormtrooper_sergeant', 'droid_security'],
-    hard: ['bounty_hunter', 'pirate_captain', 'stormtrooper_sergeant']
+    easy: ['wild_animal', 'ironclad', 'droid_security'],
+    moderate: ['pirate', 'syndicate_thug', 'ironclad_sergeant', 'droid_security'],
+    hard: ['bounty_hunter', 'pirate_captain', 'ironclad_sergeant']
   };
   
   return difficultyTiers[difficulty] || difficultyTiers.moderate;
@@ -335,8 +335,8 @@ function generateRandomEnemy(playerLevel, difficulty = 'moderate', enemyPool = n
   const template = enemyTemplates[randomEnemyId];
   
   if (!template) {
-    // Fallback to stormtrooper if template not found
-    return scaleEnemyForLevel(enemyTemplates.stormtrooper, playerLevel, difficulty);
+    // Fallback to ironclad if template not found
+    return scaleEnemyForLevel(enemyTemplates.ironclad, playerLevel, difficulty);
   }
 
   return scaleEnemyForLevel(template, playerLevel, difficulty);

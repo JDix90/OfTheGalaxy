@@ -1,29 +1,29 @@
 /**
  * Faction List
- * Common Star Wars factions for NPC assignment
+ * Common factions for NPC assignment
  */
 
 const factions = [
-  'galactic_republic',
-  'galactic_empire',
-  'rebel_alliance',
-  'new_republic',
-  'first_order',
-  'resistance',
-  'jedi_order',
-  'sith',
-  'mandalorians',
-  'hutts',
-  'black_sun',
-  'crimson_dawn',
+  'old_concord',
+  'iron_dominion',
+  'free_worlds',
+  'concord',
+  'ascendancy',
+  'uprising',
+  'keeper_order',
+  'hollow',
+  'ironkin',
+  'vorr',
+  'umbra',
+  'scarlet_tide',
   'independent',
   'neutral',
   'smugglers',
-  'bounty_hunters',
-  'trade_federation',
-  'separatists',
-  'chiss_ascendancy',
-  'hapes_consortium'
+  'the_tally',
+  'commerce_league',
+  'secession',
+  'vorne_ascendancy',
+  'hesperan_consortium'
 ];
 
 /**
@@ -68,10 +68,10 @@ function getFactionForNPC(planet, npcType, rnd) {
  */
 function getMajorFaction(rnd) {
   const majorFactions = [
-    'galactic_republic',
-    'galactic_empire',
-    'rebel_alliance',
-    'new_republic',
+    'old_concord',
+    'iron_dominion',
+    'free_worlds',
+    'concord',
     'independent',
     'neutral'
   ];
@@ -83,26 +83,26 @@ function getMajorFaction(rnd) {
  */
 function getFactionDisplayName(factionId) {
   const displayNames = {
-    'galactic_republic': 'Galactic Republic',
-    'galactic_empire': 'Galactic Empire',
-    'rebel_alliance': 'Rebel Alliance',
-    'new_republic': 'New Republic',
-    'first_order': 'First Order',
-    'resistance': 'Resistance',
-    'jedi_order': 'Jedi Order',
-    'sith': 'Sith',
-    'mandalorians': 'Mandalorians',
-    'hutts': 'Hutts',
-    'black_sun': 'Black Sun',
-    'crimson_dawn': 'Crimson Dawn',
+    'old_concord': 'Old Concord',
+    'iron_dominion': 'Iron Dominion',
+    'free_worlds': 'Free Worlds',
+    'concord': 'Concord',
+    'ascendancy': 'Ascendancy',
+    'uprising': 'Uprising',
+    'keeper_order': 'Keeper Order',
+    'hollow': 'Hollow',
+    'ironkin': 'Ironkin',
+    'vorr': 'Vorr',
+    'umbra': 'Umbra',
+    'scarlet_tide': 'Scarlet Tide',
     'independent': 'Independent',
     'neutral': 'Neutral',
     'smugglers': 'Smugglers',
-    'bounty_hunters': 'Bounty Hunters',
-    'trade_federation': 'Trade Federation',
-    'separatists': 'Separatists',
-    'chiss_ascendancy': 'Chiss Ascendancy',
-    'hapes_consortium': 'Hapes Consortium'
+    'the_tally': 'Bounty Hunters',
+    'commerce_league': 'Commerce League',
+    'secession': 'Secessionists',
+    'vorne_ascendancy': 'Vorne Ascendancy',
+    'hesperan_consortium': 'Hesperan Consortium'
   };
 
   return displayNames[factionId] || factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

@@ -10,10 +10,10 @@ import { SKILL_DEFINITIONS } from '../data/skills';
  */
 const COMBAT_ABILITY_DEFINITIONS = {
   // Item-Based Abilities
-  force_insight: {
-    id: 'force_insight',
-    name: 'Force Insight',
-    description: 'Use the Force to gain insight into your enemy, reducing their accuracy for 2 turns.',
+  veil_insight: {
+    id: 'veil_insight',
+    name: 'Veil Insight',
+    description: 'Use the Veil to gain insight into your enemy, reducing their accuracy for 2 turns.',
     cost: { stamina: 20 },
     cooldown: 3,
     targetType: 'enemy',
@@ -21,17 +21,17 @@ const COMBAT_ABILITY_DEFINITIONS = {
   },
   force_artifact_mastery: {
     id: 'force_artifact_mastery',
-    name: 'Force Artifact Mastery',
-    description: 'Channel ancient Force power through your artifact, dealing Force damage and restoring stamina.',
+    name: 'Veil Artifact Mastery',
+    description: 'Channel ancient Veil power through your artifact, dealing Veil damage and restoring stamina.',
     cost: { stamina: 30 },
     cooldown: 4,
     targetType: 'enemy',
     icon: '🔮'
   },
-  force_mastery: {
-    id: 'force_mastery',
-    name: 'Force Mastery',
-    description: 'Unleash your mastery of the Force, dealing significant damage and stunning the target for 1 turn.',
+  veil_mastery: {
+    id: 'veil_mastery',
+    name: 'Veil Mastery',
+    description: 'Unleash your mastery of the Veil, dealing significant damage and stunning the target for 1 turn.',
     cost: { stamina: 40 },
     cooldown: 5,
     targetType: 'enemy',

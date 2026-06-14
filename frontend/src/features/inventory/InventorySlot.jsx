@@ -7,7 +7,27 @@ import React from 'react';
 import { getRarityColor, getRarityBorderColor } from '../../utils/itemRarity';
 import './InventorySlot.css';
 
-export default function InventorySlot({ item, slotIndex, onHover, onLeave, onClick, onContextMenu }) {
+// Pick an icon from the item's type / equipment slot so the grid is readable at a
+// glance instead of a wall of identical boxes.
+function getItemIcon(item) {
+  if (!item) return '📦';
+  const slot = item.equipmentSlot;
+  const type = (item.itemType || item.type || '').toLowerCase();
+  const id = (item.itemId || '').toLowerCase();
+  if (id.includes('medpac') || id.includes('stimpack') || id.includes('medical') || id.includes('scanner')) return '💉';
+  if (slot === 'weapon' || type === 'weapon') return id.includes('blade') || id.includes('sword') ? '🗡️' : '🔫';
+  if (slot === 'armor' || type === 'armor') return '🛡️';
+  if (slot === 'accessory') return '💠';
+  if (slot === 'tool') return '🔧';
+  if (type === 'consumable') return '🧪';
+  if (type === 'quest_item' || type === 'quest') return '❗';
+  if (type === 'resource') return '🪨';
+  if (id.includes('datapad') || id.includes('slicer') || type === 'tech') return '💾';
+  if (type === 'junk') return '🗑️';
+  return '📦';
+}
+
+export default function InventorySlot({ item, slotIndex, onHover, onLeave, onClick, onEquipShortcut, onContextMenu }) {
   const handleMouseEnter = (e) => {
     if (item) {
       onHover(item, e);
@@ -32,9 +52,9 @@ export default function InventorySlot({ item, slotIndex, onHover, onLeave, onCli
   };
 
   const handleDoubleClick = (e) => {
-    // Double-click to equip if item is equippable
-    if (item && item.equipmentSlot && !item.equipped && onClick) {
-      onClick(item, e);
+    // Double-click is a shortcut to equip directly (single-click only inspects).
+    if (item && item.equipmentSlot && !item.equipped && onEquipShortcut) {
+      onEquipShortcut(item, e);
     }
   };
 
@@ -54,14 +74,13 @@ export default function InventorySlot({ item, slotIndex, onHover, onLeave, onCli
       onDoubleClick={handleDoubleClick}
       onContextMenu={handleContextMenu}
       style={rarityBorderColor ? { borderColor: rarityBorderColor, borderWidth: '2px' } : {}}
-      title={isEquippable ? `Double-click to equip ${item.name || item.itemId}` : ''}
+      title={item ? `${item.name || item.itemId}${isEquippable ? ' — click to inspect, double-click to equip' : ' — click to inspect'}` : ''}
       data-tutorial-target={item ? tutorialTarget : undefined}
     >
       {item && (
         <>
           <div className="item-icon">
-            {/* Placeholder icon - would use actual item icon */}
-            <span className="item-icon-placeholder">📦</span>
+            <span className="item-icon-placeholder">{getItemIcon(item)}</span>
           </div>
           {item.quantity > 1 && (
             <div className="item-quantity">{item.quantity}</div>

@@ -1,0 +1,92 @@
+{
+  "id": "js_caldon_01_enclave_call",
+  "factionId": "keeper_seekers",
+  "questType": "main",
+  "title": "The Enclave's Call",
+  "description": "Master Kira Voss, a Keeper Seeker, has been called to Caldon by the Veil. The ancient Keeper Enclave, abandoned for thousands of years, still holds secrets and power. She believes you have been called as well. Will you join her on a pilgrimage to the Enclave? There is much to learn, and perhaps something to recover—an artifact of great power.",
+  "shortDescription": "Join Master Kira Voss on a pilgrimage to the Keeper Enclave",
+  "prerequisites": {
+    "level": 4,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_mentor",
+      "type": "interact",
+      "description": "Meet with Master Kira Voss at the Caldon settlement",
+      "target": "npc_keeper_seeker_mentor"
+    },
+    {
+      "id": "travel_enclave",
+      "type": "travel",
+      "description": "Travel to the Keeper Enclave ruins",
+      "location": {
+        "planet": "caldon",
+        "area": "enclave_region"
+      }
+    },
+    {
+      "id": "explore_enclave",
+      "type": "discover",
+      "description": "Explore the Enclave ruins and discover its secrets",
+      "evidenceId": "evidence_enclave_secrets"
+    },
+    {
+      "id": "find_map_fragment",
+      "type": "collect",
+      "description": "Find the ancient map fragment",
+      "target": "ancient_map_fragment",
+      "count": 1
+    },
+    {
+      "id": "recover_holocron",
+      "type": "collect",
+      "description": "Recover the Keeper Holocron fragment",
+      "target": "holocron_fragment",
+      "count": 1
+    },
+    {
+      "id": "receive_teaching",
+      "type": "custom",
+      "description": "Receive ancient Keeper teaching from the Enclave",
+      "target": "keeper_teaching"
+    }
+  ],
+  "rewards": {
+    "xp": 1500,
+    "credits": 500,
+    "reputation": {
+      "keeper_seekers": 50
+    },
+    "items": [
+      {
+        "itemId": "ancient_map_fragment",
+        "quantity": 1
+      },
+      {
+        "itemId": "holocron_fragment",
+        "quantity": 1
+      },
+      {
+        "itemId": "keeper_teaching",
+        "quantity": 1
+      }
+    ],
+    "unlocks": ["js_caldon_02_venox_crystals"]
+  },
+  "questGiverId": "npc_keeper_seeker_mentor",
+  "startLocation": {
+    "planet": "caldon",
+    "area": "settlement"
+  },
+  "estimatedTime": 90,
+  "difficulty": "medium",
+  "isActive": true,
+  "chainId": "js_caldon_enclave_chain",
+  "chainOrder": 1
+}
+
+
+

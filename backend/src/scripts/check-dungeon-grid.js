@@ -7,7 +7,7 @@ async function checkDungeonGrid() {
     await sequelize.authenticate();
     console.log('✓ Database connected');
 
-    const subMap = await SubMap.findByPk('tatooine_sarlacc_pit_dungeon');
+    const subMap = await SubMap.findByPk('gravenmoor_devourer_pit_dungeon');
     
     if (!subMap) {
       console.log('SubMap not found');

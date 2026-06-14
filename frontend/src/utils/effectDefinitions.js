@@ -5,28 +5,28 @@
  */
 
 export const EFFECT_DEFINITIONS = {
-  // Force Effects
-  force_enhancement: {
-    name: 'Force Enhancement',
-    description: 'Increases Force power by 10%',
+  // Veil Effects
+  veil_enhancement: {
+    name: 'Veil Enhancement',
+    description: 'Increases Veil power by 10%',
     icon: '✨',
     category: 'force'
   },
-  force_mastery: {
-    name: 'Force Mastery',
-    description: 'Unlocks Force abilities',
+  veil_mastery: {
+    name: 'Veil Mastery',
+    description: 'Unlocks Veil abilities',
     icon: '⚡',
     category: 'force'
   },
-  force_insight: {
-    name: 'Force Insight',
-    description: 'Improves Force perception',
+  veil_insight: {
+    name: 'Veil Insight',
+    description: 'Improves Veil perception',
     icon: '👁️',
     category: 'force'
   },
-  lightsaber_mastery: {
-    name: 'Lightsaber Mastery',
-    description: '+10% damage with lightsabers',
+  arcblade_mastery: {
+    name: 'Arcblade Mastery',
+    description: '+10% damage with arcblades',
     icon: '⚔️',
     category: 'combat'
   },
@@ -45,7 +45,7 @@ export const EFFECT_DEFINITIONS = {
     category: 'combat'
   },
   energy_resistance: {
-    name: 'Energy Resistance',
+    name: 'Energy Uprising',
     description: '-20% energy damage taken',
     icon: '🛡️',
     category: 'defense'
@@ -90,14 +90,14 @@ export const EFFECT_DEFINITIONS = {
   },
   
   // Faction Effects
-  imperial_identification: {
-    name: 'Imperial Identification',
-    description: 'Recognized as Imperial (access benefits)',
+  dominion_identification: {
+    name: 'Dominion Identification',
+    description: 'Recognized as Dominion (access benefits)',
     icon: '🏛️',
     category: 'faction'
   },
-  mandalorian_craftsmanship: {
-    name: 'Mandalorian Craftsmanship',
+  ironkin_craftsmanship: {
+    name: 'Ironkin Craftsmanship',
     description: '+10% durability',
     icon: '🔨',
     category: 'craftsmanship'

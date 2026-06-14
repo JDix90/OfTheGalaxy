@@ -1,0 +1,156 @@
+{
+  "$schema": "./golden_path.schema (informal)",
+  "id": "golden_path_v1",
+  "title": "Dockside Initiation — The Golden Path",
+  "summary": "A tight, authored ~10-minute onboarding on the Solenne docks, guided by Dockmaster Jax. Teaches movement, combat, healing, and trade, plants the Veil-resonance hook off the training drone, and ends on a player choice that sets a faction lean and spawns the first real quest.",
+  "guide": {
+    "npcId": "npc_tutorial_dockmaster_jax",
+    "name": "Dockmaster Jax",
+    "role": "Dockmaster of the Solenne landing bays",
+    "voice": "Weathered, dryly funny, quietly kind. Has watched a thousand drifters pass through and outlived most of them. Talks like he's done you a favor by warning you.",
+    "vendorId": "npc_tutorial_vendor_jax"
+  },
+  "setting": {
+    "planet": "solenne",
+    "locale": "The Solenne docks, edge of the Severed Reach",
+    "mood": "An unsettled frontier port. The Concord flies its banners over the upper docks; the freighter crews and Drift Cartel runners below know better.",
+    "targetDurationSeconds": 600
+  },
+  "coldOpen": "Welcome to Solenne. Dockmaster Jax — I run these landing bays. New face, empty pockets, that look in your eye like the galaxy already owes you something. I know the type. Stick with me and I'll make sure your first week isn't your last.",
+  "beats": [
+    {
+      "id": "orient",
+      "state": "orient_ui",
+      "title": "Planetfall",
+      "objective": "Get your bearings on the docks.",
+      "narration": "First thing you do anywhere new: learn to walk before you run. There's no shame in being careful — the careless ones I bury.",
+      "target": null,
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "move",
+      "state": "movement_intro",
+      "title": "Find Your Feet",
+      "objective": "Move to Dockmaster Jax using WASD or the arrow keys.",
+      "narration": "Arrow keys or W-A-S-D. Get a feel for the deck plating under you, then come find me. I don't bite — not before midday, anyway.",
+      "target": "submap-view",
+      "highlightTarget": "npc-icon",
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "talk",
+      "state": "dialogue_started",
+      "title": "The Dockmaster",
+      "objective": "Talk to Dockmaster Jax and accept 'Dockside Initiation'.",
+      "narration": "As it happens, I've got work. Call it 'Dockside Initiation' — it'll teach you the four things that keep a drifter alive: move, fight, mend, bargain. You in?",
+      "target": "dialogue-interface",
+      "estimatedSeconds": 75
+    },
+    {
+      "id": "combat",
+      "state": "combat_intro",
+      "title": "The Training Drone",
+      "objective": "Defeat the training drone. Watch the turn order and pick your action.",
+      "narration": "The drone hits back, but it won't kill you — much. Watch the turn order on the left, choose from the action menu, and aim for the thing trying to dent your skull. Go.",
+      "target": "combat-action-menu",
+      "estimatedSeconds": 120
+    },
+    {
+      "id": "hook",
+      "state": "combat_complete",
+      "title": "The Resonance Spike",
+      "isHook": true,
+      "objective": "(Story beat — no input required.)",
+      "narration": "…Hold on. That drone's core just spiked — resonance readings climbing right off my board, and they're pointing at you, not the machine. I've watched Veil-touched come through these bays before, but I've never seen one light up by accident. We'll get to that. First, you're bleeding on my deck plating.",
+      "payoff": "Plants the central mystery: something in the player is Veil-touched. Pays off in the closing choice (the resonance fragment) and the first real quest.",
+      "estimatedSeconds": 30
+    },
+    {
+      "id": "heal",
+      "state": "vendor_intro",
+      "title": "Patch Yourself Up",
+      "objective": "Buy a medpac from Jax's stall.",
+      "narration": "Medpacs: field medicine in a tube. Crack one and it knits you back together — mid-fight or after. Out here a full pack is worth more than a full clip. Buy a couple.",
+      "target": "vendor-item-list",
+      "estimatedSeconds": 75
+    },
+    {
+      "id": "use_item",
+      "state": "loot_received",
+      "title": "Use What You Carry",
+      "objective": "Open your inventory (press I) and use the medpac to restore health.",
+      "narration": "Press I to open your kit. Find that medpac and use it. A weapon keeps you in the fight; a medpac keeps you in the world.",
+      "target": "inventory-item-medpac",
+      "estimatedSeconds": 60
+    },
+    {
+      "id": "hud",
+      "state": "hud_health_stamina_explained",
+      "title": "Reading the Room",
+      "objective": "Note your health, stamina, credits, and level in the HUD.",
+      "narration": "Top corners tell you everything that matters: what's keeping you alive, what's keeping you moving, and what's keeping you fed. Glance at them often. The ones who don't end up as a line in my ledger.",
+      "target": "hud-health-stamina",
+      "estimatedSeconds": 45
+    },
+    {
+      "id": "depart",
+      "state": "spaceport_exit_explained",
+      "title": "The Wider Reach",
+      "objective": "Open the galaxy map to see where you can go.",
+      "narration": "You've got the basics, and you're still breathing — that's better than most manage. Pull up the galaxy map. The Reach is wide, and for the first time it's open to you.",
+      "target": "hud-galaxy-map-button",
+      "payoffBeat": "galaxy-map-reveal",
+      "estimatedSeconds": 45
+    }
+  ],
+  "closingChoice": {
+    "state": "tutorial_complete",
+    "trigger": "After the galaxy-map reveal, Jax stops the player before they leave.",
+    "setup": "Before you wander off — I dug this out of the drone's core after you fried it.",
+    "item": {
+      "id": "veil_resonance_fragment",
+      "name": "Veil Resonance Fragment",
+      "description": "A shard pulled from the training drone's core, faintly warm and humming at the edge of hearing. It is keyed to whatever stirred in you during the fight."
+    },
+    "prompt": "It's a resonance fragment, and it's keyed to whatever woke in you back there. I can't read it, but I know two people who can. A Keeper contact on Caldon — Order folk, they live and breathe Veil-resonance — or a buyer on Sinkport, Drift Cartel, no names and no questions, pays in full. Your fragment, your call. Where's it going?",
+    "options": [
+      {
+        "id": "choose_keeper",
+        "label": "Take it to the Keeper contact on Caldon.",
+        "icon": "🛡️",
+        "response": "The Order, then. Figures — you've got that look. Caldon's a quiet world and the Keepers are quieter, but they keep their word. Tell them Jax sent you.",
+        "consequences": {
+          "reputation": { "keeper_order": 15, "drift_cartel": -5 },
+          "destinationPlanet": "caldon",
+          "followOnQuest": "mq_keeper_fragment_01",
+          "followOnQuestTitle": "What Sleeps in the Shard"
+        }
+      },
+      {
+        "id": "choose_cartel",
+        "label": "Sell it to the Drift Cartel on Sinkport.",
+        "icon": "💰",
+        "response": "Sinkport it is. Coin spends, mysteries don't — can't fault the logic. The buyer's fair by their standards, long as you don't count your fingers after. Tell them Jax vouched.",
+        "consequences": {
+          "reputation": { "drift_cartel": 15, "keeper_order": -5 },
+          "destinationPlanet": "sinkport",
+          "followOnQuest": "mq_cartel_fragment_01",
+          "followOnQuestTitle": "No Questions Asked"
+        }
+      }
+    ]
+  },
+  "recap": {
+    "state": "tutorial_complete",
+    "title": "You're On Your Way",
+    "headline": "You've learned the four things that keep a drifter alive.",
+    "learned": [
+      "Move with WASD or the arrow keys",
+      "Fight turn-by-turn — read the order, pick your action",
+      "Heal with medpacs from your inventory (press I)",
+      "Trade at vendors — standing changes the price",
+      "Travel the galaxy map to take on quests across the Reach"
+    ],
+    "closer": "The Reach is wide and it doesn't care about you — but Jax does, a little. Now get going."
+  }
+}

@@ -7,25 +7,25 @@
 // Star Wars lore data for planet types and characteristics
 const PLANET_LORE = {
   // Core Worlds
-  coruscant: {
+  centralis: {
     type: 'urban_sprawl',
     cities: [
-      { name: 'Galactic City', type: 'capital', size: 'huge', importance: 10 },
-      { name: 'Uscru District', type: 'entertainment', size: 'large', importance: 8 },
-      { name: 'CoCo Town', type: 'industrial', size: 'large', importance: 7 },
-      { name: 'Senate District', type: 'government', size: 'large', importance: 9 },
-      { name: 'Jedi Temple', type: 'temple', size: 'medium', importance: 10 }
+      { name: 'Central Spire', type: 'capital', size: 'huge', importance: 10 },
+      { name: 'Nightrun District', type: 'entertainment', size: 'large', importance: 8 },
+      { name: 'Lowmarket', type: 'industrial', size: 'large', importance: 7 },
+      { name: 'Assembly District', type: 'government', size: 'large', importance: 9 },
+      { name: 'Keeper Sanctum', type: 'temple', size: 'medium', importance: 10 }
     ],
     pois: [
-      { name: 'Galactic Senate Building', type: 'government', importance: 10 },
-      { name: 'Jedi Temple', type: 'temple', importance: 10 },
-      { name: 'Uscru Entertainment District', type: 'entertainment', importance: 8 },
-      { name: 'CoCo Town Markets', type: 'market', importance: 7 },
-      { name: 'Coruscant Underworld', type: 'danger', importance: 6 }
+      { name: 'Concord Assembly Building', type: 'government', importance: 10 },
+      { name: 'Keeper Sanctum', type: 'temple', importance: 10 },
+      { name: 'Nightrun Entertainment District', type: 'entertainment', importance: 8 },
+      { name: 'Lowmarket Markets', type: 'market', importance: 7 },
+      { name: 'Centralis Underworld', type: 'danger', importance: 6 }
     ]
   },
   
-  naboo: {
+  eloria: {
     type: 'temperate_plains',
     cities: [
       { name: 'Theed', type: 'capital', size: 'large', importance: 9 },
@@ -36,41 +36,41 @@ const PLANET_LORE = {
     pois: [
       { name: 'Theed Royal Palace', type: 'palace', importance: 10 },
       { name: 'Otoh Gunga', type: 'city', importance: 8 },
-      { name: 'Naboo Plains', type: 'landscape', importance: 5 },
-      { name: 'Naboo Swamp', type: 'wilderness', importance: 4 },
-      { name: 'Naboo Spaceport', type: 'spaceport', importance: 9 }
+      { name: 'Eloria Plains', type: 'landscape', importance: 5 },
+      { name: 'Eloria Swamp', type: 'wilderness', importance: 4 },
+      { name: 'Eloria Spaceport', type: 'spaceport', importance: 9 }
     ],
     regions: [
       { name: 'Lake Paonga', type: 'water', size: 'large' },
-      { name: 'Plains of Naboo', type: 'grassland', size: 'large' },
-      { name: 'Swamp of Naboo', type: 'swamp', size: 'medium' }
+      { name: 'Plains of Eloria', type: 'grassland', size: 'large' },
+      { name: 'Swamp of Eloria', type: 'swamp', size: 'medium' }
     ]
   },
   
-  tatooine: {
+  gravenmoor: {
     type: 'desert',
     cities: [
-      { name: 'Mos Eisley', type: 'spaceport', size: 'large', importance: 9 },
-      { name: 'Mos Espa', type: 'settlement', size: 'medium', importance: 7 },
+      { name: 'Greywell', type: 'spaceport', size: 'large', importance: 9 },
+      { name: 'Dustreach', type: 'settlement', size: 'medium', importance: 7 },
       { name: 'Mos Entha', type: 'settlement', size: 'small', importance: 5 },
       { name: 'Anchorhead', type: 'settlement', size: 'small', importance: 4 },
       { name: 'Bestine', type: 'settlement', size: 'medium', importance: 6 }
     ],
     pois: [
-      { name: 'Mos Eisley Cantina', type: 'cantina', importance: 9 },
-      { name: 'Mos Espa Podracing Arena', type: 'arena', importance: 8 },
-      { name: "Jabba's Palace", type: 'palace', importance: 10 },
-      { name: 'Lars Homestead', type: 'homestead', importance: 7 },
-      { name: 'Sarlacc Pit', type: 'danger', importance: 8 }
+      { name: 'Greywell Cantina', type: 'cantina', importance: 9 },
+      { name: 'Dustreach Podracing Arena', type: 'arena', importance: 8 },
+      { name: "Vorga's Palace", type: 'palace', importance: 10 },
+      { name: 'Marn Homestead', type: 'homestead', importance: 7 },
+      { name: 'Devourer Pit', type: 'danger', importance: 8 }
     ],
     regions: [
-      { name: 'Jundland Wastes', type: 'desert', size: 'huge' },
+      { name: 'Sunder Wastes', type: 'desert', size: 'huge' },
       { name: 'Dune Sea', type: 'desert', size: 'huge' },
-      { name: 'Tusken Raider Territory', type: 'danger', size: 'large' }
+      { name: 'Dune Nomad Territory', type: 'danger', size: 'large' }
     ]
   },
   
-  kashyyyk: {
+  verdholm: {
     type: 'jungle',
     cities: [
       { name: 'Kachirho', type: 'city', size: 'large', importance: 9 },
@@ -88,7 +88,7 @@ const PLANET_LORE = {
     ]
   },
   
-  hoth: {
+  rime: {
     type: 'ice',
     cities: [
       { name: 'Echo Base', type: 'base', size: 'medium', importance: 9 }
@@ -96,7 +96,7 @@ const PLANET_LORE = {
     pois: [
       { name: 'Echo Base', type: 'base', importance: 10 },
       { name: 'Wampa Cave', type: 'danger', importance: 6 },
-      { name: 'Tauntaun Territory', type: 'wilderness', importance: 4 }
+      { name: 'Ridgeback Territory', type: 'wilderness', importance: 4 }
     ],
     regions: [
       { name: 'Ice Plains', type: 'ice', size: 'huge' },
@@ -104,7 +104,7 @@ const PLANET_LORE = {
     ]
   },
   
-  bespin: {
+  cirruan: {
     type: 'gas_giant',
     cities: [
       { name: 'Cloud City', type: 'city', size: 'large', importance: 10 }
@@ -116,14 +116,14 @@ const PLANET_LORE = {
     ]
   },
   
-  endor: {
+  verdance: {
     type: 'forest',
     cities: [
       { name: 'Bright Tree Village', type: 'village', size: 'medium', importance: 8 }
     ],
     pois: [
       { name: 'Bright Tree Village', type: 'village', importance: 8 },
-      { name: 'Ewok Village', type: 'village', importance: 7 },
+      { name: 'Brindle Village', type: 'village', importance: 7 },
       { name: 'Death Star II Wreckage', type: 'wreckage', importance: 9 }
     ],
     regions: [
@@ -131,13 +131,13 @@ const PLANET_LORE = {
     ]
   },
   
-  mustafar: {
+  embervast: {
     type: 'volcanic',
     cities: [
-      { name: 'Mustafar Mining Facility', type: 'industrial', size: 'medium', importance: 8 }
+      { name: 'Embervast Mining Facility', type: 'industrial', size: 'medium', importance: 8 }
     ],
     pois: [
-      { name: 'Vader\'s Castle', type: 'fortress', importance: 10 },
+      { name: 'Korrth\'s Castle', type: 'fortress', importance: 10 },
       { name: 'Mining Facility', type: 'industrial', importance: 8 },
       { name: 'Lava Rivers', type: 'danger', importance: 7 }
     ],
@@ -384,32 +384,32 @@ function getTerrainFromPlanetType(planetType, climate, planetName = '') {
   
   // Lore-accurate mapping for specific planets
   const specificPlanets = {
-    'coruscant': 'urban_sprawl',
-    'tatooine': 'desert',
-    'geonosis': 'desert',
-    'jakku': 'desert',
-    'kashyyyk': 'jungle',
-    'felucia': 'jungle',
-    'endor': 'forest',
-    'naboo': 'tropical_forest',
-    'scarif': 'tropical_ocean',
-    'kamino': 'ocean',
+    'centralis': 'urban_sprawl',
+    'gravenmoor': 'desert',
+    'karrn': 'desert',
+    'talveen': 'desert',
+    'verdholm': 'jungle',
+    'myssia': 'jungle',
+    'verdance': 'forest',
+    'eloria': 'tropical_forest',
+    'coralsec': 'tropical_ocean',
+    'tethys': 'ocean',
     'mon cala': 'ocean',
-    'dac': 'ocean',
-    'hoth': 'ice',
-    'ilum': 'ice',
-    'mygeeto': 'ice',
-    'mustafar': 'lava_field',
-    'sullust': 'volcanic',
-    'dagobah': 'swamp',
-    'utapau': 'canyon',
-    'ryloth': 'arid_plains',
-    'bespin': 'gas_giant',
+    'dorrun': 'ocean',
+    'rime': 'ice',
+    'kthala': 'ice',
+    'glaiv': 'ice',
+    'embervast': 'lava_field',
+    'pyrren': 'volcanic',
+    'mirefen': 'swamp',
+    'casmer': 'canyon',
+    'sytha': 'arid_plains',
+    'cirruan': 'gas_giant',
     'crait': 'barren',
     'jedha': 'barren',
-    'corellia': 'temperate_plains',
-    'alderaan': 'temperate_plains',
-    'chandrila': 'temperate_plains'
+    'drydock': 'temperate_plains',
+    'caelmore': 'temperate_plains',
+    'solenne': 'temperate_plains'
   };
   
   if (specificPlanets[name]) {
@@ -473,7 +473,7 @@ function getPOIDescription(type, name) {
     cantina: 'Cantina and gathering place',
     arena: 'Arena for competitions',
     fortress: 'Military fortress',
-    temple: 'Religious or Jedi temple',
+    temple: 'Religious or Keeper temple',
     danger: 'Dangerous area',
     landscape: 'Notable landscape feature',
     wilderness: 'Wilderness area',

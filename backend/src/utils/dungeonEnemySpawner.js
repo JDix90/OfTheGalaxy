@@ -38,7 +38,7 @@ const DUNGEON_ENEMY_POOLS = {
   underworld: ['syndicate_thug', 'pirate', 'bounty_hunter'],
   cave: ['wild_animal'],
   ruins: ['droid_security', 'wild_animal'],
-  fortress: ['stormtrooper', 'stormtrooper_sergeant']
+  fortress: ['ironclad', 'ironclad_sergeant']
 };
 
 /**
@@ -103,11 +103,11 @@ function enhanceDungeonEnemyLoot(baseLootTable, depthZone) {
   
   // Uncommon weapons (higher chance in deeper zones)
   const uncommonWeapons = [
-    { itemId: 'blaster_pistol_01', chance: 0.08, quantity: 1 },
-    { itemId: 'blaster_pistol_imperial', chance: 0.06, quantity: 1 },
-    { itemId: 'blaster_pistol_rebel', chance: 0.06, quantity: 1 },
-    { itemId: 'blaster_rifle_generic', chance: 0.05, quantity: 1 },
-    { itemId: 'vibroblade', chance: 0.07, quantity: 1 },
+    { itemId: 'pulser_pistol_01', chance: 0.08, quantity: 1 },
+    { itemId: 'pulser_pistol_dominion', chance: 0.06, quantity: 1 },
+    { itemId: 'pulser_pistol_rebel', chance: 0.06, quantity: 1 },
+    { itemId: 'pulser_rifle_generic', chance: 0.05, quantity: 1 },
+    { itemId: 'shock_blade', chance: 0.07, quantity: 1 },
     { itemId: 'vibrosword', chance: 0.05, quantity: 1 }
   ];
   
@@ -121,9 +121,9 @@ function enhanceDungeonEnemyLoot(baseLootTable, depthZone) {
   
   // Rare items (only in deeper zones)
   const rareWeapons = [
-    { itemId: 'blaster_pistol_02', chance: 0.03, quantity: 1 },
-    { itemId: 'blaster_rifle_02', chance: 0.03, quantity: 1 },
-    { itemId: 'blaster_pistol_03', chance: 0.02, quantity: 1 },
+    { itemId: 'pulser_pistol_02', chance: 0.03, quantity: 1 },
+    { itemId: 'pulser_rifle_02', chance: 0.03, quantity: 1 },
+    { itemId: 'pulser_pistol_03', chance: 0.02, quantity: 1 },
     { itemId: 'electrostaff', chance: 0.02, quantity: 1 }
   ];
   

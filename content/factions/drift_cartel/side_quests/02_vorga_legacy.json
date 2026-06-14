@@ -1,0 +1,84 @@
+{
+  "id": "gravenmoor_side_02_vorga_legacy",
+  "factionId": "drift_cartel",
+  "questType": "side",
+  "title": "Vorga's Legacy",
+  "description": "Grakka the Vorr, a lieutenant who has taken over some of Vorga's former operations, offers you a deal: enter Vorga's abandoned palace, recover the treasures within, and bring them to him. He'll pay you 30% of the value. But be warned—the palace is dangerous. Many have tried. Few have succeeded. Traps, guardians, and who knows what else await inside.",
+  "shortDescription": "Recover treasures from Vorga's abandoned palace",
+  "prerequisites": {
+    "level": 6,
+    "reputation": {},
+    "completedQuests": [],
+    "items": []
+  },
+  "objectives": [
+    {
+      "id": "meet_vorr",
+      "type": "interact",
+      "description": "Speak with Grakka the Vorr about the job",
+      "target": "npc_vorr_lieutenant"
+    },
+    {
+      "id": "travel_palace",
+      "type": "travel",
+      "description": "Travel to Vorga's Palace",
+      "location": {
+        "planet": "gravenmoor",
+        "area": "dune_sea"
+      }
+    },
+    {
+      "id": "navigate_traps",
+      "type": "custom",
+      "description": "Navigate the palace traps and security systems",
+      "target": "palace_traps"
+    },
+    {
+      "id": "defeat_guardians",
+      "type": "defeat",
+      "description": "Defeat the palace guardians",
+      "target": "palace_guardian",
+      "count": 3
+    },
+    {
+      "id": "recover_treasure",
+      "type": "collect",
+      "description": "Recover Vorr treasure from the palace",
+      "target": "vorr_treasure",
+      "count": 1
+    },
+    {
+      "id": "return_to_vorr",
+      "type": "deliver",
+      "description": "Return the treasure to Grakka (or keep it for yourself)",
+      "target": "npc_vorr_lieutenant"
+    }
+  ],
+  "rewards": {
+    "xp": 2000,
+    "credits": 5000,
+    "reputation": {
+      "drift_cartel": 40
+    },
+    "items": [
+      {
+        "itemId": "vorr_treasure",
+        "quantity": 1
+      }
+    ],
+    "unlocks": []
+  },
+  "questGiverId": "npc_vorr_lieutenant",
+  "startLocation": {
+    "planet": "gravenmoor",
+    "area": "dune_sea"
+  },
+  "estimatedTime": 120,
+  "difficulty": "very_hard",
+  "isActive": true,
+  "chainId": null,
+  "chainOrder": null
+}
+
+
+

@@ -7,6 +7,8 @@ import React, { useEffect, useState } from 'react';
 import { useCharacterStore } from '../../state/characterSlice';
 import { useFactionStore } from '../../state/factionSlice';
 import FactionCard from './FactionCard';
+import { MAJOR_FACTIONS, NEUTRAL_TIER_INFO } from '../../data/majorFactions';
+import { formatDisplayName } from '../../utils/formatName';
 import './FactionView.css';
 
 export default function FactionView() {
@@ -32,8 +34,35 @@ export default function FactionView() {
     );
   }
 
-  // Sort reputations
-  const sortedReputations = [...reputations].sort((a, b) => {
+  // Build the FULL major-faction roster, merging in any standings the player has
+  // actually earned. Factions the player hasn't dealt with show as Neutral / 0,
+  // so the screen always communicates the galaxy's political landscape.
+  const repById = new Map(reputations.map((r) => [r.factionId, r]));
+  const rosterCards = MAJOR_FACTIONS.map((f) => {
+    const tracked = repById.get(f.id);
+    if (tracked) {
+      return { ...tracked, factionName: tracked.factionName || f.name };
+    }
+    return {
+      factionId: f.id,
+      factionName: f.name,
+      reputation: 0,
+      tier: 'neutral',
+      tierInfo: NEUTRAL_TIER_INFO
+    };
+  });
+  // Keep any earned standings with factions outside the curated roster.
+  const extraCards = reputations
+    .filter((r) => !MAJOR_FACTIONS.some((f) => f.id === r.factionId))
+    .map((r) => ({
+      ...r,
+      factionName: r.factionName || formatDisplayName(r.factionId),
+      tierInfo: r.tierInfo || NEUTRAL_TIER_INFO
+    }));
+  const allFactions = [...rosterCards, ...extraCards];
+
+  // Sort the full roster
+  const sortedReputations = [...allFactions].sort((a, b) => {
     switch (sortBy) {
       case 'name':
         return (a.factionName || '').localeCompare(b.factionName || '');
