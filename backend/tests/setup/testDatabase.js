@@ -5,19 +5,21 @@
 
 const { sequelize } = require('../../src/models');
 
+// Expose the test data factories as globals so specs can use them whether or not
+// they explicitly import from ./testHelpers (many use createTestCharacter etc.
+// without importing it).
+Object.assign(global, require('./testHelpers'));
+
 // Set test environment
 process.env.NODE_ENV = 'test';
 
 beforeAll(async () => {
   try {
-    // Authenticate with test database
+    // Authenticate with test database. The schema is built once in jest globalSetup
+    // (sequelize.sync force) — the source of truth is the models, not the drifted
+    // migration files — so we don't run migrations per test file here.
     await sequelize.authenticate();
     console.log('✅ Test database connected');
-    
-    // Run migrations
-    const { runMigrations } = require('../../src/migrations/run');
-    await runMigrations();
-    console.log('✅ Test migrations completed');
   } catch (error) {
     console.error('❌ Test database setup failed:', error);
     throw error;

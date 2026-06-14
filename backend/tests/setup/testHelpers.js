@@ -35,9 +35,13 @@ async function createTestCharacter(userId, overrides = {}) {
     endurance: 10
   };
 
+  // Merge stat overrides into the defaults (the model requires all six stats), so a
+  // partial `stats` override like { endurance: 12 } doesn't wipe the rest.
+  const { stats: statOverrides, ...rest } = overrides;
+
   return await PlayerCharacter.create({
     userId,
-    name: `Test Character ${Date.now()}`,
+    name: `Test Character ${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     species: 'human',
     background: 'soldier',
     level: 1,
@@ -45,7 +49,7 @@ async function createTestCharacter(userId, overrides = {}) {
     skillPoints: 0,
     attributePoints: 0,
     specializationPoints: 0,
-    stats: defaultStats,
+    stats: { ...defaultStats, ...statOverrides },
     skills: {
       combat: {},
       stealth: {},
@@ -60,7 +64,7 @@ async function createTestCharacter(userId, overrides = {}) {
     maxStamina: 50,
     credits: 1000,
     currentPlanet: 'solenne',
-    ...overrides
+    ...rest
   });
 }
 
@@ -69,7 +73,7 @@ async function createTestCharacter(userId, overrides = {}) {
  */
 async function createTestItem(overrides = {}) {
   return await Item.create({
-    id: `test-item-${Date.now()}`,
+    id: `test-item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     name: 'Test Item',
     description: 'A test item',
     itemType: 'weapon',
@@ -86,8 +90,8 @@ async function createTestItem(overrides = {}) {
  */
 async function createTestQuest(overrides = {}) {
   return await Quest.create({
-    id: `test-quest-${Date.now()}`,
-    name: 'Test Quest',
+    id: `test-quest-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+    title: 'Test Quest',
     description: 'A test quest',
     questType: 'main',
     objectives: [
@@ -113,8 +117,9 @@ async function createTestQuest(overrides = {}) {
  */
 async function createTestNPC(overrides = {}) {
   return await NPC.create({
-    id: `test-npc-${Date.now()}`,
+    id: `test-npc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     name: 'Test NPC',
+    species: 'human', // required by the model (allowNull: false)
     npcType: 'quest_giver',
     factionId: 'independent_investigators',
     planetId: 'solenne',
