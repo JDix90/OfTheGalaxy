@@ -25,12 +25,15 @@ const deadEnemy = () => { const c = combatService.buildEnemyCombatant(generateRa
 const liveEnemy = () => combatService.buildEnemyCombatant(generateRandomEnemy(5));
 
 async function mkPlayer(character) {
+  const sent = []; // captures WS messages the server pushes to this player
   return {
     characterId: character.id,
     combatant: await combatService.buildPlayerCombatant(character),
     engagedEnemies: new Map(),
     encounterId: null, _engaging: false, _finalizing: false, _fleePushed: false,
     abilities: [], abilityCdUntil: {}, x: 0, z: 0, facing: 0, dead: false, maxHp: character.maxHealth,
+    ws: { readyState: 1, OPEN: 1, send: (s) => sent.push(JSON.parse(s)) },
+    _sent: sent,
   };
 }
 
@@ -128,5 +131,39 @@ describe('Realtime combat lifecycle (Phase 0–1)', () => {
     await mgr._refreshCombatant(p);
     expect(p.maxHp).toBe(250);
     expect(p.combatant.stats.maxHealth).toBe(250);
+    // also pushes the refreshed hotbar to the client
+    expect(p._sent.some((m) => m.t === 'hotbar')).toBe(true);
+  });
+
+  // --- Phase 2: non-blocking victory/death feedback ---
+
+  test('a win pushes a reward toast (xp / credits / loot)', async () => {
+    const p = await mkPlayer(character);
+    p.engagedEnemies.set('e0', deadEnemy());
+    await mgr.ensureEncounter(mkWorld(), p);
+    await mgr.finalize(mkWorld(), p, 'won');
+
+    const reward = p._sent.find((m) => m.t === 'reward');
+    expect(reward).toBeTruthy();
+    expect(typeof reward.xp).toBe('number');
+    expect(typeof reward.credits).toBe('number');
+    expect(Array.isArray(reward.loot)).toBe(true);
+    expect(Array.isArray(reward.leveledUp)).toBe(true);
+  });
+
+  test('a death pushes a respawn toast with location + medical fee', async () => {
+    // Use the dungeon path: respawn resolves to the dungeon ENTRANCE (deterministic, no planet
+    // mapData lookup), so the assertion doesn't depend on seed data being present in the test DB.
+    const world = mkWorld(DUNGEON_ZONE);
+    const p = await mkPlayer(character);
+    p.engagedEnemies.set('e0', liveEnemy());
+    await mgr.ensureEncounter(world, p);
+    p.combatant.stats.health = 0;
+    await mgr.finalize(world, p, 'lost');
+
+    const respawn = p._sent.find((m) => m.t === 'respawn');
+    expect(respawn).toBeTruthy();
+    expect(respawn.area).toBe('Dungeon Entrance'); // safe-location name from the dungeon branch
+    expect(respawn.fee).toBe(100 + 3 * 50);        // medical fee = base + level*50 (level 3)
   });
 });

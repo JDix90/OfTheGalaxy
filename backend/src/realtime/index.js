@@ -20,20 +20,8 @@ const { WebSocketServer } = require('ws');
 const { WorldManager } = require('./WorldManager');
 const characterService = require('../services/characterService');
 const combatService = require('../services/combatService');
-const { getAbilityDefinition, isCombatUsable } = require('../data/abilityDefinitions');
-
-// Build the client's combat hotbar from a character's known, combat-usable abilities.
-function buildHotbar(character) {
-  const known = Array.isArray(character.abilities) ? character.abilities : [];
-  const out = [];
-  for (const id of known) {
-    if (!isCombatUsable(id)) continue;
-    const d = getAbilityDefinition(id);
-    if (!d) continue;
-    out.push({ id, name: d.name, type: d.type, cd: d.cooldown || 1, stam: (d.cost && d.cost.stamina) || 0, target: d.targetType });
-  }
-  return out;
-}
+const { isCombatUsable } = require('../data/abilityDefinitions');
+const { buildHotbar } = require('./combat'); // shared with _refreshCombatant (mid-session hotbar push)
 
 const JWT_SECRET = process.env.JWT_SECRET;
 

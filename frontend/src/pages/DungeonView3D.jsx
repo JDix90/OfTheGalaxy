@@ -21,6 +21,7 @@ import { useDungeonWorld } from '../world/useDungeonWorld';
 import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import DungeonScene from '../components/submap3d/DungeonScene';
 import HUD from '../components/hud/HUD';
+import CombatToasts from '../components/hud/CombatToasts';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 
 useGLTF.preload(CHARACTER_GLTF_URLS[0]);
@@ -158,6 +159,8 @@ export default function DungeonView3D({ subMap }) {
           <button style={{ ...btnStyle, background: 'rgba(12,18,32,0.92)', borderColor: '#2f7a64' }} onClick={handleExit}>▸ {proxPrompt.poi.label || 'Exit'}</button>
         </div>
       )}
+
+      <CombatToasts world={worldRef} />
 
       <TutorialOverlay />
 

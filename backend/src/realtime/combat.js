@@ -209,7 +209,27 @@ function buildEncounterMeta(world) {
   return { encounterType: 'dungeon', metadata };
 }
 
+/** Build the client ability hotbar from a character's known, combat-usable abilities. */
+function buildHotbar(character) {
+  const known = Array.isArray(character.abilities) ? character.abilities : [];
+  const out = [];
+  for (const id of known) {
+    if (!isCombatUsable(id)) continue;
+    const d = getAbilityDefinition(id);
+    if (!d) continue;
+    out.push({ id, name: d.name, type: d.type, cd: d.cooldown || 1, stam: (d.cost && d.cost.stamina) || 0, target: d.targetType });
+  }
+  return out;
+}
+
 class CombatManager {
+  /** Send a message to one player's socket (best-effort; never throws into the tick). */
+  _send(player, msg) {
+    if (player && player.ws && player.ws.readyState === player.ws.OPEN) {
+      try { player.ws.send(JSON.stringify(msg)); } catch (_) {}
+    }
+  }
+
   async handleIntent(world, intent) {
     const player = world.players.get(intent.playerId);
     if (!player) return;
@@ -294,13 +314,14 @@ class CombatManager {
       // actually a win — grant the kill's rewards (covers the kill+disconnect-same-tick race).
       let outcome = status;
       if (outcome === 'fled' && enemyCombatants.length && enemyCombatants.every((c) => c.stats.health <= 0)) outcome = 'won';
+      let result = null;
       if (id) {
         const enc = await CombatEncounter.findByPk(id);
         if (enc) {
           enc.combatants = [player.combatant, ...enemyCombatants]; // sync final hp + dead enemies
           enc.changed('combatants', true);
           await enc.save();
-          await combatService.endEncounter(id, outcome); // rewards / quests / respawn / hp-save
+          result = await combatService.endEncounter(id, outcome); // rewards / quests / respawn / hp-save
         }
       }
       // A win may have leveled the character up (PlayerCharacter.addXP raises maxHealth/stats and
@@ -308,12 +329,15 @@ class CombatManager {
       // (not the join-time snapshot); the next snapshot carries the new maxHp to the client.
       if (outcome === 'won' && id && player.combatant) {
         try { await this._refreshCombatant(player); } catch (e) { /* keep stale rather than crash the tick */ }
+        // Victory feedback: a non-blocking reward toast (xp / credits / loot / level-up).
+        const rw = result && result.metadata && result.metadata.rewards;
+        if (rw) this._send(player, { t: 'reward', xp: rw.xp || 0, credits: rw.credits || 0, loot: rw.loot || [], leveledUp: rw.leveledUp || [], newLevel: rw.newLevel });
       }
       // On loss, restore the in-world player. With an encounter (id), endEncounter already did
-      // the authoritative DB respawn (40% heal / fee / location) and this mirrors it. Without an
-      // id (cross-engine guard suppressed a spurious 3D death while a turn-based fight owns the
-      // character), it's an in-world-only resurrect from DB health — no fee, no DB writes.
-      if (outcome === 'lost') await this._respawn(world, player);
+      // the authoritative DB respawn (40% heal / fee / location) and this mirrors it (+ a death
+      // toast). Without an id (cross-engine guard suppressed a spurious 3D death while a turn-
+      // based fight owns the character), it's an in-world-only resurrect from DB health — no fee.
+      if (outcome === 'lost') await this._respawn(world, player, result && result.metadata && result.metadata.respawn);
     } finally {
       player._finalizing = false;
     }
@@ -329,15 +353,18 @@ class CombatManager {
     fresh.temporaryEffects = fresh.temporaryEffects || [];
     player.combatant = fresh;
     player.maxHp = fresh.stats.maxHealth;
-    // A level-up can unlock new abilities; refresh the server-authoritative kit. (The client
-    // hotbar UI refresh is a Phase-2 follow-up — the server already accepts the new abilities.)
+    // A level-up can unlock new abilities; refresh the server-authoritative kit AND push the
+    // rebuilt hotbar so the client shows any newly-unlocked ability buttons mid-session.
     if (Array.isArray(character.abilities)) {
       player.abilities = character.abilities.filter((aid) => isCombatUsable(aid));
     }
+    this._send(player, { t: 'hotbar', hotbar: buildHotbar(character) });
   }
 
-  /** endEncounter('lost') already respawned the character (hp + location); mirror it in-world. */
-  async _respawn(world, player) {
+  /** endEncounter('lost') already respawned the character (hp + location); mirror it in-world.
+   *  `respawnInfo` (from endEncounter's metadata) carries the safe-location area + medical fee
+   *  for the client's death toast. */
+  async _respawn(world, player, respawnInfo) {
     try {
       const { PlayerCharacter } = require('../models');
       const character = await PlayerCharacter.findByPk(player.characterId);
@@ -372,15 +399,20 @@ class CombatManager {
     player.iFrameUntil = 0;
     player.dashUntil = 0;
     player.dodgeCdUntil = 0;
-    if (player.ws && player.ws.readyState === player.ws.OPEN) {
-      try { player.ws.send(JSON.stringify({ t: 'respawn', x: player.x, z: player.z, hp: player.combatant ? player.combatant.stats.health : undefined })); } catch (_) {}
-    }
+    this._send(player, {
+      t: 'respawn',
+      x: player.x, z: player.z,
+      hp: player.combatant ? player.combatant.stats.health : undefined,
+      area: (respawnInfo && respawnInfo.area) || null,
+      fee: (respawnInfo && respawnInfo.medicalFee) || 0,
+      restored: respawnInfo && respawnInfo.healthRestored,
+    });
   }
 }
 
 module.exports = {
   CombatManager, resolveCast, resolveDodge, enemyTryAttack, applyDamage,
   buildEnemyActorCombatant: (template) => combatService.buildEnemyCombatant(template),
-  buildEncounterMeta,
+  buildEncounterMeta, buildHotbar,
   DISENGAGE_MS, FRESH_TURNBASED_MS,
 };
