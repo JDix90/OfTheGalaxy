@@ -189,27 +189,43 @@ class RespawnService {
   async respawnPlayer(characterId, options = {}) {
     const {
       healthRestorePercent = 50,
-      chargeFee = true
+      chargeFee = true,
+      dungeon = null // { subMapId, parentLocationId, x, y } => respawn at the dungeon entrance
     } = options;
 
     console.log(`💀 Respawn player ${characterId} with options:`, options);
 
     const character = await PlayerCharacter.findByPk(characterId);
-    
+
     if (!character) {
       throw new Error('Character not found');
     }
 
     console.log(`📍 Character current planet: ${character.currentPlanet}`);
 
-    // Find nearest safe location on current planet
+    // Resolve the respawn target. Dungeon deaths respawn at the dungeon entrance (the player
+    // stays in the dungeon) so the persisted location keeps its submap context — writing a
+    // SURFACE POI here (the old path) dropped `subMapId` and corrupted the dungeon location.
     let safeLocation;
-    try {
-      safeLocation = await this.findNearestSafeLocation(character.currentPlanet);
-      console.log(`✅ Safe location found:`, safeLocation);
-    } catch (error) {
-      console.error(`❌ Failed to find safe location:`, error);
-      throw error;
+    if (dungeon && dungeon.subMapId) {
+      safeLocation = {
+        type: 'dungeon_entrance',
+        name: 'Dungeon Entrance',
+        x: Number.isFinite(dungeon.x) ? dungeon.x : 50,
+        y: Number.isFinite(dungeon.y) ? dungeon.y : 50,
+        area: 'submap',
+        subMapId: dungeon.subMapId,
+        parentLocationId: dungeon.parentLocationId || null
+      };
+      console.log(`✅ Dungeon respawn target (entrance):`, safeLocation);
+    } else {
+      try {
+        safeLocation = await this.findNearestSafeLocation(character.currentPlanet);
+        console.log(`✅ Safe location found:`, safeLocation);
+      } catch (error) {
+        console.error(`❌ Failed to find safe location:`, error);
+        throw error;
+      }
     }
     
     // Calculate health restoration
@@ -232,7 +248,9 @@ class RespawnService {
     character.currentLocation = {
       x: safeLocation.x,
       y: safeLocation.y,
-      area: safeLocation.area
+      area: safeLocation.area,
+      // Preserve submap context for dungeon respawns so the location stays coherent.
+      ...(safeLocation.subMapId ? { subMapId: safeLocation.subMapId, parentLocationId: safeLocation.parentLocationId || null } : {})
     };
     character.credits = Math.max(0, character.credits - medicalFee);
 
