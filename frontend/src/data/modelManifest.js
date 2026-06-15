@@ -178,7 +178,13 @@ export function getPoiStructure(type) {
 export function getPoiBuilding(type, seed) {
   const s = getPoiStructure(type);
   if (!s.buildings || s.buildings.length === 0) return null;
-  return { url: pickBySeed(s.buildings, seed ?? getPoiCategory(type)), fit: s.fit || s.footprint * 1.6 };
+  const key = seed ?? getPoiCategory(type);
+  const h = hashStr(key);
+  // Deterministic yaw + slight scale jitter so same-category buildings don't look stamped.
+  const yaw = (h % 360) * (Math.PI / 180);
+  const jitter = 0.9 + ((h >> 5) % 21) / 100; // 0.90–1.10
+  const baseFit = s.fit || s.footprint * 1.6;
+  return { url: pickBySeed(s.buildings, key), fit: baseFit * jitter, yaw };
 }
 
 /** Deterministic scatter of N props around a POI (each { url, fit, angle, radius }). */

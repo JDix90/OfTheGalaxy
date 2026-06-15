@@ -15,7 +15,7 @@ import * as THREE from 'three';
 
 // fall > 0 falls; fall < 0 rises. area = field diameter; top = spawn ceiling (world units).
 const PRESETS = {
-  dust: { count: 320, color: '#d9c9a8', size: 0.13, fall: 0.3, drift: 0.6, area: 64, top: 22, opacity: 0.5 },
+  dust: { count: 400, color: '#d9c9a8', size: 0.14, fall: 0.3, drift: 0.7, area: 64, top: 22, opacity: 0.58 },
   ash:  { count: 260, color: '#ff8a4a', size: 0.16, fall: -0.5, drift: 0.8, area: 58, top: 26, opacity: 0.65, glow: true },
   rain: { count: 600, color: '#a9c9ee', size: 0.1, fall: 9.0, drift: 0.5, area: 52, top: 28, opacity: 0.4 },
   snow: { count: 420, color: '#eaf2ff', size: 0.17, fall: 1.3, drift: 1.1, area: 64, top: 26, opacity: 0.75 },

@@ -154,9 +154,15 @@ function PropScatter({ props }) {
   );
 }
 
+// Distance label fade (world units): crisp when near, gone past the far edge — keeps
+// far POIs from piling labels on the horizon.
+const LABEL_NEAR = 36;
+const LABEL_FAR = 80;
+
 export default function PoiStructure({ poi, active, onActivate, lit }) {
   const ringRef = useRef();
   const lightRef = useRef();
+  const labelRef = useRef();
   const atmo = useAtmosphere();
   const s = poi.structure;
   const building = poi.building;
@@ -167,7 +173,8 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
   const h = building ? (fitH || building.fit * 0.5) : s.height;
   const fp = building ? building.fit * 0.5 : s.footprint;
 
-  useFrame(({ clock }) => {
+  useFrame((state) => {
+    const { clock, camera } = state;
     if (ringRef.current && poi.enterable) {
       const pulse = active ? 1 + Math.sin(clock.elapsedTime * 4) * 0.12 : 1;
       ringRef.current.scale.setScalar(pulse);
@@ -178,6 +185,12 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
       const night = (atmo.current && atmo.current.nightFactor) || 0;
       const flicker = 0.92 + Math.sin(clock.elapsedTime * 6 + poi.wx) * 0.08;
       lightRef.current.intensity = (0.25 + night * 1.6) * s.glow * (s.footprint * 0.6) * flicker;
+    }
+    if (labelRef.current) {
+      const d = Math.hypot(camera.position.x - poi.wx, camera.position.z - poi.wz);
+      let o = active ? 1 : d <= LABEL_NEAR ? 0.9 : d >= LABEL_FAR ? 0 : 0.9 * (1 - (d - LABEL_NEAR) / (LABEL_FAR - LABEL_NEAR));
+      labelRef.current.style.opacity = o.toFixed(2);
+      labelRef.current.style.display = o <= 0.03 ? 'none' : 'block';
     }
   });
 
@@ -192,9 +205,11 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
       >
         {building
           ? (
-            <Suspense fallback={<StructureMesh s={s} />}>
-              <GltfModel url={building.url} fit={building.fit} onFitted={setFitH} selfEmissive={0.14} />
-            </Suspense>
+            <group rotation={[0, building.yaw || 0, 0]}>
+              <Suspense fallback={<StructureMesh s={s} />}>
+                <GltfModel url={building.url} fit={building.fit} onFitted={setFitH} selfEmissive={0.14} />
+              </Suspense>
+            </group>
           )
           : <StructureMesh s={s} />}
       </group>
@@ -229,9 +244,9 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
       )}
 
       <Html position={[0, h + 1.6, 0]} center distanceFactor={28} occlude={false} style={{ pointerEvents: 'none' }}>
-        <div style={{
+        <div ref={labelRef} style={{
           textAlign: 'center', whiteSpace: 'nowrap', fontFamily: 'system-ui, sans-serif',
-          transform: 'translateY(-50%)', opacity: active ? 1 : 0.82,
+          transform: 'translateY(-50%)', opacity: 0.9,
         }}>
           <div style={{ color: '#e6eefc', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px #000' }}>{label}</div>
           {poi.enterable && active && (
