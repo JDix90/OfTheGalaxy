@@ -16,6 +16,20 @@ const characterService = require('../services/characterService');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 const r3 = (n) => Math.round(n * 1000) / 1000;
+
+/** Salvage encounterService's faction/planet enemy pool for ambient world spawns, filtered to
+ *  ids that are real enemy templates (so generateRandomEnemy gets a usable pool). */
+function buildEnemyPool(planet) {
+  try {
+    const encounterService = require('../services/encounterService');
+    const { enemyTemplates } = require('../data/enemyTemplates');
+    const raw = encounterService.getPlanetEnemyTypes(planet) || [];
+    const valid = raw.filter((id) => enemyTemplates[id]);
+    return valid.length ? valid : null; // null → generateRandomEnemy falls back to a difficulty pool
+  } catch (e) {
+    return null;
+  }
+}
 const SAVE_MIN_MOVE = 0.6; // surface units; skip saves for tiny jitter
 const MAX_WORLDS = 200;     // backstop against unbounded world growth (DoS)
 
@@ -64,7 +78,10 @@ class WorldManager {
     return this._getOrCreate(planetId, async () => {
       const { planet, mapData } = await loadPlanetMapData(planetId);
       const sim = this.createSurfaceSim(mapData || {}, { scale: this.DEFAULTS.scale });
-      return new PlanetWorld(planetId, sim, mapData, { dangerLevel: (planet && planet.dangerLevel) || 1 });
+      return new PlanetWorld(planetId, sim, mapData, {
+        dangerLevel: (planet && planet.dangerLevel) || 1,
+        enemyPool: buildEnemyPool(planet || {}),
+      });
     });
   }
 

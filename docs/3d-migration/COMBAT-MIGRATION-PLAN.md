@@ -14,14 +14,15 @@
 | **1 — S1 backend correctness** | dungeon encounterType/subMapId, dungeon-aware respawn, level-up combatant refresh | ✅ **Done** (PR #10) |
 | **2 — 3D combat UX** | reward toast, death/medical-fee toast, mid-session hotbar refresh (health bars / damage numbers / hotbar cooldowns / target ring already shipped in P4.3/4.4) | ✅ **Done** (PR #11) |
 | **3 — Consumables + regen in 3D** | WS `t:'item'` → in-world `useItem`, HTTP `useItem` routes in-world for live players, consumable quickslot (Q), in-tick OOC health regen | ✅ **Done** (PR #12) |
-| 4 — Re-home random encounters | build respawn/escort escalation; remove dual-engine on the 3D surface | ⏭️ **Next** |
-| 5 — Re-home NPC / POI / quest combat | fix `'npc'` enum, scripted spawns, honor `metadata.questId/objectiveId` | ⬜ Planned |
+| **4 — Re-home random encounters** | ambient in-world respawn (faction pools + level-blend + escort escalation); removed the turn-based dual-engine on the 3D surface | ✅ **Done** (PR #13) |
+| 5 — Re-home NPC / POI / quest combat | fix `'npc'` enum, scripted spawns, honor `metadata.questId/objectiveId` | ⏭️ **Next** |
 | 6 — Tutorial → 3D scripted fight | (old route kept as fallback) | ⬜ Planned |
 | 7 — Retire turn-based UI | flip flag, remove old layer; keep the shared funnel | ⬜ Planned |
 | 8 — Faction rep + polish (flagged) | rep-on-kill (MP-aware), enemy abilities/telegraphs, `defeat_boss` hook, companion actor | ⬜ Optional |
 
 **Decisions locked so far:**
 - **O3 (dungeon respawn destination): respawn at the dungeon ENTRANCE, staying in the dungeon** (implemented in Phase 1) — `currentLocation` keeps its `subMapId`; no eject-to-surface.
+- **O2 (random-encounter pacing after conversion):** ambient hostiles maintain a danger-scaled population (`clamp(2 + ⌊danger/2⌋, 2, 8)`, +2 while escorting) that trickles back one every 8 s; enemies scale to `max(danger, avg player level)` and draw from the planet's faction pool. `encounterService` is **salvaged, not deleted** (Phase 4 reuses `getPlanetEnemyTypes`; full removal is deferred to Phase 7 with the rest of the turn-based layer).
 
 **Still open (need a product call before their phase):** O1 faction-rep policy/deltas (Phase 8) · O2 random-encounter pacing after conversion (Phase 4) · O4 companion/escort combat in 3D — parity or drop? (Phase 5/8) · O5 enemy abilities/boss behavior (Phase 8) · O6 `defeat_boss` achievement hook (Phase 8).
 
