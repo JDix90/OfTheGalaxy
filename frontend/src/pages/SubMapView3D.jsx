@@ -25,19 +25,19 @@ import { CHARACTER_GLTF_URLS } from '../data/modelManifest';
 import { useSubmapWorld } from '../world/useSubmapWorld';
 import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import SubmapScene from '../components/submap3d/SubmapScene';
-import { createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints } from '../components/submap3d/submapData';
+import { createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture } from '../components/submap3d/submapData';
 
 import HUD from '../components/hud/HUD';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import DialogueInterface from '../features/dialogue/DialogueInterface';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import SubMapView from './SubMapView';     // 2D fallback for building interiors (Phase 5.2)
+import SubMapView from './SubMapView';     // 2D fallback (no submap types delegate here now; kept defensive)
 import DungeonView3D from './DungeonView3D'; // 3D real-time dungeon (Phase 5.1)
 
 useGLTF.preload(CHARACTER_GLTF_URLS[0]);
 
-const DELEGATE_2D = new Set(['building_interior']);
+const DELEGATE_2D = new Set(); // spaceport/city/settlement/market/civic/building_interior all 3D now
 
 export default function SubMapView3D() {
   const { planetId, parentLocationId, parentLocationType, type, subMapId } = useParams();
@@ -68,6 +68,8 @@ export default function SubMapView3D() {
   const exits = useMemo(() => buildSubmapExits(subMap, sim), [subMap, sim]);
   const npcs3d = useMemo(() => buildSubmapNpcs(npcs, subMap, sim), [npcs, subMap, sim]);
   const waypoints = useMemo(() => buildSubmapWaypoints(activeQuests, subMap, sim), [activeQuests, subMap, sim]);
+  const isInterior = subMap?.type === 'building_interior';
+  const furniture = useMemo(() => (isInterior ? buildSubmapFurniture(subMap, sim) : []), [isInterior, subMap, sim]);
 
   const planetLike = useMemo(() => ({ terrain: subMap?.type === 'spaceport' ? 'urban' : (subMap?.type || 'urban') }), [subMap]);
 
@@ -136,11 +138,16 @@ export default function SubMapView3D() {
   }, []);
 
   const handleExit = useCallback(() => {
+    // A building interior exits back to its PARENT submap, not the surface.
+    if (subMap?.type === 'building_interior') {
+      const parent = location.state?.parentSubMap || (exits[0] && exits[0].exitsTo && exits[0].exitsTo.subMapId);
+      if (parent) { navigate(`/game/submap/${parent}`, { state: { returnFromBuilding: true } }); return; }
+    }
     const surf = worldRef.current?.getSurfacePos?.() || { x: 50, y: 50 };
     navigate(`/game/planet/${planetId || subMap?.planetId}`, {
       state: { returnFromSubmap: true, playerLocation: { x: surf.x, y: surf.y, area: 'surface' } },
     });
-  }, [navigate, planetId, subMap, worldRef]);
+  }, [navigate, planetId, subMap, worldRef, location.state, exits]);
 
   const handleEnterBuilding = useCallback(async (poi) => {
     const b = poi.raw;
@@ -204,8 +211,9 @@ export default function SubMapView3D() {
           <SubmapScene
             world={worldRef} input={input} planetLike={planetLike}
             pois={pois} exits={exits} npcs3d={npcs3d} waypoints={waypoints}
+            subMap={subMap} sim={sim} furniture={furniture} interior={isInterior}
             activePoiId={activePoiId} worldHalf={sim.worldHalf}
-            startTime={0.42} postQuality="high"
+            startTime={isInterior ? 0.5 : 0.42} postQuality="high"
             onProximity={onProximity} onMoved={onMoved}
             onPoiActivate={onPoiActivate} onNpcActivate={onNpcActivate} onExitActivate={onExitActivate}
           />

@@ -24,7 +24,7 @@ export function useDungeonWorld(subMap, sharedSim, netOptions) {
     if (!subMap) { worldRef.current = null; return; }
     const sim = sharedSim || createSubmapSim(subMap);
     const ch = useCharacterStore.getState().currentCharacter;
-    const surf = submapSpawn(subMap, ch);
+    const surf = submapSpawn(subMap, ch, sim);
     const w0 = sim.surfaceToWorld(surf.x, surf.y);
     const planetId = subMap.planetId || (ch && ch.currentPlanet);
     const parentLocationId = subMap.parentLocationId;

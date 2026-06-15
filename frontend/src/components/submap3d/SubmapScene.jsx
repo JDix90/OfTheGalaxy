@@ -18,6 +18,8 @@ import Atmosphere from '../surface3d/atmosphere/Atmosphere';
 import PostFX from '../surface3d/atmosphere/PostFX';
 import { AtmosphereContext } from '../surface3d/atmosphere/AtmosphereContext';
 import ExitMarker from './ExitMarker';
+import InteriorWalls from './InteriorWalls';
+import Furniture from './Furniture';
 
 function HeadlessHook() {
   const get = useThree((s) => s.get);
@@ -31,6 +33,7 @@ function HeadlessHook() {
 export default function SubmapScene({
   world, input, planetLike, pois, exits, npcs3d, waypoints, activePoiId, worldHalf,
   onProximity, onMoved, onPoiActivate, onNpcActivate, onExitActivate,
+  subMap, sim, furniture, interior = false,
   startTime = 0.4, postQuality = 'high',
 }) {
   const groundSize = worldHalf * 2;
@@ -46,6 +49,9 @@ export default function SubmapScene({
     <AtmosphereContext.Provider value={atmoRef}>
       <Atmosphere worldHalf={worldHalf} time={startTime} startTime={startTime} paused atmoRef={atmoRef} />
       <Ground planet={planetLike} size={groundSize} />
+
+      {interior && <InteriorWalls subMap={subMap} sim={sim} />}
+      {interior && <Furniture items={furniture} />}
 
       {pois.map((poi) => (
         <PoiStructure key={poi.id} poi={poi} active={poi.id === activePoiId} lit onActivate={onPoiActivate} />

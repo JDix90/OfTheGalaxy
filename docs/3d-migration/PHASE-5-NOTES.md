@@ -81,8 +81,25 @@ joins are blocked).
 real-DB authoritative dungeon flow (enemies/player spawn walkable, real-time kill → rewards);
 frontend build + full suite green; backend CI green.
 
+## 5.2 — 3D building interiors (shipped)
+
+`type==='building_interior'` submaps now render in 3D via `SubMapView3D`/`SubmapScene`
+(collisionMap sim path, single-player LocalWorld). Enclosed **room walls** (`InteriorWalls`,
+sim-sampled at the building grid resolution) + typed **furniture / decoration / interactive
+props** (`Furniture` + `buildSubmapFurniture` — counters, shelves, displays, signs, plants,
+glowing vendor/terminal accents) + the building's NPCs (vendor, etc.) you click to talk/shop.
+The exit (read from `entryPoints` `type:'exit'`, since `exitPoints` is empty for interiors)
+returns to the **parent submap** (not the surface). Spawn is hardened to validate walkability
+and scan for a free cell (`submapSpawn(subMap, ch, sim)`) so the player never spawns in a wall.
+
+**Files added:** `frontend/src/components/submap3d/{InteriorWalls,Furniture}.jsx`; builders
+`buildSubmapFurniture` + entryPoints-exit support in `buildSubmapExits`. Now **no submap type
+delegates to the 2D `SubMapView`** — the entire submap subsystem is 3D.
+
+**Verified:** real saved building interior (collisionMap + entryPoints-exit + furniture);
+9/9 submap-data unit tests (incl. interior exit + furniture); frontend build + full suite (72) green.
+
 ## Deferred
-- **5.2 building interiors** — recursive interiors + furniture (`type==='building_interior'`
-  delegates to the 2D `SubMapView` for now).
-- Distinct interior aesthetic (walls/ceiling meshes) beyond the reused look; dungeon depth-zone
-  scaling + dungeon-enemy persistence parity with the 2D respawn-on-reentry model.
+- Recursive nested interiors (interior-within-interior); distinct furniture *meshes* (glTF)
+  beyond the typed boxes; dungeon depth-zone scaling + dungeon-enemy persistence parity with
+  the 2D respawn-on-reentry model; discovery-gated dungeon/submap entry (cross-cutting design).

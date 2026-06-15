@@ -25,7 +25,7 @@ export function useSubmapWorld(subMap, sharedSim) {
     if (!subMap) { worldRef.current = null; return; }
     const sim = sharedSim || createSubmapSim(subMap);
     const ch = useCharacterStore.getState().currentCharacter;
-    const surf = submapSpawn(subMap, ch);
+    const surf = submapSpawn(subMap, ch, sim);
     const w0 = sim.surfaceToWorld(surf.x, surf.y);
     const parentLocationId = subMap.parentLocationId || (subMap.layoutData && subMap.layoutData.parentLocationId);
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  createSubmapSim, toPct, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints,
+  createSubmapSim, toPct, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture,
 } from '../../src/components/submap3d/submapData';
 import { submapCoordDims } from '../../../shared/sim/submap.mjs';
 
@@ -100,6 +100,31 @@ describe('submapData — coordinate conversion + builders', () => {
     const vend = npcs.find((n) => n.id === 'vend1');
     expect(vend.sx).toBeCloseTo(75, 1);
     expect(vend.sy).toBeCloseTo(30, 1);
+  });
+
+  it('building interior: exit read from entryPoints type:exit; furniture/interactive → props', () => {
+    const interior = {
+      id: 'shop_interior', type: 'building_interior', planetId: 'drydock',
+      layoutData: {
+        width: 8, height: 8, gridSize: 40,
+        exitPoints: [], // empty — the exit lives in entryPoints
+        entryPoints: [{ id: 'exit', label: 'Exit', type: 'exit', position: { x: 4, y: 7 }, exitsTo: { subMapId: 'parent_city' } }],
+        furniture: [{ id: 'c1', type: 'counter', position: { x: 2, y: 2 }, size: { width: 4, height: 1 } }],
+        interactiveElements: [{ id: 'v1', type: 'vendor', position: { x: 2, y: 2 }, size: { width: 3, height: 1 } }],
+        decorations: [{ id: 's1', type: 'sign', position: { x: 4, y: 1 }, size: { width: 1, height: 1 } }],
+        collisionMap: { resolution: 100, cells: Array.from({ length: 100 }, () => Array(100).fill(0)) },
+      },
+    };
+    const sim = createSubmapSim(interior);
+    const exits = buildSubmapExits(interior, sim);
+    expect(exits).toHaveLength(1);
+    expect(exits[0].label).toBe('Exit');
+    expect(exits[0].exitsTo.subMapId).toBe('parent_city');
+    const furn = buildSubmapFurniture(interior, sim);
+    expect(furn).toHaveLength(3); // counter + vendor + sign
+    const vendor = furn.find((f) => f.type === 'vendor');
+    expect(vendor.emissive).toBeTruthy(); // vendor glows
+    expect(furn.every((f) => Number.isFinite(f.wx) && f.wlen > 0)).toBe(true);
   });
 
   it('waypoints: built for incomplete in-submap objectives, skipped when complete', () => {
