@@ -19,6 +19,7 @@ import PoiStructure from './PoiStructure';
 import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
 import PlayerActor from './PlayerActor';
+import RemotePlayers from './RemotePlayers';
 import QuestWaypoint from './QuestWaypoint';
 import Weather, { getWeatherPreset } from './Weather';
 import Atmosphere from './atmosphere/Atmosphere';
@@ -180,6 +181,9 @@ export default function SurfaceScene({
       />
 
       <PlayerActor world={world} input={input} pois={pois} onProximity={onProximity} onMoved={onMoved} />
+
+      {/* Other players sharing the planet (Phase 4.1 — online only). */}
+      <RemotePlayers world={world} />
 
       {weatherPreset && weatherPreset !== 'none' && (
         <Weather preset={weatherPreset} world={world} worldHalf={worldHalf} />
