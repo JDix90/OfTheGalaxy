@@ -74,6 +74,52 @@ Restart the backend so it picks up `/realtime` (`cd backend && npm run dev`); th
 proxies `/realtime` → :3001. The surface then shows an **Online** pill; with the server down
 it shows **Offline** and plays locally (single-player). `/surface-test` stays local (no auth).
 
+## P4.3 design — real-time combat (full encounter integration, chosen)
+Kills run through the EXISTING reward machinery (loot/quests/achievements/respawn), reusing
+the combat math verbatim; only the loop becomes real-time.
+
+**Combatant blocks (the key change).** Every actor carries a real combat stat block:
+- Player: `combatService.buildPlayerCombatant(character)` (async, DB) — build ONCE on WS join
+  (in realtime/index.js before addPlayer) and hang it on the player as `player.combatant`.
+- Enemy: `buildEnemyCombatant(scaledTemplate)` — `generateRandomEnemy()` already returns the
+  scaled template, so build the combatant at spawn and store as `enemy.combatant`
+  (hp lives in `combatant.stats.health`; the wire `hp/maxHp` mirror it).
+
+**Engagement = a CombatEncounter record.** On first hit between a player and enemies, create a
+`CombatEncounter` (status 'active', `encounterType:'random'`, `combatants:[player, ...enemies]`,
+`metadata:{ realtime:true }`, turnOrder/currentTurn unused). Track `encounterId` on the player.
+As more enemies aggro into the fight, add their combatants to the record. Keep the record's
+`combatants` pointing at the SAME in-memory blocks so hp stays in sync.
+
+**Resolution (server-authoritative, reuse the math).**
+- Client → `{t:'cast', ability, targetId}`. Server validates: target exists + in range
+  (ability.range or melee), ability off cooldown (turns→seconds: store `cooldownUntil` ms),
+  stamina/energy cost affordable. Then `calculateDamage(player.combatant, enemy.combatant)` /
+  `calculateAbilityDamage(...)`; apply hp; start a cooldown timer.
+- Default basic attack = a cheap, short-cooldown ability (always available).
+- Enemy AI (extend P4.2): in chase + melee range + off cooldown → `calculateDamage(enemy.combatant,
+  player.combatant)` → player hp down.
+- Broadcast combat events in snapshots (or a `{t:'fx'}` channel): `{hit, dmg, crit, targetId,
+  sourceId, death}` so the client shows damage numbers + health bars.
+
+**Death / finalize.**
+- Enemy hp ≤ 0 → mark dead (combatant.stats.health=0), remove the actor; when all the
+  encounter's enemies are dead → `save encounter.combatants` then `endEncounter(id, 'won')`
+  (distributeRewards/quests/achievements). XP/loot/credits flow through the existing path.
+- Player hp ≤ 0 → `endEncounter(id, 'lost')` → respawnService (40% hp, fee) → teleport the
+  authoritative player to the respawn location + broadcast.
+- Disengage (no combat for ~6s, all enemies out of leash) → `endEncounter(id, 'fled')` to
+  release the record (so a fresh fight starts a new encounter).
+
+**Client (P4.3 UI slice).** Soft-target the nearest enemy (Tab / click); basic attack on a
+key/click; enemy health bars (drei Html) + floating damage numbers; death/respawn feedback.
+Action bar + telegraphs + dodge = P4.4.
+
+**Risks/edge cases to handle:** one active encounter per character (createEncounter guards
+this — reuse or bypass), encounter cleanup on disconnect mid-fight (endEncounter 'fled' on
+flush), reconciling real-time hp into `encounter.combatants` before endEncounter, and the
+turn-based fields (turnOrder/currentTurn) being inert for realtime encounters.
+
 ## Deferred to P4.3+
 Real-time ability casting + cooldowns (turns→timers), enemy attacks + damage, death/respawn/
 rewards (reusing combatService math), the action bar / damage numbers / enemy health bars,
