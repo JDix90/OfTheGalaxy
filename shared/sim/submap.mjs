@@ -24,6 +24,21 @@ export function submapDims(subMap) {
   return { w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 };
 }
 
+/**
+ * Dimensions to use for grid→percent coordinate conversion so positions land on the SAME
+ * cells the sim collides against. Dungeon grids are square-padded to N=max(w,h) in
+ * submapToMapData, so their coords must convert with N (not the original w/h). City /
+ * collision / open submaps map the original dims onto the full 0–100 space.
+ */
+export function submapCoordDims(subMap) {
+  const d = submapLayout(subMap);
+  if (Array.isArray(d.grid) && d.grid.length && Array.isArray(d.grid[0])) {
+    const N = Math.max(d.grid[0].length, d.grid.length);
+    return { w: N, h: N };
+  }
+  return submapDims(subMap);
+}
+
 /** @returns {{ mapData: object, scale: number, kind: 'dungeon'|'collision'|'open' }} */
 export function submapToMapData(subMap) {
   const d = submapLayout(subMap);

@@ -8,7 +8,7 @@
 
 import React, { useMemo, useRef, useLayoutEffect } from 'react';
 import * as THREE from 'three';
-import { submapLayout, submapDims } from '../../../../shared/sim/submap.mjs';
+import { submapLayout, submapCoordDims } from '../../../../shared/sim/submap.mjs';
 
 const WALL_H = 5;
 
@@ -18,10 +18,12 @@ export default function DungeonWalls({ subMap, sim }) {
   const cells = useMemo(() => {
     const d = submapLayout(subMap);
     const grid = d.grid;
-    if (!Array.isArray(grid) || !grid.length || !sim) return [];
+    if (!Array.isArray(grid) || !grid.length || !Array.isArray(grid[0]) || !sim) return [];
     const h = grid.length;
     const w = grid[0].length;
-    const { w: dw, h: dh } = submapDims(subMap);
+    // Use the SAME padded dims the sim uses (submapToMapData square-pads to N=max(w,h)),
+    // so walls render exactly on the cells the sim collides against.
+    const { w: dw, h: dh } = submapCoordDims(subMap);
     const walkable = (x, y) => (y >= 0 && y < h && x >= 0 && x < w && grid[y][x] !== 0);
     const out = [];
     for (let y = 0; y < h; y++) {

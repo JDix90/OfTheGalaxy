@@ -27,6 +27,7 @@ class WorldManager {
   constructor(simModule, submapModule) {
     this.createSurfaceSim = simModule.createSurfaceSim;
     this.submapToMapData = submapModule && submapModule.submapToMapData;
+    this.submapCoordDims = submapModule && submapModule.submapCoordDims;
     this.DEFAULTS = simModule.DEFAULTS;
     this.TICK_HZ = simModule.DEFAULTS.tickHz || 20;
     this.DT = 1 / this.TICK_HZ;
@@ -80,7 +81,9 @@ class WorldManager {
       const sim = this.createSurfaceSim(mapData || {}, { scale });
       const d = subMap.layoutData || subMap.layout || {};
       const entrance = (d.entryPoints && d.entryPoints[0] && d.entryPoints[0].position) || d.entrance || null;
-      const dims = { w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 };
+      // Padded dims (square-padded for dungeon grids) so spawn coords match the sim + client.
+      const dims = this.submapCoordDims ? this.submapCoordDims(subMap)
+        : { w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 };
       const dangerLevel = opts.dangerLevel || (subMap.metadata && subMap.metadata.dangerLevel) || 6;
       return new PlanetWorld(subMapId, sim, mapData, {
         dangerLevel,

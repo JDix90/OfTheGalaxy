@@ -228,16 +228,20 @@ class CombatManager {
       player.encounterId = null;
       player.engagedEnemies.clear();
       player._fleePushed = false;
+      // A 'fled' finalize (e.g. disconnect) where every engaged enemy is already dead is
+      // actually a win — grant the kill's rewards (covers the kill+disconnect-same-tick race).
+      let outcome = status;
+      if (outcome === 'fled' && enemyCombatants.length && enemyCombatants.every((c) => c.stats.health <= 0)) outcome = 'won';
       if (id) {
         const enc = await CombatEncounter.findByPk(id);
         if (enc) {
           enc.combatants = [player.combatant, ...enemyCombatants]; // sync final hp + dead enemies
           enc.changed('combatants', true);
           await enc.save();
-          await combatService.endEncounter(id, status); // rewards / quests / respawn / hp-save
+          await combatService.endEncounter(id, outcome); // rewards / quests / respawn / hp-save
         }
       }
-      if (status === 'lost') await this._respawn(world, player);
+      if (outcome === 'lost') await this._respawn(world, player);
     } finally {
       player._finalizing = false;
     }

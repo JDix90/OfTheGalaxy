@@ -11,11 +11,10 @@
  */
 
 import { createSurfaceSim, normalizeSurfaceCoord } from '../../../../shared/sim/surface.mjs';
-import { createSubmapSimWith, submapToPct, submapLayout } from '../../../../shared/sim/submap.mjs';
+import { createSubmapSimWith, submapToPct, submapLayout, submapCoordDims } from '../../../../shared/sim/submap.mjs';
 import { getPoiStructure } from '../../data/modelManifest';
 
 const layoutOf = (subMap) => submapLayout(subMap);
-const dimsOf = (d) => ({ w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 });
 
 /** A grid-or-percent coord pair → 0–100 percent (grid cells use cell-center). */
 export const toPct = submapToPct;
@@ -28,7 +27,7 @@ export function createSubmapSim(subMap) {
 /** Resolve the player's spawn (0–100 surface coords) for this submap. */
 export function submapSpawn(subMap, character) {
   const d = layoutOf(subMap);
-  const { w, h } = dimsOf(d);
+  const { w, h } = submapCoordDims(subMap);
   const loc = character && character.currentLocation;
   // Resume saved position only if it's THIS submap.
   if (loc && loc.subMapId === subMap.id && Number.isFinite(loc.x) && Number.isFinite(loc.y)) {
@@ -47,7 +46,7 @@ export function submapSpawn(subMap, character) {
 export function buildSubmapPois(subMap, sim) {
   if (!sim) return [];
   const d = layoutOf(subMap);
-  const { w, h } = dimsOf(d);
+  const { w, h } = submapCoordDims(subMap);
   const out = [];
   const seen = new Set();
   const raw = [...(d.buildings || []), ...(d.pointsOfInterest || [])];
@@ -74,7 +73,7 @@ export function buildSubmapPois(subMap, sim) {
 export function buildSubmapExits(subMap, sim) {
   if (!sim) return [];
   const d = layoutOf(subMap);
-  const { w, h } = dimsOf(d);
+  const { w, h } = submapCoordDims(subMap);
   return (d.exitPoints || []).map((e, i) => {
     const p = toPct(e.position.x, e.position.y, w, h);
     const wpos = sim.surfaceToWorld(p.x, p.y);
@@ -85,8 +84,7 @@ export function buildSubmapExits(subMap, sim) {
 /** Quest objectives located in THIS submap → world-positioned waypoint beacons. */
 export function buildSubmapWaypoints(activeQuests, subMap, sim) {
   if (!sim || !Array.isArray(activeQuests)) return [];
-  const d = layoutOf(subMap);
-  const { w, h } = dimsOf(d);
+  const { w, h } = submapCoordDims(subMap);
   const out = [];
   for (const entry of activeQuests) {
     const quest = entry?.quest;
@@ -108,8 +106,7 @@ export function buildSubmapWaypoints(activeQuests, subMap, sim) {
 /** Submap NPCs → world-positioned actors (coords normalized grid|percent → world). */
 export function buildSubmapNpcs(npcs, subMap, sim) {
   if (!sim) return [];
-  const d = layoutOf(subMap);
-  const { w, h } = dimsOf(d);
+  const { w, h } = submapCoordDims(subMap);
   return (npcs || [])
     .map((n) => {
       const loc = n.location || {};

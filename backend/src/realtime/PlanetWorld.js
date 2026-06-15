@@ -122,7 +122,7 @@ class PlanetWorld {
       const e = this.zone.entrance;
       if (e && Number.isFinite(e.x)) {
         sx = gridToPct(e.x, dims.w); sy = gridToPct(e.y, dims.h);
-        sx += sx < 50 ? 4 : -4; sy += sy < 50 ? 4 : -4; // nudge off the entrance wall
+        sx += sx < 50 ? 6 : -6; sy += sy < 50 ? 6 : -6; // nudge off entrance wall (matches client submapSpawn)
       }
       const loc = character && character.currentLocation;
       if (loc && loc.subMapId === this.subMapId && Number.isFinite(loc.x) && (loc.x || loc.y)) {

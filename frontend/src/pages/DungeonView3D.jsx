@@ -60,7 +60,7 @@ export default function DungeonView3D({ subMap }) {
       setHp(w.combat());
     }, 100);
     return () => clearInterval(id);
-  }, [worldRef]);
+  }, []); // worldRef is stable; the interval reads worldRef.current dynamically
 
   const targetRef = useRef(null);
   useEffect(() => { targetRef.current = combatTarget; }, [combatTarget]);

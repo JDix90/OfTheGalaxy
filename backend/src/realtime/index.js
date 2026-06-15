@@ -142,6 +142,10 @@ async function attachRealtime(server) {
         return;
       }
 
+      // Ignore gameplay messages from a connection that's been replaced (reconnect / 2nd tab).
+      const me = world.players.get(playerId);
+      if (!me || me.ws !== ws) return;
+
       if (msg.t === 'input') {
         const now = Date.now();
         if (now - lastInputAt < 25) return; // server-side flood guard (legit clients send @20Hz)

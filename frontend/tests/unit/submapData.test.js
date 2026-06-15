@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   createSubmapSim, toPct, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints,
 } from '../../src/components/submap3d/submapData';
+import { submapCoordDims } from '../../../shared/sim/submap.mjs';
 
 // Mirrors the real Drydock "Coronet Spaceport" submap: 12x12, fully walkable, exit at
 // grid (1,6), no buildings.
@@ -25,6 +26,21 @@ describe('submapData — sim from collisionMap', () => {
     expect(sim.worldHalf).toBeCloseTo(42.5, 5); // 50 * collision scale (0.85)
     expect(sim.isWalkableSurface(50, 50)).toBe(true);
     expect(sim.isWalkableSurface(-1, 50)).toBe(false);
+  });
+
+  it('NON-square dungeon: coords use padded N so they land on the sim\'s real cells', () => {
+    // 4 wide x 6 tall → sim square-pads to N=6. A walkable cell at grid (3,5) must convert
+    // via the PADDED dim (6), not the original width (4), or it lands in a padding wall.
+    const grid = Array.from({ length: 6 }, () => Array(4).fill(0));
+    grid[5][3] = 2; // walkable room cell at the far corner
+    const dungeon = { id: 'nsq', type: 'dungeon', layoutData: { size: { width: 4, height: 6 }, grid } };
+    const sim = createSubmapSim(dungeon);
+    const cd = submapCoordDims(dungeon);
+    expect(cd.w).toBe(6); // padded
+    const good = toPct(3, 5, cd.w, cd.h);       // padded conversion
+    const bad = toPct(3, 5, 4, 6);              // old unpadded conversion
+    expect(sim.isWalkableSurface(good.x, good.y)).toBe(true);  // lands on the real walkable cell
+    expect(sim.isWalkableSurface(bad.x, bad.y)).toBe(false);   // old coords miss into padding
   });
 
   it('dungeon grid: walls block, rooms/corridors pass (square-padded)', () => {
