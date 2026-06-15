@@ -32,11 +32,12 @@ import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import DialogueInterface from '../features/dialogue/DialogueInterface';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import SubMapView from './SubMapView'; // 2D fallback for dungeon / building_interior (Phase 5.1/5.2)
+import SubMapView from './SubMapView';     // 2D fallback for building interiors (Phase 5.2)
+import DungeonView3D from './DungeonView3D'; // 3D real-time dungeon (Phase 5.1)
 
 useGLTF.preload(CHARACTER_GLTF_URLS[0]);
 
-const DELEGATE_2D = new Set(['dungeon', 'building_interior']);
+const DELEGATE_2D = new Set(['building_interior']);
 
 export default function SubMapView3D() {
   const { planetId, parentLocationId, parentLocationType, type, subMapId } = useParams();
@@ -57,7 +58,8 @@ export default function SubMapView3D() {
 
   const inputEnabledRef = useRef(true);
 
-  const is3D = !!subMap && !DELEGATE_2D.has(subMap.type);
+  const isDungeon = !!subMap && subMap.type === 'dungeon';
+  const is3D = !!subMap && !isDungeon && !DELEGATE_2D.has(subMap.type);
   const sim = useMemo(() => (is3D ? createSubmapSim(subMap) : null), [is3D, subMap?.id]); // eslint-disable-line
   const worldRef = useSubmapWorld(is3D ? subMap : null, sim);
   const input = useSurfaceInput(inputEnabledRef);
@@ -91,7 +93,8 @@ export default function SubMapView3D() {
         sm.planetId = sm.planetId || planetId;
         if (cancelled) return;
         setSubMap(sm);
-        if (DELEGATE_2D.has(sm.type)) { setLoading(false); return; } // 2D fallback handles its own load
+        // Dungeons (3D real-time, own NPC/enemy + net world) + building interiors (2D) load themselves.
+        if (sm.type === 'dungeon' || DELEGATE_2D.has(sm.type)) { setLoading(false); return; }
 
         // Ensure the onboarding contact (e.g. Dockmaster Jax) is on this submap.
         try { if (currentCharacter) await tutorialApi.ensureNPCOnSubmap(currentCharacter.id, sm.id); } catch (e) { /* non-fatal */ }
@@ -179,7 +182,8 @@ export default function SubMapView3D() {
 
   if (!currentCharacter) { navigate('/character/select'); return null; }
   if (loading) return <LoadingSpinner fullScreen message="Entering..." />;
-  if (subMap && DELEGATE_2D.has(subMap.type)) return <SubMapView />; // dungeons / building interiors (2D for now)
+  if (subMap && subMap.type === 'dungeon') return <DungeonView3D subMap={subMap} />; // 3D real-time dungeon
+  if (subMap && DELEGATE_2D.has(subMap.type)) return <SubMapView />; // building interiors (2D for now)
   if (error || !subMap) {
     return (
       <div style={{ position: 'fixed', inset: 0, display: 'grid', placeItems: 'center', background: '#05070f', color: '#e6eefc' }}>

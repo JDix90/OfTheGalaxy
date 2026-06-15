@@ -30,10 +30,11 @@ function wsUrl(planetId, token) {
 }
 
 export class NetClient {
-  constructor({ token, characterId, planetId, sim, player, onStatus }) {
+  constructor({ token, characterId, planetId, subMapId, sim, player, onStatus }) {
     this.token = token;
     this.characterId = characterId;
     this.planetId = planetId;
+    this.subMapId = subMapId || null; // when set, joins a dungeon submap world (real-time combat)
     this.sim = sim;
     this.player = player;        // the live, scene-rendered player ref (mutated on reconcile)
     this.onStatus = onStatus || (() => {});
@@ -93,7 +94,7 @@ export class NetClient {
     ws.onopen = () => {
       clearTimeout(this._connectTimer);
       // Handshake: assert which character on which planet.
-      ws.send(JSON.stringify({ t: 'join', characterId: this.characterId, planetId: this.planetId }));
+      ws.send(JSON.stringify({ t: 'join', characterId: this.characterId, planetId: this.planetId, subMapId: this.subMapId }));
     };
 
     ws.onmessage = (ev) => {
