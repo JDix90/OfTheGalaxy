@@ -37,6 +37,7 @@ import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import DialogueInterface from '../features/dialogue/DialogueInterface';
 import EncounterDialog from '../components/encounter/EncounterDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 
 useGLTF.preload(CHARACTER_GLTF_URLS[0]);
 
@@ -292,9 +293,11 @@ export default function PlanetSurface3D() {
         onFlee={() => setEncounter(null)}
       />
 
+      {/* Onboarding / tutorial overlay (rendered per-page; the surface is the 3D scene now). */}
+      <TutorialOverlay />
+
       {/* Top-right controls */}
       <div style={{ position: 'fixed', top: 16, right: 16, display: 'flex', gap: 8, zIndex: 50 }}>
-        <button style={btnStyle} onClick={() => navigate(`/game/planet/${planetId}`)}>2D view</button>
         <button style={btnStyle} onClick={() => navigate('/game/galaxy')}>Galaxy</button>
       </div>
 

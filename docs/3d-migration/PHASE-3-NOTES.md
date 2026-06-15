@@ -81,6 +81,17 @@ frontend/src/pages/SurfaceTest.jsx  # weather buttons; title → "Phase-3 glTF K
 - Live page inherits everything automatically: `PlanetSurface3D` already passes `planet`
   (→ weather) + `npcs3d` (→ variety) through `buildNpcs`/`SurfaceScene`. No page changes.
 
+## 3D is now the default surface
+The walkable 3D scene is the **standard** planet view (immersive-first). `/game/planet/:id`
+renders `PlanetSurface3D`, so every existing navigation — galaxy landing, post-combat
+return, submap exit, character creation, tutorial — lands in 3D with no call-site changes
+(URL + `location.state` preserved; the world hook resumes the persisted position or
+spaceport spawn, and records arrival). `/game/planet3d/:id` stays as an alias; the 2D
+`PlanetSurface` is kept only at the explicit `/game/planet2d/:id` fallback (no UI links).
+`TutorialOverlay` is now rendered on the 3D page so onboarding still fires (its
+`pathname.startsWith('/game/planet/')` check matches because we kept the canonical path).
+The in-scene "2D view" toggle was removed. Submaps/interiors + combat remain 2D for now (P4).
+
 ## Deferred (Phase 4+)
 - Player model variety (still the gold RobotExpressive — proven locomotion; swap is a manifest edit).
 - Quaternius Environment buildings (blend-only; needs Blender to convert — Kenney covers it for now).

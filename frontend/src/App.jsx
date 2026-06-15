@@ -103,11 +103,14 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        {/* The planet surface is the real-time 3D walkable scene by default. The 2D
+            surface is kept reachable only via the explicit /game/planet2d fallback
+            (no UI links to it) so it can be restored if ever needed. */}
         <Route
           path="/game/planet/:planetId"
           element={
             <ProtectedRoute>
-              {currentCharacter ? <PlanetSurface /> : <Navigate to="/character/select" />}
+              {currentCharacter ? <PlanetSurface3D /> : <Navigate to="/character/select" />}
             </ProtectedRoute>
           }
         />
@@ -116,6 +119,14 @@ function App() {
           element={
             <ProtectedRoute>
               {currentCharacter ? <PlanetSurface3D /> : <Navigate to="/character/select" />}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/game/planet2d/:planetId"
+          element={
+            <ProtectedRoute>
+              {currentCharacter ? <PlanetSurface /> : <Navigate to="/character/select" />}
             </ProtectedRoute>
           }
         />
