@@ -13,6 +13,8 @@ import * as THREE from 'three';
 const TERRAIN_COLORS = {
   desert: '#b9925a', sand: '#caa472',
   urban: '#39405a', city: '#39405a',
+  // Enclosed clinic/civic interiors: a clean clinical floor (only matches submap "terrains").
+  medical_center: '#808a9e', hospital: '#808a9e', civic: '#868ea2',
   jungle: '#2f5d3a', forest: '#2f5d3a', grassland: '#496b39', swamp: '#3d4a35',
   ocean: '#1f4a6b', water: '#1f4a6b', underwater: '#173a55',
   ice: '#acc6d6', frozen: '#acc6d6',

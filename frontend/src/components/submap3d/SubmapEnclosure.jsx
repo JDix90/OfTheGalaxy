@@ -28,7 +28,9 @@ const WALL_MARGIN = 5;
 const CAM_HEIGHT = 6.5;
 
 const PALETTE = {
-  enclosed: { wall: '#2c3346', floor: '#242a3a', ceiling: '#161b2a', strip: '#dce8ff', trim: '#7db8ff' },
+  // Enclosed = bright, sterile clinic/civic: clean light surfaces lit by cool artificial light.
+  // floor matches Ground's clinical tone (#808a9e) so the play-area floor + border are seamless.
+  enclosed: { wall: '#c2cbdb', floor: '#808a9e', ceiling: '#dde4ef', strip: '#f3f8ff', trim: '#7fd6ff' },
   open: { wall: '#39405a', floor: '#2a3145', ceiling: '#161b2a', strip: '#cfe3ff', trim: '#6cf0c2' },
 };
 
@@ -91,18 +93,18 @@ export default function SubmapEnclosure({ sim, mode = 'open', accent }) {
             <planeGeometry args={[span, span]} />
             <meshStandardMaterial color={pal.ceiling} side={THREE.DoubleSide} roughness={1} metalness={0} />
           </mesh>
-          {[-ringHalf * 0.5, 0, ringHalf * 0.5].map((cx, i) => (
+          {[-ringHalf * 0.55, 0, ringHalf * 0.55].map((cx, i) => (
             <mesh key={i} position={[cx, wallH - 0.18, 0]}>
-              <boxGeometry args={[ringHalf * 0.06, 0.12, span * 0.7]} />
-              <meshStandardMaterial color={pal.strip} emissive={pal.strip} emissiveIntensity={1.6} toneMapped={false} />
+              <boxGeometry args={[ringHalf * 0.07, 0.12, span * 0.74]} />
+              <meshStandardMaterial color={pal.strip} emissive={pal.strip} emissiveIntensity={2.4} toneMapped={false} />
             </mesh>
           ))}
-          {/* Indoor lighting: hemisphere + ambient give an even, distance-independent base (no
-              dark corners); a soft overhead point adds gentle center pooling. Kept moderate so
-              the night-time room reads as a clean lit interior without blowing out the floor. */}
-          <ambientLight intensity={0.3} color="#cdd8ee" />
-          <hemisphereLight intensity={0.5} color="#dce8ff" groundColor="#2a3145" />
-          <pointLight position={[0, wallH - 1, 0]} intensity={1.5} distance={ringHalf * 3} decay={2} color="#e9f0ff" />
+          {/* Bright clinical lighting: strong hemisphere + ambient give an even, distance-
+              independent cool-white base (no dark corners / no hotspot), with a soft overhead
+              point for a touch of depth. The sun is off (night) so this fully defines the room. */}
+          <ambientLight intensity={0.9} color="#e3ecf8" />
+          <hemisphereLight intensity={1.4} color="#eef4ff" groundColor="#aeb8cc" />
+          <pointLight position={[0, wallH - 1, 0]} intensity={1.6} distance={ringHalf * 3.6} decay={1.5} color="#f3f8ff" />
         </group>
       )}
     </group>
