@@ -35,6 +35,7 @@ import { buildPois, buildNpcs, buildQuestWaypoints, isDungeon, deriveSubMapType 
 
 import HUD from '../components/hud/HUD';
 import CombatToasts from '../components/hud/CombatToasts';
+import ConsumableQuickslot from '../components/hud/ConsumableQuickslot';
 import SubMapEntryMenu from '../components/submap/SubMapEntryMenu';
 import POIInteractionMenu from '../components/poi/POIInteractionMenu';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
@@ -390,10 +391,10 @@ export default function PlanetSurface3D() {
       {/* Combat HUD (Phase 4.3/4.4) — health bar + ability hotbar (online only). */}
       {combat && (
         <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 45, fontFamily: 'system-ui, sans-serif', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          {/* ability hotbar */}
-          {hotbar.length > 0 && (
-            <div style={{ display: 'flex', gap: 6 }}>
-              {hotbar.slice(0, 9).map((ab, i) => {
+          {/* consumable quickslot + ability hotbar */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            <ConsumableQuickslot world={worldRef} characterId={currentCharacter?.id} enabledRef={inputEnabledRef} />
+            {hotbar.slice(0, 9).map((ab, i) => {
                 const ready = (cdSnap[ab.id] || 0) <= Date.now();
                 const cdLeft = Math.max(0, ((cdSnap[ab.id] || 0) - Date.now()) / 1000);
                 const accent = ab.type === 'heal' ? '#6cf0c2' : ab.type === 'buff' ? '#ffd24a' : ab.type === 'debuff' ? '#d18cff' : '#ff8d6c';
@@ -409,8 +410,7 @@ export default function PlanetSurface3D() {
                   </button>
                 );
               })}
-            </div>
-          )}
+          </div>
           {/* health bar */}
           <div style={{ width: 240 }}>
             <div style={{ height: 14, background: 'rgba(8,12,22,0.8)', border: '1px solid #2a3654', borderRadius: 7, overflow: 'hidden' }}>

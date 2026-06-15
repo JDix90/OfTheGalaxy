@@ -263,6 +263,13 @@ export class NetClient {
     if (ws && ws.readyState === ws.OPEN) { ws.send(JSON.stringify({ t: 'dodge' })); this.dodgeCdUntil = Date.now() + 1000; }
   }
 
+  /** Use a consumable in-world (server applies it to the authoritative combatant + decrements). */
+  useItem(itemId) {
+    if (this.mode !== 'online' || !itemId) return;
+    const ws = this._ws;
+    if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify({ t: 'item', itemId }));
+  }
+
   /** Drain queued combat fx (hit/death) for the scene to render. */
   drainFx() { if (this.fxQueue.length === 0) return null; const f = this.fxQueue; this.fxQueue = []; return f; }
 

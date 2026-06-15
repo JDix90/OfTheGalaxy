@@ -94,6 +94,8 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
       cast(ability, targetId) { if (this._net) this._net.cast(ability, targetId); },
       /** Dodge-roll (Phase 4.4). */
       dodge() { if (this._net) this._net.dodge(); },
+      /** Use a consumable in-world (Phase 3); server resolves on the authoritative combatant. */
+      useItem(itemId) { if (this._net) this._net.useItem(itemId); },
       /** Ability hotbar [{id,name,type,cd,stam,target}] (online). */
       hotbar() { return this._net ? this._net.hotbar : []; },
       /** Local ability-cooldown map (id → ms-until-ready) for the hotbar sweep. */
