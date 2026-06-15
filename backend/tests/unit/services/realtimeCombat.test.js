@@ -8,7 +8,10 @@
  */
 
 const { CombatManager } = require('../../../src/realtime/combat');
+const { PlanetWorld } = require('../../../src/realtime/PlanetWorld');
+const { setRealtimeManager } = require('../../../src/realtime/registry');
 const combatService = require('../../../src/services/combatService');
+const inventoryService = require('../../../src/services/inventoryService');
 const { generateRandomEnemy } = require('../../../src/data/enemyTemplates');
 const { CombatEncounter, PlayerCharacter } = require('../../../src/models');
 const { createTestUser, createTestCharacter } = require('../../setup/testHelpers');
@@ -20,6 +23,8 @@ const mkWorld = (zone) => ({
   sim: { surfaceToWorld: (x, y) => ({ x, z: y }) },
   spawnFor: () => ({ x: 7, z: 9, facing: Math.PI }),
   players: new Map(),
+  fx: [],
+  pushFx(ev) { this.fx.push(ev); },
 });
 const deadEnemy = () => { const c = combatService.buildEnemyCombatant(generateRandomEnemy(5)); c.stats.health = 0; return c; };
 const liveEnemy = () => combatService.buildEnemyCombatant(generateRandomEnemy(5));
@@ -165,5 +170,74 @@ describe('Realtime combat lifecycle (Phase 0–1)', () => {
     expect(respawn).toBeTruthy();
     expect(respawn.area).toBe('Dungeon Entrance'); // safe-location name from the dungeon branch
     expect(respawn.fee).toBe(100 + 3 * 50);        // medical fee = base + level*50 (level 3)
+  });
+
+  // --- Phase 3: consumables + out-of-combat regen ---
+
+  test('useItem heals the in-world combatant, decrements inventory, pushes a heal fx', async () => {
+    await inventoryService.addItem(character.id, 'medpac_01', 2); // healthRestore 50
+    const world = mkWorld();
+    const p = await mkPlayer(character);
+    p.combatant.stats.health = p.combatant.stats.maxHealth - 40;
+
+    const r = await mgr.useItem(world, p, 'medpac_01');
+
+    expect(p.combatant.stats.health).toBe(p.combatant.stats.maxHealth); // +50 caps at max (was -40)
+    expect(r.healthRestored).toBe(40);
+    expect(world.fx.some((f) => f.type === 'heal')).toBe(true);
+    const inv = await inventoryService.getInventory(character.id);
+    expect((inv.items.find((i) => i.itemId === 'medpac_01') || {}).quantity).toBe(1);
+  });
+
+  test('useItem throws for a consumable the player does not have (no effect)', async () => {
+    const world = mkWorld();
+    const p = await mkPlayer(character);
+    p.combatant.stats.health = 10;
+    await expect(mgr.useItem(world, p, 'medpac_01')).rejects.toThrow();
+    expect(p.combatant.stats.health).toBe(10); // unchanged
+  });
+
+  test('HTTP useItem routes to the in-world combatant (no currentHealth write) when live', async () => {
+    await inventoryService.addItem(character.id, 'medpac_01', 1);
+    const world = mkWorld();
+    const p = await mkPlayer(character);
+    p.combatant.stats.health = p.combatant.stats.maxHealth - 30;
+    await character.update({ currentHealth: 7 }); // sentinel: must NOT be written by the delegated path
+    setRealtimeManager({
+      hasLivePlayer: (cid) => String(cid) === String(character.id),
+      useItemForCharacter: async (cid, iid) => mgr.useItem(world, p, iid),
+    });
+    try {
+      const r = await inventoryService.useItem(character.id, 'medpac_01');
+      expect(r.healthRestored).toBe(30);
+      expect(p.combatant.stats.health).toBe(p.combatant.stats.maxHealth);
+      const fresh = await PlayerCharacter.findByPk(character.id);
+      expect(fresh.currentHealth).toBe(7); // delegated path left currentHealth untouched
+    } finally {
+      setRealtimeManager(null);
+    }
+  });
+
+  test('out-of-combat health regen ticks up (and is gated during an encounter)', async () => {
+    const stubSim = {
+      isWalkableSurface: () => true, isWalkableWorld: () => true,
+      surfaceToWorld: (x, y) => ({ x, z: y }), worldToSurface: (x, z) => ({ x, y: z }),
+      integrate: (pos) => ({ ...pos, moving: false, speed: 0 }), scale: 0.8,
+    };
+    const world = new PlanetWorld('solenne', stubSim, {}, { dangerLevel: 1 });
+    world.enemies.clear(); // deterministic: no ambient enemies to update lastCombatAt
+    const combatant = await combatService.buildPlayerCombatant(character);
+    const p = world.addPlayer({ id: String(character.id), character, ws: { readyState: 1, OPEN: 1, send: () => {} }, combatant, abilities: [] });
+    const now = Date.now();
+
+    // OOC (no encounter, combat lapsed) → regen
+    p.encounterId = null; p.lastCombatAt = 0; p.combatant.stats.health = 50;
+    for (let i = 0; i < 10; i++) world.step(1, now);
+    expect(p.combatant.stats.health).toBeGreaterThan(50);
+
+    // In an encounter → no regen
+    p.encounterId = 'enc'; p.lastCombatAt = 0; p.combatant.stats.health = 50;
+    for (let i = 0; i < 5; i++) world.step(1, now);
+    expect(p.combatant.stats.health).toBe(50);
   });
 });

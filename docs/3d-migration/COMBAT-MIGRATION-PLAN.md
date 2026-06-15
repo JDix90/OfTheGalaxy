@@ -13,8 +13,8 @@
 | **0 — Instrumentation & guardrails** | telemetry, `COMBAT_3D_ONLY` flag, cross-engine guard | ✅ **Done** (PR #10) |
 | **1 — S1 backend correctness** | dungeon encounterType/subMapId, dungeon-aware respawn, level-up combatant refresh | ✅ **Done** (PR #10) |
 | **2 — 3D combat UX** | reward toast, death/medical-fee toast, mid-session hotbar refresh (health bars / damage numbers / hotbar cooldowns / target ring already shipped in P4.3/4.4) | ✅ **Done** (PR #11) |
-| 3 — Consumables + regen in 3D | WS `t:'item'`, `resolveUseItem`, engagement-gated `useItem`, in-tick OOC health regen | ⏭️ **Next** |
-| 4 — Re-home random encounters | build respawn/escort escalation; remove dual-engine on the 3D surface | ⬜ Planned |
+| **3 — Consumables + regen in 3D** | WS `t:'item'` → in-world `useItem`, HTTP `useItem` routes in-world for live players, consumable quickslot (Q), in-tick OOC health regen | ✅ **Done** (PR #12) |
+| 4 — Re-home random encounters | build respawn/escort escalation; remove dual-engine on the 3D surface | ⏭️ **Next** |
 | 5 — Re-home NPC / POI / quest combat | fix `'npc'` enum, scripted spawns, honor `metadata.questId/objectiveId` | ⬜ Planned |
 | 6 — Tutorial → 3D scripted fight | (old route kept as fallback) | ⬜ Planned |
 | 7 — Retire turn-based UI | flip flag, remove old layer; keep the shared funnel | ⬜ Planned |

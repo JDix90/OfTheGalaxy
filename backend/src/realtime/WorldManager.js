@@ -199,6 +199,27 @@ class WorldManager {
     }
   }
 
+  /** Find a live player by characterId across all worlds (players are keyed by characterId). */
+  findPlayer(characterId) {
+    const id = String(characterId);
+    for (const w of this.worlds.values()) {
+      const p = w.players.get(id);
+      if (p) return { world: w, player: p };
+    }
+    return null;
+  }
+
+  /** True when the character is currently present in a realtime world. */
+  hasLivePlayer(characterId) { return !!this.findPlayer(characterId); }
+
+  /** Apply a consumable to a live in-world player (the HTTP inventory path delegates here so the
+   *  authoritative in-world combatant — not character.currentHealth — receives the effect). */
+  async useItemForCharacter(characterId, itemId) {
+    const found = this.findPlayer(characterId);
+    if (!found) return null;
+    return this.combat.useItem(found.world, found.player, itemId);
+  }
+
   stop() {
     if (this._loop) clearInterval(this._loop);
     if (this._saveLoop) clearInterval(this._saveLoop);

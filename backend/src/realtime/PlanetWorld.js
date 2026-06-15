@@ -21,6 +21,8 @@ const LEASH = 24;          // enemies won't chase beyond this from home
 const PATROL_SPEED = 3.2;
 const CHASE_SPEED = 5.4;
 const STAMINA_REGEN = 3;     // stamina per second regenerated in-world (no rejoin-to-refill)
+const HEALTH_REGEN = 4;          // hp/sec regenerated OUT of combat (authoritative; flushed to DB)
+const OOC_REGEN_DELAY_MS = 5000; // wait this long after the last combat before health regen kicks in
 const DECAY_INTERVAL = 1.2;  // seconds ≈ one "turn" — decays combat status/temporary effects
 const r2 = (n) => Math.round(n * 100) / 100;
 const normYaw = (y) => (typeof y === 'number' && Number.isFinite(y) ? ((y % TWO_PI) + TWO_PI) % TWO_PI : null);
@@ -180,6 +182,7 @@ class PlanetWorld {
       _finalizing: false,
       _fleePushed: false,
       _stamFrac: 0,
+      _hpFrac: 0,
       abilityCdUntil: {},
       lastCombatAt: 0,
       // dodge-roll (Phase 4.4)
@@ -252,6 +255,14 @@ class PlanetWorld {
         p._stamFrac += STAMINA_REGEN * dt;
         const whole = Math.floor(p._stamFrac);
         if (whole > 0) { p._stamFrac -= whole; s.stamina = Math.min(s.maxStamina, s.stamina + whole); }
+        // Out-of-combat health regen (authoritative): only when not in an encounter AND combat
+        // has lapsed, so it can't "leak" free healing while enemies are still attacking (the
+        // disengage-window bug). The in-world value is what the snapshot shows + what gets flushed.
+        if (!p.dead && !p.encounterId && (now - (p.lastCombatAt || 0)) > OOC_REGEN_DELAY_MS && s.health < s.maxHealth) {
+          p._hpFrac += HEALTH_REGEN * dt;
+          const wh = Math.floor(p._hpFrac);
+          if (wh > 0) { p._hpFrac -= wh; s.health = Math.min(s.maxHealth, s.health + wh); }
+        }
         if (decayNow) this._decay(p.combatant);
       }
       // Disengage: drop an idle-too-long engagement so a fresh fight starts a new encounter.

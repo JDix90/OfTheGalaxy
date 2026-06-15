@@ -22,6 +22,7 @@ const characterService = require('../services/characterService');
 const combatService = require('../services/combatService');
 const { isCombatUsable } = require('../data/abilityDefinitions');
 const { buildHotbar } = require('./combat'); // shared with _refreshCombatant (mid-session hotbar push)
+const { setRealtimeManager } = require('./registry'); // expose the manager to the HTTP inventory path
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -37,6 +38,7 @@ async function attachRealtime(server) {
   const submapModule = await import(SUBMAP_URL); // ESM submap→sim adapter (dungeons)
   const manager = new WorldManager(simModule, submapModule);
   manager.start();
+  setRealtimeManager(manager); // so HTTP inventory `useItem` can route to a live in-world player
 
   // maxPayload caps inbound frames (legit messages are < 1KB) to prevent memory-exhaustion
   // DoS; deflate off (tiny messages don't benefit and it adds CPU).
@@ -72,6 +74,7 @@ async function attachRealtime(server) {
     let lastInputAt = 0;
     let lastCastAt = 0;
     let lastDodgeAt = 0;
+    let lastItemAt = 0;
 
     // Force-close connections that authenticate but never join (stale-connection DoS).
     const joinTimeout = setTimeout(() => {
@@ -149,6 +152,12 @@ async function attachRealtime(server) {
         if (now - lastDodgeAt < 120) return; // independent throttle (cast must not block dodge)
         lastDodgeAt = now;
         world.handleDodge(playerId, now); // server validates cooldown
+      } else if (msg.t === 'item') {
+        const now = Date.now();
+        if (now - lastItemAt < 400) return; // anti-spam (consumables are slow actions)
+        lastItemAt = now;
+        // Apply to the authoritative in-world combatant; swallow invalid/absent-item errors.
+        try { await manager.combat.useItem(world, me, String(msg.itemId)); } catch (e) { /* non-fatal */ }
       }
     });
 

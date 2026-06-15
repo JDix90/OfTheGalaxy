@@ -331,6 +331,16 @@ class InventoryService {
    * @returns {Promise<Object>} Result with healing/stamina restoration info
    */
   async useItem(characterId, itemId) {
+    // If the character is live in a 3D world, the in-world combatant is authoritative for HP:
+    // apply the consumable there so the realtime autosave doesn't overwrite a direct
+    // currentHealth write (and so it works mid-fight). Invalid-item errors propagate as today.
+    let mgr = null;
+    try { mgr = require('../realtime/registry').getRealtimeManager(); } catch (e) { mgr = null; }
+    if (mgr && mgr.hasLivePlayer(characterId)) {
+      const r = await mgr.useItemForCharacter(characterId, itemId);
+      if (r) return r; // null only on a rare race (player left) — fall through to the standard path
+    }
+
     // Verify character exists
     const character = await PlayerCharacter.findByPk(characterId);
     if (!character) {

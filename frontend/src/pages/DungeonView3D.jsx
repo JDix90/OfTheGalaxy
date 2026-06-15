@@ -22,6 +22,7 @@ import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import DungeonScene from '../components/submap3d/DungeonScene';
 import HUD from '../components/hud/HUD';
 import CombatToasts from '../components/hud/CombatToasts';
+import ConsumableQuickslot from '../components/hud/ConsumableQuickslot';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 
 useGLTF.preload(CHARACTER_GLTF_URLS[0]);
@@ -137,10 +138,10 @@ export default function DungeonView3D({ subMap }) {
         </div>
       )}
 
-      {/* Ability hotbar (Phase 4.4) */}
-      {hotbar.length > 0 && (
-        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 50 }}>
-          {hotbar.map((ab, i) => {
+      {/* consumable quickslot + ability hotbar (Phase 3 / 4.4) */}
+      <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 50 }}>
+        <ConsumableQuickslot world={worldRef} characterId={currentCharacter?.id} enabledRef={inputEnabledRef} />
+        {hotbar.map((ab, i) => {
             const cdLeft = Math.max(0, ((cdSnap[ab.id] || 0) - now) / 1000);
             return (
               <button key={ab.id} title={`${ab.name} (${ab.stam} stamina)`} onClick={() => castAbility(ab)}
@@ -150,9 +151,8 @@ export default function DungeonView3D({ subMap }) {
                 {cdLeft > 0 && <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,6,12,0.7)', display: 'grid', placeItems: 'center', color: '#ffd24a', fontWeight: 700 }}>{cdLeft.toFixed(1)}</div>}
               </button>
             );
-          })}
-        </div>
-      )}
+        })}
+      </div>
 
       {proxPrompt && (
         <div style={{ position: 'fixed', left: proxPrompt.x, top: proxPrompt.y, transform: 'translate(-50%, -130%)', zIndex: 45 }}>

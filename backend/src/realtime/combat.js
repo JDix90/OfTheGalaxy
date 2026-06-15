@@ -230,6 +230,49 @@ class CombatManager {
     }
   }
 
+  /**
+   * Apply a consumable to the player's AUTHORITATIVE in-world combatant (heal / stamina /
+   * temporary effects), decrement inventory, and track use-item quest objectives (e.g.
+   * tutorial_heal). Used by the WS `t:'item'` path AND — for a live in-world player — by the
+   * HTTP inventory path, so a heal is never lost to the realtime autosave overwriting a direct
+   * currentHealth write. Throws on an invalid/absent consumable: the WS handler swallows it;
+   * the HTTP path surfaces it as an error.
+   */
+  async useItem(world, player, itemId) {
+    if (!player || !player.combatant || !itemId) throw new Error('Item not usable');
+    if (player.dead) throw new Error('Cannot use items while defeated');
+    const { getItemDefinition } = require('../data/items');
+    const itemDef = getItemDefinition(itemId);
+    if (!itemDef || itemDef.type !== 'consumable') throw new Error('Item is not a consumable');
+    const inventoryService = require('../services/inventoryService');
+    // Decrement FIRST — throws if the player doesn't actually have it (so no effect is applied).
+    await inventoryService.removeItem(player.characterId, itemId, 1);
+
+    const st = player.combatant.stats;
+    const before = st.health;
+    const heal = (itemDef.stats && (itemDef.stats.healthRestore || itemDef.stats.healing)) || 0;
+    if (itemDef.stats && itemDef.stats.fullHeal === true) st.health = st.maxHealth;
+    else if (heal > 0) st.health = Math.min(st.maxHealth, Math.round(st.health + heal));
+    const healed = Math.max(0, Math.round(st.health - before));
+
+    const sta = (itemDef.stats && itemDef.stats.staminaRestore) || 0;
+    let stamRestored = 0;
+    if (sta > 0) { const b = st.stamina; st.stamina = Math.min(st.maxStamina, st.stamina + sta); stamRestored = st.stamina - b; }
+
+    // Temporary effects (shield / accuracy / damage / stealth) — same shape as executeUseItem.
+    player.combatant.temporaryEffects = player.combatant.temporaryEffects || [];
+    const addEff = (type, key, dur) => { if (itemDef.stats && itemDef.stats[key]) player.combatant.temporaryEffects.push({ type, value: itemDef.stats[key], duration: (itemDef.stats.duration || dur), source: itemId }); };
+    addEff('shield', 'temporaryShield', 300); addEff('accuracy', 'temporaryAccuracy', 180);
+    addEff('damage', 'temporaryDamage', 240); addEff('stealth', 'temporaryStealth', 300);
+
+    try { await inventoryService.trackUseItemObjectives(player.characterId, itemId); } catch (e) { /* non-fatal */ }
+
+    if (healed > 0) world.pushFx({ type: 'heal', targetId: player.id, x: player.x, z: player.z, amount: healed });
+    else world.pushFx({ type: 'buff', targetId: player.id, x: player.x, z: player.z });
+
+    return { itemId, itemName: itemDef.name, healthRestored: healed, staminaRestored: stamRestored, fullHeal: !!(itemDef.stats && itemDef.stats.fullHeal) };
+  }
+
   async handleIntent(world, intent) {
     const player = world.players.get(intent.playerId);
     if (!player) return;
