@@ -110,6 +110,7 @@ export default function SurfaceScene({
   world, input, planet, pois, npcs3d, waypoints, activePoiId, textureUrl, worldHalf,
   onProximity, onMoved, onPoiActivate, onNpcActivate,
   time, cycleSeconds, startTime = 0.6, paused, onTime, postQuality = 'high', weather,
+  combatTarget = null, onCombatTarget = () => {},
 }) {
   const groundSize = worldHalf * 2;
   const atmoRef = useRef({ nightFactor: 0, dayFactor: 1, time: startTime });
@@ -131,8 +132,6 @@ export default function SurfaceScene({
   // Nearest-N ids that should show a nameplate (bounds DOM on crowds).
   const [npcLabels, setNpcLabels] = useState(() => new Set());
   const labelsRef = useRef(new Set());
-  // Combat soft-target (clicked enemy id) — Phase 4.3.
-  const [combatTarget, setCombatTarget] = useState(null);
 
   // Split NPCs by LOD tier: animated ones mount full glTF actors; the rest draw as a
   // single instanced-mesh crowd. Memoized so the arrays are stable between LOD changes.
@@ -190,8 +189,8 @@ export default function SurfaceScene({
       <RemotePlayers world={world} />
 
       {/* Server-driven hostile actors (Phase 4.2/4.3 — online only). */}
-      <RemoteEnemies world={world} targetId={combatTarget} onTarget={setCombatTarget} />
-      <CombatFx world={world} targetId={combatTarget} onClearTarget={() => setCombatTarget(null)} />
+      <RemoteEnemies world={world} targetId={combatTarget} onTarget={onCombatTarget} />
+      <CombatFx world={world} targetId={combatTarget} onClearTarget={() => onCombatTarget(null)} />
 
       {weatherPreset && weatherPreset !== 'none' && (
         <Weather preset={weatherPreset} world={world} worldHalf={worldHalf} />

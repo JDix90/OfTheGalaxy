@@ -20,6 +20,20 @@ const { WebSocketServer } = require('ws');
 const { WorldManager } = require('./WorldManager');
 const characterService = require('../services/characterService');
 const combatService = require('../services/combatService');
+const { getAbilityDefinition, isCombatUsable } = require('../data/abilityDefinitions');
+
+// Build the client's combat hotbar from a character's known, combat-usable abilities.
+function buildHotbar(character) {
+  const known = Array.isArray(character.abilities) ? character.abilities : [];
+  const out = [];
+  for (const id of known) {
+    if (!isCombatUsable(id)) continue;
+    const d = getAbilityDefinition(id);
+    if (!d) continue;
+    out.push({ id, name: d.name, type: d.type, cd: d.cooldown || 1, stam: (d.cost && d.cost.stamina) || 0, target: d.targetType });
+  }
+  return out;
+}
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -67,6 +81,7 @@ async function attachRealtime(server) {
     let playerId = null;
     let lastInputAt = 0;
     let lastCastAt = 0;
+    let lastDodgeAt = 0;
 
     // Force-close connections that authenticate but never join (stale-connection DoS).
     const joinTimeout = setTimeout(() => {
@@ -103,7 +118,8 @@ async function attachRealtime(server) {
           // Build the player's combat stat block once (DB: stats + equipped items).
           let combatant = null;
           try { combatant = await combatService.buildPlayerCombatant(character); } catch (e) { /* combat-less fallback */ }
-          const player = world.addPlayer({ id: playerId, character, ws, combatant });
+          const abilityIds = Array.isArray(character.abilities) ? character.abilities.filter((id) => isCombatUsable(id)) : [];
+          const player = world.addPlayer({ id: playerId, character, ws, combatant, abilities: abilityIds });
           if (!player) { try { ws.close(4007, 'world-full'); } catch (_) {} return; }
           joined = true;
           clearTimeout(joinTimeout);
@@ -113,6 +129,7 @@ async function attachRealtime(server) {
             color: player.color,
             tickHz: manager.TICK_HZ,
             spawn: { x: player.x, z: player.z, facing: player.facing },
+            hotbar: buildHotbar(character), // ability bar (Phase 4.4)
           }));
         } catch (e) {
           try { ws.close(4002, 'join-failed'); } catch (_) {}
@@ -130,6 +147,11 @@ async function attachRealtime(server) {
         if (now - lastCastAt < 120) return; // anti-spam (server still gates real cooldowns)
         lastCastAt = now;
         world.handleCast(playerId, msg, now); // server validates range/cooldown/cost
+      } else if (msg.t === 'dodge') {
+        const now = Date.now();
+        if (now - lastDodgeAt < 120) return; // independent throttle (cast must not block dodge)
+        lastDodgeAt = now;
+        world.handleDodge(playerId, now); // server validates cooldown
       }
     });
 

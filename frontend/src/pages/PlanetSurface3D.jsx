@@ -84,16 +84,56 @@ export default function PlanetSurface3D() {
   }), [currentCharacter?.id]);
   const worldRef = useSurfaceWorld(planet, sim, netOptions);
 
-  // Combat HUD state (Phase 4.3) — polled from the authoritative net world.
-  const [combat, setCombat] = useState(null); // { hp, maxHp, dead } | null
+  // Combat HUD state (Phase 4.3/4.4) — polled from the authoritative net world.
+  const [combat, setCombat] = useState(null);   // { hp, maxHp, dead } | null
+  const [hotbar, setHotbar] = useState([]);     // ability bar
+  const [cdSnap, setCdSnap] = useState({});     // ability id → ms-ready
+  const [log, setLog] = useState([]);           // combat log lines
+  const [combatTarget, setCombatTarget] = useState(null); // soft-target enemy id (Phase 4.4)
   useEffect(() => {
     const id = setInterval(() => {
       const w = worldRef.current;
       setCombat(w && w.combat ? w.combat() : null);
-    }, 200);
+      setHotbar(w && w.hotbar ? w.hotbar() : []);
+      const cd = w && w.castCd ? w.castCd() : null;
+      setCdSnap(cd ? { ...cd } : {});
+      const lg = w && w.combatLog ? w.combatLog() : null;
+      setLog(lg ? lg.slice(-8) : []);
+    }, 100);
     return () => clearInterval(id);
   }, [worldRef]);
   const input = useSurfaceInput(inputEnabledRef);
+
+  // Combat keybinds (Phase 4.4): 1–9 cast hotbar abilities at the soft-target, Space dodges.
+  const targetRef = useRef(null);
+  useEffect(() => { targetRef.current = combatTarget; }, [combatTarget]);
+  // Cast an ability, validating an enemy target client-side first so we don't start a
+  // local cooldown for a cast the server will reject (no/dead target).
+  const castAbility = useCallback((ab) => {
+    const w = worldRef.current;
+    if (!w || !ab || !w.cast) return;
+    const tid = targetRef.current;
+    if (ab.target === 'enemy' || ab.target === 'all_enemies') {
+      const en = w._net && w._net.enemies && w._net.enemies.get(String(tid));
+      if (!en || en.hp <= 0) return; // require a live target for offensive abilities
+    }
+    w.cast(ab.id, tid);
+  }, [worldRef]);
+  useEffect(() => {
+    const onKey = (e) => {
+      const w = worldRef.current;
+      if (!w || !inputEnabledRef.current) return; // not while a menu/modal is open
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.code === 'Space') { e.preventDefault(); w.dodge && w.dodge(); return; }
+      if (e.key >= '1' && e.key <= '9') {
+        const hb = w.hotbar ? w.hotbar() : [];
+        castAbility(hb[parseInt(e.key, 10) - 1]);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [worldRef, castAbility]);
 
   const pois = useMemo(() => buildPois(planet, sim), [planet, sim]);
   const npcs3d = useMemo(() => buildNpcs(npcs, sim), [npcs, sim]);
@@ -289,6 +329,8 @@ export default function PlanetSurface3D() {
             startTime={0.55}
             cycleSeconds={600}
             postQuality="high"
+            combatTarget={combatTarget}
+            onCombatTarget={setCombatTarget}
             onProximity={onProximity}
             onMoved={onMoved}
             onPoiActivate={onPoiActivate}
@@ -344,13 +386,48 @@ export default function PlanetSurface3D() {
         onFlee={() => setEncounter(null)}
       />
 
-      {/* Combat HUD (Phase 4.3) — player health + defeat overlay (online only). */}
+      {/* Combat HUD (Phase 4.3/4.4) — health bar + ability hotbar (online only). */}
       {combat && (
-        <div style={{ position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)', width: 240, zIndex: 45, fontFamily: 'system-ui, sans-serif', textAlign: 'center' }}>
-          <div style={{ height: 14, background: 'rgba(8,12,22,0.8)', border: '1px solid #2a3654', borderRadius: 7, overflow: 'hidden' }}>
-            <div style={{ width: `${Math.max(0, Math.min(100, (combat.hp / combat.maxHp) * 100))}%`, height: '100%', background: (combat.hp / combat.maxHp) < 0.3 ? '#ff5a4a' : '#6cf0c2', transition: 'width .15s' }} />
+        <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 45, fontFamily: 'system-ui, sans-serif', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          {/* ability hotbar */}
+          {hotbar.length > 0 && (
+            <div style={{ display: 'flex', gap: 6 }}>
+              {hotbar.slice(0, 9).map((ab, i) => {
+                const ready = (cdSnap[ab.id] || 0) <= Date.now();
+                const cdLeft = Math.max(0, ((cdSnap[ab.id] || 0) - Date.now()) / 1000);
+                const accent = ab.type === 'heal' ? '#6cf0c2' : ab.type === 'buff' ? '#ffd24a' : ab.type === 'debuff' ? '#d18cff' : '#ff8d6c';
+                return (
+                  <button key={ab.id} title={`${ab.name} (${ab.stam} stamina)`}
+                    onClick={() => castAbility(ab)}
+                    style={{ position: 'relative', width: 48, height: 48, borderRadius: 8, background: 'rgba(10,15,28,0.92)', border: `1px solid ${ready ? accent : '#2a3654'}`, color: ready ? '#e6eefc' : '#6f7c98', cursor: 'pointer', overflow: 'hidden', fontFamily: 'system-ui' }}>
+                    <div style={{ position: 'absolute', top: 2, left: 4, fontSize: 10, color: '#8aa0c4' }}>{i + 1}</div>
+                    <div style={{ fontSize: 9, lineHeight: 1.05, padding: '14px 3px 0', fontWeight: 600 }}>{ab.name.replace(/ (Mastery|Insight)$/, '')}</div>
+                    {!ready && (
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,6,12,0.66)', display: 'grid', placeItems: 'center', color: '#cfe3ff', fontWeight: 700, fontSize: 14 }}>{cdLeft.toFixed(1)}</div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {/* health bar */}
+          <div style={{ width: 240 }}>
+            <div style={{ height: 14, background: 'rgba(8,12,22,0.8)', border: '1px solid #2a3654', borderRadius: 7, overflow: 'hidden' }}>
+              <div style={{ width: `${Math.max(0, Math.min(100, (combat.hp / combat.maxHp) * 100))}%`, height: '100%', background: (combat.hp / combat.maxHp) < 0.3 ? '#ff5a4a' : '#6cf0c2', transition: 'width .15s' }} />
+            </div>
+            <div style={{ color: '#cfe3ff', fontSize: 11, marginTop: 2, textShadow: '0 1px 3px #000' }}>
+              {Math.max(0, Math.round(combat.hp))}/{combat.maxHp} HP · click a hostile · <b style={{ color: '#cfe3ff' }}>1–9</b> abilities · <b style={{ color: '#cfe3ff' }}>Space</b> dodge
+            </div>
           </div>
-          <div style={{ color: '#cfe3ff', fontSize: 11, marginTop: 2, textShadow: '0 1px 3px #000' }}>{Math.max(0, Math.round(combat.hp))}/{combat.maxHp} HP · click a hostile to fight</div>
+        </div>
+      )}
+
+      {/* Combat log (Phase 4.4) */}
+      {combat && log.length > 0 && (
+        <div style={{ position: 'fixed', bottom: 20, right: 16, width: 210, maxHeight: 140, overflow: 'hidden', zIndex: 44, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 11, lineHeight: 1.5, pointerEvents: 'none' }}>
+          {log.map((l, i) => (
+            <div key={l.t + '_' + i} style={{ color: '#aebbd6', opacity: 0.55 + (i / log.length) * 0.45, textShadow: '0 1px 2px #000', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.line}{l.count > 1 ? ` ×${l.count}` : ''}</div>
+          ))}
         </div>
       )}
       {combat && combat.dead && (

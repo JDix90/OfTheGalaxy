@@ -54,6 +54,10 @@ export default function CombatFx({ world, targetId, onClearTarget }) {
       const you = net.you;
       const add = [];
       for (const f of fx) {
+        if (f.type === 'heal') {
+          if (f.amount > 0 && f.x !== undefined) add.push({ key: ++idRef.current, x: f.x, z: f.z, text: `+${f.amount}`, color: '#6cf0c2', crit: false, born: now });
+          continue;
+        }
         if (f.type !== 'hit') continue;
         // Optimistic enemy hp so the bar drops immediately (server snapshot reconciles ~50ms later).
         if (f.dmg && net.enemies.has(f.targetId)) { const e = net.enemies.get(f.targetId); e.hp = Math.max(0, (e.hp || 0) - f.dmg); }

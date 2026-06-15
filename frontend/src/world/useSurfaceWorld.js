@@ -89,6 +89,14 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
 
       /** Combat (Phase 4.3) — cast an ability at a target enemy; server resolves. */
       cast(ability, targetId) { if (this._net) this._net.cast(ability, targetId); },
+      /** Dodge-roll (Phase 4.4). */
+      dodge() { if (this._net) this._net.dodge(); },
+      /** Ability hotbar [{id,name,type,cd,stam,target}] (online). */
+      hotbar() { return this._net ? this._net.hotbar : []; },
+      /** Local ability-cooldown map (id → ms-until-ready) for the hotbar sweep. */
+      castCd() { return this._net ? this._net.castCdUntil : null; },
+      /** Recent combat log lines. */
+      combatLog() { return this._net ? this._net.log : null; },
       /** Authoritative player combat state ({ hp, maxHp, dead }) or null offline. */
       combat() {
         const n = this._net;

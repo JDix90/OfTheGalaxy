@@ -10,7 +10,7 @@
  */
 
 const { generateRandomEnemy } = require('../data/enemyTemplates');
-const { resolveCast, enemyTryAttack, buildEnemyActorCombatant, DISENGAGE_MS } = require('./combat');
+const { resolveCast, resolveDodge, enemyTryAttack, buildEnemyActorCombatant, DISENGAGE_MS } = require('./combat');
 
 const PALETTE = ['#ffcf5c', '#6cf0c2', '#7db8ff', '#ff8d6c', '#d18cff', '#9affa0', '#ff5a8a', '#5ad1ff'];
 const TWO_PI = Math.PI * 2;
@@ -52,6 +52,11 @@ class PlanetWorld {
   /** Resolve a player combat cast (basic attack / ability) against a target enemy. */
   handleCast(playerId, msg, now) {
     resolveCast(this, this.players.get(playerId), msg, now);
+  }
+
+  /** Resolve a dodge-roll (i-frames + dash). */
+  handleDodge(playerId, now) {
+    resolveDodge(this, this.players.get(playerId), now);
   }
 
   /** Find a random walkable world position (away from spawn) for enemy placement. */
@@ -114,7 +119,7 @@ class PlanetWorld {
   /**
    * Add a player. `id` is a stable per-connection id. Returns the player record.
    */
-  addPlayer({ id, character, ws, combatant }) {
+  addPlayer({ id, character, ws, combatant, abilities }) {
     if (this.players.size >= MAX_PLAYERS && !this.players.has(id)) return null;
     const spawn = this.spawnFor(character);
     const color = PALETTE[this._nextColor++ % PALETTE.length];
@@ -132,8 +137,9 @@ class PlanetWorld {
       input: { f: 0, b: 0, l: 0, r: 0, run: 0, yaw: 0 },
       lastSeq: 0,
       lastClientTime: 0,
-      // combat state (Phase 4.3) — hp lives in combatant.stats.health
+      // combat state (Phase 4.3/4.4) — hp lives in combatant.stats.health
       combatant,
+      abilities: Array.isArray(abilities) ? abilities : [],
       dead: false,
       engagedEnemies: new Map(),  // enemyId -> enemy combatant (kept for rewards even after death)
       encounterId: null,
@@ -143,6 +149,11 @@ class PlanetWorld {
       _stamFrac: 0,
       abilityCdUntil: {},
       lastCombatAt: 0,
+      // dodge-roll (Phase 4.4)
+      iFrameUntil: 0,
+      dashUntil: 0,
+      dashSpeed: 0,
+      dodgeCdUntil: 0,
       // persistence bookkeeping
       _saveAcc: 0,
       _lastSavedSurf: this.sim.worldToSurface(spawn.x, spawn.z),
@@ -193,6 +204,11 @@ class PlanetWorld {
         const next = this.sim.integrate({ x: p.x, z: p.z, facing: p.facing }, p.input, dt);
         p.x = next.x; p.z = next.z; p.facing = next.facing;
         p.moving = next.moving; p.speed = next.speed;
+        // Dodge dash: a brief burst in the facing direction (on top of input movement).
+        if (p.dashUntil && now < p.dashUntil) {
+          const step = (p.dashSpeed || 0) * dt;
+          this._tryMove(p, Math.sin(p.facing) * step, Math.cos(p.facing) * step);
+        }
       } else {
         p.moving = false; p.speed = 0;
       }

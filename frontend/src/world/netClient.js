@@ -47,6 +47,10 @@ export class NetClient {
     this.selfMaxHp = null;
     this.selfDead = false;
     this.fxQueue = [];           // combat fx events to render (drained by the scene)
+    this.hotbar = [];            // ability bar (Phase 4.4) [{id,name,type,cd,stam,target}]
+    this.castCdUntil = {};       // local cooldown display (ms) per ability id
+    this.dodgeCdUntil = 0;
+    this.log = [];               // combat log lines (bounded)
     this.pending = [];           // unacked inputs [{ seq, input, dt }]
     this.seq = 0;
     this.rttEMA = 0;
@@ -101,6 +105,7 @@ export class NetClient {
         clearTimeout(this._reconnectTimer);
         this._lastAck = -1;
         this._lastAckAt = Date.now();
+        this.hotbar = m.hotbar || [];
         // Adopt the authoritative spawn (server resumes saved position / spaceport).
         if (m.spawn) {
           this.player.x = m.spawn.x; this.player.z = m.spawn.z; this.player.facing = m.spawn.facing;
@@ -137,7 +142,25 @@ export class NetClient {
     }
     this.serverSelf = m.self;
     if (typeof m.self.hp === 'number') { this.selfHp = m.self.hp; this.selfMaxHp = m.self.maxHp; this.selfDead = !!m.self.dead; }
-    if (m.fx && m.fx.length) { for (const f of m.fx) this.fxQueue.push(f); if (this.fxQueue.length > 96) this.fxQueue.splice(0, this.fxQueue.length - 96); }
+    if (m.fx && m.fx.length) {
+      const nameOf = (id) => (id === this.you ? 'You' : ((this.enemies.get(id) && this.enemies.get(id).name) || (this.remotes.get(id) && this.remotes.get(id).name) || 'Hostile'));
+      for (const f of m.fx) {
+        this.fxQueue.push(f);
+        let line = null;
+        if (f.type === 'hit') {
+          if (f.dodged || f.miss) line = `${nameOf(f.sourceId)} → ${nameOf(f.targetId)}: ${f.dodged ? 'dodged' : 'miss'}`;
+          else line = `${nameOf(f.sourceId)} → ${nameOf(f.targetId)}: ${f.dmg}${f.crit ? ' (crit!)' : ''}`;
+        } else if (f.type === 'heal') line = `${nameOf(f.targetId)} heals +${f.amount}`;
+        else if (f.type === 'death') line = `${nameOf(f.id)} defeated`;
+        if (line) {
+          const last = this.log[this.log.length - 1];
+          if (last && last.line === line) last.count = (last.count || 1) + 1; // collapse repeats
+          else this.log.push({ t: now, line, count: 1 });
+        }
+      }
+      if (this.fxQueue.length > 96) this.fxQueue.splice(0, this.fxQueue.length - 96);
+      if (this.log.length > 40) this.log.splice(0, this.log.length - 40);
+    }
 
     // --- reconcile our predicted player: server pos + replay of unacked inputs ---
     this.pending = this.pending.filter((p) => p.seq > m.ack);
@@ -211,11 +234,23 @@ export class NetClient {
     }
   }
 
-  /** Send a combat cast (server validates range/cooldown/cost). */
+  /** Send a combat cast (server validates range/cooldown/cost) + track local cooldown. */
   cast(ability, targetId) {
     if (this.mode !== 'online') return;
     const ws = this._ws;
-    if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify({ t: 'cast', ability, targetId }));
+    if (!(ws && ws.readyState === ws.OPEN)) return;
+    ws.send(JSON.stringify({ t: 'cast', ability, targetId }));
+    const e = this.hotbar.find((h) => h.id === ability);
+    const cdMs = ability === 'basic_attack' ? 850 : (e ? (e.cd || 1) * 1000 : 1000);
+    this.castCdUntil[ability] = Date.now() + cdMs;
+  }
+
+  /** Send a dodge-roll. */
+  dodge() {
+    if (this.mode !== 'online') return;
+    if (Date.now() < this.dodgeCdUntil) return;
+    const ws = this._ws;
+    if (ws && ws.readyState === ws.OPEN) { ws.send(JSON.stringify({ t: 'dodge' })); this.dodgeCdUntil = Date.now() + 1000; }
   }
 
   /** Drain queued combat fx (hit/death) for the scene to render. */

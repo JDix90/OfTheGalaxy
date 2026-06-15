@@ -30,8 +30,24 @@ const TURN_MS = 1000;          // ability cooldown: turns → ms
 const ENEMY_MELEE = 2.8;
 const ENEMY_CD_MS = 1400;
 const DISENGAGE_MS = 6000;
+// Dodge-roll (Phase 4.4)
+const DODGE_CD_MS = 1000;
+const IFRAME_MS = 450;       // invulnerability window
+const DASH_SPEED = 17;       // world units/s during the dash
+const DASH_MS = 180;
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+
+/** Dodge-roll: brief i-frames + a forward dash (applied in PlanetWorld.step). */
+function resolveDodge(world, player, now) {
+  if (!player || player.dead) return;
+  if (now < (player.dodgeCdUntil || 0)) return;
+  player.dodgeCdUntil = now + DODGE_CD_MS;
+  player.iFrameUntil = now + IFRAME_MS;
+  player.dashUntil = now + DASH_MS;
+  player.dashSpeed = DASH_SPEED;
+  world.pushFx({ type: 'dodge', id: player.id, x: player.x, z: player.z });
+}
 
 /** Apply a calculateDamage-style result to a combatant (shield first, then health). */
 function applyDamage(target, result) {
@@ -52,12 +68,12 @@ function applyDamage(target, result) {
 
 /** Player → enemy cast (basic attack or ability). Sync; mutates state + queues fx/intents. */
 function resolveCast(world, player, msg, now) {
-  if (!player || player.dead) return;
-  const enemy = world.enemies.get(String(msg.targetId));
-  if (!enemy || enemy.dead) return;
+  if (!player || player.dead || !player.combatant) return;
+  const enemy = world.enemies.get(String(msg.targetId)); // may be null for self-cast abilities
   const abilityId = msg.ability || BASIC;
 
   if (abilityId === BASIC) {
+    if (!enemy || enemy.dead) return;
     if (now < (player.abilityCdUntil[BASIC] || 0)) return;
     if (dist(player, enemy) > BASIC_RANGE) return;
     if (player.combatant.stats.stamina < BASIC_STAMINA) return;
@@ -74,24 +90,48 @@ function resolveCast(world, player, msg, now) {
     if (!def) console.warn('[combat] invalid ability cast', { player: player.id, ability: abilityId });
     return;
   }
+  // Must actually know the ability (server-authoritative kit). A player with no abilities
+  // can only basic-attack — the empty-array case must REJECT, not fall open.
+  if (!Array.isArray(player.abilities) || !player.abilities.includes(abilityId)) return;
   if (now < (player.abilityCdUntil[abilityId] || 0)) return;
-  const range = def.effects && def.effects.damage ? ABILITY_RANGE_RANGED : ABILITY_RANGE_MELEE;
-  if (dist(player, enemy) > range) return;
   const cost = (def.cost && def.cost.stamina) || 0;
   if (player.combatant.stats.stamina < cost) return;
-  player.combatant.stats.stamina = Math.max(0, player.combatant.stats.stamina - cost);
+  const eff = def.effects || {};
+  const selfCast = def.targetType === 'self' || def.targetType === 'ally'; // targetType is authoritative
 
-  // A minimal encounter stub keeps the contract with combatService's ability helpers
-  // (they currently read attacker/target only, but won't crash if they grow to use it).
+  if (selfCast) {
+    player.combatant.stats.stamina = Math.max(0, player.combatant.stats.stamina - cost);
+    const enc = { combatants: [player.combatant] };
+    if (eff.heal) {
+      const before = player.combatant.stats.health;
+      try { combatService.calculateAbilityHeal(enc, player.combatant, player.combatant, def); } catch (e) {}
+      player.combatant.stats.health = Math.min(player.combatant.stats.maxHealth, Math.round(player.combatant.stats.health));
+      world.pushFx({ type: 'heal', targetId: player.id, x: player.x, z: player.z, amount: Math.max(0, Math.round(player.combatant.stats.health - before)), ability: abilityId });
+    }
+    if (eff.buff) {
+      try { combatService.applyAbilityBuff(enc, player.combatant, player.combatant, eff.buff); } catch (e) {}
+      world.pushFx({ type: 'buff', targetId: player.id, x: player.x, z: player.z, ability: abilityId });
+    }
+    player.abilityCdUntil[abilityId] = now + (def.cooldown || 1) * TURN_MS;
+    player.lastCombatAt = now;
+    return;
+  }
+
+  // enemy-targeted (damage / debuff)
+  if (!enemy || enemy.dead) return;
+  const range = eff.damage ? ABILITY_RANGE_RANGED : ABILITY_RANGE_MELEE;
+  if (dist(player, enemy) > range) return;
+  player.combatant.stats.stamina = Math.max(0, player.combatant.stats.stamina - cost);
   const enc = { combatants: [player.combatant, enemy.combatant] };
   let res = { hit: true, damage: 0, critical: false };
-  if (def.effects && def.effects.damage) {
+  if (eff.damage) {
     const out = combatService.calculateAbilityDamage(enc, player.combatant, [enemy.combatant], def); // mutates target hp
     const td = out && out.targets && out.targets[0];
     res = { hit: true, damage: td ? td.damage : 0, critical: td ? !!td.critical : false };
+    enemy.combatant.stats.health = Math.max(0, Math.round(enemy.combatant.stats.health)); // keep integer
   }
-  if (def.effects && def.effects.debuff) {
-    try { combatService.applyAbilityDebuff(enc, player.combatant, enemy.combatant, def.effects.debuff); } catch (e) {}
+  if (eff.debuff) {
+    try { combatService.applyAbilityDebuff(enc, player.combatant, enemy.combatant, eff.debuff); } catch (e) {}
   }
   player.abilityCdUntil[abilityId] = now + (def.cooldown || 1) * TURN_MS;
   afterPlayerHit(world, player, enemy, res, now, abilityId);
@@ -121,6 +161,11 @@ function enemyTryAttack(world, enemy, target, now) {
   if (dist(enemy, target) > ENEMY_MELEE) return;
   if (now < (enemy.attackCdUntil || 0)) return;
   enemy.attackCdUntil = now + ENEMY_CD_MS;
+  // Dodge i-frames: the swing whiffs.
+  if (now < (target.iFrameUntil || 0)) {
+    world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, dmg: 0, dodged: true });
+    return;
+  }
   const res = combatService.calculateDamage(enemy.combatant, target.combatant);
   applyDamage(target.combatant, res);
   target.lastCombatAt = now;
@@ -221,6 +266,10 @@ class CombatManager {
     } catch (e) { /* ignore */ }
     player.dead = false;
     player.abilityCdUntil = {};
+    // Clear dodge timers so an in-progress dodge can't grant invulnerability post-respawn.
+    player.iFrameUntil = 0;
+    player.dashUntil = 0;
+    player.dodgeCdUntil = 0;
     if (player.ws && player.ws.readyState === player.ws.OPEN) {
       try { player.ws.send(JSON.stringify({ t: 'respawn', x: player.x, z: player.z, hp: player.combatant ? player.combatant.stats.health : undefined })); } catch (_) {}
     }
@@ -228,7 +277,7 @@ class CombatManager {
 }
 
 module.exports = {
-  CombatManager, resolveCast, enemyTryAttack, applyDamage,
+  CombatManager, resolveCast, resolveDodge, enemyTryAttack, applyDamage,
   buildEnemyActorCombatant: (template) => combatService.buildEnemyCombatant(template),
   DISENGAGE_MS,
 };

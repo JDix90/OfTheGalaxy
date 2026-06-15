@@ -10,7 +10,24 @@
 - ✅ **P4.1 — multiplayer presence** (other players in your world)
 - ✅ **P4.2 — real-time enemies** (server-driven patrol/aggro AI)
 - ✅ **P4.3 — real-time combat resolution** (full encounter integration)
-- ⏳ P4.4 — action-RPG feel / UX vocab · P4.5 — persistence + hardening + MP scale
+- ✅ **P4.4 — action-RPG feel** (ability hotbar, dodge-roll, combat log, damage numbers)
+- ⏳ P4.5 — persistence + hardening + MP scale; P4.4b — AoE telegraphs + enemy ability patterns + threat + cast bars
+
+## P4.4 — action-RPG feel (shipped)
+- **Ability hotbar**: the `welcome` carries the character's known combat abilities; client
+  shows a hotbar (keys **1–9**, click) with cooldown sweeps + stamina. `resolveCast` handles
+  enemy-targeted **damage/debuff** and self-cast **heal/buff** (routed by `targetType`), with
+  a server-authoritative "must know the ability" check.
+- **Dodge-roll**: **Space** → `resolveDodge` grants ~450 ms i-frames + a dash (applied in
+  `step`); enemy melee whiffs during i-frames. Independent dodge cooldown + throttle.
+- **Combat log** (bottom-right, deduped with ×N) + **floating damage/heal numbers** (red /
+  crit-gold / green) at the server-embedded hit position.
+- **Adversarial review: 15 findings fixed** (deduped): permanent-i-frames-after-respawn,
+  ability-guard empty-array bypass, **separate cast/dodge throttles**, targetType-authoritative
+  self-cast routing, client target-validation (no cooldown desync), faster cd poll, log dedupe.
+- **Verified**: server combat 7/7 (damage ability, self-cast heal, unknown-ability reject,
+  dodge i-frames + whiff + dash) + fix re-checks 4/4 (incl. empty-abilities reject, respawn
+  clears i-frames); wire smoke (hotbar delivered, cast/dodge stable); frontend 63/63; builds green.
 
 ## P4.3 — real-time combat (shipped, full encounter integration)
 Server-authoritative combat reusing the existing math + reward machinery; turns → timers.
