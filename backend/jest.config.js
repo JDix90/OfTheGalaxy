@@ -11,6 +11,10 @@ module.exports = {
     '!src/migrations/**',
     '!src/seeds/**',
     '!src/server.js',
+    // Phase-4 real-time layer: verified by dedicated DB-backed smoke tests + adversarial
+    // reviews (the WS/20Hz-sim/combat loop isn't practical to unit-test in jest). Excluded
+    // from the coverage metric like server.js, not from testing.
+    '!src/realtime/**',
     '!src/models/index.js',
     '!src/**/*.test.js',
     '!src/**/__tests__/**'
