@@ -19,6 +19,7 @@ import PoiStructure from './PoiStructure';
 import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
 import PlayerActor from './PlayerActor';
+import QuestWaypoint from './QuestWaypoint';
 import Weather, { getWeatherPreset } from './Weather';
 import Atmosphere from './atmosphere/Atmosphere';
 import PostFX from './atmosphere/PostFX';
@@ -103,7 +104,7 @@ function NpcLOD({ npcs, world, worldHalf, tiersRef, labelsRef, onChange, onLabel
 }
 
 export default function SurfaceScene({
-  world, input, planet, pois, npcs3d, activePoiId, textureUrl, worldHalf,
+  world, input, planet, pois, npcs3d, waypoints, activePoiId, textureUrl, worldHalf,
   onProximity, onMoved, onPoiActivate, onNpcActivate,
   time, cycleSeconds, startTime = 0.6, paused, onTime, postQuality = 'high', weather,
 }) {
@@ -169,6 +170,10 @@ export default function SurfaceScene({
         <NpcActor key={npc.id} npc3d={npc} tier={npcTiers[npc.id]} onActivate={onNpcActivate} />
       ))}
       <NpcProxies npcs={proxyNpcs} labelIds={npcLabels} onActivate={onNpcActivate} />
+
+      {(waypoints || []).map((wp) => (
+        <QuestWaypoint key={wp.id} wp={wp} />
+      ))}
       <NpcLOD
         npcs={npcs3d} world={world} worldHalf={worldHalf}
         tiersRef={tiersRef} labelsRef={labelsRef} onChange={setNpcTiers} onLabels={setNpcLabels}

@@ -16,6 +16,8 @@ import { useGLTF } from '@react-three/drei';
 
 import { useCharacterStore } from '../state/characterSlice';
 import { useCombatStore } from '../state/combatSlice';
+import { useQuestStore } from '../state/questSlice';
+import { tutorialEventBus, TUTORIAL_EVENTS } from '../services/tutorialEventBus';
 import { galaxyApi } from '../services/api/galaxyApi';
 import { npcApi } from '../services/api/npcApi';
 import subMapApi from '../services/api/subMapApi';
@@ -28,7 +30,7 @@ import { CHARACTER_GLTF_URLS } from '../data/modelManifest';
 import { useSurfaceWorld } from '../world/useSurfaceWorld';
 import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import SurfaceScene from '../components/surface3d/SurfaceScene';
-import { buildPois, buildNpcs, isDungeon, deriveSubMapType } from '../components/surface3d/surfaceData';
+import { buildPois, buildNpcs, buildQuestWaypoints, isDungeon, deriveSubMapType } from '../components/surface3d/surfaceData';
 
 import HUD from '../components/hud/HUD';
 import SubMapEntryMenu from '../components/submap/SubMapEntryMenu';
@@ -46,6 +48,7 @@ export default function PlanetSurface3D() {
   const navigate = useNavigate();
   const { currentCharacter } = useCharacterStore();
   const { startEncounter } = useCombatStore();
+  const activeQuests = useQuestStore((s) => s.activeQuests);
 
   const [planet, setPlanet] = useState(null);
   const [npcs, setNpcs] = useState([]);
@@ -74,6 +77,10 @@ export default function PlanetSurface3D() {
 
   const pois = useMemo(() => buildPois(planet, sim), [planet, sim]);
   const npcs3d = useMemo(() => buildNpcs(npcs, sim), [npcs, sim]);
+  const waypoints = useMemo(
+    () => buildQuestWaypoints(activeQuests, planet?.id, sim, currentCharacter?.currentLocation?.area),
+    [activeQuests, planet?.id, sim, currentCharacter?.currentLocation?.area],
+  );
 
   // Modal menus block movement; the passive proximity prompt does not.
   const modalOpen = !!(poiMenu || npcMenu || selectedNPC || encounter);
@@ -164,6 +171,29 @@ export default function PlanetSurface3D() {
   const onMoved = useCallback(async (surfacePos) => {
     const ch = useCharacterStore.getState().currentCharacter;
     if (!ch || !planet || encounter) return;
+
+    // Quest objective proximity → fire the tutorial/quest "reached" event (mirrors the 2D
+    // surface). Cheap, runs on the throttled move report; the visual beacons come from
+    // buildQuestWaypoints.
+    const aq = useQuestStore.getState().activeQuests;
+    if (aq && aq.length) {
+      for (const { quest, progress } of aq) {
+        if (!quest?.objectives) continue;
+        for (const objective of quest.objectives) {
+          if (progress?.objectivesCompleted?.[objective.id]) continue;
+          const loc = objective.location;
+          if (!loc || loc.planet !== planet.id) continue;
+          const d = Math.hypot(surfacePos.x - (loc.x || 0), surfacePos.y - (loc.y || 0));
+          if (d < 5) {
+            tutorialEventBus.emit(TUTORIAL_EVENTS.QUEST_OBJECTIVE_LOCATION_REACHED, {
+              characterId: ch.id, questId: quest.id, objectiveId: objective.id,
+              objectiveType: objective.type, location: 'planet_surface', planetId: planet.id,
+            });
+          }
+        }
+      }
+    }
+
     const now = Date.now();
     if (now - lastEncounterRef.current < 2500) return;
     lastEncounterRef.current = now;
@@ -232,6 +262,7 @@ export default function PlanetSurface3D() {
             planet={planet}
             pois={pois}
             npcs3d={npcs3d}
+            waypoints={waypoints}
             activePoiId={activePoiId}
             textureUrl={textureUrl}
             worldHalf={sim.worldHalf}

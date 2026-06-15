@@ -80,6 +80,44 @@ export function buildPois(planet, sim) {
   return out;
 }
 
+/**
+ * Build world-positioned quest waypoints from the active-quest list. Mirrors the 2D
+ * surface's `drawQuestTargets`: one waypoint per incomplete objective that has a
+ * location on THIS planet (area-gated the same way), placed via the shared sim so it
+ * lines up with the POI/NPC at that spot. `combat` objectives get the ⚔ treatment.
+ */
+export function buildQuestWaypoints(activeQuests, planetId, sim, currentArea) {
+  if (!sim || !Array.isArray(activeQuests) || activeQuests.length === 0) return [];
+  const out = [];
+  for (const entry of activeQuests) {
+    const quest = entry?.quest;
+    const progress = entry?.progress;
+    if (!quest?.objectives) continue;
+    for (const obj of quest.objectives) {
+      if (progress?.objectivesCompleted?.[obj.id]) continue;
+      const loc = obj.location;
+      if (!loc || loc.planet !== planetId) continue;
+      // Area gate (mirror the 2D surface branch): on the open surface (area 'surface'
+      // or unset) show all planet objectives; only hide when in a specific non-surface
+      // area that doesn't match.
+      if (loc.area && currentArea && currentArea !== 'surface' && currentArea !== loc.area) continue;
+      const s = normalizeSurfaceCoord(loc.x || 0, loc.y || 0);
+      if (!Number.isFinite(s.x) || !Number.isFinite(s.y)) continue;
+      const w = sim.surfaceToWorld(s.x, s.y);
+      if (!Number.isFinite(w.x)) continue;
+      const t = (loc.type || obj.type || '').toLowerCase();
+      const combat = /combat|kill|defeat|eliminate|destroy/.test(t);
+      out.push({
+        id: `${quest.id}:${obj.id}`,
+        wx: w.x, wz: w.z,
+        combat,
+        label: obj.description || quest.title || quest.name || 'Objective',
+      });
+    }
+  }
+  return out;
+}
+
 /** Map a surface-level NPC list to world-positioned actors. */
 export function buildNpcs(npcs, sim) {
   if (!sim) return [];

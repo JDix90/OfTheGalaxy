@@ -95,6 +95,15 @@ export default function SurfaceTest() {
 
   const pois = useMemo(() => buildPois(planet, sim), [sim]);
   const npcs3d = useMemo(() => buildNpcs(SYNTH_NPCS, sim), [sim]);
+  // Synthetic quest waypoints (one delivery objective at the market, one combat at the refinery).
+  const waypoints = useMemo(() => {
+    const a = sim.surfaceToWorld(42, 47);
+    const b = sim.surfaceToWorld(56, 47);
+    return [
+      { id: 'wp_deliver', wx: a.x, wz: a.z, combat: false, label: 'Deliver the cargo' },
+      { id: 'wp_clear', wx: b.x, wz: b.z, combat: true, label: 'Clear the Ore Refinery' },
+    ];
+  }, [sim]);
 
   const [activePoiId, setActivePoiId] = useState(null);
   const [prompt, setPrompt] = useState(null);   // { name, x, y } proximity
@@ -140,6 +149,7 @@ export default function SurfaceTest() {
           planet={planet}
           pois={pois}
           npcs3d={npcs3d}
+          waypoints={waypoints}
           activePoiId={activePoiId}
           textureUrl={null}
           worldHalf={sim.worldHalf}
