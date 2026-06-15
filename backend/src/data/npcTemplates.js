@@ -4,10 +4,19 @@
  */
 
 /**
- * Seeded random number generator
+ * Seeded random number generator.
+ *
+ * The raw first output of this small LCG is serially correlated: consecutive seeds (getSeed
+ * of '..._npc_0', '..._npc_1', ... differ by 1) yield first draws ~0.04 apart, so a whole
+ * submap's NPCs fell into the same weightedRandom band (e.g. every clinic staffer rolled
+ * "vendor"). Normalizing the seed and advancing the LCG a few steps decorrelates consecutive
+ * seeds while preserving the overall uniform distribution.
  */
 function seededRandom(seed) {
-  let value = seed;
+  let value = ((seed % 233280) + 233280) % 233280;
+  for (let i = 0; i < 10; i++) {
+    value = (value * 9301 + 49297) % 233280;
+  }
   return function() {
     value = (value * 9301 + 49297) % 233280;
     return value / 233280;
@@ -194,24 +203,39 @@ const subMapTemplates = {
     maxNPCs: 8
   },
   medical_center: {
-    npcTypes: ['vendor', 'generic'],
-    npcTypeWeights: [0.5, 0.5],
+    // Mostly medical staff (generic w/ medic occupations) + one supply vendor.
+    npcTypes: ['generic', 'vendor', 'quest_giver'],
+    npcTypeWeights: [0.7, 0.2, 0.1],
     spawnDistribution: {
-      vendor: 0.5,
-      generic: 0.5
+      generic: 0.7,
+      vendor: 0.2,
+      quest_giver: 0.1
     },
     minNPCs: 3,
     maxNPCs: 8
   },
   hospital: {
-    npcTypes: ['vendor', 'generic'],
-    npcTypeWeights: [0.5, 0.5],
+    npcTypes: ['generic', 'vendor', 'quest_giver'],
+    npcTypeWeights: [0.7, 0.2, 0.1],
     spawnDistribution: {
-      vendor: 0.5,
-      generic: 0.5
+      generic: 0.7,
+      vendor: 0.2,
+      quest_giver: 0.1
     },
     minNPCs: 3,
     maxNPCs: 8
+  },
+  // Government / administrative / temple interiors: officials, clerks, faction security.
+  civic: {
+    npcTypes: ['quest_giver', 'generic', 'faction_leader'],
+    npcTypeWeights: [0.3, 0.6, 0.1],
+    spawnDistribution: {
+      quest_giver: 0.3,
+      generic: 0.6,
+      faction_leader: 0.1
+    },
+    minNPCs: 4,
+    maxNPCs: 10
   }
 };
 
@@ -328,16 +352,20 @@ function getPlanetTemplate(planet) {
  * Get NPC template for sub-map
  */
 function getSubMapTemplate(subMapType) {
-  // Handle sub-map type variations (e.g., 'city_district' -> 'city')
-  const normalizedType = subMapType.includes('city') ? 'city' :
-                         subMapType.includes('spaceport') ? 'spaceport' :
-                         subMapType.includes('market') ? 'market' :
-                         subMapType.includes('cantina') ? 'cantina' :
-                         subMapType.includes('palace') ? 'palace' :
-                         subMapType.includes('residential') ? 'residential' :
-                         subMapType.includes('commercial') ? 'commercial' :
-                         subMapType;
-  
+  // Handle sub-map type variations (e.g., 'city_district' -> 'city', 'hospital' -> 'medical_center').
+  const t = String(subMapType || '').toLowerCase();
+  const normalizedType =
+    t.includes('spaceport') ? 'spaceport' :
+    t.includes('market') ? 'market' :
+    t.includes('cantina') ? 'cantina' :
+    t.includes('palace') ? 'palace' :
+    (t.includes('medical') || t.includes('hospital') || t.includes('clinic')) ? 'medical_center' :
+    (t.includes('civic') || t.includes('government') || t.includes('temple')) ? 'civic' :
+    (t.includes('residential') || t.includes('residence')) ? 'residential' :
+    t.includes('commercial') ? 'commercial' :
+    t.includes('city') ? 'city' :
+    t;
+
   return subMapTemplates[normalizedType] || subMapTemplates.city;
 }
 

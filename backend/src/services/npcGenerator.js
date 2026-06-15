@@ -13,6 +13,76 @@ const memoryService = require('./memoryService');
 const motivationService = require('./motivationService');
 const trustService = require('./trustService');
 
+// Occupations that imply a faction enforcer / official — these align to the planet's
+// controlling faction so a location feels "run by" whoever holds the world.
+const SECURITY_OCCUPATION_RE = /(guard|security|enforcer|sentinel|sentry|patrol|warden|customs|militia|bouncer|official|officer)/i;
+
+/**
+ * Map a submap's type (+ a building interior's template) to an occupation "domain" key used
+ * by getOccupationForSubMap. Building interiors take their flavor from the building type.
+ */
+function occupationDomainFor(subMap, subMapType) {
+  const t = String(subMapType || '').toLowerCase();
+  if (t === 'building_interior') {
+    const tmpl = String(subMap.template || '').toLowerCase();
+    if (tmpl.includes('commercial')) return 'commercial';
+    if (tmpl.includes('medical') || tmpl.includes('hospital') || tmpl.includes('clinic')) return 'medical_center';
+    return 'residential';
+  }
+  if (t.includes('spaceport')) return 'spaceport';
+  if (t.includes('market')) return 'market';
+  if (t.includes('cantina')) return 'cantina';
+  if (t.includes('palace')) return 'palace';
+  if (t.includes('medical') || t.includes('hospital') || t.includes('clinic')) return 'medical_center';
+  if (t.includes('civic') || t.includes('government') || t.includes('temple')) return 'civic';
+  if (t.includes('residential') || t.includes('residence')) return 'residential';
+  if (t.includes('commercial')) return 'commercial';
+  if (t.includes('settlement') || t.includes('province') || t.includes('wilderness')) return 'settlement';
+  return 'city';
+}
+
+/**
+ * Translate a spawn point's declared occupant type (layout `requiredType` / `type`) into a
+ * generation role. Lets building interiors (resident/vendor/customer) and facility layouts
+ * place the right kind of NPC at the right spot.
+ */
+function roleFromSpawnType(t) {
+  if (!t) return null;
+  const s = String(t).toLowerCase();
+  if (['vendor', 'merchant', 'trader', 'shopkeeper', 'pharmacist'].includes(s)) return { npcType: 'vendor' };
+  if (['quest_giver', 'official', 'administrator'].includes(s)) return { npcType: 'quest_giver' };
+  if (s === 'companion') return { npcType: 'companion' };
+  if (['faction_leader', 'leader', 'ruler'].includes(s)) return { npcType: 'faction_leader' };
+  if (['guard', 'security', 'enforcer', 'militia', 'sentry'].includes(s)) return { npcType: 'generic', role: 'security' };
+  // Generic occupant labels (resident/customer/patient/occupant/...) — keep as the occupation.
+  return { npcType: 'generic', occupation: s === 'occupant' ? 'resident' : s };
+}
+
+/**
+ * "Anchor" roles a public submap should always include: a vendor and, where the planet has a
+ * controlling faction, a security presence. Applied to the first NPCs (by spawn order); the
+ * rest follow the template distribution. Private/interior types get no anchors.
+ */
+function forcedRolesFor(domain, hasFaction) {
+  switch (domain) {
+    case 'spaceport':      return ['vendor', hasFaction ? 'security' : 'official'];
+    case 'city':           return [hasFaction ? 'security' : 'official', 'vendor'];
+    case 'civic':          return ['official', hasFaction ? 'security' : 'official'];
+    case 'settlement':     return ['vendor', hasFaction ? 'security' : 'official'];
+    case 'palace':         return hasFaction ? ['security', 'official'] : ['official'];
+    case 'medical_center': return ['vendor']; // pharmacy/supply desk; staff come from the template
+    default:               return []; // residential / building_interior / commercial: no anchors
+  }
+}
+
+/** An anchor-role string -> a generation role descriptor. */
+function anchorRole(a) {
+  if (a === 'vendor') return { npcType: 'vendor' };
+  if (a === 'official') return { npcType: 'quest_giver' };
+  if (a === 'security') return { npcType: 'generic', role: 'security' };
+  return { npcType: 'generic' };
+}
+
 class NPCGenerator {
   /**
    * Generate NPCs for a planet
@@ -244,21 +314,30 @@ class NPCGenerator {
         console.log(`[NPC Generator] Market submap ${subMap.id} has sufficient vendors in stalls (${vendorCount} vendors, ${vendorsInStalls} in stalls), keeping existing NPCs`);
         return existingNPCs;
       }
-    } else if (existingNPCs.length > 0) {
-      // For non-market submaps, don't regenerate if NPCs already exist
+    } else if (existingNPCs.some((n) => !String(n.id).startsWith('npc_tutorial_'))) {
+      // For non-market submaps, don't regenerate if procedural NPCs already exist. The tutorial
+      // NPC (e.g. Dockmaster Jax) is ignored here so the spaceport still gets its vendors/dock
+      // staff/security alongside him instead of being left with just the tutorial contact.
       return existingNPCs;
     }
+
+    // A building interior is a small private space: its spawn points encode exactly who
+    // belongs there (0-2 residents, a shopkeeper + customers, ...). Never fall back to the
+    // random open-submap crowd count for it (that dumped strangers into empty homes).
+    const isInterior = subMapType === 'building_interior';
 
     // Determine NPC count
     let npcCount = count;
     if (!npcCount) {
       if (spawnPoints.length > 0) {
         npcCount = Math.min(spawnPoints.length, template.maxNPCs);
+      } else if (isInterior) {
+        npcCount = 0; // no spawn points in an interior => it stays empty
       } else {
         npcCount = Math.floor(rnd() * (template.maxNPCs - template.minNPCs + 1)) + template.minNPCs;
       }
     }
-    
+
     // For market submaps, ensure minimum of 7 NPCs (4 category vendors + 3 faction vendors)
     if (isMarket && npcCount < 7) {
       npcCount = 7;
@@ -269,16 +348,12 @@ class NPCGenerator {
     const spawnedVendorCategories = new Set();
     const spawnedFactionVendors = [];
     const gameFactions = ['dominion_remnant', 'concord', 'drift_cartel', 'keeper_seekers', 'corporate_sector'];
-    
-    // For medical facility submaps, ensure at least 1 vendor
-    const isMedicalFacility = subMapType === 'medical_center' || subMapType === 'hospital';
-    let vendorSpawned = false;
-    let vendorSpawnPointIndex = -1;
-    
-    // Find vendor spawn point if it exists
-    if (isMedicalFacility && spawnPoints.length > 0) {
-      vendorSpawnPointIndex = spawnPoints.findIndex(sp => sp.requiredType === 'vendor');
-    }
+
+    // Occupation domain + forced "anchor" roles for this submap. Anchors guarantee the right
+    // baseline cast per type (a pharmacy vendor in a clinic, a vendor + faction guard in public
+    // places); a spawn point's declared occupant type fills the rest, then the template.
+    const occupationDomain = occupationDomainFor(subMap, subMapType);
+    const forcedRoles = isMarket ? [] : forcedRolesFor(occupationDomain, !!planet.factionControl);
 
     // For market submaps, ensure we have enough spawn points for required vendors
     if (isMarket && spawnPoints.length < 7) {
@@ -313,7 +388,9 @@ class NPCGenerator {
       let npcType;
       let vendorCategory = null;
       let assignedFaction = null;
-      
+      let roleKey = null;        // 'security' => faction enforcer rendered as a generic NPC
+      let occupationHint = null; // explicit occupation from a spawn point's occupant type
+
       if (isMarket) {
         // First 4 NPCs: One of each vendor category (medical, tech, communication, general)
         if (npcIndex < 4 && spawnedVendorCategories.size < 4) {
@@ -351,21 +428,26 @@ class NPCGenerator {
           );
         }
         npcIndex++;
-      }
-      // For medical facilities, ensure first vendor spawn point gets a vendor
-      else if (isMedicalFacility && !vendorSpawned && i === vendorSpawnPointIndex && vendorSpawnPointIndex >= 0) {
-        npcType = 'vendor';
-        vendorSpawned = true;
-      } else if (isMedicalFacility && !vendorSpawned && i === 0 && vendorSpawnPointIndex < 0) {
-        // If no vendor spawn point found, make first NPC a vendor
-        npcType = 'vendor';
-        vendorSpawned = true;
       } else {
-        npcType = templates.weightedRandom(
-          template.npcTypes,
-          template.npcTypeWeights || template.npcTypes.map(() => 1 / template.npcTypes.length),
-          npcRnd
-        );
+        // Non-market: forced anchor roles first (vendor + faction security per submap type),
+        // then a spawn point's declared occupant type (resident / vendor / patient / ...),
+        // then the template distribution. This puts medics in clinics, residents in homes,
+        // vendors in shops, and a faction guard among the public.
+        const sp = spawnPoints.length > 0 ? spawnPoints[i % spawnPoints.length] : null;
+        let role = i < forcedRoles.length ? anchorRole(forcedRoles[i]) : null;
+        if (!role && sp) role = roleFromSpawnType(sp.requiredType || sp.type);
+
+        if (role) {
+          npcType = role.npcType;
+          roleKey = role.role || null;
+          occupationHint = role.occupation || null;
+        } else {
+          npcType = templates.weightedRandom(
+            template.npcTypes,
+            template.npcTypeWeights || template.npcTypes.map(() => 1 / template.npcTypes.length),
+            npcRnd
+          );
+        }
       }
 
       // Select spawn point or building position
@@ -461,15 +543,22 @@ class NPCGenerator {
         npcRnd
       );
 
-      // Select occupation based on sub-map type
-      const occupation = this.getOccupationForSubMap(subMapType, npcType, npcRnd);
+      // Select occupation: a spawn point's explicit occupant label wins; otherwise derive from
+      // the submap's occupation domain ('security' resolves to faction guard occupations).
+      const occupation = occupationHint || this.getOccupationForSubMap(occupationDomain, roleKey || npcType, npcRnd);
 
       // Determine faction for market vendors
       let finalFactionId = assignedFaction || getFactionForNPC(planet, npcType, npcRnd);
-      
+
       // For market category vendors, they should be non-faction (general vendors)
       if (isMarket && vendorCategory && vendorCategory !== 'general') {
         finalFactionId = null; // Category vendors are non-faction
+      }
+
+      // Faction security / officials align to the planet's controlling faction so a location
+      // reads as "run by" whoever holds the world (e.g. Vorr Cartel enforcers on Sinkport).
+      if (planet.factionControl && (roleKey === 'security' || SECURITY_OCCUPATION_RE.test(occupation))) {
+        finalFactionId = planet.factionControl;
       }
 
       // Generate NPC
@@ -522,47 +611,77 @@ class NPCGenerator {
   }
 
   /**
-   * Get occupation for sub-map type
+   * Get occupation for sub-map type.
+   * `npcType` may be a real NPC type ('vendor'/'quest_giver'/'generic'/...) or the pseudo
+   * role 'security' (a faction guard rendered as a 'generic' NPC) — both resolve here.
    */
   getOccupationForSubMap(subMapType, npcType, rnd) {
     const occupations = {
       city: {
         vendor: ['merchant', 'shopkeeper', 'trader'],
         quest_giver: ['official', 'guard_captain', 'citizen_leader'],
-        generic: ['citizen', 'resident', 'worker']
+        security: ['city_guard', 'patrol_officer', 'enforcer'],
+        generic: ['citizen', 'resident', 'worker', 'laborer']
       },
       spaceport: {
         vendor: ['vendor', 'trader', 'ship_parts_dealer'],
         quest_giver: ['port_official', 'smuggler', 'pilot'],
-        generic: ['traveler', 'passenger', 'worker']
+        security: ['dock_security', 'customs_officer', 'enforcer'],
+        generic: ['traveler', 'passenger', 'dock_worker', 'mechanic']
       },
       market: {
         vendor: ['merchant', 'trader', 'vendor', 'shopkeeper'],
+        security: ['market_warden', 'enforcer'],
         generic: ['customer', 'browser', 'trader']
       },
       cantina: {
         quest_giver: ['bartender', 'patron', 'informant'],
         companion: ['adventurer', 'mercenary', 'wanderer'],
+        security: ['bouncer', 'enforcer'],
         generic: ['patron', 'drinker', 'gambler']
       },
       palace: {
-        faction_leader: ['ruler', 'governor', 'leader'],
-        quest_giver: ['advisor', 'official', 'guard'],
-        generic: ['servant', 'guard', 'courtier']
+        faction_leader: ['ruler', 'governor', 'crime_lord'],
+        quest_giver: ['advisor', 'official', 'majordomo'],
+        security: ['palace_guard', 'enforcer', 'sentinel'],
+        generic: ['servant', 'attendant', 'courtier']
+      },
+      // Clinics / hospitals: medical staff dominate; the vendor is a supply/pharmacy desk.
+      medical_center: {
+        vendor: ['pharmacist', 'apothecary', 'medical_supplier', 'quartermaster'],
+        quest_giver: ['chief_physician', 'head_nurse', 'medic'],
+        security: ['medical_security', 'orderly'],
+        generic: ['medic', 'nurse', 'doctor', 'orderly', 'paramedic', 'caretaker', 'patient']
+      },
+      // Government / administrative / temple: officials, clerks, faction security.
+      civic: {
+        vendor: ['registrar', 'clerk'],
+        quest_giver: ['administrator', 'magistrate', 'official', 'envoy'],
+        faction_leader: ['governor', 'minister', 'magistrate'],
+        security: ['civic_guard', 'sentinel', 'enforcer'],
+        generic: ['clerk', 'aide', 'bureaucrat', 'citizen', 'petitioner']
       },
       residential: {
-        generic: ['resident', 'homeowner', 'tenant'],
-        quest_giver: ['neighbor', 'community_leader']
+        quest_giver: ['community_leader', 'neighbor', 'landlord'],
+        security: ['neighborhood_watch', 'guard'],
+        generic: ['resident', 'homeowner', 'tenant', 'neighbor', 'caretaker']
+      },
+      settlement: {
+        vendor: ['trader', 'merchant', 'supplier'],
+        quest_giver: ['settlement_elder', 'official', 'foreman'],
+        security: ['militia', 'guard', 'sentry'],
+        generic: ['settler', 'laborer', 'farmer', 'resident']
       },
       commercial: {
         vendor: ['shopkeeper', 'merchant', 'trader'],
-        generic: ['customer', 'shopper', 'worker']
+        security: ['shop_guard', 'enforcer'],
+        generic: ['customer', 'shopper', 'clerk']
       }
     };
 
     const subMapOccupations = occupations[subMapType] || occupations.city;
     const typeOccupations = subMapOccupations[npcType] || subMapOccupations.generic || ['citizen'];
-    
+
     return typeOccupations[Math.floor(rnd() * typeOccupations.length)];
   }
 

@@ -39,6 +39,8 @@ const CombatView = lazy(() => import('./features/combat/CombatView'));
 const SpikePage = lazy(() => import('./spike/SpikePage'));
 // Phase-1 walkable surface harness (standalone, unauthenticated — synthetic data).
 const SurfaceTest = lazy(() => import('./pages/SurfaceTest'));
+// Phase-5.3 submap interior harness (standalone, unauthenticated — synthetic submaps).
+const SubmapTest = lazy(() => import('./pages/SubmapTest'));
 
 function App() {
   const { currentCharacter } = useCharacterStore();
@@ -208,6 +210,8 @@ function App() {
         <Route path="/spike" element={<SpikePage />} />
         {/* Phase-1 walkable surface harness — standalone, synthetic data */}
         <Route path="/surface-test" element={<SurfaceTest />} />
+        {/* Phase-5.3 submap interior harness — standalone, synthetic submaps */}
+        <Route path="/submap-test" element={<SubmapTest />} />
 
         <Route path="*" element={<Navigate to="/" />} />
           </Routes>
