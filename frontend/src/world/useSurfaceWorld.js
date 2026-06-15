@@ -87,6 +87,16 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
       /** Live remote players (Phase 4.1) — empty unless online. */
       remotes() { return this._net ? this._net.remotes : null; },
 
+      /** Combat (Phase 4.3) — cast an ability at a target enemy; server resolves. */
+      cast(ability, targetId) { if (this._net) this._net.cast(ability, targetId); },
+      /** Authoritative player combat state ({ hp, maxHp, dead }) or null offline. */
+      combat() {
+        const n = this._net;
+        return n && n.selfHp != null ? { hp: n.selfHp, maxHp: n.selfMaxHp, dead: n.selfDead } : null;
+      },
+      /** Drain combat fx events (hit/death) for rendering damage numbers. */
+      drainFx() { return this._net ? this._net.drainFx() : null; },
+
       /** Current player position in 0–100 surface coords. */
       getSurfacePos() {
         return sim.worldToSurface(this.player.x, this.player.z);

@@ -10,6 +10,7 @@
  */
 
 const { generateRandomEnemy } = require('../data/enemyTemplates');
+const { resolveCast, enemyTryAttack, buildEnemyActorCombatant, DISENGAGE_MS } = require('./combat');
 
 const PALETTE = ['#ffcf5c', '#6cf0c2', '#7db8ff', '#ff8d6c', '#d18cff', '#9affa0', '#ff5a8a', '#5ad1ff'];
 const TWO_PI = Math.PI * 2;
@@ -19,6 +20,8 @@ const AGGRO_RADIUS = 16;   // world units: a player this close pulls an enemy in
 const LEASH = 24;          // enemies won't chase beyond this from home
 const PATROL_SPEED = 3.2;
 const CHASE_SPEED = 5.4;
+const STAMINA_REGEN = 3;     // stamina per second regenerated in-world (no rejoin-to-refill)
+const DECAY_INTERVAL = 1.2;  // seconds ≈ one "turn" — decays combat status/temporary effects
 const r2 = (n) => Math.round(n * 100) / 100;
 const normYaw = (y) => (typeof y === 'number' && Number.isFinite(y) ? ((y % TWO_PI) + TWO_PI) % TWO_PI : null);
 
@@ -35,7 +38,20 @@ class PlanetWorld {
     this.players = new Map();  // playerId -> player
     this.enemies = new Map();  // enemyId -> enemy
     this._nextColor = 0;
+    this.fx = [];              // combat events for broadcast (drained each snapshot)
+    this.intents = [];         // engagement lifecycle intents (drained each tick → CombatManager)
+    this._decayAcc = 0;        // accumulator for periodic status-effect decay
     this.spawnEnemies(options.dangerLevel || 1);
+  }
+
+  pushFx(ev) { if (this.fx.length < 256) this.fx.push(ev); }
+  pushIntent(it) { this.intents.push(it); }
+  drainFx() { if (this.fx.length === 0) return null; const f = this.fx; this.fx = []; return f; }
+  drainIntents() { if (this.intents.length === 0) return null; const i = this.intents; this.intents = []; return i; }
+
+  /** Resolve a player combat cast (basic attack / ability) against a target enemy. */
+  handleCast(playerId, msg, now) {
+    resolveCast(this, this.players.get(playerId), msg, now);
   }
 
   /** Find a random walkable world position (away from spawn) for enemy placement. */
@@ -55,6 +71,10 @@ class PlanetWorld {
       let t;
       try { t = generateRandomEnemy(dangerLevel); } catch (e) { t = null; }
       if (!t || !t.stats) continue;
+      let combatant;
+      try { combatant = buildEnemyActorCombatant(t); } catch (e) { continue; }
+      if (!combatant || !combatant.stats) continue;
+      combatant.temporaryEffects = combatant.temporaryEffects || [];
       const home = this._randomWalkable();
       this.enemies.set(`e${i}`, {
         id: `e${i}`,
@@ -62,10 +82,12 @@ class PlanetWorld {
         level: t.level || dangerLevel,
         tier: t.tier || 'normal',
         templateKey: t.templateKey || t.key || null,
-        hp: t.stats.health, maxHp: t.stats.maxHealth,
+        combatant,                              // full combat stat block (hp = combatant.stats.health)
+        maxHp: combatant.stats.maxHealth,
         x: home.x, z: home.z, facing: 0,
         home, patrolRadius: 4 + Math.random() * 3, phase: Math.random() * TWO_PI,
         state: 'patrol', targetId: null, _t: Math.random() * 10,
+        dead: false, attackCdUntil: 0,
       });
     }
   }
@@ -92,10 +114,11 @@ class PlanetWorld {
   /**
    * Add a player. `id` is a stable per-connection id. Returns the player record.
    */
-  addPlayer({ id, character, ws }) {
+  addPlayer({ id, character, ws, combatant }) {
     if (this.players.size >= MAX_PLAYERS && !this.players.has(id)) return null;
     const spawn = this.spawnFor(character);
     const color = PALETTE[this._nextColor++ % PALETTE.length];
+    if (combatant) combatant.temporaryEffects = combatant.temporaryEffects || [];
     const player = {
       id,
       ws,
@@ -105,10 +128,21 @@ class PlanetWorld {
       color,
       x: spawn.x, z: spawn.z, facing: spawn.facing,
       moving: false, speed: 0,
-      hp: character.currentHealth, maxHp: character.maxHealth,
+      maxHp: combatant ? combatant.stats.maxHealth : character.maxHealth,
       input: { f: 0, b: 0, l: 0, r: 0, run: 0, yaw: 0 },
       lastSeq: 0,
       lastClientTime: 0,
+      // combat state (Phase 4.3) — hp lives in combatant.stats.health
+      combatant,
+      dead: false,
+      engagedEnemies: new Map(),  // enemyId -> enemy combatant (kept for rewards even after death)
+      encounterId: null,
+      _engaging: false,
+      _finalizing: false,
+      _fleePushed: false,
+      _stamFrac: 0,
+      abilityCdUntil: {},
+      lastCombatAt: 0,
       // persistence bookkeeping
       _saveAcc: 0,
       _lastSavedSurf: this.sim.worldToSurface(spawn.x, spawn.z),
@@ -135,14 +169,51 @@ class PlanetWorld {
     p.lastClientTime = msg.ct || 0;
   }
 
-  /** Integrate one fixed step for every player + enemy. */
-  step(dt) {
-    for (const p of this.players.values()) {
-      const next = this.sim.integrate({ x: p.x, z: p.z, facing: p.facing }, p.input, dt);
-      p.x = next.x; p.z = next.z; p.facing = next.facing;
-      p.moving = next.moving; p.speed = next.speed;
+  /** Decrement combat status/temporary effect durations; drop expired (real-time decay). */
+  _decay(c) {
+    if (!c) return;
+    if (Array.isArray(c.statusEffects) && c.statusEffects.length) {
+      c.statusEffects = c.statusEffects.filter((e) => { if (e.duration == null) return true; e.duration -= 1; return e.duration > 0; });
     }
-    this.stepEnemies(dt);
+    if (Array.isArray(c.temporaryEffects) && c.temporaryEffects.length) {
+      c.temporaryEffects = c.temporaryEffects.filter((e) => { if (e.duration == null) return true; e.duration -= DECAY_INTERVAL; return e.duration > 0; });
+    }
+  }
+
+  /** Integrate one fixed step for every player + enemy. */
+  step(dt, now) {
+    // Periodic effect decay (~1 turn worth) so combat buffs/debuffs aren't permanent.
+    this._decayAcc += dt;
+    const decayNow = this._decayAcc >= DECAY_INTERVAL;
+    if (decayNow) this._decayAcc = 0;
+
+    for (const p of this.players.values()) {
+      // Dead players hold position until respawn; they don't integrate input.
+      if (!p.dead) {
+        const next = this.sim.integrate({ x: p.x, z: p.z, facing: p.facing }, p.input, dt);
+        p.x = next.x; p.z = next.z; p.facing = next.facing;
+        p.moving = next.moving; p.speed = next.speed;
+      } else {
+        p.moving = false; p.speed = 0;
+      }
+      // Stamina regen + effect decay (combat). Stamina stays an INTEGER (DB column is int)
+      // via a fractional accumulator — never write a float to currentStamina.
+      if (p.combatant) {
+        const s = p.combatant.stats;
+        p._stamFrac += STAMINA_REGEN * dt;
+        const whole = Math.floor(p._stamFrac);
+        if (whole > 0) { p._stamFrac -= whole; s.stamina = Math.min(s.maxStamina, s.stamina + whole); }
+        if (decayNow) this._decay(p.combatant);
+      }
+      // Disengage: drop an idle-too-long engagement so a fresh fight starts a new encounter.
+      // _fleePushed guards against re-queueing while the async finalize lands.
+      if (p.encounterId && !p.dead && !p._fleePushed && now - p.lastCombatAt > DISENGAGE_MS) {
+        p._fleePushed = true;
+        this.pushIntent({ type: 'flee', playerId: p.id });
+      }
+    }
+    if (decayNow) for (const e of this.enemies.values()) this._decay(e.combatant);
+    this.stepEnemies(dt, now);
   }
 
   /** Collision-aware directional move (try full, then axis-slide) — mirrors the sim. */
@@ -152,14 +223,16 @@ class PlanetWorld {
     else if (this.sim.isWalkableWorld(e.x, e.z + mz)) { e.z += mz; }
   }
 
-  /** Enemy AI: chase the nearest in-range player, else patrol around home. */
-  stepEnemies(dt) {
+  /** Enemy AI: chase the nearest in-range player, else patrol around home. Attacks in melee. */
+  stepEnemies(dt, now) {
     if (this.enemies.size === 0) return;
     for (const e of this.enemies.values()) {
+      if (e.dead) continue;
       e._t += dt;
-      // nearest player
+      // nearest LIVING player
       let target = null, best = Infinity;
       for (const p of this.players.values()) {
+        if (p.dead) continue;
         const d = Math.hypot(p.x - e.x, p.z - e.z);
         if (d < best) { best = d; target = p; }
       }
@@ -176,13 +249,15 @@ class PlanetWorld {
         tz = e.home.z + Math.sin(a) * e.patrolRadius;
         speed = PATROL_SPEED;
       }
-      const dx = tx - e.x, dz = tz - e.z, dist = Math.hypot(dx, dz);
-      if (dist > 0.15) {
-        const ux = dx / dist, uz = dz / dist;
+      const dx = tx - e.x, dz = tz - e.z, dd = Math.hypot(dx, dz);
+      if (dd > 0.15) {
+        const ux = dx / dd, uz = dz / dd;
         e.facing = Math.atan2(ux, uz); // 0 = +Z (sim convention)
         const stp = speed * dt;
         this._tryMove(e, ux * stp, uz * stp);
       }
+      // Attack when chasing a player in melee range (combat.js handles range/cooldown/death).
+      if (e.state === 'chase' && target) enemyTryAttack(this, e, target, now);
     }
   }
 
@@ -190,7 +265,10 @@ class PlanetWorld {
   playersWire() {
     const out = [];
     for (const p of this.players.values()) {
-      out.push({ id: p.id, x: r2(p.x), z: r2(p.z), f: r2(p.facing), m: p.moving ? 1 : 0, c: p.color, name: p.name });
+      out.push({
+        id: p.id, x: r2(p.x), z: r2(p.z), f: r2(p.facing), m: p.moving ? 1 : 0, c: p.color, name: p.name,
+        hp: p.combatant ? p.combatant.stats.health : p.maxHp, maxHp: p.maxHp, dead: p.dead ? 1 : 0,
+      });
     }
     return out;
   }
@@ -199,7 +277,7 @@ class PlanetWorld {
   enemiesWire() {
     const out = [];
     for (const e of this.enemies.values()) {
-      out.push({ id: e.id, x: r2(e.x), z: r2(e.z), f: r2(e.facing), hp: e.hp, maxHp: e.maxHp, name: e.name, level: e.level, tier: e.tier, st: e.state });
+      out.push({ id: e.id, x: r2(e.x), z: r2(e.z), f: r2(e.facing), hp: e.combatant.stats.health, maxHp: e.maxHp, name: e.name, level: e.level, tier: e.tier, st: e.state });
     }
     return out;
   }

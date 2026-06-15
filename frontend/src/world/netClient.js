@@ -43,6 +43,10 @@ export class NetClient {
     this.serverSelf = null;
     this.remotes = new Map();    // id -> { x,z,f,m,name,c, px,pz,pf, at }  (other players)
     this.enemies = new Map();    // id -> { x,z,f,hp,maxHp,name,level,st, px,pz,pf, at }
+    this.selfHp = null;          // authoritative player hp (Phase 4.3)
+    this.selfMaxHp = null;
+    this.selfDead = false;
+    this.fxQueue = [];           // combat fx events to render (drained by the scene)
     this.pending = [];           // unacked inputs [{ seq, input, dt }]
     this.seq = 0;
     this.rttEMA = 0;
@@ -105,6 +109,12 @@ export class NetClient {
         this._setMode('online');
       } else if (m.t === 'snap') {
         this._onSnap(m);
+      } else if (m.t === 'respawn') {
+        // Server respawned us (after death): teleport + clear prediction buffer + revive.
+        if (typeof m.x === 'number') { this.player.x = m.x; this.player.z = m.z; }
+        this.pending.length = 0;
+        this.selfDead = false;
+        if (typeof m.hp === 'number') this.selfHp = m.hp;
       }
     };
 
@@ -126,6 +136,8 @@ export class NetClient {
       this.rttEMA = this.rttEMA ? this.rttEMA * 0.85 + rtt * 0.15 : rtt;
     }
     this.serverSelf = m.self;
+    if (typeof m.self.hp === 'number') { this.selfHp = m.self.hp; this.selfMaxHp = m.self.maxHp; this.selfDead = !!m.self.dead; }
+    if (m.fx && m.fx.length) { for (const f of m.fx) this.fxQueue.push(f); if (this.fxQueue.length > 96) this.fxQueue.splice(0, this.fxQueue.length - 96); }
 
     // --- reconcile our predicted player: server pos + replay of unacked inputs ---
     this.pending = this.pending.filter((p) => p.seq > m.ack);
@@ -199,10 +211,22 @@ export class NetClient {
     }
   }
 
+  /** Send a combat cast (server validates range/cooldown/cost). */
+  cast(ability, targetId) {
+    if (this.mode !== 'online') return;
+    const ws = this._ws;
+    if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify({ t: 'cast', ability, targetId }));
+  }
+
+  /** Drain queued combat fx (hit/death) for the scene to render. */
+  drainFx() { if (this.fxQueue.length === 0) return null; const f = this.fxQueue; this.fxQueue = []; return f; }
+
   _goOffline() {
     this.serverSelf = null;
     this.remotes.clear();
     this.enemies.clear();
+    this.fxQueue.length = 0;
+    this.selfHp = null; this.selfDead = false;
     this.pending.length = 0;
     this._setMode('offline');
   }

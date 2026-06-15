@@ -7,8 +7,11 @@
  * attached to the http.Server WS endpoint.
  */
 
+const { Op } = require('sequelize');
 const { PlanetWorld } = require('./PlanetWorld');
 const { loadPlanetMapData } = require('./planetData');
+const { CombatManager } = require('./combat');
+const { CombatEncounter } = require('../models');
 const characterService = require('../services/characterService');
 
 const r2 = (n) => Math.round(n * 100) / 100;
@@ -25,6 +28,7 @@ class WorldManager {
     this.DT = 1 / this.TICK_HZ;
     this.worlds = new Map();      // planetId -> PlanetWorld
     this._loading = new Map();    // planetId -> Promise<PlanetWorld> (dedupe concurrent loads)
+    this.combat = new CombatManager(); // Phase 4.3 engagement lifecycle (encounter records + rewards)
     this.tickN = 0;
     this.tickMsEMA = 0;
     this._loop = null;
@@ -58,16 +62,22 @@ class WorldManager {
     let acc = 0;
     this._loop = setInterval(() => {
       const t0 = process.hrtime.bigint();
+      const now = Date.now();
       let frame = Number(t0 - last) / 1e9;
       last = t0;
       if (frame > 0.25) frame = 0.25; // clamp after a stall; never spiral
       acc += frame;
       let steps = 0;
       while (acc >= this.DT && steps < 5) {
-        for (const w of this.worlds.values()) w.step(this.DT);
+        for (const w of this.worlds.values()) w.step(this.DT, now);
         this.tickN++;
         acc -= this.DT;
         steps++;
+      }
+      // Process combat lifecycle intents (async, fire-and-forget; CombatManager guards re-entrancy).
+      for (const w of this.worlds.values()) {
+        const intents = w.drainIntents();
+        if (intents) for (const it of intents) this.combat.handleIntent(w, it);
       }
       if (steps > 0) this.broadcast();
       this.gcEmpty();
@@ -76,6 +86,17 @@ class WorldManager {
     }, 1000 / this.TICK_HZ);
 
     this._saveLoop = setInterval(() => this.flushAll(), 30000);
+
+    // Reap orphaned 'active' encounters (server crash / GC leftovers) so they don't
+    // accumulate. Combat never lasts 30 min, so anything older is dead.
+    this._cleanupLoop = setInterval(async () => {
+      try {
+        await CombatEncounter.update(
+          { status: 'fled', endedAt: new Date() },
+          { where: { status: 'active', updatedAt: { [Op.lt]: new Date(Date.now() - 30 * 60 * 1000) } } },
+        );
+      } catch (e) { /* non-fatal */ }
+    }, 5 * 60 * 1000);
   }
 
   broadcast() {
@@ -85,6 +106,7 @@ class WorldManager {
       if (w.isEmpty()) continue;
       const players = w.playersWire();
       const enemies = w.enemiesWire();
+      const fx = w.drainFx(); // combat events this tick (shared by all recipients)
       for (const p of w.players.values()) {
         const ws = p.ws;
         if (!ws || ws.readyState !== ws.OPEN) continue;
@@ -94,17 +116,22 @@ class WorldManager {
           serverMs,
           ack: p.lastSeq,
           actMs: p.lastClientTime,
-          self: { x: r2(p.x), z: r2(p.z), f: r2(p.facing) },
+          self: { x: r2(p.x), z: r2(p.z), f: r2(p.facing), hp: p.combatant ? p.combatant.stats.health : p.maxHp, maxHp: p.maxHp, dead: p.dead ? 1 : 0 },
           players,
           enemies,
+          fx,
           n: w.players.size,
         }));
       }
     }
   }
 
-  /** Persist one player's position to the DB (throttled by movement). */
+  /** Persist a player's combat vitals (always) + position (throttled by movement). */
   async flushPlayer(player, world, force = false) {
+    // Combat hp/stamina — so a crash/disconnect doesn't lose recent combat state.
+    if (player.combatant && player.combatant.stats) {
+      try { await characterService.updateVitals(player.characterId, Math.round(player.combatant.stats.health), Math.round(player.combatant.stats.stamina)); } catch (e) { /* non-fatal */ }
+    }
     try {
       const s = world.sim.worldToSurface(player.x, player.z);
       const moved = Math.hypot(
@@ -140,7 +167,8 @@ class WorldManager {
   stop() {
     if (this._loop) clearInterval(this._loop);
     if (this._saveLoop) clearInterval(this._saveLoop);
-    this._loop = this._saveLoop = null;
+    if (this._cleanupLoop) clearInterval(this._cleanupLoop);
+    this._loop = this._saveLoop = this._cleanupLoop = null;
   }
 
   stats() {

@@ -83,6 +83,16 @@ export default function PlanetSurface3D() {
     onStatus: setNetStatus,
   }), [currentCharacter?.id]);
   const worldRef = useSurfaceWorld(planet, sim, netOptions);
+
+  // Combat HUD state (Phase 4.3) — polled from the authoritative net world.
+  const [combat, setCombat] = useState(null); // { hp, maxHp, dead } | null
+  useEffect(() => {
+    const id = setInterval(() => {
+      const w = worldRef.current;
+      setCombat(w && w.combat ? w.combat() : null);
+    }, 200);
+    return () => clearInterval(id);
+  }, [worldRef]);
   const input = useSurfaceInput(inputEnabledRef);
 
   const pois = useMemo(() => buildPois(planet, sim), [planet, sim]);
@@ -333,6 +343,24 @@ export default function PlanetSurface3D() {
         onFight={handleFight}
         onFlee={() => setEncounter(null)}
       />
+
+      {/* Combat HUD (Phase 4.3) — player health + defeat overlay (online only). */}
+      {combat && (
+        <div style={{ position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)', width: 240, zIndex: 45, fontFamily: 'system-ui, sans-serif', textAlign: 'center' }}>
+          <div style={{ height: 14, background: 'rgba(8,12,22,0.8)', border: '1px solid #2a3654', borderRadius: 7, overflow: 'hidden' }}>
+            <div style={{ width: `${Math.max(0, Math.min(100, (combat.hp / combat.maxHp) * 100))}%`, height: '100%', background: (combat.hp / combat.maxHp) < 0.3 ? '#ff5a4a' : '#6cf0c2', transition: 'width .15s' }} />
+          </div>
+          <div style={{ color: '#cfe3ff', fontSize: 11, marginTop: 2, textShadow: '0 1px 3px #000' }}>{Math.max(0, Math.round(combat.hp))}/{combat.maxHp} HP · click a hostile to fight</div>
+        </div>
+      )}
+      {combat && combat.dead && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(24,4,6,0.5)', display: 'grid', placeItems: 'center', zIndex: 60, pointerEvents: 'none' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ color: '#ff8a7a', fontFamily: 'system-ui, sans-serif', fontSize: 44, fontWeight: 800, textShadow: '0 2px 14px #000' }}>Defeated</div>
+            <div style={{ color: '#cfe3ff', fontFamily: 'system-ui, sans-serif', fontSize: 14, marginTop: 6, textShadow: '0 1px 4px #000' }}>respawning…</div>
+          </div>
+        </div>
+      )}
 
       {/* Onboarding / tutorial overlay (rendered per-page; the surface is the 3D scene now). */}
       <TutorialOverlay />

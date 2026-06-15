@@ -8,9 +8,35 @@
 ## Status
 - ✅ **P4.0 — authoritative movement** (the netcode backbone)
 - ✅ **P4.1 — multiplayer presence** (other players in your world)
-- ✅ **P4.2 — real-time enemies** (server-driven patrol/aggro AI; no damage yet)
-- ⏳ **P4.3 — real-time combat resolution** (next)
+- ✅ **P4.2 — real-time enemies** (server-driven patrol/aggro AI)
+- ✅ **P4.3 — real-time combat resolution** (full encounter integration)
 - ⏳ P4.4 — action-RPG feel / UX vocab · P4.5 — persistence + hardening + MP scale
+
+## P4.3 — real-time combat (shipped, full encounter integration)
+Server-authoritative combat reusing the existing math + reward machinery; turns → timers.
+- **Combatant blocks**: every actor carries a real combat stat block — player via
+  `buildPlayerCombatant` on join, enemy via `buildEnemyCombatant` at spawn. hp lives in
+  `combatant.stats.health`.
+- **Resolution** (`backend/src/realtime/combat.js`, in-memory, reuses `calculateDamage`/
+  `calculateAbilityDamage`/`getTemporaryEffects`/`applyAbilityDebuff`): client `{t:'cast',
+  ability, targetId}` → server validates range/cooldown(ms)/stamina → applies damage →
+  fx events (carry hit position). Basic attack + damage/debuff abilities. Enemy AI attacks
+  players in melee. Stamina regenerates in-world (integer); status effects decay (~1 turn/1.2s).
+- **Engagement = a CombatEncounter record** managed by `CombatManager`: engage creates it
+  (abandoning any stale `active` first — single-active invariant), win/lost/flee finalizes
+  via the real `endEncounter` → `distributeRewards`/quests/achievements (won) or
+  `respawnService` (lost). A per-player `_finalizing` mutex serializes finalization; a 5-min
+  reaper marks orphaned `active` rows `fled`; combat vitals autosave in `flushPlayer`.
+- **Client**: click a hostile to soft-target (target ring) → auto-attacks in range;
+  `RemoteEnemies` health bars + a player HP HUD + floating damage numbers (`CombatFx`) +
+  a "Defeated → respawning" overlay; `netClient` carries self hp / fx / respawn.
+- **Adversarial review: 20 findings fixed** (encounter-orphan reaper, single-active guard,
+  finalize mutex/race serialization, permanent-debuff decay, stamina regen + integer-stamina
+  DB-type bug, fx hit-position, optimistic enemy hp, cast rate-limit, …).
+- **Verified vs the real dev DB**: kill → `won` encounter + rewards distributed; no stacked
+  active encounters; integer stamina regen; enemy kills player → real `respawnService`
+  respawn (40% hp at a medical center) — 6/6; client netcode unit incl. cast/fx/respawn 5/5;
+  frontend 63/63, backend logic 48/48, builds green.
 
 ## Architecture (as built)
 ```

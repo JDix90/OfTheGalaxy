@@ -21,6 +21,7 @@ import NpcProxies from './NpcProxies';
 import PlayerActor from './PlayerActor';
 import RemotePlayers from './RemotePlayers';
 import RemoteEnemies from './RemoteEnemies';
+import CombatFx from './CombatFx';
 import QuestWaypoint from './QuestWaypoint';
 import Weather, { getWeatherPreset } from './Weather';
 import Atmosphere from './atmosphere/Atmosphere';
@@ -130,6 +131,8 @@ export default function SurfaceScene({
   // Nearest-N ids that should show a nameplate (bounds DOM on crowds).
   const [npcLabels, setNpcLabels] = useState(() => new Set());
   const labelsRef = useRef(new Set());
+  // Combat soft-target (clicked enemy id) — Phase 4.3.
+  const [combatTarget, setCombatTarget] = useState(null);
 
   // Split NPCs by LOD tier: animated ones mount full glTF actors; the rest draw as a
   // single instanced-mesh crowd. Memoized so the arrays are stable between LOD changes.
@@ -186,8 +189,9 @@ export default function SurfaceScene({
       {/* Other players sharing the planet (Phase 4.1 — online only). */}
       <RemotePlayers world={world} />
 
-      {/* Server-driven hostile actors (Phase 4.2 — online only). */}
-      <RemoteEnemies world={world} />
+      {/* Server-driven hostile actors (Phase 4.2/4.3 — online only). */}
+      <RemoteEnemies world={world} targetId={combatTarget} onTarget={setCombatTarget} />
+      <CombatFx world={world} targetId={combatTarget} onClearTarget={() => setCombatTarget(null)} />
 
       {weatherPreset && weatherPreset !== 'none' && (
         <Weather preset={weatherPreset} world={world} worldHalf={worldHalf} />

@@ -19,6 +19,7 @@ const jwt = require('jsonwebtoken');
 const { WebSocketServer } = require('ws');
 const { WorldManager } = require('./WorldManager');
 const characterService = require('../services/characterService');
+const combatService = require('../services/combatService');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -65,6 +66,7 @@ async function attachRealtime(server) {
     let world = null;
     let playerId = null;
     let lastInputAt = 0;
+    let lastCastAt = 0;
 
     // Force-close connections that authenticate but never join (stale-connection DoS).
     const joinTimeout = setTimeout(() => {
@@ -98,7 +100,10 @@ async function attachRealtime(server) {
           if (existing && existing.ws && existing.ws !== ws) {
             try { existing.ws.close(4000, 'replaced'); } catch (_) {}
           }
-          const player = world.addPlayer({ id: playerId, character, ws });
+          // Build the player's combat stat block once (DB: stats + equipped items).
+          let combatant = null;
+          try { combatant = await combatService.buildPlayerCombatant(character); } catch (e) { /* combat-less fallback */ }
+          const player = world.addPlayer({ id: playerId, character, ws, combatant });
           if (!player) { try { ws.close(4007, 'world-full'); } catch (_) {} return; }
           joined = true;
           clearTimeout(joinTimeout);
@@ -120,6 +125,11 @@ async function attachRealtime(server) {
         if (now - lastInputAt < 25) return; // server-side flood guard (legit clients send @20Hz)
         lastInputAt = now;
         world.applyInput(playerId, msg);
+      } else if (msg.t === 'cast') {
+        const now = Date.now();
+        if (now - lastCastAt < 120) return; // anti-spam (server still gates real cooldowns)
+        lastCastAt = now;
+        world.handleCast(playerId, msg, now); // server validates range/cooldown/cost
       }
     });
 
@@ -128,6 +138,7 @@ async function attachRealtime(server) {
       if (joined && world && playerId) {
         const p = world.players.get(playerId);
         if (p && p.ws === ws) {
+          if (p.encounterId) { try { await manager.combat.finalize(world, p, 'fled'); } catch (_) {} } // end fight + save combat hp
           await manager.flushPlayer(p, world, true); // final save on disconnect (awaited)
           world.removePlayer(playerId);
         }

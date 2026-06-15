@@ -88,6 +88,35 @@ describe('NetClient', () => {
     client.close();
   });
 
+  it('combat: sends cast, tracks self hp + fx, and revives on respawn', () => {
+    const { client, ws, player } = makeClient();
+    ws._open();
+    ws._recv({ t: 'welcome', you: 'c1', spawn: { x: 0, z: 0, facing: 0 }, tickHz: 20 });
+
+    client.cast('basic_attack', 'e0');
+    expect(ws.sent.some((m) => m.t === 'cast' && m.ability === 'basic_attack' && m.targetId === 'e0')).toBe(true);
+
+    ws._recv({
+      t: 'snap', tick: 1, serverMs: 0, ack: 0, actMs: Date.now(),
+      self: { x: 0, z: 0, f: 0, hp: 42, maxHp: 100, dead: 0 }, players: [], enemies: [], n: 1,
+      fx: [{ type: 'hit', sourceId: 'c1', targetId: 'e0', dmg: 17, crit: true }],
+    });
+    expect(client.selfHp).toBe(42);
+    expect(client.selfMaxHp).toBe(100);
+    const fx = client.drainFx();
+    expect(fx).toHaveLength(1);
+    expect(fx[0]).toMatchObject({ targetId: 'e0', dmg: 17, crit: true });
+    expect(client.drainFx()).toBeNull(); // drained
+
+    // death then server respawn
+    ws._recv({ t: 'snap', tick: 2, serverMs: 0, ack: 0, actMs: Date.now(), self: { x: 0, z: 0, f: 0, hp: 0, maxHp: 100, dead: 1 }, players: [], enemies: [], n: 1 });
+    expect(client.selfDead).toBe(true);
+    ws._recv({ t: 'respawn', x: 7, z: -3, hp: 40 });
+    expect(client.selfDead).toBe(false);
+    expect(player).toMatchObject({ x: 7, z: -3 });
+    client.close();
+  });
+
   it('falls offline when the socket closes and stops sending', () => {
     const { client, ws, player } = makeClient();
     ws._open();
