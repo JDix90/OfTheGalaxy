@@ -1,17 +1,19 @@
 /**
  * PoiStructure — a manifest-driven 3D structure for one POI / location.
  *
- * Phase 1 renders clean composed-primitive "buildings" per category (spaceport, market,
- * settlement, civic, industrial, danger, monument). The shape + palette come from
- * `modelManifest.getPoiStructure(type)`, so dropping in a Synty building later is a
- * manifest change. Shows a floating label and, for enterable locations, a pulsing
- * ground ring when the player is in range (`active`).
+ * Phase 3 renders a real CC0 glTF building (Kenney Space Kit) per category, auto-fitted
+ * to the ground, plus a deterministic scatter of props around it. While the glTF streams
+ * in (or if a category has no building) it falls back to the Phase-1 composed-primitive
+ * "building". The building/props come from `modelManifest` (poi.building / poi.props), so
+ * dropping in a Synty kit later is a manifest change. Shows a floating label and, for
+ * enterable locations, a pulsing ground ring when the player is in range (`active`).
  */
 
-import React, { useRef } from 'react';
+import React, { Suspense, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
+import GltfModel from './GltfModel';
 import { useAtmosphere } from './atmosphere/AtmosphereContext';
 
 function Box({ w, h, d, y = 0, color, emissive, ei = 0, ...rest }) {
@@ -138,11 +140,32 @@ function StructureMesh({ s }) {
   }
 }
 
+// Deterministic scatter of CC0 props around the building (decoration; not interactive).
+function PropScatter({ props }) {
+  if (!props || props.length === 0) return null;
+  return (
+    <Suspense fallback={null}>
+      {props.map((p, i) => (
+        <group key={i} position={[Math.cos(p.angle) * p.radius, 0, Math.sin(p.angle) * p.radius]} rotation={[0, p.yaw || 0, 0]}>
+          <GltfModel url={p.url} fit={p.fit} />
+        </group>
+      ))}
+    </Suspense>
+  );
+}
+
 export default function PoiStructure({ poi, active, onActivate, lit }) {
   const ringRef = useRef();
   const lightRef = useRef();
   const atmo = useAtmosphere();
   const s = poi.structure;
+  const building = poi.building;
+
+  // Building height drives label/light placement. Until the glTF reports its fitted
+  // height, use a guess from its target footprint (hangars are wider than tall).
+  const [fitH, setFitH] = useState(null);
+  const h = building ? (fitH || building.fit * 0.5) : s.height;
+  const fp = building ? building.fit * 0.5 : s.footprint;
 
   useFrame(({ clock }) => {
     if (ringRef.current && poi.enterable) {
@@ -167,28 +190,45 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
         onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
         onPointerOut={() => { document.body.style.cursor = 'auto'; }}
       >
-        <StructureMesh s={s} />
+        {building
+          ? (
+            <Suspense fallback={<StructureMesh s={s} />}>
+              <GltfModel url={building.url} fit={building.fit} onFitted={setFitH} selfEmissive={0.14} />
+            </Suspense>
+          )
+          : <StructureMesh s={s} />}
       </group>
+
+      {/* Category-colored beacon on glTF buildings: POI identity at night + bloom glow,
+          mirroring the primitives' emissive accents (the kit buildings have none). */}
+      {building && (
+        <mesh position={[0, h + 0.55, 0]}>
+          <sphereGeometry args={[0.34, 16, 16]} />
+          <meshStandardMaterial color={s.accent} emissive={s.emissive} emissiveIntensity={s.glow * 1.5} toneMapped={false} />
+        </mesh>
+      )}
+
+      <PropScatter props={poi.props} />
 
       {lit && (
         <pointLight
           ref={lightRef}
-          position={[0, s.height * 0.7 + 1, 0]}
+          position={[0, h * 0.7 + 1, 0]}
           color={s.emissive}
           intensity={0}
-          distance={s.footprint * 5}
+          distance={fp * 6}
           decay={2}
         />
       )}
 
       {poi.enterable && (
         <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
-          <ringGeometry args={[s.footprint * 0.62, s.footprint * 0.74, 40]} />
+          <ringGeometry args={[fp * (building ? 0.95 : 0.62), fp * (building ? 1.12 : 0.74), 40]} />
           <meshBasicMaterial color={s.emissive} transparent opacity={0.35} side={THREE.DoubleSide} toneMapped={false} depthWrite={false} />
         </mesh>
       )}
 
-      <Html position={[0, s.height + 1.6, 0]} center distanceFactor={28} occlude={false} style={{ pointerEvents: 'none' }}>
+      <Html position={[0, h + 1.6, 0]} center distanceFactor={28} occlude={false} style={{ pointerEvents: 'none' }}>
         <div style={{
           textAlign: 'center', whiteSpace: 'nowrap', fontFamily: 'system-ui, sans-serif',
           transform: 'translateY(-50%)', opacity: active ? 1 : 0.82,

@@ -9,7 +9,7 @@
  */
 
 import { normalizeSurfaceCoord } from '../../../../shared/sim/surface.mjs';
-import { getPoiStructure, getPoiCategory } from '../../data/modelManifest';
+import { getPoiStructure, getPoiCategory, getPoiBuilding, getPoiProps } from '../../data/modelManifest';
 
 const ENTERABLE_TYPES = new Set([
   'spaceport', 'market', 'cantina', 'palace', 'temple', 'medical_center', 'hospital',
@@ -72,6 +72,8 @@ export function buildPois(planet, sim) {
       enterable: isEnterable(loc),
       category: getPoiCategory(loc.type),
       structure: getPoiStructure(loc.type),
+      building: getPoiBuilding(loc.type, id),
+      props: getPoiProps(loc.type, id),
       raw: loc,
     });
   }

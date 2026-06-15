@@ -1,56 +1,34 @@
 /**
- * NpcActor — one NPC, rendered at a level-of-detail decided by NpcLOD (in SurfaceScene).
+ * NpcActor — one ANIMATED NPC (LOD tier 'full' or 'lod').
  *
- *   tier 'full'   — animated glTF, mixer every frame (nearest NPCs)
- *   tier 'lod'    — animated glTF, mixer throttled (mid-range, still within the cap)
- *   tier 'proxy'  — cheap static capsule stand-in, NO mixer/skinning (far / over-cap)
- *   tier 'hidden' — culled (beyond fog); renders nothing
+ *   tier 'full' — animated glTF, mixer every frame (nearest NPCs)
+ *   tier 'lod'  — animated glTF, mixer throttled (mid-range, still within the cap)
  *
- * This bounds the number of expensive skinned-mesh + AnimationMixer instances on
- * crowded planets (Sinkport) while keeping every visible NPC's nameplate + click-to-
- * interact working. Model + tint come from the manifest, keyed by npcType.
+ * Distant / over-cap NPCs are NOT rendered here — they go through <NpcProxies> (a single
+ * instanced mesh). SurfaceScene splits NPCs by tier and only mounts NpcActor for the
+ * animated set, bounding the number of skinned-mesh + AnimationMixer instances.
+ *
+ * The model variant is picked deterministically from the role's roster by the NPC id, so
+ * a crowd has visual variety (astronauts / mechs / robots, alien creatures for hostiles).
  */
 
 import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
 import CharacterModel from './CharacterModel';
+import Nameplate from './Nameplate';
 import { getCharacterModel } from '../../data/modelManifest';
 
-// Cheap, animation-free stand-in for distant NPCs (a tinted capsule figure).
-function NpcProxy({ tint }) {
-  return (
-    <group>
-      <mesh position={[0, 0.62, 0]} castShadow>
-        <capsuleGeometry args={[0.32, 0.7, 4, 8]} />
-        <meshStandardMaterial color={tint} roughness={0.8} metalness={0.1} />
-      </mesh>
-      <mesh position={[0, 1.42, 0]} castShadow>
-        <sphereGeometry args={[0.27, 12, 10]} />
-        <meshStandardMaterial color={tint} roughness={0.7} metalness={0.1} />
-      </mesh>
-    </group>
-  );
-}
-
-export default function NpcActor({ npc3d, onActivate, tier = 'proxy' }) {
+export default function NpcActor({ npc3d, onActivate, tier = 'full', showLabel = true }) {
   const group = useRef();
   const motion = useRef({ speed: 0 });
-  const model = useMemo(() => getCharacterModel(`npc.${npc3d.npcType || 'generic'}`), [npc3d.npcType]);
-  const facing = useMemo(() => (npc3d.facing != null ? npc3d.facing : (npc3d.id ? npc3d.id.length : 0)), [npc3d]);
-
-  const animated = tier === 'full' || tier === 'lod';
+  const npcType = npc3d.npcType || 'generic';
+  const model = useMemo(() => getCharacterModel(`npc.${npcType}`, npc3d.id), [npcType, npc3d.id]);
+  const facing = useMemo(() => (npc3d.facing != null ? npc3d.facing : (npc3d.id ? String(npc3d.id).length : 0)), [npc3d]);
 
   useFrame(({ clock }) => {
-    // subtle idle bob, only for the nearby animated NPCs (proxies stay fully static)
-    if (animated && group.current) {
-      group.current.position.y = Math.sin(clock.elapsedTime * 1.5 + facing) * 0.04;
-    }
+    // subtle idle bob (proxies stay fully static)
+    if (group.current) group.current.position.y = Math.sin(clock.elapsedTime * 1.5 + facing) * 0.04;
   });
-
-  if (tier === 'hidden') return null;
-
-  const typeLabel = (npc3d.npcType || '').replace(/_/g, ' ');
 
   return (
     <group position={[npc3d.wx, 0, npc3d.wz]}>
@@ -61,16 +39,9 @@ export default function NpcActor({ npc3d, onActivate, tier = 'proxy' }) {
         onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
         onPointerOut={() => { document.body.style.cursor = 'auto'; }}
       >
-        {animated
-          ? <CharacterModel model={model} motion={motion} stride={tier === 'lod' ? 3 : 1} />
-          : <NpcProxy tint={model.tint} />}
+        <CharacterModel model={model} motion={motion} stride={tier === 'lod' ? 3 : 1} />
       </group>
-      <Html position={[0, 2.4, 0]} center distanceFactor={22} occlude={false} style={{ pointerEvents: 'none' }}>
-        <div style={{ textAlign: 'center', whiteSpace: 'nowrap', fontFamily: 'system-ui, sans-serif', transform: 'translateY(-50%)' }}>
-          <div style={{ color: '#cfe3ff', fontSize: 12, fontWeight: 600, textShadow: '0 1px 3px #000' }}>{npc3d.name}</div>
-          {typeLabel && <div style={{ color: '#8aa0c4', fontSize: 10, textShadow: '0 1px 3px #000' }}>{typeLabel}</div>}
-        </div>
-      </Html>
+      {showLabel && <Nameplate name={npc3d.name} npcType={npcType} level={npc3d.level} />}
     </group>
   );
 }
