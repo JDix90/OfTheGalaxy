@@ -98,8 +98,17 @@ export default function SubMapView3D() {
         // Dungeons (3D real-time, own NPC/enemy + net world) + building interiors (2D) load themselves.
         if (sm.type === 'dungeon' || DELEGATE_2D.has(sm.type)) { setLoading(false); return; }
 
-        // Ensure the onboarding contact (e.g. Dockmaster Jax) is on this submap.
-        try { if (currentCharacter) await tutorialApi.ensureNPCOnSubmap(currentCharacter.id, sm.id); } catch (e) { /* non-fatal */ }
+        // Ensure the onboarding contact (Dockmaster Jax) is on this submap — but ONLY in
+        // the spaceport and ONLY while the onboarding tutorial is still running. The backend
+        // `ensureTutorialNPCOnSubmap` RELOCATES the single tutorial NPC to whatever submap we
+        // pass, so calling it for every facility made Jax follow the player into the clinic,
+        // market, residences, etc. (the reported bug). Gate mirrors the 2D SubMapView
+        // (`isNewCharacter && isSpaceport`).
+        const tutorialActive = !!currentCharacter && currentCharacter.level === 1 && !currentCharacter.tutorialCompleted;
+        const ensureTutorialNpc = sm.type === 'spaceport' && tutorialActive;
+        if (ensureTutorialNpc) {
+          try { await tutorialApi.ensureNPCOnSubmap(currentCharacter.id, sm.id); } catch (e) { /* non-fatal */ }
+        }
 
         // NPCs (generate if none).
         let list = [];
@@ -108,11 +117,16 @@ export default function SubMapView3D() {
             : (sm.parentLocationId && /sythmar/i.test(sm.parentLocationId) ? 'sythmar' : null);
           const r = await npcApi.getBySubMap(sm.id, sm.parentLocationId, sm.planetId, area);
           if (r?.success && r.data) list = Array.isArray(r.data) ? r.data : [r.data];
-          if (list.length === 0) {
+          // Generate procedural NPCs when the submap has none — or only the tutorial contact,
+          // so the spaceport still gets its vendors/dock staff/security beside Dockmaster Jax.
+          const nonTutorial = list.filter((n) => !String(n.id || '').startsWith('npc_tutorial_'));
+          if (nonTutorial.length === 0) {
             const gen = await npcApi.generateForSubMap(sm.id);
             if (gen?.success && Array.isArray(gen.data)) list = gen.data;
-            // re-ensure the tutorial NPC after a fresh generate
-            try { if (currentCharacter) { await tutorialApi.ensureNPCOnSubmap(currentCharacter.id, sm.id); const r2 = await npcApi.getBySubMap(sm.id, sm.parentLocationId, sm.planetId, area); if (r2?.success && Array.isArray(r2.data)) list = r2.data; } } catch (e) {}
+            // Re-ensure the tutorial NPC after a fresh generate (still spaceport + tutorial only).
+            if (ensureTutorialNpc) {
+              try { await tutorialApi.ensureNPCOnSubmap(currentCharacter.id, sm.id); const r2 = await npcApi.getBySubMap(sm.id, sm.parentLocationId, sm.planetId, area); if (r2?.success && Array.isArray(r2.data)) list = r2.data; } catch (e) {}
+            }
           }
         } catch (e) { list = []; }
         if (!cancelled) setNpcs(Array.from(new Map(list.map((n) => [n.id, n])).values()));

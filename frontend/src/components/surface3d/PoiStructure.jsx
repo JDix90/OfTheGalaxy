@@ -122,6 +122,47 @@ function StructureMesh({ s }) {
           </mesh>
         </group>
       );
+    // Low room block — facility rooms (clinic wards, civic offices) + houses. Reads as a
+    // walled room, not a tall obelisk. Footprint matches the building's floor cells.
+    case 'room':
+      return (
+        <group>
+          <Box w={F} h={H} d={F} color={color} emissive={emissive} ei={glow * 0.12} />
+          <Box w={F * 1.05} h={0.18} d={F * 1.05} y={H} color={accent} emissive={emissive} ei={glow * 0.32} />
+          {/* lit window/door band on the entrance face */}
+          <mesh position={[0, H * 0.46, F / 2 + 0.02]}>
+            <planeGeometry args={[F * 0.52, H * 0.42]} />
+            <meshStandardMaterial color={accent} emissive={emissive} emissiveIntensity={glow * 1.1} toneMapped={false} />
+          </mesh>
+        </group>
+      );
+    // Market stall — counter + glowing wares under a canopy on posts.
+    case 'stall':
+      return (
+        <group>
+          <Box w={F} h={H * 0.5} d={F * 0.62} color={color} />
+          <Box w={F * 0.72} h={0.16} d={F * 0.42} y={H * 0.5} color={accent} emissive={emissive} ei={glow * 1.3} />
+          {[[-F * 0.45, -F * 0.28], [F * 0.45, -F * 0.28], [-F * 0.45, F * 0.28], [F * 0.45, F * 0.28]].map(([px, pz], i) => (
+            <mesh key={i} position={[px, H * 0.62, pz]} castShadow>
+              <cylinderGeometry args={[0.07, 0.07, H * 1.25, 6]} />
+              <meshStandardMaterial color={color} metalness={0.3} roughness={0.6} />
+            </mesh>
+          ))}
+          <Box w={F * 1.12} h={0.12} d={F * 0.78} y={H * 1.22} color={accent} emissive={emissive} ei={glow * 0.4} />
+        </group>
+      );
+    // Service desk / terminal — reception, crafting bench, info kiosk.
+    case 'desk':
+      return (
+        <group>
+          <Box w={F} h={H * 0.55} d={F * 0.5} color={color} />
+          <Box w={F * 0.9} h={0.12} d={F * 0.42} y={H * 0.55} color={accent} emissive={emissive} ei={glow * 0.5} />
+          <mesh position={[0, H * 0.82, 0]}>
+            <boxGeometry args={[F * 0.32, H * 0.36, 0.08]} />
+            <meshStandardMaterial color={accent} emissive={emissive} emissiveIntensity={glow * 1.2} toneMapped={false} />
+          </mesh>
+        </group>
+      );
     case 'monument':
     default:
       return (

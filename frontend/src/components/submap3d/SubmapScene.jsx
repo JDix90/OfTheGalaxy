@@ -20,6 +20,10 @@ import { AtmosphereContext } from '../surface3d/atmosphere/AtmosphereContext';
 import ExitMarker from './ExitMarker';
 import InteriorWalls from './InteriorWalls';
 import Furniture from './Furniture';
+import SubmapEnclosure from './SubmapEnclosure';
+
+// Facility submaps that should read as enclosed interiors (walls + ceiling), not open-air.
+const ENCLOSED_TYPES = new Set(['medical_center', 'hospital', 'civic', 'government', 'temple']);
 
 function HeadlessHook() {
   const get = useThree((s) => s.get);
@@ -39,6 +43,15 @@ export default function SubmapScene({
   const groundSize = worldHalf * 2;
   const atmoRef = useRef({ nightFactor: 0, dayFactor: 1, time: startTime });
 
+  // How the boundary reads: building interiors keep their own (5.2) room shell + daylight;
+  // clinics/civic become enclosed roofed rooms; everything else is an open-air district ringed
+  // by compound walls. Only the enclosed/open facility submaps get the SubmapEnclosure shell.
+  const enclosureMode = ENCLOSED_TYPES.has(subMap?.type) ? 'enclosed' : 'open';
+  const isEnclosed = !interior && enclosureMode === 'enclosed';
+  // Enclosed rooms render at "night" so the global sun never floods through the ceiling; the
+  // room is lit by its ceiling strips, fill, and POI lights (which rise at night).
+  const atmoTime = isEnclosed ? 0.02 : startTime;
+
   // Exits double as enterable POIs so PlayerActor's proximity prompt reuse works.
   const proximityPois = useMemo(() => ([
     ...pois,
@@ -47,8 +60,13 @@ export default function SubmapScene({
 
   return (
     <AtmosphereContext.Provider value={atmoRef}>
-      <Atmosphere worldHalf={worldHalf} time={startTime} startTime={startTime} paused atmoRef={atmoRef} />
+      <Atmosphere
+        worldHalf={worldHalf} time={atmoTime} startTime={atmoTime} paused atmoRef={atmoRef}
+        fogNear={isEnclosed ? 0.55 : 0.85} fogFar={isEnclosed ? 1.7 : 2.0}
+        fogColor={isEnclosed ? '#0e1422' : null}
+      />
       <Ground planet={planetLike} size={groundSize} />
+      {!interior && <SubmapEnclosure sim={sim} mode={enclosureMode} />}
 
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}
       {interior && <Furniture items={furniture} />}

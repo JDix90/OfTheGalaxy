@@ -53,6 +53,38 @@ export function submapSpawn(subMap, character, sim) {
   return spawn;
 }
 
+// Type-appropriate, low-profile structures for submap buildings/rooms. Submap "buildings"
+// are small floor-plan cells (clinic wards, market stalls, houses, reception desks), so the
+// surface's tall monument/habitat primitives read as out-of-place obelisks. These map a
+// submap building type → a low room/stall/desk shape sized to its floor footprint.
+const SUBMAP_PALETTE = {
+  medical: { color: '#dfe8f2', accent: '#a9ead2', emissive: '#46d6a0' },
+  vendor: { color: '#b88a42', accent: '#ffd98a', emissive: '#ff9a3c' },
+  civic: { color: '#c6d0e6', accent: '#ffe9a8', emissive: '#ffcf5c' },
+  home: { color: '#7e6450', accent: '#e0b890', emissive: '#ffb060' },
+  tech: { color: '#33506e', accent: '#bfe3ff', emissive: '#3aa0ff' },
+};
+
+function submapStructure(b, w, sim) {
+  const t = String(b.type || '').toLowerCase();
+  const cellW = (100 / Math.max(1, w)) * (sim.scale || 0.85);
+  const cells = Math.max((b.size && b.size.width) || 1, (b.size && b.size.height) || 1);
+  // Footprint is capped: PoiStructure scales its accent point-light by footprint, and a roomful
+  // of large footprints floods the enclosed floor with the accent color. Keep it modest so each
+  // room casts a soft colored glow, not a wash. Low glow for the same reason.
+  const fp = Math.max(2.2, Math.min(cells * cellW * 0.8, 6));
+  const mk = (shape, palKey, h) => ({ shape, ...SUBMAP_PALETTE[palKey], height: h, footprint: fp, glow: 0.28 });
+  if (/vendor|stall|stand|market/.test(t)) return mk('stall', 'vendor', Math.min(2.6, cellW));
+  if (/crafting|reception|desk|terminal|counter|kiosk|info/.test(t)) return mk('desk', 'tech', Math.min(1.9, cellW * 0.9));
+  if (/treatment|surgery|patient|ward|exam|medical|clinic/.test(t)) return mk('room', 'medical', Math.min(3.4, Math.max(2.4, cellW * 0.7)));
+  if (/residential|residence|home|quarters|apartment/.test(t)) return mk('room', 'home', Math.min(3.8, Math.max(2.8, cellW * 0.8)));
+  if (/commercial|shop|store|cantina|bar/.test(t)) return mk('room', 'vendor', Math.min(3.6, Math.max(2.6, cellW * 0.75)));
+  if (/office|court|chamber|hall|civic|gov|temple|palace/.test(t)) return mk('room', 'civic', Math.min(3.6, Math.max(2.6, cellW * 0.75)));
+  // Fallback: surface category, capped so it doesn't tower over a compact submap.
+  const s = getPoiStructure(b.type);
+  return { ...s, height: Math.min(s.height, 3.6), footprint: Math.min(s.footprint, Math.max(fp, 3.0)) };
+}
+
 /** Buildings (+ POIs) as world-positioned, enterable POI structures. */
 export function buildSubmapPois(subMap, sim) {
   if (!sim) return [];
@@ -73,7 +105,7 @@ export function buildSubmapPois(subMap, sim) {
       id, name: b.name || b.type, type: b.type, kind: 'building',
       sx: p.x, sy: p.y, wx: wpos.x, wz: wpos.z,
       enterable: !!b.opensTo || b.type === 'crafting_bench' || b.type === 'vendor_stall' || b.type === 'commercial',
-      structure: getPoiStructure(b.type),
+      structure: submapStructure(b, w, sim),
       raw: b,
     });
   }

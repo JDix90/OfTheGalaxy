@@ -46,7 +46,7 @@ const SKY_FRAG = `
   }
 `;
 
-export default function Atmosphere({ worldHalf, time, cycleSeconds = 240, startTime = 0.6, paused = false, atmoRef, onTime }) {
+export default function Atmosphere({ worldHalf, time, cycleSeconds = 240, startTime = 0.6, paused = false, atmoRef, onTime, fogNear = 0.8, fogFar = 2.6, fogColor = null }) {
   const { scene } = useThree();
   const sun = useRef();
   const hemi = useRef();
@@ -69,12 +69,14 @@ export default function Atmosphere({ worldHalf, time, cycleSeconds = 240, startT
     sunGlow: { value: 1.0 },
   }), []);
 
-  // Cool fog so distance reads at night too; color is updated each frame.
+  // Cool fog so distance reads at night too; color is updated each frame. fogNear/fogFar are
+  // in units of worldHalf — submaps pass tighter values so the ground-slab edge + grey void
+  // beyond the play area fade into the sky instead of floating in the dark.
   useEffect(() => {
     const prevFog = scene.fog;
-    scene.fog = new THREE.Fog('#0c1426', worldHalf * 0.8, worldHalf * 2.6);
+    scene.fog = new THREE.Fog(fogColor || '#0c1426', worldHalf * fogNear, worldHalf * fogFar);
     return () => { scene.fog = prevFog; };
-  }, [scene, worldHalf]);
+  }, [scene, worldHalf, fogNear, fogFar, fogColor]);
 
   useFrame((_, dt) => {
     let t = time;
@@ -120,7 +122,9 @@ export default function Atmosphere({ worldHalf, time, cycleSeconds = 240, startT
       moon.current.material.color.setRGB(0.7 * m, 0.78 * m, 0.95 * m);
     }
 
-    if (scene.fog) scene.fog.color.setRGB(s.skyHorizon[0], s.skyHorizon[1], s.skyHorizon[2]);
+    // Outdoor fog tracks the sky horizon; an explicit fogColor (enclosed interiors) stays put
+    // so distance reads as indoor depth instead of washing out to bright daytime sky.
+    if (scene.fog && !fogColor) scene.fog.color.setRGB(s.skyHorizon[0], s.skyHorizon[1], s.skyHorizon[2]);
     if (!scene.background) scene.background = new THREE.Color();
     scene.background.setRGB(s.skyHorizon[0], s.skyHorizon[1], s.skyHorizon[2]);
 
