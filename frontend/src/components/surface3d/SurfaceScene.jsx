@@ -20,6 +20,7 @@ import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
 import PlayerActor from './PlayerActor';
 import RemotePlayers from './RemotePlayers';
+import RemoteEnemies from './RemoteEnemies';
 import QuestWaypoint from './QuestWaypoint';
 import Weather, { getWeatherPreset } from './Weather';
 import Atmosphere from './atmosphere/Atmosphere';
@@ -184,6 +185,9 @@ export default function SurfaceScene({
 
       {/* Other players sharing the planet (Phase 4.1 — online only). */}
       <RemotePlayers world={world} />
+
+      {/* Server-driven hostile actors (Phase 4.2 — online only). */}
+      <RemoteEnemies world={world} />
 
       {weatherPreset && weatherPreset !== 'none' && (
         <Weather preset={weatherPreset} world={world} worldHalf={worldHalf} />

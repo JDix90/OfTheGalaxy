@@ -38,9 +38,9 @@ class WorldManager {
     if (this.worlds.size >= MAX_WORLDS) throw new Error('world-cap-reached');
     const p = (async () => {
       try {
-        const { mapData } = await loadPlanetMapData(planetId);
+        const { planet, mapData } = await loadPlanetMapData(planetId);
         const sim = this.createSurfaceSim(mapData || {}, { scale: this.DEFAULTS.scale });
-        const world = new PlanetWorld(planetId, sim, mapData);
+        const world = new PlanetWorld(planetId, sim, mapData, { dangerLevel: (planet && planet.dangerLevel) || 1 });
         this.worlds.set(planetId, world);
         return world;
       } finally {
@@ -84,6 +84,7 @@ class WorldManager {
     for (const w of this.worlds.values()) {
       if (w.isEmpty()) continue;
       const players = w.playersWire();
+      const enemies = w.enemiesWire();
       for (const p of w.players.values()) {
         const ws = p.ws;
         if (!ws || ws.readyState !== ws.OPEN) continue;
@@ -95,6 +96,7 @@ class WorldManager {
           actMs: p.lastClientTime,
           self: { x: r2(p.x), z: r2(p.z), f: r2(p.facing) },
           players,
+          enemies,
           n: w.players.size,
         }));
       }

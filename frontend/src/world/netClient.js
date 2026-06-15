@@ -42,6 +42,7 @@ export class NetClient {
     this.you = null;
     this.serverSelf = null;
     this.remotes = new Map();    // id -> { x,z,f,m,name,c, px,pz,pf, at }  (other players)
+    this.enemies = new Map();    // id -> { x,z,f,hp,maxHp,name,level,st, px,pz,pf, at }
     this.pending = [];           // unacked inputs [{ seq, input, dt }]
     this.seq = 0;
     this.rttEMA = 0;
@@ -156,6 +157,21 @@ export class NetClient {
       }
     }
     for (const id of [...this.remotes.keys()]) if (!seen.has(id)) this.remotes.delete(id);
+
+    // --- enemies (server-driven actors; same interpolation anchoring) ---
+    const eseen = new Set();
+    for (const e of (m.enemies || [])) {
+      eseen.add(e.id);
+      const prev = this.enemies.get(e.id);
+      if (prev) {
+        prev.px = prev.x; prev.pz = prev.z; prev.pf = prev.f;
+        prev.x = e.x; prev.z = e.z; prev.f = e.f; prev.hp = e.hp; prev.maxHp = e.maxHp;
+        prev.name = e.name; prev.level = e.level; prev.st = e.st; prev.at = now;
+      } else {
+        this.enemies.set(e.id, { ...e, px: e.x, pz: e.z, pf: e.f, at: now });
+      }
+    }
+    for (const id of [...this.enemies.keys()]) if (!eseen.has(id)) this.enemies.delete(id);
   }
 
   /** Called every frame from world.step (predict happens in the caller). Throttles the send. */
@@ -186,6 +202,7 @@ export class NetClient {
   _goOffline() {
     this.serverSelf = null;
     this.remotes.clear();
+    this.enemies.clear();
     this.pending.length = 0;
     this._setMode('offline');
   }
