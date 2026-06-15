@@ -27,7 +27,7 @@ const QuestLog = lazy(() => import('./features/quests/QuestLog'));
 const GalaxyMap = lazy(() => import('./pages/GalaxyMap'));
 const PlanetSurface = lazy(() => import('./pages/PlanetSurface'));
 const PlanetSurface3D = lazy(() => import('./pages/PlanetSurface3D'));
-const SubMapView = lazy(() => import('./pages/SubMapView'));
+const SubMapView3D = lazy(() => import('./pages/SubMapView3D')); // 3D interiors (delegates dungeons/building-interiors to the 2D SubMapView)
 const NPCBrowser = lazy(() => import('./pages/NPCBrowser'));
 const InventoryView = lazy(() => import('./features/inventory/InventoryView'));
 const FactionView = lazy(() => import('./features/factions/FactionView'));
@@ -134,17 +134,17 @@ function App() {
           path="/game/location/:planetId/:parentLocationId/:parentLocationType/:type"
           element={
             <ProtectedRoute>
-              {currentCharacter ? <SubMapView /> : <Navigate to="/character/select" />}
+              {currentCharacter ? <SubMapView3D /> : <Navigate to="/character/select" />}
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/game/submap/:subMapId" 
+        <Route
+          path="/game/submap/:subMapId"
           element={
             <ProtectedRoute>
-              {currentCharacter ? <SubMapView /> : <Navigate to="/character/select" />}
+              {currentCharacter ? <SubMapView3D /> : <Navigate to="/character/select" />}
             </ProtectedRoute>
-          } 
+          }
         />
         <Route 
           path="/game/npcs" 

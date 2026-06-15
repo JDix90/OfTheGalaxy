@@ -19,15 +19,15 @@ import './TutorialOverlay.css';
 // Tutorial step configurations
 const TUTORIAL_STEPS = {
   [TUTORIAL_STATES.STARTING]: {
-    title: 'Planetfall on Solenne',
-    description: "You've made planetfall at the Solenne docks, edge of the Severed Reach. Dockmaster Jax runs these landing bays — find him and he'll show you how to stay breathing out here.",
+    title: 'Planetfall',
+    description: "You've made planetfall at the docks, edge of the Severed Reach. Dockmaster Jax runs these landing bays — find him and he'll show you how to stay breathing out here.",
     target: null, // Center tooltip
     position: 'center',
     showHighlight: false
   },
   [TUTORIAL_STATES.ORIENT_UI]: {
-    title: 'Planetfall on Solenne',
-    description: "Welcome to the Solenne docks. Get your bearings, then look for Dockmaster Jax. Move with the arrow keys or WASD.",
+    title: 'Planetfall',
+    description: "Welcome to the docks. Get your bearings, then look for Dockmaster Jax. Move with the arrow keys or WASD.",
     target: null, // Center tooltip
     position: 'center',
     showHighlight: false

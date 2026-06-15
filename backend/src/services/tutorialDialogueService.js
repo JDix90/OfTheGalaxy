@@ -34,7 +34,7 @@ class TutorialDialogueService {
    */
   getInitialGreeting(background, characterName) {
     const name = characterName || 'stranger';
-    return `Welcome to Solenne, ${name}. Dockmaster Jax — I run these landing bays, which mostly means I keep the wrong people from running them. You picked a restless season to make planetfall. The Concord swears the lanes are safe; the freighter crews who actually fly them say otherwise. Either way, a newcomer with no creds and no contacts doesn't last a week out here. Lucky for you, I've got a soft spot for strays. Stay close and I'll teach you how to keep breathing.`;
+    return `Welcome to the docks, ${name}. Dockmaster Jax — I run these landing bays, which mostly means I keep the wrong people from running them. You picked a restless season to make planetfall. The Concord swears the lanes are safe; the freighter crews who actually fly them say otherwise. Either way, a newcomer with no creds and no contacts doesn't last a week out here. Lucky for you, I've got a soft spot for strays. Stay close and I'll teach you how to keep breathing.`;
   }
 
   /**
@@ -464,13 +464,13 @@ class TutorialDialogueService {
    */
   getJaxDialogueTree() {
     return {
-      greeting: "Welcome to Solenne. Dockmaster Jax — I run these landing bays. New face, empty pockets, that look in your eye like the galaxy already owes you something. I know the type. Stick with me and I'll make sure your first week isn't your last.",
+      greeting: "Welcome to the docks. Dockmaster Jax — I run these landing bays. New face, empty pockets, that look in your eye like the galaxy already owes you something. I know the type. Stick with me and I'll make sure your first week isn't your last.",
       initialResponses: [
         { text: "Is there any work going?", action: 'quest_offer' },
         { text: "What is this place?", action: 'location_info' },
         { text: "Where do I even start?", action: 'guidance' }
       ],
-      locationInfo: "Solenne? Edge of the Reach, last honest fuel stop before the lanes get mean. The Concord flies its banners over the upper docks and pretends that means order. Down here it's freighter crews, Drift Cartel runners, and whoever else needs to disappear for a while. It's not pretty, but it's mine, and it'll teach you everything the core worlds won't.",
+      locationInfo: "These docks? Edge of the Reach, last honest fuel stop before the lanes get mean. The Concord flies its banners over the upper docks and pretends that means order. Down here it's freighter crews, Drift Cartel runners, and whoever else needs to disappear for a while. It's not pretty, but it's mine, and it'll teach you everything the core worlds won't.",
       guidance: "First thing you do anywhere new — learn to walk before you run. Move with the arrow keys or W-A-S-D. Get a feel for the deck. Then come find me and we'll talk about earning your keep.",
       questOffer: "As it happens, yes. Call it 'Dockside Initiation' — nothing glamorous, but it'll teach you the four things that keep a drifter alive out here: how to move, how to fight, how to patch yourself up, and how to drive a bargain. Do it right and I'll see you squared away with creds and a direction. You in?",
       questDetails: "Simple enough. You'll learn to find your footing on the docks, hold your own against a training drone, heal up afterward, and trade for supplies. Master those and the rest of the Reach is just variations on a theme. Ready when you are.",
