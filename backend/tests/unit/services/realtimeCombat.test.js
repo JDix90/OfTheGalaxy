@@ -151,8 +151,10 @@ describe('Realtime combat lifecycle (Phase 0–1)', () => {
     expect(Array.isArray(reward.leveledUp)).toBe(true);
   });
 
-  test('a surface death pushes a respawn toast with location + medical fee', async () => {
-    const world = mkWorld();
+  test('a death pushes a respawn toast with location + medical fee', async () => {
+    // Use the dungeon path: respawn resolves to the dungeon ENTRANCE (deterministic, no planet
+    // mapData lookup), so the assertion doesn't depend on seed data being present in the test DB.
+    const world = mkWorld(DUNGEON_ZONE);
     const p = await mkPlayer(character);
     p.engagedEnemies.set('e0', liveEnemy());
     await mgr.ensureEncounter(world, p);
@@ -161,7 +163,7 @@ describe('Realtime combat lifecycle (Phase 0–1)', () => {
 
     const respawn = p._sent.find((m) => m.t === 'respawn');
     expect(respawn).toBeTruthy();
-    expect(respawn.area).toBeTruthy();          // safe-location name
-    expect(respawn.fee).toBe(100 + 3 * 50);     // medical fee = base + level*50 (level 3)
+    expect(respawn.area).toBe('Dungeon Entrance'); // safe-location name from the dungeon branch
+    expect(respawn.fee).toBe(100 + 3 * 50);        // medical fee = base + level*50 (level 3)
   });
 });
