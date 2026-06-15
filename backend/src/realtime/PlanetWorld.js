@@ -32,7 +32,11 @@ class PlanetWorld {
    * @param {object} mapData the planet mapData (for spawn)
    */
   constructor(planetId, sim, mapData, options = {}) {
-    this.planetId = planetId;
+    // `planetId` is the world KEY (a subMapId for dungeons). zone.planetId is the real planet.
+    this.zone = options.zone || { type: 'surface' };
+    this.zoneId = planetId;
+    this.planetId = this.zone.planetId || planetId; // real planet (combat + persistence)
+    this.subMapId = this.zone.subMapId || null;
     this.sim = sim;
     this.mapData = mapData || {};
     this.players = new Map();  // playerId -> player
@@ -59,14 +63,25 @@ class PlanetWorld {
     resolveDodge(this, this.players.get(playerId), now);
   }
 
-  /** Find a random walkable world position (away from spawn) for enemy placement. */
+  /** Deterministic scan for any walkable 0–100 point (fallback for sparse dungeon grids). */
+  _scanWalkable() {
+    for (let sy = 3; sy < 100; sy += 3) {
+      for (let sx = 3; sx < 100; sx += 3) {
+        if (this.sim.isWalkableSurface(sx, sy)) return { x: sx, y: sy };
+      }
+    }
+    return { x: 50, y: 50 };
+  }
+
+  /** Find a random walkable world position for enemy placement (scans if random fails). */
   _randomWalkable() {
     for (let i = 0; i < 24; i++) {
       const sx = 12 + Math.random() * 76;
       const sy = 12 + Math.random() * 76;
       if (this.sim.isWalkableSurface(sx, sy)) return this.sim.surfaceToWorld(sx, sy);
     }
-    return this.sim.surfaceToWorld(50, 50);
+    const p = this._scanWalkable();
+    return this.sim.surfaceToWorld(p.x, p.y);
   }
 
   /** Populate the world with patrolling enemies scaled to the planet's danger level. */
@@ -99,6 +114,24 @@ class PlanetWorld {
 
   /** Resolve a character's spawn (world units) — mirrors the client's useSurfaceWorld. */
   spawnFor(character) {
+    // Dungeon: spawn just inside the entrance (or resume saved position on this submap).
+    if (this.zone.type === 'dungeon') {
+      const dims = this.zone.dims || { w: 12, h: 12 };
+      const gridToPct = (v, dim) => (v > dim ? (v > 100 ? v / 10 : v) : ((v + 0.5) / dim) * 100);
+      let sx = 50, sy = 50;
+      const e = this.zone.entrance;
+      if (e && Number.isFinite(e.x)) {
+        sx = gridToPct(e.x, dims.w); sy = gridToPct(e.y, dims.h);
+        sx += sx < 50 ? 4 : -4; sy += sy < 50 ? 4 : -4; // nudge off the entrance wall
+      }
+      const loc = character && character.currentLocation;
+      if (loc && loc.subMapId === this.subMapId && Number.isFinite(loc.x) && (loc.x || loc.y)) {
+        sx = loc.x > 100 ? loc.x / 10 : loc.x; sy = loc.y > 100 ? loc.y / 10 : loc.y;
+      }
+      if (!this.sim.isWalkableSurface(sx, sy)) { const p = this._scanWalkable(); sx = p.x; sy = p.y; }
+      const w = this.sim.surfaceToWorld(sx, sy);
+      return { x: w.x, z: w.z, facing: Math.PI };
+    }
     const sp = this.mapData.spaceport;
     const loc = character && character.currentLocation;
     const onThisPlanet = character && character.currentPlanet === this.planetId;

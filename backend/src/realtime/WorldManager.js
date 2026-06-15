@@ -9,7 +9,7 @@
 
 const { Op } = require('sequelize');
 const { PlanetWorld } = require('./PlanetWorld');
-const { loadPlanetMapData } = require('./planetData');
+const { loadPlanetMapData, loadSubmap } = require('./planetData');
 const { CombatManager } = require('./combat');
 const { CombatEncounter } = require('../models');
 const characterService = require('../services/characterService');
@@ -20,9 +20,13 @@ const SAVE_MIN_MOVE = 0.6; // surface units; skip saves for tiny jitter
 const MAX_WORLDS = 200;     // backstop against unbounded world growth (DoS)
 
 class WorldManager {
-  /** @param {{ createSurfaceSim: Function, DEFAULTS: object }} simModule  the ESM sim, imported once */
-  constructor(simModule) {
+  /**
+   * @param {{ createSurfaceSim: Function, DEFAULTS: object }} simModule  the ESM surface sim
+   * @param {{ submapToMapData: Function }} [submapModule]  the ESM submap→sim adapter (dungeons)
+   */
+  constructor(simModule, submapModule) {
     this.createSurfaceSim = simModule.createSurfaceSim;
+    this.submapToMapData = submapModule && submapModule.submapToMapData;
     this.DEFAULTS = simModule.DEFAULTS;
     this.TICK_HZ = simModule.DEFAULTS.tickHz || 20;
     this.DT = 1 / this.TICK_HZ;
@@ -35,25 +39,54 @@ class WorldManager {
     this._saveLoop = null;
   }
 
-  /** Lazily create (or fetch) a planet's authoritative world. */
-  async getOrCreateWorld(planetId) {
-    if (this.worlds.has(planetId)) return this.worlds.get(planetId);
-    if (this._loading.has(planetId)) return this._loading.get(planetId);
+  /** Lazily create (or fetch) an authoritative world by key, building it with `build`. */
+  async _getOrCreate(key, build) {
+    if (this.worlds.has(key)) return this.worlds.get(key);
+    if (this._loading.has(key)) return this._loading.get(key);
     if (this.worlds.size >= MAX_WORLDS) throw new Error('world-cap-reached');
     const p = (async () => {
       try {
-        const { planet, mapData } = await loadPlanetMapData(planetId);
-        const sim = this.createSurfaceSim(mapData || {}, { scale: this.DEFAULTS.scale });
-        const world = new PlanetWorld(planetId, sim, mapData, { dangerLevel: (planet && planet.dangerLevel) || 1 });
-        this.worlds.set(planetId, world);
+        const world = await build();
+        this.worlds.set(key, world);
         return world;
       } finally {
         // Always clear the in-flight entry — a failed load must NOT poison future joins.
-        this._loading.delete(planetId);
+        this._loading.delete(key);
       }
     })();
-    this._loading.set(planetId, p);
+    this._loading.set(key, p);
     return p;
+  }
+
+  /** Lazily create (or fetch) a planet's surface world. */
+  async getOrCreateWorld(planetId) {
+    return this._getOrCreate(planetId, async () => {
+      const { planet, mapData } = await loadPlanetMapData(planetId);
+      const sim = this.createSurfaceSim(mapData || {}, { scale: this.DEFAULTS.scale });
+      return new PlanetWorld(planetId, sim, mapData, { dangerLevel: (planet && planet.dangerLevel) || 1 });
+    });
+  }
+
+  /** Lazily create (or fetch) a dungeon submap's authoritative world (real-time combat). */
+  async getOrCreateDungeon(subMapId, opts = {}) {
+    return this._getOrCreate(subMapId, async () => {
+      const subMap = await loadSubmap(subMapId);
+      // Guard: a dungeon world must belong to the joining character's planet.
+      if (opts.planetId && subMap.planetId && String(subMap.planetId) !== String(opts.planetId)) {
+        throw new Error('dungeon-planet-mismatch');
+      }
+      if (!this.submapToMapData) throw new Error('submap-sim-unavailable');
+      const { mapData, scale } = this.submapToMapData(subMap);
+      const sim = this.createSurfaceSim(mapData || {}, { scale });
+      const d = subMap.layoutData || subMap.layout || {};
+      const entrance = (d.entryPoints && d.entryPoints[0] && d.entryPoints[0].position) || d.entrance || null;
+      const dims = { w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 };
+      const dangerLevel = opts.dangerLevel || (subMap.metadata && subMap.metadata.dangerLevel) || 6;
+      return new PlanetWorld(subMapId, sim, mapData, {
+        dangerLevel,
+        zone: { type: 'dungeon', subMapId, planetId: subMap.planetId || opts.planetId, parentLocationId: subMap.parentLocationId, entrance, dims },
+      });
+    });
   }
 
   start() {
@@ -140,11 +173,10 @@ class WorldManager {
       );
       if (!force && moved < SAVE_MIN_MOVE) return;
       player._lastSavedSurf = { x: s.x, y: s.y };
-      await characterService.updateLocation(player.characterId, world.planetId, {
-        x: Math.max(0, Math.min(100, s.x)),
-        y: Math.max(0, Math.min(100, s.y)),
-        area: 'surface',
-      });
+      const zone = world.zone || { type: 'surface' };
+      const loc = { x: Math.max(0, Math.min(100, s.x)), y: Math.max(0, Math.min(100, s.y)), area: zone.type === 'dungeon' ? 'submap' : 'surface' };
+      if (zone.type === 'dungeon') { loc.subMapId = zone.subMapId; loc.parentLocationId = zone.parentLocationId; }
+      await characterService.updateLocation(player.characterId, world.planetId, loc);
     } catch (e) {
       // Non-fatal: retry next interval / on disconnect.
     }

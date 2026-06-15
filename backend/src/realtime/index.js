@@ -38,14 +38,16 @@ function buildHotbar(character) {
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const SIM_URL = pathToFileURL(path.join(__dirname, '../../../shared/sim/surface.mjs')).href;
+const SUBMAP_URL = pathToFileURL(path.join(__dirname, '../../../shared/sim/submap.mjs')).href;
 
 /**
  * @param {import('http').Server} server
  * @returns {Promise<{ wss: WebSocketServer, manager: WorldManager }>}
  */
 async function attachRealtime(server) {
-  const simModule = await import(SIM_URL); // ESM sim across the CJS→ESM boundary
-  const manager = new WorldManager(simModule);
+  const simModule = await import(SIM_URL);       // ESM surface sim across the CJS→ESM boundary
+  const submapModule = await import(SUBMAP_URL); // ESM submap→sim adapter (dungeons)
+  const manager = new WorldManager(simModule, submapModule);
   manager.start();
 
   // maxPayload caps inbound frames (legit messages are < 1KB) to prevent memory-exhaustion
@@ -108,7 +110,10 @@ async function attachRealtime(server) {
             try { ws.close(4006, 'planet-mismatch'); } catch (_) {}
             return;
           }
-          world = await manager.getOrCreateWorld(planetId); // throws on bad planet / world cap
+          // Dungeon submap → its own authoritative world (real-time combat); else the surface.
+          world = msg.subMapId
+            ? await manager.getOrCreateDungeon(String(msg.subMapId), { planetId }) // validates submap↔planet
+            : await manager.getOrCreateWorld(planetId); // throws on bad planet / world cap
           playerId = String(character.id);
           // Replace any stale session for this character (e.g. a second tab / reconnect).
           const existing = world.players.get(playerId);

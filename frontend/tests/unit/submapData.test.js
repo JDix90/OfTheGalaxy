@@ -20,11 +20,28 @@ function spaceport(extra = {}) {
 }
 
 describe('submapData — sim from collisionMap', () => {
-  it('open spaceport: 80u interior, center walkable, oob blocked', () => {
+  it('collisionMap spaceport: ~85u interior, center walkable, oob blocked', () => {
     const sim = createSubmapSim(spaceport());
-    expect(sim.worldHalf).toBeCloseTo(40, 5); // 50 * SUBMAP_SCALE(0.8)
+    expect(sim.worldHalf).toBeCloseTo(42.5, 5); // 50 * collision scale (0.85)
     expect(sim.isWalkableSurface(50, 50)).toBe(true);
     expect(sim.isWalkableSurface(-1, 50)).toBe(false);
+  });
+
+  it('dungeon grid: walls block, rooms/corridors pass (square-padded)', () => {
+    const dungeon = {
+      id: 'd1', type: 'dungeon',
+      layoutData: { size: { width: 4, height: 4 }, grid: [
+        [0, 0, 0, 0],
+        [0, 2, 1, 0],
+        [0, 1, 3, 0],
+        [0, 0, 0, 0],
+      ] },
+    };
+    const sim = createSubmapSim(dungeon);
+    expect(sim.worldHalf).toBeCloseTo(60, 5); // 50 * dungeon scale (1.2)
+    // grid cell (1,1)=room → walkable; (0,0)=wall → blocked. tileSize=100/4=25.
+    expect(sim.isWalkableSurface(25 * 1.5, 25 * 1.5)).toBe(true); // center of cell (1,1)
+    expect(sim.isWalkableSurface(25 * 0.5, 25 * 0.5)).toBe(false); // center of cell (0,0) wall
   });
 
   it('wall cells block, floor cells pass', () => {

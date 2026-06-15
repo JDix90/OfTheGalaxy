@@ -11,35 +11,18 @@
  */
 
 import { createSurfaceSim, normalizeSurfaceCoord } from '../../../../shared/sim/surface.mjs';
+import { createSubmapSimWith, submapToPct, submapLayout } from '../../../../shared/sim/submap.mjs';
 import { getPoiStructure } from '../../data/modelManifest';
 
-export const SUBMAP_SCALE = 0.8; // world units per percent → 0–100 maps to an 80u interior
-
-const layoutOf = (subMap) => (subMap && (subMap.layoutData || subMap.layout)) || {};
+const layoutOf = (subMap) => submapLayout(subMap);
 const dimsOf = (d) => ({ w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 });
 
 /** A grid-or-percent coord pair → 0–100 percent (grid cells use cell-center). */
-export function toPct(x, y, w, h) {
-  const px = x > w ? (x > 100 ? x / 10 : x) : ((x + 0.5) / w) * 100;
-  const py = y > h ? (y > 100 ? y / 10 : y) : ((y + 0.5) / h) * 100;
-  return { x: px, y: py };
-}
+export const toPct = submapToPct;
 
-/** Build a surface sim from a submap: collisionMap → tileMap walkability, else open. */
+/** Build a surface sim from a submap — shared with the authoritative server (identical collision). */
 export function createSubmapSim(subMap) {
-  const d = layoutOf(subMap);
-  const cm = d.collisionMap;
-  let mapData = {};
-  if (cm && Array.isArray(cm.cells) && cm.cells.length) {
-    const res = cm.resolution || cm.cells.length;
-    // collision cells: 0=walkable, 1=wall, 2=door (walkable), 3=locked door, 4=restricted.
-    const tiles = cm.cells.map((row) => row.map((c) => ({
-      walkable: c === 0 || c === 2,
-      type: c === 1 ? 'building' : 'floor', // 'building' is an OBSTACLE_TILE_TYPE
-    })));
-    mapData = { tileMap: { gridSize: res, tileSize: 100 / res, tiles } };
-  }
-  return createSurfaceSim(mapData, { scale: SUBMAP_SCALE });
+  return createSubmapSimWith(subMap, createSurfaceSim);
 }
 
 /** Resolve the player's spawn (0–100 surface coords) for this submap. */
