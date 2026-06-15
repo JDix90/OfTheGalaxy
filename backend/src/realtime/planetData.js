@@ -37,4 +37,18 @@ async function loadPlanetMapData(planetId) {
   return { planet: planet.toJSON ? planet.toJSON() : planet, mapData };
 }
 
-module.exports = { loadPlanetMapData };
+/**
+ * Load a submap (dungeon) for the authoritative sim. Returns the plain submap; the caller
+ * builds the sim from its grid via the shared submapToMapData helper (identical to the
+ * client, so prediction tracks authority).
+ * @param {string} subMapId
+ * @returns {Promise<object>} plain submap ({ id, type, planetId, parentLocationId, layoutData, metadata })
+ */
+async function loadSubmap(subMapId) {
+  const subMapService = require('../services/subMapService');
+  const sm = await subMapService.getSubMapById(subMapId); // throws if not found
+  if (!sm) throw new Error('submap-not-found');
+  return sm.toJSON ? sm.toJSON() : sm;
+}
+
+module.exports = { loadPlanetMapData, loadSubmap };

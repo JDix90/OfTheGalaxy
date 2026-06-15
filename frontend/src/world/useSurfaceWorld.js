@@ -37,7 +37,10 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
     let surf = { x: 50, y: 50, area: 'surface' };
     const onThisPlanet = ch && (ch.currentPlanet === planet.id);
     const loc = ch?.currentLocation;
-    if (onThisPlanet && loc && Number.isFinite(loc.x) && Number.isFinite(loc.y) && (loc.x || loc.y)) {
+    // Only resume a SURFACE-area saved position. A 'submap' position (e.g. just exited a
+    // dungeon) is in the submap's own coord space — using it here would teleport the player
+    // to garbage surface coords; fall through to the spaceport spawn instead.
+    if (onThisPlanet && loc && loc.area !== 'submap' && Number.isFinite(loc.x) && Number.isFinite(loc.y) && (loc.x || loc.y)) {
       surf = { x: loc.x > 100 ? loc.x / 10 : loc.x, y: loc.y > 100 ? loc.y / 10 : loc.y, area: loc.area || 'surface' };
     } else if (sp && Number.isFinite(sp.spawnX)) {
       surf = { x: sp.spawnX, y: sp.spawnY, area: 'spaceport' };
