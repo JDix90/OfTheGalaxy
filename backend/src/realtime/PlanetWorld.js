@@ -23,6 +23,7 @@ const CHASE_SPEED = 5.4;
 const STAMINA_REGEN = 3;     // stamina per second regenerated in-world (no rejoin-to-refill)
 const HEALTH_REGEN = 4;          // hp/sec regenerated OUT of combat (authoritative; flushed to DB)
 const OOC_REGEN_DELAY_MS = 5000; // wait this long after the last combat before health regen kicks in
+const RESPAWN_INTERVAL = 8;      // seconds between ambient enemy respawns (replaces the encounter roll)
 const DECAY_INTERVAL = 1.2;  // seconds ≈ one "turn" — decays combat status/temporary effects
 const r2 = (n) => Math.round(n * 100) / 100;
 const normYaw = (y) => (typeof y === 'number' && Number.isFinite(y) ? ((y % TWO_PI) + TWO_PI) % TWO_PI : null);
@@ -47,7 +48,11 @@ class PlanetWorld {
     this.fx = [];              // combat events for broadcast (drained each snapshot)
     this.intents = [];         // engagement lifecycle intents (drained each tick → CombatManager)
     this._decayAcc = 0;        // accumulator for periodic status-effect decay
-    this.spawnEnemies(options.dangerLevel || 1);
+    this.dangerLevel = options.dangerLevel || 1;
+    this.enemyPool = (Array.isArray(options.enemyPool) && options.enemyPool.length) ? options.enemyPool : null; // faction/planet-appropriate template ids
+    this._enemySeq = 0;        // monotonic id source so respawned enemies get fresh ids
+    this._respawnAcc = 0;      // accumulator for ambient respawn (replaces the old random-encounter roll)
+    this.spawnEnemies();
   }
 
   pushFx(ev) { if (this.fx.length < 256) this.fx.push(ev); }
@@ -86,31 +91,68 @@ class PlanetWorld {
     return this.sim.surfaceToWorld(p.x, p.y);
   }
 
-  /** Populate the world with patrolling enemies scaled to the planet's danger level. */
-  spawnEnemies(dangerLevel) {
-    const count = Math.max(2, Math.min(8, 2 + Math.floor(dangerLevel / 2)));
-    for (let i = 0; i < count; i++) {
-      let t;
-      try { t = generateRandomEnemy(dangerLevel); } catch (e) { t = null; }
-      if (!t || !t.stats) continue;
-      let combatant;
-      try { combatant = buildEnemyActorCombatant(t); } catch (e) { continue; }
-      if (!combatant || !combatant.stats) continue;
-      combatant.temporaryEffects = combatant.temporaryEffects || [];
-      const home = this._randomWalkable();
-      this.enemies.set(`e${i}`, {
-        id: `e${i}`,
-        name: t.name || 'Hostile',
-        level: t.level || dangerLevel,
-        tier: t.tier || 'normal',
-        templateKey: t.templateKey || t.key || null,
-        combatant,                              // full combat stat block (hp = combatant.stats.health)
-        maxHp: combatant.stats.maxHealth,
-        x: home.x, z: home.z, facing: 0,
-        home, patrolRadius: 4 + Math.random() * 3, phase: Math.random() * TWO_PI,
-        state: 'patrol', targetId: null, _t: Math.random() * 10,
-        dead: false, attackCdUntil: 0,
-      });
+  /** Any player on this world currently escorting? (raises spawn target + difficulty). */
+  _anyEscort() { for (const p of this.players.values()) if (p.escort) return true; return false; }
+
+  /** Target ambient-enemy population: danger-scaled, bumped while a player is escorting. */
+  _targetCount() {
+    const base = Math.max(2, Math.min(8, 2 + Math.floor(this.dangerLevel / 2)));
+    return Math.min(10, base + (this._anyEscort() ? 2 : 0));
+  }
+
+  /** Effective enemy level: the planet's danger blended with the average player level present,
+   *  so a high-level player isn't trivially safe and a low-level player isn't overrun. */
+  _effLevel() {
+    let sum = 0, n = 0;
+    for (const p of this.players.values()) { if (p.level) { sum += p.level; n++; } }
+    return Math.max(this.dangerLevel, n ? Math.round(sum / n) : 0);
+  }
+
+  /** A walkable home that isn't on top of a player (for ambient respawns). */
+  _farWalkable(minDist = 22) {
+    for (let i = 0; i < 16; i++) {
+      const w = this._randomWalkable();
+      let ok = true;
+      for (const p of this.players.values()) { if (Math.hypot(p.x - w.x, p.z - w.z) < minDist) { ok = false; break; } }
+      if (ok) return w;
+    }
+    return this._randomWalkable();
+  }
+
+  /** Spawn one ambient enemy (faction/planet pool, level-blended, escort-aware difficulty). */
+  _spawnOne(home) {
+    const level = this._effLevel();
+    const difficulty = this._anyEscort() ? 'hard' : 'moderate';
+    let t;
+    try { t = generateRandomEnemy(level, difficulty, this.enemyPool); } catch (e) { return false; }
+    if (!t || !t.stats) return false;
+    let combatant;
+    try { combatant = buildEnemyActorCombatant(t); } catch (e) { return false; }
+    if (!combatant || !combatant.stats) return false;
+    combatant.temporaryEffects = combatant.temporaryEffects || [];
+    const h = home || this._randomWalkable();
+    const id = `e${this._enemySeq++}`;
+    this.enemies.set(id, {
+      id,
+      name: t.name || 'Hostile',
+      level: t.level || level,
+      tier: t.tier || 'normal',
+      templateKey: t.templateKey || t.key || null,
+      combatant,                              // full combat stat block (hp = combatant.stats.health)
+      maxHp: combatant.stats.maxHealth,
+      x: h.x, z: h.z, facing: 0,
+      home: h, patrolRadius: 4 + Math.random() * 3, phase: Math.random() * TWO_PI,
+      state: 'patrol', targetId: null, _t: Math.random() * 10,
+      dead: false, attackCdUntil: 0,
+    });
+    return true;
+  }
+
+  /** Fill the world up to the current target population (initial spawn). */
+  spawnEnemies() {
+    let guard = 0;
+    while (this.enemies.size < this._targetCount() && guard++ < 12) {
+      if (!this._spawnOne()) break;
     }
   }
 
@@ -165,6 +207,8 @@ class PlanetWorld {
       characterId: character.id,
       userId: character.userId,
       name: character.name || 'Traveler',
+      level: character.level || 1,   // for enemy level-blending
+      escort: false,                 // set async at join (escort-quest escalation)
       color,
       x: spawn.x, z: spawn.z, facing: spawn.facing,
       moving: false, speed: 0,
@@ -274,6 +318,15 @@ class PlanetWorld {
     }
     if (decayNow) for (const e of this.enemies.values()) this._decay(e.combatant);
     this.stepEnemies(dt, now);
+
+    // Ambient respawn: keep the world populated over time (this replaces the old movement-driven
+    // random-encounter roll). Trickle one hostile in every RESPAWN_INTERVAL, away from players,
+    // only while someone is here and below the danger/escort-scaled target.
+    this._respawnAcc += dt;
+    if (this._respawnAcc >= RESPAWN_INTERVAL) {
+      this._respawnAcc = 0;
+      if (this.players.size > 0 && this.enemies.size < this._targetCount()) this._spawnOne(this._farWalkable());
+    }
   }
 
   /** Collision-aware directional move (try full, then axis-slide) — mirrors the sim. */

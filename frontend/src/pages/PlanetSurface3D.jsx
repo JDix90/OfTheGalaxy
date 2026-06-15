@@ -15,13 +15,11 @@ import { Canvas } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 
 import { useCharacterStore } from '../state/characterSlice';
-import { useCombatStore } from '../state/combatSlice';
 import { useQuestStore } from '../state/questSlice';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../services/tutorialEventBus';
 import { galaxyApi } from '../services/api/galaxyApi';
 import { npcApi } from '../services/api/npcApi';
 import subMapApi from '../services/api/subMapApi';
-import { combatApi } from '../services/api/combatApi';
 import { generateProceduralMap } from '../services/mapGenerator';
 import { assetManager } from '../services/assetManager';
 
@@ -40,7 +38,6 @@ import SubMapEntryMenu from '../components/submap/SubMapEntryMenu';
 import POIInteractionMenu from '../components/poi/POIInteractionMenu';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import DialogueInterface from '../features/dialogue/DialogueInterface';
-import EncounterDialog from '../components/encounter/EncounterDialog';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 
@@ -50,7 +47,6 @@ export default function PlanetSurface3D() {
   const { planetId } = useParams();
   const navigate = useNavigate();
   const { currentCharacter } = useCharacterStore();
-  const { startEncounter } = useCombatStore();
   const activeQuests = useQuestStore((s) => s.activeQuests);
 
   const [planet, setPlanet] = useState(null);
@@ -65,9 +61,7 @@ export default function PlanetSurface3D() {
   const [poiMenu, setPoiMenu] = useState(null);     // { poi, x, y } (click; modal)
   const [npcMenu, setNpcMenu] = useState(null);     // { npc, x, y } (click; modal)
   const [selectedNPC, setSelectedNPC] = useState(null);
-  const [encounter, setEncounter] = useState(null); // { enemies, planetDangerLevel, enemyCount }
 
-  const lastEncounterRef = useRef(0);
   const inputEnabledRef = useRef(true);
 
   // --- sim + world seam ---
@@ -145,7 +139,7 @@ export default function PlanetSurface3D() {
   );
 
   // Modal menus block movement; the passive proximity prompt does not.
-  const modalOpen = !!(poiMenu || npcMenu || selectedNPC || encounter);
+  const modalOpen = !!(poiMenu || npcMenu || selectedNPC);
   useEffect(() => {
     inputEnabledRef.current = !modalOpen;
     if (modalOpen) {
@@ -230,68 +224,30 @@ export default function PlanetSurface3D() {
     setNpcMenu({ npc: npc.raw, x: ne?.clientX ?? window.innerWidth / 2, y: ne?.clientY ?? window.innerHeight / 2 });
   }, []);
 
-  const onMoved = useCallback(async (surfacePos) => {
+  // Ambient combat is now in-world (walkable hostiles via the realtime layer) — no random-
+  // encounter roll here. onMoved only fires quest/tutorial proximity events (mirrors the 2D
+  // surface); the visual beacons come from buildQuestWaypoints.
+  const onMoved = useCallback((surfacePos) => {
     const ch = useCharacterStore.getState().currentCharacter;
-    if (!ch || !planet || encounter) return;
-
-    // Quest objective proximity → fire the tutorial/quest "reached" event (mirrors the 2D
-    // surface). Cheap, runs on the throttled move report; the visual beacons come from
-    // buildQuestWaypoints.
+    if (!ch || !planet) return;
     const aq = useQuestStore.getState().activeQuests;
-    if (aq && aq.length) {
-      for (const { quest, progress } of aq) {
-        if (!quest?.objectives) continue;
-        for (const objective of quest.objectives) {
-          if (progress?.objectivesCompleted?.[objective.id]) continue;
-          const loc = objective.location;
-          if (!loc || loc.planet !== planet.id) continue;
-          const d = Math.hypot(surfacePos.x - (loc.x || 0), surfacePos.y - (loc.y || 0));
-          if (d < 5) {
-            tutorialEventBus.emit(TUTORIAL_EVENTS.QUEST_OBJECTIVE_LOCATION_REACHED, {
-              characterId: ch.id, questId: quest.id, objectiveId: objective.id,
-              objectiveType: objective.type, location: 'planet_surface', planetId: planet.id,
-            });
-          }
+    if (!aq || !aq.length) return;
+    for (const { quest, progress } of aq) {
+      if (!quest?.objectives) continue;
+      for (const objective of quest.objectives) {
+        if (progress?.objectivesCompleted?.[objective.id]) continue;
+        const loc = objective.location;
+        if (!loc || loc.planet !== planet.id) continue;
+        const d = Math.hypot(surfacePos.x - (loc.x || 0), surfacePos.y - (loc.y || 0));
+        if (d < 5) {
+          tutorialEventBus.emit(TUTORIAL_EVENTS.QUEST_OBJECTIVE_LOCATION_REACHED, {
+            characterId: ch.id, questId: quest.id, objectiveId: objective.id,
+            objectiveType: objective.type, location: 'planet_surface', planetId: planet.id,
+          });
         }
       }
     }
-
-    const now = Date.now();
-    if (now - lastEncounterRef.current < 2500) return;
-    lastEncounterRef.current = now;
-    try {
-      const r = await combatApi.checkEncounter(
-        ch.id, planet.id, planet.dangerLevel || 1,
-        { x: surfacePos.x, y: surfacePos.y, area: 'surface' },
-      );
-      const result = r?.data || r;
-      if (result?.shouldTrigger) {
-        setEncounter({
-          enemies: result.enemies || ['ironclad'],
-          planetDangerLevel: result.planetDangerLevel || planet.dangerLevel || 1,
-          enemyCount: result.enemies?.length || result.enemyCount || 1,
-        });
-      }
-    } catch (e) { /* ignore */ }
-  }, [planet, encounter]);
-
-  const handleFight = useCallback(async () => {
-    const ch = useCharacterStore.getState().currentCharacter;
-    if (!ch || !encounter) return;
-    const surf = worldRef.current?.getSurfacePos?.() || { x: 50, y: 50 };
-    try {
-      const enc = await startEncounter(ch.id, 'random', encounter.enemies);
-      const id = enc?.id || enc?.encounter?.id || enc?.data?.id;
-      setEncounter(null);
-      if (id) {
-        navigate(`/game/combat/${id}`, {
-          state: { returnLocation: { planetId: planet.id, location: { x: surf.x, y: surf.y, area: 'surface' } } },
-        });
-      }
-    } catch (e) {
-      setEncounter(null);
-    }
-  }, [encounter, navigate, planet, startEncounter, worldRef]);
+  }, [planet]);
 
   if (!currentCharacter) { navigate('/character/select'); return null; }
 
@@ -378,15 +334,6 @@ export default function PlanetSurface3D() {
       {selectedNPC && !npcMenu && (
         <DialogueInterface npc={selectedNPC} onClose={() => setSelectedNPC(null)} />
       )}
-
-      <EncounterDialog
-        isOpen={!!encounter}
-        enemyCount={encounter?.enemyCount || 1}
-        planetDangerLevel={encounter?.planetDangerLevel || 1}
-        canFlee
-        onFight={handleFight}
-        onFlee={() => setEncounter(null)}
-      />
 
       {/* Combat HUD (Phase 4.3/4.4) — health bar + ability hotbar (online only). */}
       {combat && (

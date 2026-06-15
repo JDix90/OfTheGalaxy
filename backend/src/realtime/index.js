@@ -23,6 +23,7 @@ const combatService = require('../services/combatService');
 const { isCombatUsable } = require('../data/abilityDefinitions');
 const { buildHotbar } = require('./combat'); // shared with _refreshCombatant (mid-session hotbar push)
 const { setRealtimeManager } = require('./registry'); // expose the manager to the HTTP inventory path
+const escortService = require('../services/escortService'); // escort-quest ambient-spawn escalation
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -117,6 +118,9 @@ async function attachRealtime(server) {
           const abilityIds = Array.isArray(character.abilities) ? character.abilities.filter((id) => isCombatUsable(id)) : [];
           const player = world.addPlayer({ id: playerId, character, ws, combatant, abilities: abilityIds });
           if (!player) { try { ws.close(4007, 'world-full'); } catch (_) {} return; }
+          // Escort-quest escalation: an escorting player draws denser/tougher ambient spawns.
+          // Checked async so it never blocks the join (re-evaluated on the next join).
+          escortService.getActiveEscortQuest(character.id).then((eq) => { player.escort = !!eq; }).catch(() => {});
           joined = true;
           clearTimeout(joinTimeout);
           ws.send(JSON.stringify({
