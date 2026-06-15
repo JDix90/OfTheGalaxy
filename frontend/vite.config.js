@@ -22,6 +22,12 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true
       },
+      // Phase-4: the authoritative real-time world is attached to the backend's own
+      // http.Server, so this WS shares the API port (ws://<host>/realtime -> :3001).
+      '/realtime': {
+        target: 'ws://localhost:3001',
+        ws: true
+      },
       // Phase-0 spike: proxy the authoritative tick server's WebSocket so the client
       // connects same-origin (ws://<host>/spike-ws -> ws://localhost:3002).
       '/spike-ws': {

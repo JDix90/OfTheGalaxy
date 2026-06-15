@@ -28,6 +28,7 @@ import { assetManager } from '../services/assetManager';
 import { createSurfaceSim, DEFAULTS } from '../../../shared/sim/surface.mjs';
 import { CHARACTER_GLTF_URLS } from '../data/modelManifest';
 import { useSurfaceWorld } from '../world/useSurfaceWorld';
+import { getAuthToken } from '../services/api/client';
 import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import SurfaceScene from '../components/surface3d/SurfaceScene';
 import { buildPois, buildNpcs, buildQuestWaypoints, isDungeon, deriveSubMapType } from '../components/surface3d/surfaceData';
@@ -72,7 +73,16 @@ export default function PlanetSurface3D() {
     () => (planet ? createSurfaceSim(planet.mapData || {}, { scale: DEFAULTS.scale }) : null),
     [planet?.id], // eslint-disable-line react-hooks/exhaustive-deps
   );
-  const worldRef = useSurfaceWorld(planet, sim);
+
+  // Phase 4: authoritative real-time net (with offline fallback). Opt out via VITE_REALTIME=false.
+  const [netStatus, setNetStatus] = useState({ mode: 'connecting', online: 0, rtt: 0 });
+  const netOptions = useMemo(() => ({
+    enabled: import.meta.env.VITE_REALTIME !== 'false',
+    token: getAuthToken(),
+    characterId: currentCharacter?.id,
+    onStatus: setNetStatus,
+  }), [currentCharacter?.id]);
+  const worldRef = useSurfaceWorld(planet, sim, netOptions);
   const input = useSurfaceInput(inputEnabledRef);
 
   const pois = useMemo(() => buildPois(planet, sim), [planet, sim]);
@@ -328,7 +338,21 @@ export default function PlanetSurface3D() {
       <TutorialOverlay />
 
       {/* Top-right controls */}
-      <div style={{ position: 'fixed', top: 16, right: 16, display: 'flex', gap: 8, zIndex: 50 }}>
+      <div style={{ position: 'fixed', top: 16, right: 16, display: 'flex', gap: 8, alignItems: 'center', zIndex: 50 }}>
+        {netOptions.enabled && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px',
+            background: 'rgba(12,18,32,0.85)', border: '1px solid #2a3654', borderRadius: 8,
+            fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#cfe3ff',
+          }} title={netStatus.mode === 'online' ? `Server-authoritative · ${netStatus.rtt}ms RTT · ${netStatus.online} online` : 'Single-player (server unavailable)'}>
+            <span style={{
+              width: 8, height: 8, borderRadius: '50%',
+              background: netStatus.mode === 'online' ? '#6cf0c2' : netStatus.mode === 'connecting' ? '#ffe9a8' : '#ff8d6c',
+              boxShadow: netStatus.mode === 'online' ? '0 0 6px #6cf0c2' : 'none',
+            }} />
+            {netStatus.mode === 'online' ? `Online · ${netStatus.rtt}ms` : netStatus.mode === 'connecting' ? 'Connecting…' : 'Offline'}
+          </div>
+        )}
         <button style={btnStyle} onClick={() => navigate('/game/galaxy')}>Galaxy</button>
       </div>
 
