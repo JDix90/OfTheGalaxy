@@ -46,10 +46,43 @@ the existing encounter path. No NPC LOD (interiors are small).
 **Verified:** frontend build green; 6 submap-data unit tests + full suite 69/69. Live
 onboarding (fresh smuggler → 3D spaceport + Jax + waypoint + exit) to be confirmed in-app.
 
+## 5.1 — real-time 3D dungeons (shipped)
+
+**What it does:** `type==='dungeon'` submaps now render `DungeonView3D` — a dark, torch-lit
+walkable 3D dungeon built from the dungeon grid (instanced `DungeonWalls`), with the **full
+P4 real-time, server-authoritative combat** (hotbar, dodge, damage numbers, server-resolved
+abilities) against server-driven enemies. Exit portals return to the 3D surface. (Building
+interiors still delegate to the 2D `SubMapView` — Phase 5.2.)
+
+**Architecture:** the P4 realtime layer is extended to dungeon submaps:
+- `shared/sim/submap.mjs` `submapToMapData` (dungeon grid → tileMap, square-padded to
+  N=max(w,h)) + `submapCoordDims` (padded dims for grid→percent) — shared by client +
+  server so prediction tracks authority.
+- Server: `WorldManager.getOrCreateDungeon(subMapId)` builds a `PlanetWorld` from the grid
+  (zone='dungeon'; real planet for combat/persistence; enemies in walkable cells; zone-aware
+  `area:'submap'` persistence). WS join branches on `subMapId`.
+- Client: `useDungeonWorld` (NetClient joins with `subMapId`) + `DungeonScene` reuses the P4
+  net-combat leaf components (RemotePlayers/RemoteEnemies/CombatFx/PlayerActor) + walls +
+  exits; `DungeonView3D` adds the combat UI.
+
+**Files:** `shared/sim/submap.mjs`; `backend/src/realtime/{WorldManager,PlanetWorld,index,
+planetData,combat}.js`; `frontend/src/world/{useDungeonWorld,netClient}.js`;
+`frontend/src/components/submap3d/{DungeonScene,DungeonWalls}.jsx`;
+`frontend/src/pages/{DungeonView3D,SubMapView3D}.jsx`.
+
+**Adversarially reviewed (11 findings fixed):** keystone = NON-square dungeon coordinate
+parity (all grid→world conversions now use the padded N, or walls/spawns/enemies land on the
+wrong cells); + spawn-nudge parity, garbage-spawn-on-exit, lost-win-reward-on-disconnect,
+malformed-grid guard, stale-WS-input guard. Deferred: discovery-gated dungeon entry (the game
+has no dungeon access control anywhere — cross-cutting design, not a P5 regression; cross-planet
+joins are blocked).
+
+**Verified:** non-square coord parity + dungeon-grid walkability (8/8 submapData unit tests);
+real-DB authoritative dungeon flow (enemies/player spawn walkable, real-time kill → rewards);
+frontend build + full suite green; backend CI green.
+
 ## Deferred
-- **5.1 dungeons** — grid movement + depth zones + real-time dungeon enemies (currently the
-  2D `SubMapView` handles `type==='dungeon'` via `SubMapView3D`'s delegate).
-- **5.2 building interiors** — recursive interiors + furniture (delegate handles
-  `type==='building_interior'` in 2D for now).
-- Distinct interior aesthetic (walls/ceiling meshes from the collisionMap) beyond the
-  reused open-surface look.
+- **5.2 building interiors** — recursive interiors + furniture (`type==='building_interior'`
+  delegates to the 2D `SubMapView` for now).
+- Distinct interior aesthetic (walls/ceiling meshes) beyond the reused look; dungeon depth-zone
+  scaling + dungeon-enemy persistence parity with the 2D respawn-on-reentry model.
