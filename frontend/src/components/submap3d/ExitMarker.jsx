@@ -20,7 +20,8 @@ export default function ExitMarker({ exit, active, onActivate }) {
       ringRef.current.scale.setScalar(1 + Math.sin(t * 3) * 0.14);
       ringRef.current.material.opacity = (active ? 0.85 : 0.5) + Math.sin(t * 3) * 0.15;
     }
-    if (archRef.current) archRef.current.material.emissiveIntensity = 0.8 + (Math.sin(t * 2) + 1) * 0.3;
+    // archRef is on the <meshStandardMaterial>, so archRef.current IS the material.
+    if (archRef.current) archRef.current.emissiveIntensity = 0.8 + (Math.sin(t * 2) + 1) * 0.3;
   });
 
   return (
