@@ -45,6 +45,14 @@ export default function CharacterModel({ model, motion, stride = 1 }) {
     return c;
   }, [scene, model.tint]);
 
+  // Normalize mixed-rig sizes: if the descriptor gives a target `fitHeight`, derive the
+  // scale from the model's own (rest-pose) height; otherwise use the literal `scale`.
+  const fitScale = useMemo(() => {
+    if (!model.fitHeight) return model.scale || 0.42;
+    const sy = new THREE.Box3().setFromObject(cloned).getSize(new THREE.Vector3()).y || 1;
+    return model.fitHeight / sy;
+  }, [cloned, model.fitHeight, model.scale]);
+
   const mixer = useMemo(() => new THREE.AnimationMixer(cloned), [cloned]);
   const actions = useMemo(() => {
     const map = {};
@@ -90,5 +98,10 @@ export default function CharacterModel({ model, motion, stride = 1 }) {
     }
   });
 
-  return <primitive object={cloned} scale={model.scale || 0.42} />;
+  // yOffset lifts hovering models (flyers) off the ground.
+  return (
+    <group position={[0, model.yOffset || 0, 0]}>
+      <primitive object={cloned} scale={fitScale} />
+    </group>
+  );
 }

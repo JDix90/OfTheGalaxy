@@ -95,6 +95,15 @@ export default function SurfaceTest() {
 
   const pois = useMemo(() => buildPois(planet, sim), [sim]);
   const npcs3d = useMemo(() => buildNpcs(SYNTH_NPCS, sim), [sim]);
+  // Synthetic quest waypoints (one delivery objective at the market, one combat at the refinery).
+  const waypoints = useMemo(() => {
+    const a = sim.surfaceToWorld(42, 47);
+    const b = sim.surfaceToWorld(56, 47);
+    return [
+      { id: 'wp_deliver', wx: a.x, wz: a.z, combat: false, label: 'Deliver the cargo' },
+      { id: 'wp_clear', wx: b.x, wz: b.z, combat: true, label: 'Clear the Ore Refinery' },
+    ];
+  }, [sim]);
 
   const [activePoiId, setActivePoiId] = useState(null);
   const [prompt, setPrompt] = useState(null);   // { name, x, y } proximity
@@ -106,6 +115,7 @@ export default function SurfaceTest() {
   const [tod, setTod] = useState(0.6);     // fixed time slider (0-1)
   const [auto, setAuto] = useState(false);
   const [displayTime, setDisplayTime] = useState(0.6);
+  const [weather, setWeather] = useState('dust'); // Phase-3 weather preset
   const clock = (t) => { const h = Math.floor(t * 24); const m = Math.floor((t * 24 - h) * 60); return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; };
 
   // FPS + player-position sampler (independent of React churn).
@@ -139,6 +149,7 @@ export default function SurfaceTest() {
           planet={planet}
           pois={pois}
           npcs3d={npcs3d}
+          waypoints={waypoints}
           activePoiId={activePoiId}
           textureUrl={null}
           worldHalf={sim.worldHalf}
@@ -147,6 +158,7 @@ export default function SurfaceTest() {
           cycleSeconds={90}
           onTime={auto ? (t) => setDisplayTime(t) : undefined}
           postQuality="high"
+          weather={weather}
           onProximity={(hit) => {
             if (!hit) { setActivePoiId(null); setPrompt(null); return; }
             setActivePoiId(hit.poi.id);
@@ -166,7 +178,7 @@ export default function SurfaceTest() {
 
       {/* status */}
       <div style={panel}>
-        <div style={{ fontWeight: 700, marginBottom: 6 }}>OtG · Phase-2 Atmosphere</div>
+        <div style={{ fontWeight: 700, marginBottom: 6 }}>OtG · Phase-3 glTF Kit</div>
         <Row k="fps" v={fps} c={fps >= 55 ? '#6cf0c2' : '#ffe9a8'} />
         <Row k="time" v={clock(auto ? displayTime : tod)} c="#ffe9a8" />
         <Row k="player x,y" v={`${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}`} />
@@ -186,6 +198,12 @@ export default function SurfaceTest() {
           <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
             {[['Dawn', 0.27], ['Day', 0.5], ['Dusk', 0.76], ['Night', 0.95]].map(([lbl, v]) => (
               <button key={lbl} onClick={() => { setAuto(false); setTod(v); }} style={todBtn}>{lbl}</button>
+            ))}
+          </div>
+          <div style={{ marginTop: 8, color: '#7e8aa6' }}>weather</div>
+          <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
+            {['dust', 'ash', 'rain', 'snow', 'none'].map((w) => (
+              <button key={w} onClick={() => setWeather(w)} style={{ ...todBtn, opacity: weather === w ? 1 : 0.55, borderColor: weather === w ? '#7db8ff' : '#2a3654' }}>{w}</button>
             ))}
           </div>
         </div>
