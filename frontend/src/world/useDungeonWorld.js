@@ -57,6 +57,7 @@ export function useDungeonWorld(subMap, sharedSim, netOptions) {
       combatLog() { return this._net ? this._net.log : null; },
       combat() { const n = this._net; return n && n.selfHp != null ? { hp: n.selfHp, maxHp: n.selfMaxHp, dead: n.selfDead } : null; },
       drainFx() { return this._net ? this._net.drainFx() : null; },
+      drainToasts() { return this._net ? this._net.drainToasts() : null; },
       getSurfacePos() { return sim.worldToSurface(this.player.x, this.player.z); },
       async persist(force) {
         if (this._persisting) return;

@@ -52,6 +52,8 @@ export class NetClient {
     this.castCdUntil = {};       // local cooldown display (ms) per ability id
     this.dodgeCdUntil = 0;
     this.log = [];               // combat log lines (bounded)
+    this.toasts = [];            // non-blocking combat toasts (reward/death) drained by the HUD
+    this._toastId = 0;
     this.pending = [];           // unacked inputs [{ seq, input, dt }]
     this.seq = 0;
     this.rttEMA = 0;
@@ -121,6 +123,13 @@ export class NetClient {
         this.pending.length = 0;
         this.selfDead = false;
         if (typeof m.hp === 'number') this.selfHp = m.hp;
+        this._pushToast({ kind: 'death', area: m.area || null, fee: m.fee || 0, restored: m.restored });
+      } else if (m.t === 'reward') {
+        // Victory: non-blocking reward toast (xp / credits / loot / level-up).
+        this._pushToast({ kind: 'reward', xp: m.xp || 0, credits: m.credits || 0, loot: m.loot || [], leveledUp: m.leveledUp || [], newLevel: m.newLevel });
+      } else if (m.t === 'hotbar') {
+        // Server pushed a refreshed kit (e.g. a mid-session ability unlock after a level-up).
+        if (Array.isArray(m.hotbar)) this.hotbar = m.hotbar;
       }
     };
 
@@ -256,6 +265,10 @@ export class NetClient {
 
   /** Drain queued combat fx (hit/death) for the scene to render. */
   drainFx() { if (this.fxQueue.length === 0) return null; const f = this.fxQueue; this.fxQueue = []; return f; }
+
+  _pushToast(t) { this.toasts.push({ id: ++this._toastId, at: Date.now(), ...t }); if (this.toasts.length > 8) this.toasts.shift(); }
+  /** Drain queued combat toasts (reward/death) for the HUD to display. */
+  drainToasts() { if (this.toasts.length === 0) return null; const t = this.toasts; this.toasts = []; return t; }
 
   _goOffline() {
     this.serverSelf = null;

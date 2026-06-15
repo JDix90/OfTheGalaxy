@@ -34,6 +34,7 @@ import SurfaceScene from '../components/surface3d/SurfaceScene';
 import { buildPois, buildNpcs, buildQuestWaypoints, isDungeon, deriveSubMapType } from '../components/surface3d/surfaceData';
 
 import HUD from '../components/hud/HUD';
+import CombatToasts from '../components/hud/CombatToasts';
 import SubMapEntryMenu from '../components/submap/SubMapEntryMenu';
 import POIInteractionMenu from '../components/poi/POIInteractionMenu';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
@@ -438,6 +439,9 @@ export default function PlanetSurface3D() {
           </div>
         </div>
       )}
+
+      {/* Non-blocking victory/death feedback (Phase 2). */}
+      <CombatToasts world={worldRef} />
 
       {/* Onboarding / tutorial overlay (rendered per-page; the surface is the 3D scene now). */}
       <TutorialOverlay />

@@ -107,6 +107,8 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
       },
       /** Drain combat fx events (hit/death) for rendering damage numbers. */
       drainFx() { return this._net ? this._net.drainFx() : null; },
+      /** Drain non-blocking combat toasts (reward/death) for the HUD. */
+      drainToasts() { return this._net ? this._net.drainToasts() : null; },
 
       /** Current player position in 0–100 surface coords. */
       getSurfacePos() {

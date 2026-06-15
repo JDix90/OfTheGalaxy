@@ -2068,11 +2068,22 @@ class CombatService {
         y: md.respawn && Number.isFinite(md.respawn.y) ? md.respawn.y : undefined,
       } : null;
       try {
-        await respawnService.respawnPlayer(encounter.characterId, {
+        const respawnResult = await respawnService.respawnPlayer(encounter.characterId, {
           healthRestorePercent: 40, // Restore to 40% health — a slightly bigger setback (light retune)
           chargeFee: true, // Charge medical fee
           dungeon, // null for surface; dungeon-entrance respawn target otherwise
         });
+        // Stash a respawn summary so the realtime death toast can show where you revived + the fee.
+        if (respawnResult && respawnResult.location) {
+          encounter.metadata = {
+            ...encounter.metadata,
+            respawn: {
+              area: respawnResult.location.name || respawnResult.location.area || null,
+              medicalFee: respawnResult.medicalFee || 0,
+              healthRestored: respawnResult.healthRestored,
+            },
+          };
+        }
         console.log(`💀 Player defeated, respawned at safe location`);
       } catch (error) {
         console.error('Failed to respawn player:', error);
@@ -2321,9 +2332,10 @@ class CombatService {
       }
     }
 
-    // Award XP
+    // Award XP (capture level-up info so the victory toast can celebrate it)
+    let levelInfo = null;
     if (totalXP > 0) {
-      await characterService.addXP(character.id, totalXP, 'combat', { transaction: t });
+      levelInfo = await characterService.addXP(character.id, totalXP, 'combat', { transaction: t });
       if (isDungeonEncounter) {
         console.log(`[Combat Service] Dungeon encounter: Awarded ${totalXP} XP (50% of base ${Math.floor(totalXP / rewardMultiplier)})`);
       }
@@ -2357,7 +2369,9 @@ class CombatService {
     return {
       xp: totalXP,
       credits: totalCredits,
-      loot: enrichedLoot
+      loot: enrichedLoot,
+      leveledUp: (levelInfo && levelInfo.leveledUp) || [],
+      newLevel: levelInfo ? levelInfo.newLevel : undefined
     };
     } catch (error) {
       await t.rollback();
