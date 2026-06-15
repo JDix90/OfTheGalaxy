@@ -62,8 +62,8 @@ export default function SubmapScene({
     <AtmosphereContext.Provider value={atmoRef}>
       <Atmosphere
         worldHalf={worldHalf} time={atmoTime} startTime={atmoTime} paused atmoRef={atmoRef}
-        fogNear={isEnclosed ? 0.55 : 0.85} fogFar={isEnclosed ? 1.7 : 2.0}
-        fogColor={isEnclosed ? '#0e1422' : null}
+        fogNear={isEnclosed ? 0.7 : 0.85} fogFar={isEnclosed ? 2.0 : 2.0}
+        fogColor={isEnclosed ? '#9aa6bc' : null}
       />
       <Ground planet={planetLike} size={groundSize} />
       {!interior && <SubmapEnclosure sim={sim} mode={enclosureMode} />}
