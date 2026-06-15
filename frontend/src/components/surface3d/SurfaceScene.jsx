@@ -19,6 +19,9 @@ import PoiStructure from './PoiStructure';
 import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
 import PlayerActor from './PlayerActor';
+import RemotePlayers from './RemotePlayers';
+import RemoteEnemies from './RemoteEnemies';
+import CombatFx from './CombatFx';
 import QuestWaypoint from './QuestWaypoint';
 import Weather, { getWeatherPreset } from './Weather';
 import Atmosphere from './atmosphere/Atmosphere';
@@ -107,6 +110,7 @@ export default function SurfaceScene({
   world, input, planet, pois, npcs3d, waypoints, activePoiId, textureUrl, worldHalf,
   onProximity, onMoved, onPoiActivate, onNpcActivate,
   time, cycleSeconds, startTime = 0.6, paused, onTime, postQuality = 'high', weather,
+  combatTarget = null, onCombatTarget = () => {},
 }) {
   const groundSize = worldHalf * 2;
   const atmoRef = useRef({ nightFactor: 0, dayFactor: 1, time: startTime });
@@ -180,6 +184,13 @@ export default function SurfaceScene({
       />
 
       <PlayerActor world={world} input={input} pois={pois} onProximity={onProximity} onMoved={onMoved} />
+
+      {/* Other players sharing the planet (Phase 4.1 — online only). */}
+      <RemotePlayers world={world} />
+
+      {/* Server-driven hostile actors (Phase 4.2/4.3 — online only). */}
+      <RemoteEnemies world={world} targetId={combatTarget} onTarget={onCombatTarget} />
+      <CombatFx world={world} targetId={combatTarget} onClearTarget={() => onCombatTarget(null)} />
 
       {weatherPreset && weatherPreset !== 'none' && (
         <Weather preset={weatherPreset} world={world} worldHalf={worldHalf} />

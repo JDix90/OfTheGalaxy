@@ -39,7 +39,7 @@ const ROLE_TAG = {
   random_encounter: { tag: 'Hostile', hostile: true },
 };
 
-export default function Nameplate({ name, npcType, level, y = 2.4 }) {
+export default function Nameplate({ name, npcType, level, y = 2.4, hp, maxHp }) {
   const color = getRoleColor(npcType);
   const cfg = ROLE_TAG[npcType] || {};
   const sub = level != null
@@ -79,6 +79,11 @@ export default function Nameplate({ name, npcType, level, y = 2.4 }) {
         </div>
         {sub && (
           <div style={{ color: cfg.hostile ? '#ff8a7a' : '#8aa0c4', fontSize: 10, textShadow: '0 1px 3px #000' }}>{sub}</div>
+        )}
+        {hp != null && maxHp > 0 && (
+          <div style={{ width: 56, height: 5, margin: '3px auto 0', background: 'rgba(8,12,22,0.7)', border: '1px solid rgba(0,0,0,0.6)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ width: `${Math.max(0, Math.min(100, (hp / maxHp) * 100))}%`, height: '100%', background: cfg.hostile ? '#ff5a4a' : '#6cf0c2' }} />
+          </div>
         )}
       </div>
     </Html>

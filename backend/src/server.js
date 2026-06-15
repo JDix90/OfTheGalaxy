@@ -4,11 +4,13 @@
  */
 
 require('dotenv').config();
+const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { sequelize } = require('./models');
+const { attachRealtime } = require('./realtime');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
@@ -48,7 +50,9 @@ app.use(cors({
 })); // Enable CORS
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use(morgan('dev')); // HTTP request logging
+// HTTP request logging — skip the /realtime WS upgrade so the ?token=<JWT> query is
+// never written to logs.
+app.use(morgan('dev', { skip: (req) => req.url.startsWith('/realtime') }));
 app.use('/api/', apiLimiter); // Rate limiting for API routes
 
 // Health check endpoint
@@ -138,19 +142,37 @@ const startServer = async () => {
       }
     }
     
-    // Start server
-    app.listen(PORT, () => {
+    // Start server — wrap Express in an http.Server so the realtime WebSocket world
+    // can share the same port (Phase 4 authoritative loop).
+    const server = http.createServer(app);
+
+    // Attach the authoritative real-time world (Phase 4). Opt-out with REALTIME_ENABLED=false.
+    if (process.env.REALTIME_ENABLED !== 'false') {
+      try {
+        realtime = await attachRealtime(server);
+      } catch (rtErr) {
+        console.error('✗ Realtime world failed to attach (continuing without it):', rtErr.message);
+      }
+    }
+
+    server.listen(PORT, () => {
       console.log(`✓ Server running on port ${PORT}`);
       console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
-      
+
       // Start background jobs after server starts
       startBackgroundJobs();
     });
+
+    httpServer = server;
   } catch (error) {
     console.error('✗ Unable to start server:', error);
     process.exit(1);
   }
 };
+
+// Realtime + http server handles (for graceful shutdown).
+let realtime = null;
+let httpServer = null;
 
 // Start the server only when run directly (`node src/server.js`). When the app is
 // imported (e.g. supertest integration tests), do NOT auto-listen — multiple imports
@@ -160,16 +182,20 @@ if (require.main === module) {
 }
 
 // Handle graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, closing server gracefully');
+const shutdown = async (signal) => {
+  console.log(`${signal} received, closing server gracefully`);
+  try {
+    if (realtime) {
+      realtime.manager.stop();
+      await realtime.manager.flushAll(); // persist final positions before exit
+      realtime.wss.close();
+    }
+    if (httpServer) httpServer.close();
+  } catch (e) { /* ignore */ }
   await sequelize.close();
   process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-  console.log('SIGINT received, closing server gracefully');
-  await sequelize.close();
-  process.exit(0);
-});
+};
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 module.exports = app;

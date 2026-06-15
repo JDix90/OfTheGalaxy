@@ -1,12 +1,13 @@
 /**
- * useSurfaceWorld — the IWorld seam for the walkable 3D surface (Phase 1).
+ * useSurfaceWorld — the IWorld seam for the walkable 3D surface.
  *
- * The scene reads ONE `world` object and doesn't care where movement comes from.
- * Phase 1 ships the SINGLE-PLAYER (LocalWorld) path: the player is integrated by the
- * shared surface sim at render rate, position is persisted to the backend on a
- * throttle, and the character store is kept loosely in sync. The future multiplayer
- * path swaps this internal for a NetWorld (send inputs → apply snapshots) behind the
- * same `world` shape — see PHASE-0-SPIKE-RECOMMENDATION.md.
+ * The scene reads ONE `world` object and doesn't care where movement authority lives:
+ *  - SINGLE-PLAYER / OFFLINE (LocalWorld): the player is integrated by the shared surface
+ *    sim at render rate, and position is persisted to the backend on a throttle.
+ *  - NETWORKED (Phase 4): when `net` options are supplied, a NetClient streams inputs to
+ *    the authoritative server and reconciles the predicted player against snapshots; the
+ *    server owns position + persistence. If the server is unreachable it transparently
+ *    falls back to the LocalWorld behavior (offline), so single-player always works.
  *
  * Everything the render loop touches lives in a ref (no per-frame React re-renders).
  */
@@ -14,23 +15,23 @@
 import { useEffect, useRef } from 'react';
 import { useCharacterStore } from '../state/characterSlice';
 import { createSurfaceSim, DEFAULTS } from '../../../shared/sim/surface.mjs';
+import { NetClient } from './netClient';
 
-const PERSIST_INTERVAL_MS = 2000; // throttle backend writes while walking
+const PERSIST_INTERVAL_MS = 2000; // throttle backend writes while walking (offline path)
 const PERSIST_MIN_MOVE = 0.6;     // world units; skip writes for tiny jitter
 
-export function useSurfaceWorld(planet, sharedSim) {
+export function useSurfaceWorld(planet, sharedSim, netOptions) {
   const worldRef = useRef(null);
+  const netEnabled = !!(netOptions && netOptions.enabled && netOptions.token && netOptions.characterId);
 
   // (Re)build the world whenever the planet changes.
   useEffect(() => {
     if (!planet) { worldRef.current = null; return; }
 
-    // Reuse the page's sim instance so POI/NPC placement and the player share one
-    // coordinate mapping; fall back to creating one if not supplied.
     const sim = sharedSim || createSurfaceSim(planet.mapData || {}, { scale: DEFAULTS.scale });
 
-    // Initial spawn: resume the character's saved position on THIS planet, else the
-    // spaceport spawn pad, else map center.
+    // Initial spawn (also the authoritative server's spawn formula): resume saved position
+    // on THIS planet, else the spaceport pad, else map center.
     const ch = useCharacterStore.getState().currentCharacter;
     const sp = planet.mapData?.spaceport;
     let surf = { x: 50, y: 50, area: 'surface' };
@@ -50,13 +51,18 @@ export function useSurfaceWorld(planet, sharedSim) {
       sim,
       ready: true,
       player: { x: w0.x, z: w0.z, facing: Math.PI, moving: false, speed: 0 },
-      // persistence bookkeeping
+      _net: null,
+      // persistence bookkeeping (offline path)
       _persistAcc: 0,
       _lastPersist: { x: surf.x, y: surf.y },
       _persisting: false,
 
+      /** True when there's no live server authority (single-player / server down). */
+      isOffline() { return !this._net || this._net.mode === 'offline'; },
+
       /** Integrate the player for one frame from the current input. */
       step(input, dt) {
+        // Local prediction (also the sole authority when offline).
         const next = sim.integrate(this.player, input, dt);
         this.player.x = next.x;
         this.player.z = next.z;
@@ -64,20 +70,47 @@ export function useSurfaceWorld(planet, sharedSim) {
         this.player.moving = next.moving;
         this.player.speed = next.speed;
 
-        this._persistAcc += dt;
-        if (this._persistAcc >= PERSIST_INTERVAL_MS / 1000) {
-          this._persistAcc = 0;
-          this.persist(false);
+        if (this._net && this._net.mode === 'online') {
+          // Server is authoritative + autosaves; just stream inputs (reconcile is async).
+          this._net.pushInput(input, dt);
+        } else {
+          // Offline: persist position ourselves, throttled.
+          this._persistAcc += dt;
+          if (this._persistAcc >= PERSIST_INTERVAL_MS / 1000) {
+            this._persistAcc = 0;
+            this.persist(false);
+          }
         }
         return this.player;
       },
+
+      /** Live remote players (Phase 4.1) — empty unless online. */
+      remotes() { return this._net ? this._net.remotes : null; },
+
+      /** Combat (Phase 4.3) — cast an ability at a target enemy; server resolves. */
+      cast(ability, targetId) { if (this._net) this._net.cast(ability, targetId); },
+      /** Dodge-roll (Phase 4.4). */
+      dodge() { if (this._net) this._net.dodge(); },
+      /** Ability hotbar [{id,name,type,cd,stam,target}] (online). */
+      hotbar() { return this._net ? this._net.hotbar : []; },
+      /** Local ability-cooldown map (id → ms-until-ready) for the hotbar sweep. */
+      castCd() { return this._net ? this._net.castCdUntil : null; },
+      /** Recent combat log lines. */
+      combatLog() { return this._net ? this._net.log : null; },
+      /** Authoritative player combat state ({ hp, maxHp, dead }) or null offline. */
+      combat() {
+        const n = this._net;
+        return n && n.selfHp != null ? { hp: n.selfHp, maxHp: n.selfMaxHp, dead: n.selfDead } : null;
+      },
+      /** Drain combat fx events (hit/death) for rendering damage numbers. */
+      drainFx() { return this._net ? this._net.drainFx() : null; },
 
       /** Current player position in 0–100 surface coords. */
       getSurfacePos() {
         return sim.worldToSurface(this.player.x, this.player.z);
       },
 
-      /** Persist to the backend (throttled; skips tiny/no movement unless forced). */
+      /** Persist to the backend (offline path only; throttled). */
       async persist(force) {
         if (this._persisting) return;
         const s = sim.worldToSurface(this.player.x, this.player.z);
@@ -96,7 +129,7 @@ export function useSurfaceWorld(planet, sharedSim) {
             area: 'surface',
           });
         } catch (e) {
-          // Non-fatal: keep walking; we'll retry on the next interval.
+          // Non-fatal: keep walking; retry next interval.
         } finally {
           this._persisting = false;
         }
@@ -105,16 +138,32 @@ export function useSurfaceWorld(planet, sharedSim) {
 
     worldRef.current = world;
 
-    // Record arrival (sets currentPlanet + location) shortly after mount.
-    const arrivalTimer = setTimeout(() => { try { world.persist(true); } catch (e) {} }, 600);
+    // Connect the authoritative net layer (with offline fallback) when enabled.
+    if (netEnabled) {
+      world._net = new NetClient({
+        token: netOptions.token,
+        characterId: netOptions.characterId,
+        planetId: planet.id,
+        sim,
+        player: world.player,
+        onStatus: netOptions.onStatus,
+      });
+      world._net.connect();
+    }
+
+    // Record arrival (offline path sets currentPlanet + location). Online: the server does it.
+    const arrivalTimer = setTimeout(() => {
+      try { if (world.isOffline()) world.persist(true); } catch (e) {}
+    }, 800);
 
     return () => {
       clearTimeout(arrivalTimer);
-      // Final save on unmount / planet change.
-      try { world.persist(true); } catch (e) { /* ignore */ }
+      try { if (world.isOffline()) world.persist(true); } catch (e) { /* ignore */ }
+      if (world._net) world._net.close();
       worldRef.current = null;
     };
-  }, [planet?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [planet?.id, netEnabled]);
 
   return worldRef;
 }
