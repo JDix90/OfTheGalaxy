@@ -6,6 +6,29 @@
 
 ---
 
+## Migration Status (living tracker)
+
+| Phase | Scope | Status |
+|---|---|---|
+| **0 — Instrumentation & guardrails** | telemetry, `COMBAT_3D_ONLY` flag, cross-engine guard | ✅ **Done** (PR #10) |
+| **1 — S1 backend correctness** | dungeon encounterType/subMapId, dungeon-aware respawn, level-up combatant refresh | ✅ **Done** (PR #10) |
+| 2 — 3D combat UX | reward screen, death/medical-fee overlay, enemy health bars, damage numbers, hotbar cooldowns, hit feedback | ⏭️ **Next** |
+| 3 — Consumables + regen in 3D | WS `t:'item'`, `resolveUseItem`, engagement-gated `useItem`, in-tick OOC health regen | ⬜ Planned |
+| 4 — Re-home random encounters | build respawn/escort escalation; remove dual-engine on the 3D surface | ⬜ Planned |
+| 5 — Re-home NPC / POI / quest combat | fix `'npc'` enum, scripted spawns, honor `metadata.questId/objectiveId` | ⬜ Planned |
+| 6 — Tutorial → 3D scripted fight | (old route kept as fallback) | ⬜ Planned |
+| 7 — Retire turn-based UI | flip flag, remove old layer; keep the shared funnel | ⬜ Planned |
+| 8 — Faction rep + polish (flagged) | rep-on-kill (MP-aware), enemy abilities/telegraphs, `defeat_boss` hook, companion actor | ⬜ Optional |
+
+**Decisions locked so far:**
+- **O3 (dungeon respawn destination): respawn at the dungeon ENTRANCE, staying in the dungeon** (implemented in Phase 1) — `currentLocation` keeps its `subMapId`; no eject-to-surface.
+
+**Still open (need a product call before their phase):** O1 faction-rep policy/deltas (Phase 8) · O2 random-encounter pacing after conversion (Phase 4) · O4 companion/escort combat in 3D — parity or drop? (Phase 5/8) · O5 enemy abilities/boss behavior (Phase 8) · O6 `defeat_boss` achievement hook (Phase 8).
+
+**Carried-forward follow-ups (deferred from earlier phases):** client hotbar UI refresh for abilities unlocked mid-session — server already accepts them, the button just isn't shown yet (do in Phase 2 alongside the hotbar UI work).
+
+---
+
 ## 1. Current System Inventory
 
 There are **two live combat engines**, **one shared finalization funnel**, and **one dead-but-shipped path**.
