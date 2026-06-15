@@ -1952,6 +1952,18 @@ class CombatService {
     encounter.status = status;
     encounter.endedAt = new Date();
 
+    // Migration telemetry: one structured line per ended encounter, tagged by engine.
+    try {
+      const { logCombatOutcome } = require('../config/combat');
+      logCombatOutcome({
+        encounterId: encounter.id,
+        characterId: encounter.characterId,
+        encounterType: encounter.encounterType,
+        status,
+        engine: encounter.metadata && encounter.metadata.realtime ? 'realtime' : 'turn-based',
+      });
+    } catch (e) { /* telemetry must never break combat */ }
+
     // Save player health and stamina back to character (regardless of win/loss/flee)
     const character = await PlayerCharacter.findByPk(encounter.characterId);
     if (character) {
@@ -2042,10 +2054,24 @@ class CombatService {
     // If lost, respawn player at safe location
     if (status === 'lost') {
       const respawnService = require('./respawnService');
+      // Dungeon deaths respawn at the dungeon ENTRANCE (staying in the dungeon) so the saved
+      // location stays coherent (preserves subMapId) instead of being overwritten with a
+      // surface POI. The entrance %-coords + ids come from the encounter metadata that the
+      // realtime _createRecord stamped (buildEncounterMeta).
+      const md = encounter.metadata || {};
+      // Only the realtime engine's dungeon deaths get the entrance-respawn (it stamps
+      // metadata.respawn). The legacy turn-based path is left untouched.
+      const dungeon = (md.realtime && encounter.encounterType === 'dungeon' && md.subMapId) ? {
+        subMapId: md.subMapId,
+        parentLocationId: md.parentLocationId || null,
+        x: md.respawn && Number.isFinite(md.respawn.x) ? md.respawn.x : undefined,
+        y: md.respawn && Number.isFinite(md.respawn.y) ? md.respawn.y : undefined,
+      } : null;
       try {
         await respawnService.respawnPlayer(encounter.characterId, {
           healthRestorePercent: 40, // Restore to 40% health — a slightly bigger setback (light retune)
-          chargeFee: true // Charge medical fee
+          chargeFee: true, // Charge medical fee
+          dungeon, // null for surface; dungeon-entrance respawn target otherwise
         });
         console.log(`💀 Player defeated, respawned at safe location`);
       } catch (error) {

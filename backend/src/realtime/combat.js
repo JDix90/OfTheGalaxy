@@ -179,6 +179,36 @@ function enemyTryAttack(world, enemy, target, now) {
   }
 }
 
+// A turn-based encounter created within this window is treated as a LIVE fight the player just
+// started (the brief pre-navigation race where a 3D enemy could still land a hit) and is NOT
+// clobbered by the realtime engine. Anything older is a stale orphan and is safe to abandon —
+// while a player is connected to the 3D world they are, by definition, not on the turn-based
+// combat screen, so an old active turn-based row means they walked away from it.
+const FRESH_TURNBASED_MS = 60 * 1000;
+
+/**
+ * Derive a realtime encounter's `encounterType` + `metadata` from the world it happens in.
+ * Surface → 'random'; dungeon → 'dungeon' + subMapId/parentLocationId (so endEncounter runs the
+ * dungeon-service branch: clear_dungeon tracking, enemy-state, 0.5× penalty) + a `respawn` point
+ * (the entrance, as 0–100 surface %) so a dungeon death respawns coherently in the dungeon.
+ * Pure (no I/O) so it can be unit-tested without a DB.
+ */
+function buildEncounterMeta(world) {
+  const zone = (world && world.zone) || { type: 'surface' };
+  const metadata = { realtime: true, planetId: world && world.planetId };
+  if (zone.type !== 'dungeon') return { encounterType: 'random', metadata };
+  metadata.subMapId = zone.subMapId || (world && world.subMapId) || null;
+  metadata.parentLocationId = zone.parentLocationId || null;
+  const dims = zone.dims || { w: 12, h: 12 };
+  const e = zone.entrance;
+  if (e && Number.isFinite(e.x) && Number.isFinite(e.y)) {
+    // Same grid→percent mapping PlanetWorld.spawnFor uses (cell-center; percent kept as-is).
+    const g2p = (v, dim) => (v > dim ? (v > 100 ? v / 10 : v) : ((v + 0.5) / dim) * 100);
+    metadata.respawn = { x: g2p(e.x, dims.w), y: g2p(e.y, dims.h) };
+  }
+  return { encounterType: 'dungeon', metadata };
+}
+
 class CombatManager {
   async handleIntent(world, intent) {
     const player = world.players.get(intent.playerId);
@@ -191,36 +221,68 @@ class CombatManager {
     } catch (e) { /* non-fatal — combat must never crash the tick */ }
   }
 
-  /** Create the encounter record (abandoning any stale active one first). No guards. */
+  /**
+   * Create the encounter record. A character must never hold two active encounters (would
+   * double rewards), so we reconcile existing active rows first:
+   *   - a FRESH turn-based (non-realtime) encounter → the player just started a card fight;
+   *     SUPPRESS the realtime record (return false) rather than clobber it (cross-engine guard).
+   *   - realtime orphans + stale turn-based orphans → abandon ('fled').
+   * Returns true if a record was created (player.encounterId set), false if suppressed.
+   */
   async _createRecord(world, player) {
-    // A character must never hold two active encounters (would double rewards). Abandon
-    // any leftover active encounter — realtime crash orphans or a stale REST encounter.
-    await CombatEncounter.update(
-      { status: 'fled', endedAt: new Date() },
-      { where: { characterId: player.characterId, status: 'active' } },
-    );
+    const active = await CombatEncounter.findAll({
+      where: { characterId: player.characterId, status: 'active' },
+      attributes: ['id', 'metadata', 'createdAt'],
+    });
+    const now = Date.now();
+    const liveTurnBased = active.find((e) => {
+      const realtime = e.metadata && e.metadata.realtime;
+      const age = now - new Date(e.createdAt).getTime();
+      return !realtime && age >= 0 && age < FRESH_TURNBASED_MS;
+    });
+    if (liveTurnBased) return false; // don't clobber a just-started turn-based fight
+
+    const abandonIds = active.map((e) => e.id);
+    if (abandonIds.length) {
+      await CombatEncounter.update(
+        { status: 'fled', endedAt: new Date() },
+        { where: { id: abandonIds } },
+      );
+    }
+
+    const { encounterType, metadata } = buildEncounterMeta(world);
     const enc = await CombatEncounter.create({
       characterId: player.characterId,
-      encounterType: 'random',
+      encounterType,
       combatants: [player.combatant, ...player.engagedEnemies.values()],
       turnOrder: [], currentTurn: 0, status: 'active',
-      metadata: { realtime: true, planetId: world.planetId },
+      metadata,
     });
     player.encounterId = enc.id;
+    return true;
   }
 
   async ensureEncounter(world, player) {
     if (player.encounterId || player._engaging || player._finalizing || player.engagedEnemies.size === 0) return;
+    // Cross-engine suppression backoff: while a fresh turn-based fight blocks realtime record
+    // creation, don't re-run the active-encounter query on every landed hit — retry at most ~1.5s.
+    if (player._suppressedUntil && Date.now() < player._suppressedUntil) return;
     player._engaging = true;
-    try { await this._createRecord(world, player); } finally { player._engaging = false; }
+    try {
+      const created = await this._createRecord(world, player);
+      if (created === false) player._suppressedUntil = Date.now() + 1500;
+    } finally { player._engaging = false; }
   }
 
   async finalize(world, player, status) {
     if (player._finalizing) return; // mutex: serialize finalization (no double endEncounter/rewards)
     player._finalizing = true;
     try {
-      if (!player.encounterId && player.engagedEnemies.size > 0) {
-        try { await this._createRecord(world, player); } catch (e) { /* one-shot kill before engage landed */ }
+      // One-shot kill before an engage landed → create the record now (unless the cross-engine
+      // guard is actively suppressing: a fresh turn-based fight owns this character right now).
+      if (!player.encounterId && player.engagedEnemies.size > 0
+          && !(player._suppressedUntil && Date.now() < player._suppressedUntil)) {
+        try { await this._createRecord(world, player); } catch (e) { /* non-fatal */ }
       }
       const id = player.encounterId;
       const enemyCombatants = [...player.engagedEnemies.values()];
@@ -241,9 +303,36 @@ class CombatManager {
           await combatService.endEncounter(id, outcome); // rewards / quests / respawn / hp-save
         }
       }
+      // A win may have leveled the character up (PlayerCharacter.addXP raises maxHealth/stats and
+      // full-heals). Rebuild the in-world combatant so the HP bar + damage math use current stats
+      // (not the join-time snapshot); the next snapshot carries the new maxHp to the client.
+      if (outcome === 'won' && id && player.combatant) {
+        try { await this._refreshCombatant(player); } catch (e) { /* keep stale rather than crash the tick */ }
+      }
+      // On loss, restore the in-world player. With an encounter (id), endEncounter already did
+      // the authoritative DB respawn (40% heal / fee / location) and this mirrors it. Without an
+      // id (cross-engine guard suppressed a spurious 3D death while a turn-based fight owns the
+      // character), it's an in-world-only resurrect from DB health — no fee, no DB writes.
       if (outcome === 'lost') await this._respawn(world, player);
     } finally {
       player._finalizing = false;
+    }
+  }
+
+  /** Re-derive the in-world combatant + castable kit from the DB (post level-up / equip change). */
+  async _refreshCombatant(player) {
+    const { PlayerCharacter } = require('../models');
+    const character = await PlayerCharacter.findByPk(player.characterId);
+    if (!character) return;
+    const fresh = await combatService.buildPlayerCombatant(character);
+    if (!fresh || !fresh.stats) return;
+    fresh.temporaryEffects = fresh.temporaryEffects || [];
+    player.combatant = fresh;
+    player.maxHp = fresh.stats.maxHealth;
+    // A level-up can unlock new abilities; refresh the server-authoritative kit. (The client
+    // hotbar UI refresh is a Phase-2 follow-up — the server already accepts the new abilities.)
+    if (Array.isArray(character.abilities)) {
+      player.abilities = character.abilities.filter((aid) => isCombatUsable(aid));
     }
   }
 
@@ -259,12 +348,21 @@ class CombatManager {
           player.combatant.statusEffects = [];   // clear combat effects on respawn
           player.combatant.temporaryEffects = [];
         }
-        const loc = character.currentLocation;
-        if (loc && Number.isFinite(loc.x)) {
-          const sx = loc.x > 100 ? loc.x / 10 : loc.x;
-          const sy = loc.y > 100 ? loc.y / 10 : loc.y;
-          const w = world.sim.surfaceToWorld(sx, sy);
-          player.x = w.x; player.z = w.z;
+        // Position: a dungeon world derives a valid in-world spawn from its OWN spawn logic
+        // (entrance + walkability + grid→percent). Applying the respawn's surface-style coord
+        // through the dungeon sim produced an out-of-bounds position (the old bug). Surface
+        // worlds map currentLocation as before.
+        if (world.zone && world.zone.type === 'dungeon') {
+          const sp = world.spawnFor(character);
+          player.x = sp.x; player.z = sp.z; player.facing = sp.facing;
+        } else {
+          const loc = character.currentLocation;
+          if (loc && Number.isFinite(loc.x)) {
+            const sx = loc.x > 100 ? loc.x / 10 : loc.x;
+            const sy = loc.y > 100 ? loc.y / 10 : loc.y;
+            const w = world.sim.surfaceToWorld(sx, sy);
+            player.x = w.x; player.z = w.z;
+          }
         }
       }
     } catch (e) { /* ignore */ }
@@ -283,5 +381,6 @@ class CombatManager {
 module.exports = {
   CombatManager, resolveCast, resolveDodge, enemyTryAttack, applyDamage,
   buildEnemyActorCombatant: (template) => combatService.buildEnemyCombatant(template),
-  DISENGAGE_MS,
+  buildEncounterMeta,
+  DISENGAGE_MS, FRESH_TURNBASED_MS,
 };
