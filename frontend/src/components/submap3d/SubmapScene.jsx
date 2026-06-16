@@ -18,6 +18,7 @@ import RemoteEnemies from '../surface3d/RemoteEnemies';
 import CombatFx from '../surface3d/CombatFx';
 import QuestWaypoint from '../surface3d/QuestWaypoint';
 import Atmosphere from '../surface3d/atmosphere/Atmosphere';
+import DistantSkyline from '../surface3d/atmosphere/DistantSkyline';
 import PostFX from '../surface3d/atmosphere/PostFX';
 import { AtmosphereContext } from '../surface3d/atmosphere/AtmosphereContext';
 import ExitMarker from './ExitMarker';
@@ -70,6 +71,9 @@ export default function SubmapScene({
         fogColor={isEnclosed ? '#9aa6bc' : null}
       />
       <Ground planet={planetLike} size={groundSize} />
+      {/* Open-air districts (spaceport/city) get the distant animated skyline so the edge reads
+          as a continued world, not a blank slab. Enclosed rooms keep their walls/ceiling. */}
+      {!interior && !isEnclosed && <DistantSkyline worldHalf={worldHalf} />}
       {!interior && <SubmapEnclosure sim={sim} mode={enclosureMode} />}
 
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}

@@ -439,11 +439,12 @@ class CombatManager {
           player.combatant.statusEffects = [];   // clear combat effects on respawn
           player.combatant.temporaryEffects = [];
         }
-        // Position: a dungeon world derives a valid in-world spawn from its OWN spawn logic
-        // (entrance + walkability + grid→percent). Applying the respawn's surface-style coord
-        // through the dungeon sim produced an out-of-bounds position (the old bug). Surface
-        // worlds map currentLocation as before.
-        if (world.zone && world.zone.type === 'dungeon') {
+        // Position: ANY submap world (dungeon OR hub like the spaceport) derives a valid in-world
+        // spawn from its OWN spawn logic (entrance + subMapId-guarded resume + walkability), so the
+        // respawn lands somewhere reachable. Applying the respawn's surface-style coord through the
+        // submap sim produced an out-of-bounds position (the old bug). Surface worlds map
+        // currentLocation as before.
+        if (world.zone && world.zone.subMapId) {
           const sp = world.spawnFor(character);
           player.x = sp.x; player.z = sp.z; player.facing = sp.facing;
         } else {
