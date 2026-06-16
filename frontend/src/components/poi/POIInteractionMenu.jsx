@@ -6,13 +6,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterSlice';
-import { useCombatStore } from '../../state/combatSlice';
 import { useDiscoveryStore } from '../../state/discoverySlice';
 import { useInventoryStore } from '../../state/inventorySlice';
 import { useQuestStore } from '../../state/questSlice';
 import poiApi from '../../services/api/poiApi';
 import { notify } from '../hud/NotificationCenter';
-import { isCombat3DOnly, COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
+import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import InvestigationModal from './InvestigationModal';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
@@ -21,7 +20,6 @@ import './POIInteractionMenu.css';
 export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCombat, position }) {
   const navigate = useNavigate();
   const { currentCharacter } = useCharacterStore();
-  const { startEncounter } = useCombatStore();
   const { recordDiscovery } = useDiscoveryStore();
   const { loadInventory } = useInventoryStore();
   const [loading, setLoading] = useState(false);
@@ -147,18 +145,12 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
   const handleAction = async (actionType) => {
     if (!currentCharacter || !poi || !planet || loading) return;
 
-    // 3D surface re-homes POI combat to a real-time in-world spawn (no turn-based card screen):
-    // the host page supplies onCombat, which returns true when it handled it in-world (short-
-    // circuiting BEFORE the POI interact call so the server doesn't also create a turn-based
-    // encounter). If it returns false (realtime offline) or isn't supplied (2D), fall through.
-    if (actionType === 'combat' && onCombat && onCombat(poi)) {
-      onClose && onClose();
-      return;
-    }
-
-    // Phase 7: turn-based combat is retired. If the realtime layer couldn't take this POI combat
-    // (offline / no in-world handler), surface a graceful message instead of the old card screen.
-    if (actionType === 'combat' && isCombat3DOnly()) {
+    // Combat is real-time + 3D-only (Phase 7 retired the turn-based card screen). The host page
+    // supplies onCombat, which spawns the hostile in-world and returns true when it handled it;
+    // otherwise (realtime offline / no in-world handler) surface a graceful message. Either way
+    // combat never reaches the POI-interact call below (which only handles non-combat actions).
+    if (actionType === 'combat') {
+      if (onCombat && onCombat(poi)) { onClose && onClose(); return; }
       notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
       onClose && onClose();
       return;
@@ -211,18 +203,8 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
           try { if (currentCharacter) await loadInventory(currentCharacter.id); } catch (e) { /* non-fatal */ }
         }
 
-        // Handle different action results
-        if (actionType === 'combat' && data.combatEncounter) {
-          // Navigate to combat
-          const encounter = await startEncounter(
-            currentCharacter.id,
-            'poi',
-            data.combatEncounter.combatants?.filter(c => c.type === 'enemy').map(e => e.name) || []
-          );
-          if (encounter && encounter.id) {
-            navigate(`/game/combat/${encounter.id}`);
-          }
-        } else if (actionType === 'loot' && data.rewards) {
+        // Handle different action results (combat short-circuits earlier — never reaches here)
+        if (actionType === 'loot' && data.rewards) {
           // Show loot rewards
           notify({
             type: 'success',

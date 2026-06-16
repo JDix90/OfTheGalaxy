@@ -5,7 +5,6 @@
 
 const { POIInteraction, PlayerCharacter, Planet } = require('../models');
 const { Op } = require('sequelize');
-const combatService = require('./combatService');
 const questService = require('./questService');
 const discoveryService = require('./discoveryService');
 const inventoryService = require('./inventoryService');
@@ -157,6 +156,16 @@ class POIService {
       finalInteractionType = interaction.interactionType;
     }
 
+    // Phase 7: turn-based card combat is retired — POI combat is real-time + 3D-only (the client
+    // spawns hostiles in-world via the realtime engine). Reject a 'combat' interaction here so a
+    // stray/forged HTTP call (or a danger/base/pirate/hostile POI whose type auto-resolves to
+    // 'combat') can't invoke the old createEncounter() path, which would persist a fresh
+    // non-realtime active CombatEncounter and suppress the AUTHORITATIVE realtime combat record for
+    // up to FRESH_TURNBASED_MS (realtime/combat.js cross-engine guard).
+    if (finalInteractionType === 'combat') {
+      return { success: false, interaction, message: 'Combat is real-time only — engage hostiles in-world.' };
+    }
+
     // Update interaction state
     const now = new Date();
     if (interaction.state === 'undiscovered') {
@@ -174,11 +183,8 @@ class POIService {
       questTriggered: null
     };
 
-    // Handle different interaction types
+    // Handle different interaction types ('combat' is rejected above — turn-based combat retired)
     switch (finalInteractionType) {
-      case 'combat':
-        result = await this.handleCombatPOI(character, planet, poi, interaction);
-        break;
       case 'loot':
         result = await this.handleLootPOI(character, planet, poi, interaction);
         break;
@@ -211,44 +217,6 @@ class POIService {
     await interaction.save();
 
     return result;
-  }
-
-  /**
-   * Handle combat POI
-   */
-  async handleCombatPOI(character, planet, poi, interaction) {
-    // Generate enemies based on POI danger level
-    const dangerLevel = poi.dangerLevel || planet.dangerLevel || 5;
-    const numEnemies = Math.min(3, Math.ceil(dangerLevel / 3) + Math.floor(Math.random() * 2));
-    
-    const enemies = [];
-    for (let i = 0; i < numEnemies; i++) {
-      // Generate appropriate enemy type based on POI
-      const enemyTypes = this.getEnemyTypesForPOI(poi);
-      const enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-      enemies.push(enemyType);
-    }
-
-    // Create combat encounter
-    const encounter = await combatService.createEncounter(
-      character.id,
-      'poi',
-      enemies
-    );
-
-    interaction.state = 'discovered'; // Will be updated to 'completed' after combat victory
-    interaction.metadata = {
-      ...interaction.metadata,
-      encounterId: encounter.id,
-      enemies: enemies
-    };
-
-    return {
-      success: true,
-      interaction,
-      combatEncounter: encounter,
-      message: `Combat encounter triggered at ${poi.name}`
-    };
   }
 
   /**

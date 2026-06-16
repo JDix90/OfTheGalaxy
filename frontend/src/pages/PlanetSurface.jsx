@@ -8,14 +8,11 @@ import { formatDisplayName } from '../utils/formatName';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
 import { useDiscoveryStore } from '../state/discoverySlice';
-import { useCombatStore } from '../state/combatSlice';
 import { useQuestStore } from '../state/questSlice';
 import { galaxyApi } from '../services/api/galaxyApi';
 import { npcApi } from '../services/api/npcApi';
 import { characterApi } from '../services/api/characterApi';
-import { combatApi } from '../services/api/combatApi';
 import DialogueInterface from '../features/dialogue/DialogueInterface';
-import EncounterDialog from '../components/encounter/EncounterDialog';
 import POIInteractionMenu from '../components/poi/POIInteractionMenu';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import FastTravelMenu from '../components/fastTravel/FastTravelMenu';
@@ -65,8 +62,6 @@ export default function PlanetSurface() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isMoving, setIsMoving] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [encounterDialog, setEncounterDialog] = useState(null);
-  const [lastEncounterCheck, setLastEncounterCheck] = useState(null);
   const [poiMenuOpen, setPoiMenuOpen] = useState(false);
   const [poiMenuPosition, setPoiMenuPosition] = useState({ x: 0, y: 0 });
   const [npcMenuOpen, setNpcMenuOpen] = useState(false);
@@ -98,7 +93,6 @@ export default function PlanetSurface() {
   const containerRef = useRef(null);
   const { currentCharacter, setCurrentCharacter, updateLocation } = useCharacterStore();
   const { recordDiscovery } = useDiscoveryStore();
-  const { startEncounter } = useCombatStore();
   const { activeQuests, loadActiveQuests, updateObjective } = useQuestStore();
   
   // Load active quests when character is available
@@ -797,49 +791,8 @@ export default function PlanetSurface() {
     };
   }, []);
 
-  // Check for random encounter
-  const checkForEncounter = React.useCallback(async (character, planet) => {
-    // Don't check if dialog is already open
-    if (!character || !planet || encounterDialog?.isOpen) return false;
-
-    // Cooldown check - don't check too frequently
-    const now = Date.now();
-    if (lastEncounterCheck && (now - lastEncounterCheck) < 2000) {
-      return false; // 2 second cooldown between checks
-    }
-    setLastEncounterCheck(now);
-
-    try {
-      const response = await combatApi.checkEncounter(
-        character.id,
-        planet.id,
-        planet.dangerLevel || 1,
-        character.currentLocation || { x: 0, y: 0, area: 'surface' }
-      );
-      
-      // API client interceptor returns response.data from axios
-      // Backend returns: { success: true, data: { shouldTrigger: ..., enemies: ... } }
-      // So response is: { success: true, data: { shouldTrigger: ..., enemies: ... } }
-      const result = response?.data || response;
-
-      console.log('🔍 Encounter check response:', { response, result, shouldTrigger: result?.shouldTrigger });
-
-      if (result && result.shouldTrigger) {
-        // Show encounter dialog
-        setEncounterDialog({
-          isOpen: true,
-          enemies: result.enemies || ['ironclad'],
-          planetDangerLevel: result.planetDangerLevel || planet.dangerLevel || 1,
-          enemyCount: result.enemies?.length || result.enemyCount || 1
-        });
-        return true;
-      }
-    } catch (error) {
-      console.error('Failed to check for encounter:', error);
-    }
-
-    return false;
-  }, [lastEncounterCheck, encounterDialog]);
+  // (Random-encounter polling removed in Phase 7 — combat is real-time + 3D-only; ambient hostiles
+  // are walkable in-world on the 3D surface, not rolled here.)
 
   // Fast movement function for keyboard input (arrow keys/WASD)
   // Validates tile map to prevent moving into buildings
@@ -949,15 +902,13 @@ export default function PlanetSurface() {
           }
         }
         
-        // Check for encounter after movement
-        await checkForEncounter(updatedCharacter, planet);
       }
     } catch (error) {
       console.error('Failed to update player location (fast):', error);
     } finally {
       setIsMoving(false);
     }
-  }, [planet, isMoving, updateLocation, setCurrentCharacter, checkForEncounter]);
+  }, [planet, isMoving, updateLocation, setCurrentCharacter]);
 
   // Move player function with pathfinding and animation (for click-to-move)
   const movePlayer = React.useCallback(async (x, y) => {
@@ -1118,15 +1069,13 @@ export default function PlanetSurface() {
         setPathPreview(null);
         setHoveredPath(null);
         
-        // Check for random encounter after movement
-        await checkForEncounter(updatedCharacter, planet);
       }
     } catch (error) {
       console.error('Failed to update player location:', error);
     } finally {
       setIsMoving(false);
     }
-  }, [planet, isMoving, updateLocation, setCurrentCharacter, checkForEncounter]);
+  }, [planet, isMoving, updateLocation, setCurrentCharacter]);
 
   // Set up keyboard navigation
   useEffect(() => {
@@ -2183,39 +2132,10 @@ export default function PlanetSurface() {
           const distance = Math.sqrt((world.x - x) ** 2 + (world.y - y) ** 2);
 
           if (distance < 25 / zoom) {
-            // Handle quest target click
-            if (loc.type === 'combat_encounter') {
-              // Start combat encounter
-              console.log('🎯 Quest target clicked (combat):', objective.description);
-              try {
-                // Generate enemy list based on objective
-                const enemyType = objective.target || 'syndicate_thug';
-                const enemyCount = objective.count || 6;
-                const enemies = Array(enemyCount).fill(enemyType);
-                
-                const encounterResponse = await combatApi.startEncounter(
-                  currentCharacter.id,
-                  'quest',
-                  enemies
-                );
-                if (encounterResponse && encounterResponse.success) {
-                  // Store quest info in encounter metadata for objective tracking
-                  const encounter = encounterResponse.data;
-                  encounter.questId = quest.id;
-                  encounter.objectiveId = objective.id;
-                  startEncounter(encounter);
-                  navigate('/game/combat');
-                }
-              } catch (error) {
-                console.error('Failed to start quest combat encounter:', error);
-                alert('Failed to start combat: ' + (error.message || 'Unknown error'));
-              }
-            } else {
-              // Other quest target types (loot, interact, etc.)
-              console.log('🎯 Quest target clicked:', objective.description);
-              // For now, just show a message - can be expanded later
-              alert(`Quest Objective: ${objective.description}`);
-            }
+            // Quest target click. Combat is real-time + 3D-only now (Phase 7 retired turn-based);
+            // this 2D fallback surface no longer starts combat, so just surface the objective.
+            console.log('🎯 Quest target clicked:', objective.description);
+            alert(`Quest Objective: ${objective.description}`);
             clicked = true;
             return;
           }
@@ -2840,49 +2760,6 @@ export default function PlanetSurface() {
         />
       )}
 
-      {encounterDialog && (
-        <EncounterDialog
-          isOpen={encounterDialog.isOpen}
-          enemyCount={encounterDialog.enemyCount}
-          planetDangerLevel={encounterDialog.planetDangerLevel}
-          canFlee={true}
-          onFight={async () => {
-            try {
-              const character = useCharacterStore.getState().currentCharacter;
-              if (!character) return;
-
-              // Start combat encounter
-              const encounter = await startEncounter(
-                character.id,
-                'random',
-                encounterDialog.enemies
-              );
-
-              if (encounter && encounter.id) {
-                setEncounterDialog(null);
-                // Store return location (planet and player position) when entering combat
-                const returnLocation = {
-                  planetId: planet.id,
-                  location: character.currentLocation || { x: 50, y: 50 }
-                };
-                navigate(`/game/combat/${encounter.id}`, {
-                  state: {
-                    returnLocation: returnLocation
-                  }
-                });
-              }
-            } catch (error) {
-              console.error('Failed to start encounter:', error);
-              alert(`Failed to start combat: ${error.message}`);
-            }
-          }}
-          onFlee={() => {
-            // Close dialog - player successfully fled
-            setEncounterDialog(null);
-            // Could add a small cooldown or penalty here
-          }}
-        />
-      )}
       <TutorialOverlay />
     </div>
   );

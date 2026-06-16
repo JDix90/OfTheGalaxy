@@ -2,11 +2,11 @@
  * PlanetSurface3D — the walkable, lit 3D planet surface (Phase 1).
  *
  * Reuses OtG's existing domain wholesale: the same planet `mapData`, NPC API, submap
- * routing, encounter flow, character store + position persistence, and the existing
- * React overlay panels (HUD, SubMapEntryMenu, POIInteractionMenu, NPCInteractionMenu,
- * DialogueInterface, EncounterDialog). The 3D layer is purely a new *presentation +
- * real-time movement* over that domain, built on the authoritative-ready seam
- * (shared surface sim + useSurfaceWorld). Coexists with the 2D PlanetSurface.
+ * routing, character store + position persistence, and the existing React overlay panels
+ * (HUD, SubMapEntryMenu, POIInteractionMenu, NPCInteractionMenu, DialogueInterface). The 3D
+ * layer is purely a new *presentation + real-time movement* over that domain, built on the
+ * authoritative-ready seam (shared surface sim + useSurfaceWorld). Combat is real-time + 3D-only
+ * (Phase 7 retired the turn-based card screen + its EncounterDialog).
  */
 
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';

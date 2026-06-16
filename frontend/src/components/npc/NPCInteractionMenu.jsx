@@ -7,18 +7,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { formatDisplayName } from '../../utils/formatName';
 import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../../state/characterSlice';
-import { useCombatStore } from '../../state/combatSlice';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import { notify } from '../hud/NotificationCenter';
-import { isCombat3DOnly, COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
+import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import QuestList from '../quest/QuestList';
 import './NPCInteractionMenu.css';
 
 export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTalk, onAttack, position }) {
   const navigate = useNavigate();
   const { currentCharacter } = useCharacterStore();
-  const { startEncounter } = useCombatStore();
   const [showQuestList, setShowQuestList] = useState(false);
   const menuRef = useRef(null);
   const talkButtonRef = useRef(null);
@@ -90,64 +88,17 @@ export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTal
       return;
     }
 
-    // 3D surface re-homes combat to a real-time in-world spawn (no turn-based card screen): the
-    // host page supplies onAttack, which returns true when it handled it in-world. If it returns
-    // false (e.g. realtime server offline) — or isn't supplied (2D view) — fall back to the legacy
-    // turn-based encounter below.
+    // Combat is real-time + 3D-only (Phase 7 retired the turn-based card screen). The host page
+    // supplies onAttack, which spawns the hostile in-world and returns true when it handled it.
     if (onAttack && onAttack(npc)) {
       onClose && onClose();
       return;
     }
 
-    // Phase 7: turn-based combat is retired. The 3D handler returned false (realtime offline, or
-    // no in-world handler supplied), so instead of the old card screen surface a graceful message.
-    if (isCombat3DOnly()) {
-      notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
-      onClose && onClose();
-      return;
-    }
-
-    try {
-      // Create enemy from NPC
-      const enemy = {
-        name: npc.name,
-        level: npc.level || 1,
-        stats: npc.stats || {
-          health: 50,
-          maxHealth: 50,
-          strength: 10,
-          agility: 10,
-          intelligence: 10,
-          speed: 10
-        },
-        type: 'enemy'
-      };
-
-      // Start combat encounter
-      const encounter = await startEncounter(
-        currentCharacter.id,
-        'npc',
-        [enemy]
-      );
-
-      if (encounter && encounter.id) {
-        // Store return location for after combat
-        const returnLocation = {
-          planetId: planet?.id || currentCharacter.currentPlanet,
-          location: currentCharacter.currentLocation || { x: 50, y: 50 }
-        };
-
-        // Navigate to combat view
-        navigate(`/game/combat/${encounter.id}`, {
-          state: {
-            returnLocation: returnLocation
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Failed to start combat with NPC:', error);
-      alert(`Failed to start combat: ${error.message}`);
-    }
+    // The realtime layer couldn't take the fight (offline / no in-world handler) — surface a
+    // graceful message instead of the retired turn-based screen.
+    notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
+    onClose && onClose();
   };
   
   // Check if NPC is a vendor
