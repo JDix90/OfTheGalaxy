@@ -87,14 +87,19 @@ class FactionService {
       throw new Error('Character not found');
     }
 
-    // Find or create reputation record
+    // Find or create reputation record. Clamp the initial value to the model's
+    // [-1000, 10000] bounds — an out-of-range first write (e.g. a -1500 quest
+    // penalty against a faction the character has never interacted with) would
+    // otherwise trip the model's min/max validators and throw, instead of
+    // settling at the floor/ceiling like the update path below does.
+    const clampedInitial = Math.max(-1000, Math.min(10000, amount));
     const [reputation, created] = await FactionReputation.findOrCreate({
       where: { characterId, factionId },
       defaults: {
         characterId,
         factionId,
-        reputation: amount,
-        tier: this.calculateTier(amount)
+        reputation: clampedInitial,
+        tier: this.calculateTier(clampedInitial)
       }
     });
 
