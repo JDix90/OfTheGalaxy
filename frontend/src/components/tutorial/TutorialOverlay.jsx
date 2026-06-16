@@ -12,6 +12,8 @@ import { TUTORIAL_STATES } from '../../services/tutorialStateMachine';
 import { tutorialApi } from '../../services/api/tutorialApi';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import tutorialMetrics from '../../services/tutorialMetrics';
+import { notify } from '../hud/NotificationCenter';
+import { isCombat3DOnly, COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import TutorialTooltip from './TutorialTooltip';
 import TutorialHighlight from './TutorialHighlight';
 import './TutorialOverlay.css';
@@ -1374,6 +1376,15 @@ export default function TutorialOverlay() {
           isTutorial: true,
         });
         transitionTo(TUTORIAL_STATES.COMBAT_STARTED);
+        return;
+      }
+
+      // Phase 7: turn-based combat is retired. The 3D spawn didn't reach an online realtime world,
+      // so don't navigate to the old card screen — surface a graceful message and STAY at
+      // COMBAT_INTRO so the player can press Next again once reconnected.
+      if (isCombat3DOnly()) {
+        console.warn('[TutorialOverlay] realtime unavailable — cannot start the 3D tutorial fight; waiting for reconnect');
+        notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
         return;
       }
 
