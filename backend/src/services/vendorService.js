@@ -15,6 +15,14 @@ class VendorService {
   // the player never pays more than the listed price.
   static MARKUP = 1.2;
 
+  // Last-resort display name for an item that has no definition. Items SHOULD be
+  // defined in data/items.js (that's the real fix), but if an undefined id ever
+  // slips through, surface a natural-language "Reinforced Armor" rather than a
+  // raw "reinforced_armor" id in the UI.
+  static formatFallbackName(itemId) {
+    return String(itemId).replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  }
+
   // How many distinct sold items a vendor remembers for buyback.
   static MAX_BUYBACK_ENTRIES = 12;
 
@@ -112,7 +120,7 @@ class VendorService {
         buyPrice: Math.max(1, Math.floor(baseValue * VendorService.MARKUP)),
         itemDefinition: itemDef || {
           id: vendorItem.itemId,
-          name: vendorItem.itemId,
+          name: VendorService.formatFallbackName(vendorItem.itemId),
           type: 'misc',
           value: 10,
           description: 'Unknown item'
@@ -493,7 +501,7 @@ class VendorService {
     }
     
     return {
-      item: itemDef || { id: itemId, name: itemId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), value: itemValue },
+      item: itemDef || { id: itemId, name: VendorService.formatFallbackName(itemId), value: itemValue },
       quantity,
       unitPrice,
       totalValue,
@@ -529,7 +537,7 @@ class VendorService {
         soldAt: entry.soldAt,
         itemDefinition: itemDef || {
           id: entry.itemId,
-          name: entry.itemId,
+          name: VendorService.formatFallbackName(entry.itemId),
           type: 'misc',
           value: entry.unitPrice,
           description: 'Previously sold item'
@@ -585,7 +593,7 @@ class VendorService {
 
     const itemDef = getItemDefinition(itemId);
     return {
-      item: itemDef || { id: itemId, name: itemId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), value: unitPrice },
+      item: itemDef || { id: itemId, name: VendorService.formatFallbackName(itemId), value: unitPrice },
       quantity,
       unitPrice,
       totalCost,
@@ -667,7 +675,7 @@ class VendorService {
 
       return {
         itemId,
-        itemName: itemId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        itemName: VendorService.formatFallbackName(itemId),
         quantity,
         unitPrice,
         totalValue,
