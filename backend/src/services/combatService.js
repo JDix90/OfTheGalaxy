@@ -2112,6 +2112,41 @@ class CombatService {
         return;
       }
 
+      // Phase 5 keystone: precisely credit enemies tagged with an explicit objective (scripted
+      // quest spawns) — increment that exact objective, bypassing the fragile name matching.
+      // Group by objective so multiple kills in one fight credit the right amount at once; these
+      // enemies are then excluded from the type/name pass below so they aren't double-counted.
+      const taggedHandled = new Set();
+      const taggedByObjective = new Map(); // `${questId}::${objectiveId}` -> { questId, objectiveId, count }
+      for (const e of defeatedEnemies) {
+        if (!e.questId || !e.objectiveId) continue;
+        taggedHandled.add(e);
+        const key = `${e.questId}::${e.objectiveId}`;
+        const g = taggedByObjective.get(key) || { questId: e.questId, objectiveId: e.objectiveId, count: 0 };
+        g.count += 1;
+        taggedByObjective.set(key, g);
+      }
+      for (const g of taggedByObjective.values()) {
+        try {
+          const qp = await QuestProgress.findOne({ where: { characterId, questId: g.questId, status: 'active' } });
+          if (!qp) continue;
+          const q = await Quest.findByPk(g.questId);
+          const obj = q && (q.objectives || []).find(o => o.id === g.objectiveId);
+          if (!obj) continue;
+          const cur = (qp.objectiveProgress && qp.objectiveProgress[g.objectiveId]) || 0;
+          const next = cur + g.count;
+          const target = obj.count || 1;
+          console.log(`[Combat] Tagged quest credit: ${g.questId}/${g.objectiveId} ${next}/${target}`);
+          await questService.updateObjective(characterId, g.questId, g.objectiveId, next >= target, next);
+        } catch (err) {
+          console.error('[Combat] Tagged quest credit failed:', err.message);
+        }
+      }
+
+      // Remaining (untagged) kills use the existing type/name matching across active quests.
+      const untagged = defeatedEnemies.filter(e => !taggedHandled.has(e));
+      if (untagged.length === 0) return;
+
       // Get all active quests for character
       const activeQuests = await QuestProgress.findAll({
         where: {
@@ -2136,24 +2171,24 @@ class CombatService {
           // Support multiple objective types: 'defeat', 'defeat_enemies', 'defeat_boss', 'defeat_specific_enemy', 'combat'
           if (objective.type === 'combat') {
             // Tutorial combat objective - mark as complete if any enemy was defeated
-            if (defeatedEnemies.length > 0) {
+            if (untagged.length > 0) {
               console.log(`[Combat] Marking tutorial combat objective ${objective.id} as complete`);
               await questService.updateObjective(
                 characterId,
                 quest.id,
                 objective.id,
                 true,
-                { defeatedEnemies: defeatedEnemies.length, completedAt: new Date().toISOString() }
+                { defeatedEnemies: untagged.length, completedAt: new Date().toISOString() }
               );
             }
           } else if (objective.type === 'defeat' || objective.type === 'defeat_enemies' || objective.type === 'defeat_boss') {
             // Check if defeated enemies match the target type
             const targetEnemyType = objective.target;
-            let matchedEnemies = defeatedEnemies;
-            
+            let matchedEnemies = untagged;
+
             // If target is specified, filter enemies by type
             if (targetEnemyType) {
-              matchedEnemies = defeatedEnemies.filter(e => 
+              matchedEnemies = untagged.filter(e =>
                 e.id?.includes(targetEnemyType) || 
                 e.name?.toLowerCase().includes(targetEnemyType?.toLowerCase()) ||
                 e.type === targetEnemyType ||
@@ -2180,9 +2215,11 @@ class CombatService {
           } else if (objective.type === 'defeat_specific_enemy') {
             // Check if any defeated enemy matches the target
             const targetEnemyType = objective.targetEnemyType || objective.target;
-            const matchedEnemies = defeatedEnemies.filter(e => 
-              e.id?.includes(targetEnemyType) || 
-              e.name?.toLowerCase().includes(targetEnemyType?.toLowerCase())
+            const matchedEnemies = untagged.filter(e =>
+              e.id?.includes(targetEnemyType) ||
+              e.name?.toLowerCase().includes(targetEnemyType?.toLowerCase()) ||
+              e.enemyType === targetEnemyType ||
+              e.type === targetEnemyType
             );
             
             if (matchedEnemies.length > 0) {

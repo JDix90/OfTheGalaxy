@@ -9,12 +9,13 @@
 
 const { CombatManager } = require('../../../src/realtime/combat');
 const { PlanetWorld } = require('../../../src/realtime/PlanetWorld');
+const { WorldManager } = require('../../../src/realtime/WorldManager');
 const { setRealtimeManager } = require('../../../src/realtime/registry');
 const combatService = require('../../../src/services/combatService');
 const inventoryService = require('../../../src/services/inventoryService');
 const { generateRandomEnemy } = require('../../../src/data/enemyTemplates');
-const { CombatEncounter, PlayerCharacter } = require('../../../src/models');
-const { createTestUser, createTestCharacter } = require('../../setup/testHelpers');
+const { CombatEncounter, PlayerCharacter, Quest, QuestProgress } = require('../../../src/models');
+const { createTestUser, createTestCharacter, createTestQuest } = require('../../setup/testHelpers');
 
 const mkWorld = (zone) => ({
   planetId: 'solenne',
@@ -239,5 +240,93 @@ describe('Realtime combat lifecycle (Phase 0–1)', () => {
     p.encounterId = 'enc'; p.lastCombatAt = 0; p.combatant.stats.health = 50;
     for (let i = 0; i < 5; i++) world.step(1, now);
     expect(p.combatant.stats.health).toBe(50);
+  });
+});
+
+describe('Realtime combat — Phase 5 (scripted spawns + quest crediting)', () => {
+  const stubSim = {
+    isWalkableSurface: () => true, isWalkableWorld: () => true,
+    surfaceToWorld: (x, y) => ({ x, z: y }), worldToSurface: (x, z) => ({ x, y: z }),
+    integrate: (pos) => ({ ...pos, moving: false, speed: 0 }), scale: 0.8,
+  };
+  const mgr = new WorldManager({ createSurfaceSim: () => stubSim, DEFAULTS: { scale: 0.8, tickHz: 20 } }, {});
+  const O = (o) => ({ description: o.id, ...o }); // quest objectives require a description
+  const questEnemyCount = (w, objectiveId) => [...w.enemies.values()].filter((e) => e.combatant.objectiveId === objectiveId).length;
+  let user, character;
+
+  beforeEach(async () => {
+    user = await createTestUser();
+    character = await createTestCharacter(user.id, { currentPlanet: 'sinkport', level: 5 });
+  });
+  afterEach(async () => {
+    await QuestProgress.destroy({ where: { characterId: character.id } });
+    await CombatEncounter.destroy({ where: { characterId: character.id } });
+  });
+
+  async function mkWorldPlayer() {
+    const w = new PlanetWorld('sinkport', stubSim, {}, { dangerLevel: 6, enemyPool: ['pirate'] });
+    const p = w.addPlayer({ id: String(character.id), character, ws: { readyState: 1, OPEN: 1, send: () => {} }, combatant: await combatService.buildPlayerCombatant(character), abilities: [] });
+    return { w, p };
+  }
+
+  test("createEncounter('npc') no longer throws (enum fix)", async () => {
+    const enc = await combatService.createEncounter(character.id, 'npc', ['ironclad']);
+    expect(enc && enc.id).toBeTruthy();
+    await CombatEncounter.destroy({ where: { id: enc.id } });
+  });
+
+  test('quest combat spawn is sequence-gated, spawns `count`, and is once-per-session', async () => {
+    const { w, p } = await mkWorldPlayer();
+    const quest = await createTestQuest({ objectives: [O({ id: 'o1', type: 'interact', target: 'x' }), O({ id: 'o2', type: 'defeat', target: 'palace_guardian', count: 2 })] });
+    await QuestProgress.create({ characterId: character.id, questId: quest.id, status: 'active', objectivesCompleted: {}, objectiveProgress: {} });
+    try {
+      await mgr._spawnQuestEnemies(w, p, quest.id, 'o2');
+      expect(questEnemyCount(w, 'o2')).toBe(0); // prior objective incomplete → gated
+
+      const qp = await QuestProgress.findOne({ where: { characterId: character.id, questId: quest.id } });
+      qp.objectivesCompleted = { o1: true }; qp.changed('objectivesCompleted', true); await qp.save();
+      await mgr._spawnQuestEnemies(w, p, quest.id, 'o2');
+      expect(questEnemyCount(w, 'o2')).toBe(2); // prior done → spawns count
+
+      await mgr._spawnQuestEnemies(w, p, quest.id, 'o2');
+      expect(questEnemyCount(w, 'o2')).toBe(2); // once per session
+    } finally {
+      await Quest.destroy({ where: { id: quest.id } });
+    }
+  });
+
+  test('keystone: tagged kills credit the exact objective and complete at count', async () => {
+    const quest = await createTestQuest({ objectives: [O({ id: 'o2', type: 'defeat', target: 'palace_guardian', count: 2 })] });
+    await QuestProgress.create({ characterId: character.id, questId: quest.id, status: 'active', objectivesCompleted: {}, objectiveProgress: {} });
+    try {
+      await combatService.updateQuestCombatObjectives({
+        characterId: character.id,
+        combatants: [
+          { type: 'enemy', stats: { health: 0 }, questId: quest.id, objectiveId: 'o2' },
+          { type: 'enemy', stats: { health: 0 }, questId: quest.id, objectiveId: 'o2' },
+        ],
+      });
+      const qp = await QuestProgress.findOne({ where: { characterId: character.id, questId: quest.id } });
+      expect(qp.objectiveProgress.o2).toBe(2);
+      expect(qp.objectivesCompleted.o2).toBe(true);
+    } finally {
+      await Quest.destroy({ where: { id: quest.id } });
+    }
+  });
+
+  test('keystone: untagged enemyType matches a defeat objective; a non-match does not', async () => {
+    const quest = await createTestQuest({ objectives: [O({ id: 'k1', type: 'defeat', target: 'pirate', count: 1 })] });
+    await QuestProgress.create({ characterId: character.id, questId: quest.id, status: 'active', objectivesCompleted: {}, objectiveProgress: {} });
+    try {
+      await combatService.updateQuestCombatObjectives({ characterId: character.id, combatants: [{ type: 'enemy', stats: { health: 0 }, enemyType: 'bounty_hunter', name: 'Bounty Hunter' }] });
+      let qp = await QuestProgress.findOne({ where: { characterId: character.id, questId: quest.id } });
+      expect(qp.objectivesCompleted.k1).toBeFalsy(); // wrong type → no credit
+
+      await combatService.updateQuestCombatObjectives({ characterId: character.id, combatants: [{ type: 'enemy', stats: { health: 0 }, enemyType: 'pirate', name: 'Pirate' }] });
+      qp = await QuestProgress.findOne({ where: { characterId: character.id, questId: quest.id } });
+      expect(qp.objectivesCompleted.k1).toBe(true); // matching type → credit + complete
+    } finally {
+      await Quest.destroy({ where: { id: quest.id } });
+    }
   });
 });

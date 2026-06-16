@@ -24,6 +24,7 @@ const STAMINA_REGEN = 3;     // stamina per second regenerated in-world (no rejo
 const HEALTH_REGEN = 4;          // hp/sec regenerated OUT of combat (authoritative; flushed to DB)
 const OOC_REGEN_DELAY_MS = 5000; // wait this long after the last combat before health regen kicks in
 const RESPAWN_INTERVAL = 8;      // seconds between ambient enemy respawns (replaces the encounter roll)
+const MAX_WORLD_ENEMIES = 30;    // hard cap on live enemies per world (scripted-spawn DoS backstop)
 const DECAY_INTERVAL = 1.2;  // seconds ≈ one "turn" — decays combat status/temporary effects
 const r2 = (n) => Math.round(n * 100) / 100;
 const normYaw = (y) => (typeof y === 'number' && Number.isFinite(y) ? ((y % TWO_PI) + TWO_PI) % TWO_PI : null);
@@ -117,6 +118,57 @@ class PlanetWorld {
       if (ok) return w;
     }
     return this._randomWalkable();
+  }
+
+  /** A walkable point ~`dist` units around `p` (for scripted spawns near the player). */
+  _nearWalkable(p, dist = 7) {
+    for (let i = 0; i < 14; i++) {
+      const a = Math.random() * TWO_PI;
+      const r = dist * (0.7 + Math.random() * 0.6);
+      const x = p.x + Math.cos(a) * r, z = p.z + Math.sin(a) * r;
+      if (this.sim.isWalkableWorld(x, z)) return { x, z };
+    }
+    return this._farWalkable(dist);
+  }
+
+  /**
+   * Spawn a SCRIPTED enemy (NPC attack / POI / quest) — distinct from ambient `_spawnOne`.
+   * The combatant carries `enemyType` (for type-based quest matching) and optional
+   * `questId`/`objectiveId` (for precise objective crediting in updateQuestCombatObjectives).
+   * Returns the world enemy id, or null. `spec`: { level?, name?, enemyType?, templateId?,
+   * difficulty?, near?:{x,z}, questId?, objectiveId? }.
+   */
+  spawnScriptedEnemy(spec = {}) {
+    if (this.enemies.size >= MAX_WORLD_ENEMIES) return null; // backstop vs scripted-spawn flooding
+    const level = spec.level || this._effLevel();
+    const pool = spec.templateId ? [spec.templateId] : (this.enemyPool || null);
+    let t;
+    try { t = generateRandomEnemy(level, spec.difficulty || 'moderate', pool); } catch (e) { return null; }
+    if (!t || !t.stats) return null;
+    let combatant;
+    try { combatant = buildEnemyActorCombatant(t); } catch (e) { return null; }
+    if (!combatant || !combatant.stats) return null;
+    combatant.temporaryEffects = [];
+    if (spec.name) combatant.name = spec.name;
+    if (spec.enemyType) combatant.enemyType = spec.enemyType;       // quest matching by type
+    if (spec.questId) combatant.questId = spec.questId;             // precise objective credit
+    if (spec.objectiveId) combatant.objectiveId = spec.objectiveId;
+    const home = (spec.near && Number.isFinite(spec.near.x)) ? this._nearWalkable(spec.near) : this._farWalkable();
+    const id = `s${this._enemySeq++}`; // 's' = scripted (vs 'e' ambient)
+    this.enemies.set(id, {
+      id,
+      name: spec.name || t.name || 'Hostile',
+      level: t.level || level,
+      tier: t.tier || 'normal',
+      templateKey: spec.enemyType || t.templateKey || t.key || null,
+      combatant,
+      maxHp: combatant.stats.maxHealth,
+      x: home.x, z: home.z, facing: 0,
+      home, patrolRadius: 3 + Math.random() * 2, phase: Math.random() * TWO_PI,
+      state: 'patrol', targetId: null, _t: Math.random() * 4,
+      dead: false, attackCdUntil: 0, scripted: true,
+    });
+    return id;
   }
 
   /** Spawn one ambient enemy (faction/planet pool, level-blended, escort-aware difficulty). */

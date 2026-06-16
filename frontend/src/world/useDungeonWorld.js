@@ -53,6 +53,7 @@ export function useDungeonWorld(subMap, sharedSim, netOptions) {
       cast(a, t) { if (this._net) this._net.cast(a, t); },
       dodge() { if (this._net) this._net.dodge(); },
       useItem(itemId) { if (this._net) this._net.useItem(itemId); },
+      requestSpawn(payload) { if (this._net) this._net.requestSpawn(payload); },
       hotbar() { return this._net ? this._net.hotbar : []; },
       castCd() { return this._net ? this._net.castCdUntil : null; },
       combatLog() { return this._net ? this._net.log : null; },

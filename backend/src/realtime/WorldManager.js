@@ -237,6 +237,90 @@ class WorldManager {
     return this.combat.useItem(found.world, found.player, itemId);
   }
 
+  /**
+   * Server-authoritative scripted spawn from a client request (NPC "Attack" / POI combat / quest
+   * combat). The client only sends a REFERENCE (npcId / poiId / questId+objectiveId); the server
+   * derives the enemy + validates, then spawns tagged hostiles near the player. This replaces the
+   * old startEncounter()→/game/combat turn-based entry points for these in-world fights.
+   */
+  async spawnFromRequest(world, player, msg) {
+    if (!world || !player || !msg || player.dead) return;
+    const near = { x: player.x, z: player.z };
+
+    if (msg.kind === 'npc' && msg.npcId) {
+      const { NPC } = require('../models');
+      const npc = await NPC.findByPk(String(msg.npcId));
+      if (!npc) return;
+      world.spawnScriptedEnemy({ name: npc.name || 'Hostile', level: npc.level || world._effLevel(), near });
+      return;
+    }
+
+    if (msg.kind === 'poi' && msg.poiId) {
+      const tids = await this._poiEnemyTemplates(world, String(msg.poiId));
+      if (!tids || !tids.length) return;
+      for (const tid of tids) world.spawnScriptedEnemy({ templateId: tid, near });
+      return;
+    }
+
+    if (msg.kind === 'quest' && msg.questId && msg.objectiveId) {
+      await this._spawnQuestEnemies(world, player, String(msg.questId), String(msg.objectiveId));
+    }
+  }
+
+  /** Resolve a POI's enemy template ids (reuses poiService's POI→enemy logic, no encounter row). */
+  async _poiEnemyTemplates(world, poiId) {
+    try {
+      const { Planet } = require('../models');
+      const poiService = require('../services/poiService');
+      const planet = await Planet.findByPk(world.planetId);
+      if (!planet) return null;
+      const pois = (planet.mapData && planet.mapData.pointsOfInterest) || planet.pointsOfInterest || [];
+      const poi = pois.find((p) => String(p.id) === poiId);
+      if (!poi) return null;
+      const dangerLevel = poi.dangerLevel || planet.dangerLevel || 5;
+      const numEnemies = Math.min(3, Math.ceil(dangerLevel / 3) + 1);
+      const types = (typeof poiService.getEnemyTypesForPOI === 'function' && poiService.getEnemyTypesForPOI(poi)) || world.enemyPool || ['ironclad'];
+      const out = [];
+      for (let i = 0; i < numEnemies; i++) out.push(types[Math.floor(Math.random() * types.length)]);
+      return out;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /** Spawn a quest combat objective's enemies (validated: active quest, combat objective, prior
+   *  steps done, once per session) — tagged so the kill credits exactly that objective. */
+  async _spawnQuestEnemies(world, player, questId, objectiveId) {
+    player._questSpawned = player._questSpawned || new Set();
+    const spawnKey = `${questId}::${objectiveId}`; // objective ids are quest-local → key by quest too
+    if (player._questSpawned.has(spawnKey)) return; // already spawned this session
+    const { Quest, QuestProgress } = require('../models');
+    const qp = await QuestProgress.findOne({ where: { characterId: player.characterId, questId, status: 'active' } });
+    if (!qp) return;
+    const quest = await Quest.findByPk(questId);
+    if (!quest || !Array.isArray(quest.objectives)) return;
+    const idx = quest.objectives.findIndex((o) => o.id === objectiveId);
+    if (idx < 0) return;
+    const obj = quest.objectives[idx];
+    if (!/^defeat/.test(obj.type || '')) return;                       // combat objectives only
+    // Only spawn on the quest's own planet (defense in depth; the client gates too).
+    if (quest.startLocation && quest.startLocation.planet && String(quest.startLocation.planet) !== String(world.planetId)) return;
+    const done = qp.objectivesCompleted || {};
+    if (done[objectiveId]) return;                                     // already complete
+    for (let i = 0; i < idx; i++) { if (!done[quest.objectives[i].id]) return; } // sequence gate
+
+    const count = Math.max(1, Math.min(6, obj.count || 1));
+    const name = String(obj.target || 'Enemy').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    const level = player.level || world._effLevel();
+    let spawned = 0;
+    for (let i = 0; i < count; i++) {
+      if (world.spawnScriptedEnemy({ name, enemyType: obj.target, level, near: { x: player.x, z: player.z }, questId, objectiveId })) spawned++;
+    }
+    // Only mark done if something actually spawned — otherwise (e.g. world at the enemy cap) leave
+    // it so the client's retry can place them once there's room (no quest soft-lock).
+    if (spawned > 0) player._questSpawned.add(spawnKey);
+  }
+
   stop() {
     if (this._loop) clearInterval(this._loop);
     if (this._saveLoop) clearInterval(this._saveLoop);

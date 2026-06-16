@@ -15,8 +15,8 @@
 | **2 — 3D combat UX** | reward toast, death/medical-fee toast, mid-session hotbar refresh (health bars / damage numbers / hotbar cooldowns / target ring already shipped in P4.3/4.4) | ✅ **Done** (PR #11) |
 | **3 — Consumables + regen in 3D** | WS `t:'item'` → in-world `useItem`, HTTP `useItem` routes in-world for live players, consumable quickslot (Q), in-tick OOC health regen | ✅ **Done** (PR #12) |
 | **4 — Re-home random encounters** | ambient in-world respawn (faction pools + level-blend + escort escalation); removed the turn-based dual-engine on the 3D surface | ✅ **Done** (PR #13) |
-| 5 — Re-home NPC / POI / quest combat | fix `'npc'` enum, scripted spawns, honor `metadata.questId/objectiveId` | ⏭️ **Next** |
-| 6 — Tutorial → 3D scripted fight | (old route kept as fallback) | ⬜ Planned |
+| **5 — Re-home NPC / POI / quest combat** | `'npc'` enum fix + server-authoritative `spawnScriptedEnemy` (NPC/POI/quest) + keystone (tagged + enemyType objective crediting) | ✅ **Done** (PR #14) |
+| 6 — Tutorial → 3D scripted fight | (old route kept as fallback); reuses `spawnScriptedEnemy` | ⏭️ **Next** |
 | 7 — Retire turn-based UI | flip flag, remove old layer; keep the shared funnel | ⬜ Planned |
 | 8 — Faction rep + polish (flagged) | rep-on-kill (MP-aware), enemy abilities/telegraphs, `defeat_boss` hook, companion actor | ⬜ Optional |
 
@@ -27,6 +27,8 @@
 **Still open (need a product call before their phase):** O1 faction-rep policy/deltas (Phase 8) · O2 random-encounter pacing after conversion (Phase 4) · O4 companion/escort combat in 3D — parity or drop? (Phase 5/8) · O5 enemy abilities/boss behavior (Phase 8) · O6 `defeat_boss` achievement hook (Phase 8).
 
 **Carried-forward follow-ups:** _(none open)_ — the mid-session hotbar UI refresh deferred from Phase 1 was completed in Phase 2 (server pushes `t:'hotbar'` after a level-up; client adopts it).
+
+**Phase 5 notes:** combat objectives carry `target`+`count` but **no location** (only the quest's `startLocation: {planet, area}`), so quest combat is wired without content edits: when the player is on the quest's planet and a `defeat*` objective is the current step (prior steps done), the server spawns `count` enemies **near the player**, named after `target` and tagged `questId`/`objectiveId`; the keystone credits that exact objective on kill. Trade-off (noted): quest enemies appear near the player rather than at the named area (e.g. "the palace") — a proper location/submap link is future content work. Spawns are **server-authoritative** (client sends only a reference id; server validates active-quest/sequence/planet/once + a 30-enemy/world cap). Deferred **multiplayer hardening** (inherent to the shared-world model, see §6): quest-tagged enemies are kill-stealable (no false credit, but stealable) and the spawn cap is a per-planet grief lever — a per-player spawn budget / instanced quest enemies would close these. Scripted spawns are visible to all players on the planet.
 
 **Phase 2 notes:** much of the original §4.8 UX was already shipped in P4.3/4.4 (enemy health bars via `Nameplate`, floating damage numbers via `CombatFx`, the red target ring, hotbar cooldown sweep, combat log). Phase 2 added the genuinely-missing victory/death feedback as **non-blocking toasts** (`CombatToasts`, fed by new `t:'reward'` + enriched `t:'respawn'` WS messages) plus the mid-session hotbar push. Deferred polish (optional, not blocking): screen-shake / hit-flash on player-taken crits.
 
