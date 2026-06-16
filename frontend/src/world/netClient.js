@@ -15,6 +15,8 @@
  * felt immediately.
  */
 
+import { tutorialEventBus, TUTORIAL_EVENTS } from '../services/tutorialEventBus';
+
 const SEND_HZ = 20;            // input send rate (matches the server tick)
 const CONNECT_TIMEOUT_MS = 2500;
 const BACKOFF = [1000, 2000, 4000, 8000, 10000];
@@ -130,6 +132,11 @@ export class NetClient {
       } else if (m.t === 'hotbar') {
         // Server pushed a refreshed kit (e.g. a mid-session ability unlock after a level-up).
         if (Array.isArray(m.hotbar)) this.hotbar = m.hotbar;
+      } else if (m.t === 'combat_done') {
+        // A scripted 3D fight finished (e.g. the tutorial training drone). Re-emit on the tutorial
+        // bus so the state machine advances COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO — the
+        // 3D engine's analogue of the old turn-based VictoryScreen emit.
+        if (m.tutorial) { try { tutorialEventBus.emit(TUTORIAL_EVENTS.COMBAT_ENDED, { isTutorial: true, status: 'won' }); } catch (_) {} }
       }
     };
 

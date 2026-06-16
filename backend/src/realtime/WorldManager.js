@@ -257,6 +257,23 @@ class WorldManager {
     if (!world || !player || !msg || player.dead) return;
     const near = { x: player.x, z: player.z };
 
+    if (msg.kind === 'tutorial') {
+      // The 3D onboarding fight: one weak, instanced training drone. It's PASSIVE until struck
+      // (so a first-timer can read the coaching cards unharried), only the tutorial player can
+      // engage it (no shared-world leakage / kill-stealing), and that player gets an HP floor so
+      // the fight cannot kill them. The killed drone carries `tutorial` → finalize emits
+      // `t:'combat_done'` which drives COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO.
+      const id = world.spawnScriptedEnemy({
+        templateId: 'droid_security', name: 'Training Drone', enemyType: 'training_drone',
+        level: Math.max(1, player.level || 1), difficulty: 'easy',
+        near, tutorial: true, ownerId: player.id, passive: true,
+      });
+      if (id && player.combatant && player.combatant.stats) {
+        player._hpFloor = Math.max(1, Math.ceil(player.combatant.stats.maxHealth * 0.5));
+      }
+      return;
+    }
+
     if (msg.kind === 'npc' && msg.npcId) {
       const { NPC } = require('../models');
       const npc = await NPC.findByPk(String(msg.npcId));

@@ -136,6 +136,20 @@ export default function SubMapView3D() {
     return () => window.removeEventListener('keydown', onKey);
   }, [worldRef, castAbility]);
 
+  // Phase 6b: bridge for TutorialOverlay (which doesn't hold the net world) to spawn the 3D
+  // tutorial training drone in-place. Returns true when issued to an ONLINE realtime world; on
+  // false the overlay falls back to the legacy turn-based tutorial fight (kept until Phase 7).
+  useEffect(() => {
+    if (!isRealtime) return undefined;
+    window.__otgTutorialCombat = () => {
+      const w = worldRef.current;
+      if (!w || !w.requestSpawn || (w.isOffline && w.isOffline())) return false;
+      w.requestSpawn({ kind: 'tutorial' });
+      return true;
+    };
+    return () => { if (window.__otgTutorialCombat) delete window.__otgTutorialCombat; };
+  }, [isRealtime, worldRef]);
+
   const pois = useMemo(() => buildSubmapPois(subMap, sim), [subMap, sim]);
   const exits = useMemo(() => buildSubmapExits(subMap, sim), [subMap, sim]);
   const npcs3d = useMemo(() => buildSubmapNpcs(npcs, subMap, sim), [npcs, subMap, sim]);

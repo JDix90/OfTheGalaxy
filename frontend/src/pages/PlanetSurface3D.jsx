@@ -132,6 +132,19 @@ export default function PlanetSurface3D() {
     return () => window.removeEventListener('keydown', onKey);
   }, [worldRef, castAbility]);
 
+  // Phase 6b: bridge for TutorialOverlay to spawn the 3D tutorial drone in-place (the tutorial
+  // venue is the spaceport, but the surface keeps this for robustness). Returns true only when
+  // issued to an online realtime world; false → overlay falls back to the legacy turn-based fight.
+  useEffect(() => {
+    window.__otgTutorialCombat = () => {
+      const w = worldRef.current;
+      if (!w || !w.requestSpawn || (w.isOffline && w.isOffline())) return false;
+      w.requestSpawn({ kind: 'tutorial' });
+      return true;
+    };
+    return () => { if (window.__otgTutorialCombat) delete window.__otgTutorialCombat; };
+  }, [worldRef]);
+
   const pois = useMemo(() => buildPois(planet, sim), [planet, sim]);
   const npcs3d = useMemo(() => buildNpcs(npcs, sim), [npcs, sim]);
   const waypoints = useMemo(

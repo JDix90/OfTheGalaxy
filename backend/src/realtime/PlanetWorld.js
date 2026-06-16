@@ -137,7 +137,10 @@ class PlanetWorld {
    * The combatant carries `enemyType` (for type-based quest matching) and optional
    * `questId`/`objectiveId` (for precise objective crediting in updateQuestCombatObjectives).
    * Returns the world enemy id, or null. `spec`: { level?, name?, enemyType?, templateId?,
-   * difficulty?, near?:{x,z}, questId?, objectiveId? }.
+   * difficulty?, near?:{x,z}, questId?, objectiveId?, ownerId?, tutorial?, passive? }.
+   * `ownerId` instances the enemy (only that player can engage / is chased); `passive` makes it
+   * wait until struck (low-aggro tutorial drone); `tutorial` tags the combatant so the kill is
+   * detectable in finalize.
    */
   spawnScriptedEnemy(spec = {}) {
     if (this.enemies.size >= MAX_WORLD_ENEMIES) return null; // backstop vs scripted-spawn flooding
@@ -154,6 +157,7 @@ class PlanetWorld {
     if (spec.enemyType) combatant.enemyType = spec.enemyType;       // quest matching by type
     if (spec.questId) combatant.questId = spec.questId;             // precise objective credit
     if (spec.objectiveId) combatant.objectiveId = spec.objectiveId;
+    if (spec.tutorial) combatant.tutorial = true;                   // finalize detects tutorial kills
     const home = (spec.near && Number.isFinite(spec.near.x)) ? this._nearWalkable(spec.near) : this._farWalkable();
     const id = `s${this._enemySeq++}`; // 's' = scripted (vs 'e' ambient)
     this.enemies.set(id, {
@@ -168,6 +172,9 @@ class PlanetWorld {
       home, patrolRadius: 3 + Math.random() * 2, phase: Math.random() * TWO_PI,
       state: 'patrol', targetId: null, _t: Math.random() * 4,
       dead: false, attackCdUntil: 0, scripted: true,
+      ownerId: spec.ownerId || null,   // instanced: only the owner can engage / is chased
+      tutorial: !!spec.tutorial,
+      aggressive: !spec.passive,       // passive enemies (tutorial drone) wait until struck
     });
     return id;
   }
@@ -397,16 +404,19 @@ class PlanetWorld {
     for (const e of this.enemies.values()) {
       if (e.dead) continue;
       e._t += dt;
-      // nearest LIVING player
+      // nearest LIVING player. Instanced enemies (e.g. the tutorial drone) only consider their
+      // owner, so they never chase or attack bystanders in the shared world.
       let target = null, best = Infinity;
       for (const p of this.players.values()) {
         if (p.dead) continue;
+        if (e.ownerId && p.id !== e.ownerId) continue;
         const d = Math.hypot(p.x - e.x, p.z - e.z);
         if (d < best) { best = d; target = p; }
       }
+      const passive = e.aggressive === false; // passive (unstruck tutorial drone) → patrol only
       const distHome = Math.hypot(e.x - e.home.x, e.z - e.home.z);
       let tx, tz, speed;
-      if (target && best < AGGRO_RADIUS && distHome < LEASH) {
+      if (target && !passive && best < AGGRO_RADIUS && distHome < LEASH) {
         e.state = 'chase'; e.targetId = target.id; tx = target.x; tz = target.z; speed = CHASE_SPEED;
       } else if (distHome > e.patrolRadius * 1.5) {
         e.state = 'patrol'; e.targetId = null; tx = e.home.x; tz = e.home.z; speed = PATROL_SPEED; // leash home

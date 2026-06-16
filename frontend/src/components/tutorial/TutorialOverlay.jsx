@@ -96,43 +96,42 @@ const TUTORIAL_STEPS = {
     showHighlight: false
   },
   [TUTORIAL_STATES.COMBAT_INTRO]: {
-    title: 'Combat Tutorial',
-    description: "You're about to enter your first combat encounter! This tutorial will teach you the basics of turn-based combat. Pay attention to the turn order, action menu, and how to use your abilities. Ready to begin?",
+    title: 'Time to Fight',
+    description: "Jax wants to see you handle yourself. Click 'Next' and a training drone will power up right here on the dock — click it to target, fire with your abilities, and dodge with Space. It hits back, but it won't put you down. Ready?",
     target: null, // Center tooltip
     position: 'center',
     showHighlight: false
   },
+  // Real-time 3D combat coaching (Phase 6) — the fight happens in-world on the spaceport, not on
+  // a turn-based card screen, so these are center prompts that teach the live controls. Read each
+  // and click Next; the training drone waits (passive) until you strike it, and it can't kill you.
   [TUTORIAL_STATES.COMBAT_STARTED]: {
-    title: 'Combat Started!',
-    description: "Welcome to combat! Let's learn the basics. First, look at the turn order panel to see who acts when.",
-    target: 'combat-turn-order',
-    position: 'right',
-    showHighlight: true,
-    highlightTarget: 'combat-turn-order'
+    title: 'A Training Drone Powers Up',
+    description: "A training drone just deployed in front of you. Click on it to lock on — a red ring marks your target. Your blaster fires automatically while a target is in range.",
+    target: null,
+    position: 'center',
+    showHighlight: false
   },
   [TUTORIAL_STATES.COMBAT_TURN_ORDER_EXPLAINED]: {
-    title: 'Turn Order',
-    description: 'This shows the turn order. The highlighted combatant is currently acting. You\'ll see when it\'s your turn.',
-    target: 'combat-turn-order',
-    position: 'right',
-    showHighlight: true,
-    highlightTarget: 'combat-turn-order'
+    title: 'Stay on Target',
+    description: 'Move with WASD to keep the drone in front of you — your weapon auto-fires at your locked target whenever it\'s in range. Floating numbers show the damage you deal.',
+    target: null,
+    position: 'center',
+    showHighlight: false
   },
   [TUTORIAL_STATES.COMBAT_ACTION_MENU_EXPLAINED]: {
-    title: 'Action Menu',
-    description: 'During your turn, select an action. You can Attack, Defend, Use Items, or Flee.',
-    target: 'combat-action-menu',
-    position: 'top',
-    showHighlight: true,
-    highlightTarget: 'combat-action-menu'
+    title: 'Use an Ability',
+    description: 'Press the number keys (1–9) to fire your abilities from the hotbar at the bottom. Each one costs stamina and then needs a moment to cool down before you can use it again.',
+    target: null,
+    position: 'center',
+    showHighlight: false
   },
   [TUTORIAL_STATES.COMBAT_TARGETING_EXPLAINED]: {
-    title: 'Targeting',
-    description: 'Now select a target. Click on an enemy to attack them.',
-    target: 'combat-enemy-combatant',
-    position: 'bottom',
-    showHighlight: true,
-    highlightTarget: 'combat-enemy-combatant'
+    title: 'Dodge and Finish It',
+    description: 'Press Space to dodge-roll — you get a brief flicker of invulnerability to slip an incoming hit. Now put the drone down: keep firing until its health bar empties.',
+    target: null,
+    position: 'center',
+    showHighlight: false
   },
   [TUTORIAL_STATES.LOOT_RECEIVED]: {
     title: 'Open Your Inventory',
@@ -1358,7 +1357,27 @@ export default function TutorialOverlay() {
       if (completeStep) {
         completeStep(currentState);
       }
-      
+
+      // Phase 6: prefer the in-place 3D fight. The host page (which owns the real-time net world)
+      // exposes window.__otgTutorialCombat, which spawns the training drone and returns true when
+      // it reached an ONLINE realtime world. On the drone's death the server sends t:'combat_done'
+      // → netClient re-emits COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO. No navigation, no
+      // turn-based card screen. If the realtime world is unavailable, fall through to the legacy
+      // path below (kept as a fallback until Phase 7 retires the turn-based engine).
+      const spawned3d = typeof window !== 'undefined'
+        && typeof window.__otgTutorialCombat === 'function'
+        && window.__otgTutorialCombat();
+      if (spawned3d) {
+        console.log('[TutorialOverlay] Spawned 3D tutorial drone in-world');
+        tutorialEventBus.emit(TUTORIAL_EVENTS.COMBAT_STARTED, {
+          characterId: currentCharacter?.id,
+          isTutorial: true,
+        });
+        transitionTo(TUTORIAL_STATES.COMBAT_STARTED);
+        return;
+      }
+
+      // --- Legacy fallback: turn-based card combat (realtime server unavailable / offline) ---
       // Launch tutorial combat encounter
       if (currentCharacter && startEncounter) {
         console.log('[TutorialOverlay] Launching tutorial combat encounter');
