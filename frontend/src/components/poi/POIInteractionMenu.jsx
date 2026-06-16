@@ -16,7 +16,7 @@ import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventB
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
 import './POIInteractionMenu.css';
 
-export default function POIInteractionMenu({ poi, planet, isOpen, onClose, position }) {
+export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCombat, position }) {
   const navigate = useNavigate();
   const { currentCharacter } = useCharacterStore();
   const { startEncounter } = useCombatStore();
@@ -144,6 +144,15 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, posit
 
   const handleAction = async (actionType) => {
     if (!currentCharacter || !poi || !planet || loading) return;
+
+    // 3D surface re-homes POI combat to a real-time in-world spawn (no turn-based card screen):
+    // the host page supplies onCombat, which returns true when it handled it in-world (short-
+    // circuiting BEFORE the POI interact call so the server doesn't also create a turn-based
+    // encounter). If it returns false (realtime offline) or isn't supplied (2D), fall through.
+    if (actionType === 'combat' && onCombat && onCombat(poi)) {
+      onClose && onClose();
+      return;
+    }
 
     setLoading(true);
 

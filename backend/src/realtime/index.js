@@ -76,6 +76,7 @@ async function attachRealtime(server) {
     let lastCastAt = 0;
     let lastDodgeAt = 0;
     let lastItemAt = 0;
+    let lastSpawnAt = 0;
 
     // Force-close connections that authenticate but never join (stale-connection DoS).
     const joinTimeout = setTimeout(() => {
@@ -162,6 +163,12 @@ async function attachRealtime(server) {
         lastItemAt = now;
         // Apply to the authoritative in-world combatant; swallow invalid/absent-item errors.
         try { await manager.combat.useItem(world, me, String(msg.itemId)); } catch (e) { /* non-fatal */ }
+      } else if (msg.t === 'spawn') {
+        const now = Date.now();
+        if (now - lastSpawnAt < 500) return; // anti-spam (scripted spawns are deliberate actions)
+        lastSpawnAt = now;
+        // Server derives + validates the enemy from the reference (npcId/poiId/questId).
+        try { await manager.spawnFromRequest(world, me, msg); } catch (e) { /* non-fatal */ }
       }
     });
 

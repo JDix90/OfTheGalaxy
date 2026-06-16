@@ -13,7 +13,7 @@ import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventB
 import QuestList from '../quest/QuestList';
 import './NPCInteractionMenu.css';
 
-export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTalk, position }) {
+export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTalk, onAttack, position }) {
   const navigate = useNavigate();
   const { currentCharacter } = useCharacterStore();
   const { startEncounter } = useCombatStore();
@@ -85,6 +85,15 @@ export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTal
     }
 
     if (!window.confirm(`Are you sure you want to attack ${npc.name}?`)) {
+      return;
+    }
+
+    // 3D surface re-homes combat to a real-time in-world spawn (no turn-based card screen): the
+    // host page supplies onAttack, which returns true when it handled it in-world. If it returns
+    // false (e.g. realtime server offline) — or isn't supplied (2D view) — fall back to the legacy
+    // turn-based encounter below.
+    if (onAttack && onAttack(npc)) {
+      onClose && onClose();
       return;
     }
 

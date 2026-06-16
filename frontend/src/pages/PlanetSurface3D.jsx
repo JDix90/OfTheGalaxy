@@ -63,6 +63,7 @@ export default function PlanetSurface3D() {
   const [selectedNPC, setSelectedNPC] = useState(null);
 
   const inputEnabledRef = useRef(true);
+  const questSpawnReqRef = useRef(new Map()); // (quest:objective) -> last-requested ts (retry w/ cooldown)
 
   // --- sim + world seam ---
   const sim = useMemo(
@@ -224,18 +225,51 @@ export default function PlanetSurface3D() {
     setNpcMenu({ npc: npc.raw, x: ne?.clientX ?? window.innerWidth / 2, y: ne?.clientY ?? window.innerHeight / 2 });
   }, []);
 
+  // Phase 5: NPC "Attack" / POI "Enter (Combat)" spawn a real-time hostile in-world (server
+  // derives the enemy from the reference) instead of the turn-based card screen. Return true only
+  // when handled in-world (server online); on false the menu falls back to the legacy turn-based
+  // path, so combat still works if the realtime WS is unreachable.
+  const onAttackNpc = useCallback((npc) => {
+    const w = worldRef.current;
+    if (!npc?.id || !w || !w.requestSpawn || (w.isOffline && w.isOffline())) return false;
+    w.requestSpawn({ kind: 'npc', npcId: npc.id });
+    setNpcs((prev) => prev.filter((n) => n.id !== npc.id)); // the friendly NPC becomes the hostile
+    return true;
+  }, [worldRef]);
+  const onPoiCombat = useCallback((poi) => {
+    const w = worldRef.current;
+    if (!poi?.id || !w || !w.requestSpawn || (w.isOffline && w.isOffline())) return false;
+    w.requestSpawn({ kind: 'poi', poiId: poi.id });
+    return true;
+  }, [worldRef]);
+
   // Ambient combat is now in-world (walkable hostiles via the realtime layer) — no random-
-  // encounter roll here. onMoved only fires quest/tutorial proximity events (mirrors the 2D
-  // surface); the visual beacons come from buildQuestWaypoints.
+  // encounter roll here. onMoved fires quest/tutorial proximity events AND requests the in-world
+  // spawn for a quest's current combat objective (Phase 5; server validates + dedupes).
   const onMoved = useCallback((surfacePos) => {
     const ch = useCharacterStore.getState().currentCharacter;
     if (!ch || !planet) return;
     const aq = useQuestStore.getState().activeQuests;
     if (!aq || !aq.length) return;
+    const reqMap = questSpawnReqRef.current;
+    const nowTs = Date.now();
     for (const { quest, progress } of aq) {
       if (!quest?.objectives) continue;
+      const done = progress?.objectivesCompleted || {};
+      // Quest combat: ask the server to spawn the CURRENT (first incomplete) combat objective's
+      // enemies, tagged so the kill credits it. We RETRY on a cooldown (not once-per-session) so a
+      // request dropped by the server's spawn throttle self-heals; the server re-validates
+      // (active / sequence / planet) and dedupes successful spawns authoritatively.
+      const current = quest.objectives.find((o) => !done[o.id]);
+      if (current && /^defeat/.test(current.type || '')) {
+        const key = `${quest.id}:${current.id}`;
+        if (nowTs - (reqMap.get(key) || 0) > 6000) {
+          reqMap.set(key, nowTs);
+          worldRef.current?.requestSpawn?.({ kind: 'quest', questId: quest.id, objectiveId: current.id });
+        }
+      }
       for (const objective of quest.objectives) {
-        if (progress?.objectivesCompleted?.[objective.id]) continue;
+        if (done[objective.id]) continue;
         const loc = objective.location;
         if (!loc || loc.planet !== planet.id) continue;
         const d = Math.hypot(surfacePos.x - (loc.x || 0), surfacePos.y - (loc.y || 0));
@@ -316,6 +350,7 @@ export default function PlanetSurface3D() {
           planet={planet}
           isOpen
           onClose={() => setPoiMenu(null)}
+          onCombat={onPoiCombat}
           position={{ x: poiMenu.x, y: poiMenu.y }}
         />
       )}
@@ -327,6 +362,7 @@ export default function PlanetSurface3D() {
           isOpen
           onClose={() => setNpcMenu(null)}
           onTalk={() => { setSelectedNPC(npcMenu.npc); setNpcMenu(null); }}
+          onAttack={onAttackNpc}
           position={{ x: npcMenu.x, y: npcMenu.y }}
         />
       )}

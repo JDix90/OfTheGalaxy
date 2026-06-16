@@ -26,7 +26,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       field: 'encounter_type',
       validate: {
-        isIn: [['random', 'quest', 'scripted', 'bounty', 'poi', 'dungeon']]
+        isIn: [['random', 'quest', 'scripted', 'bounty', 'poi', 'dungeon', 'npc']]
       }
     },
     combatants: {

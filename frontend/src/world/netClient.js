@@ -270,6 +270,15 @@ export class NetClient {
     if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify({ t: 'item', itemId }));
   }
 
+  /** Request a server-authoritative scripted spawn (NPC attack / POI / quest combat). The server
+   *  derives + validates the enemy from the reference; e.g. { kind:'npc', npcId } / { kind:'poi',
+   *  poiId } / { kind:'quest', questId, objectiveId }. */
+  requestSpawn(payload) {
+    if (this.mode !== 'online' || !payload) return;
+    const ws = this._ws;
+    if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify({ t: 'spawn', ...payload }));
+  }
+
   /** Drain queued combat fx (hit/death) for the scene to render. */
   drainFx() { if (this.fxQueue.length === 0) return null; const f = this.fxQueue; this.fxQueue = []; return f; }
 

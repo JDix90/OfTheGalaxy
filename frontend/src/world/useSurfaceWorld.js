@@ -96,6 +96,8 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
       dodge() { if (this._net) this._net.dodge(); },
       /** Use a consumable in-world (Phase 3); server resolves on the authoritative combatant. */
       useItem(itemId) { if (this._net) this._net.useItem(itemId); },
+      /** Request a server-authoritative scripted spawn (NPC/POI/quest combat, Phase 5). */
+      requestSpawn(payload) { if (this._net) this._net.requestSpawn(payload); },
       /** Ability hotbar [{id,name,type,cd,stam,target}] (online). */
       hotbar() { return this._net ? this._net.hotbar : []; },
       /** Local ability-cooldown map (id → ms-until-ready) for the hotbar sweep. */

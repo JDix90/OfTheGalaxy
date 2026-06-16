@@ -77,3 +77,28 @@ describe('PlanetWorld ambient spawns', () => {
     expect(w.enemies.size).toBe(3);
   });
 });
+
+describe('spawnScriptedEnemy (Phase 5)', () => {
+  test('tags the combatant (enemyType / questId / objectiveId) and spawns near the point', () => {
+    const w = new PlanetWorld('p', stub, {}, { dangerLevel: 6, enemyPool: ['pirate'] });
+    w.players.set('p1', fakePlayer({ x: 10, z: 10 }));
+    const id = w.spawnScriptedEnemy({ name: 'Palace Guardian', enemyType: 'palace_guardian', questId: 'q', objectiveId: 'o', near: { x: 10, z: 10 } });
+    const e = w.enemies.get(id);
+    expect(e).toBeTruthy();
+    expect(e.name).toBe('Palace Guardian');
+    expect(e.scripted).toBe(true);
+    expect(e.combatant.enemyType).toBe('palace_guardian');
+    expect(e.combatant.questId).toBe('q');
+    expect(e.combatant.objectiveId).toBe('o');
+    expect(Math.hypot(e.x - 10, e.z - 10)).toBeLessThan(20); // spawned near the requested point
+  });
+
+  test('untagged scripted spawn carries no quest tags', () => {
+    const w = new PlanetWorld('p', stub, {}, { dangerLevel: 6 });
+    w.players.set('p1', fakePlayer());
+    const id = w.spawnScriptedEnemy({ name: 'Thug' });
+    const e = w.enemies.get(id);
+    expect(e.combatant.questId).toBeUndefined();
+    expect(e.combatant.objectiveId).toBeUndefined();
+  });
+});
