@@ -269,11 +269,8 @@ describe('Realtime combat — Phase 5 (scripted spawns + quest crediting)', () =
     return { w, p };
   }
 
-  test("createEncounter('npc') no longer throws (enum fix)", async () => {
-    const enc = await combatService.createEncounter(character.id, 'npc', ['ironclad']);
-    expect(enc && enc.id).toBeTruthy();
-    await CombatEncounter.destroy({ where: { id: enc.id } });
-  });
+  // (the turn-based createEncounter('npc') enum-fix test was removed with the turn-based engine in
+  //  Phase 7c — the realtime engine stamps encounterType via buildEncounterMeta, not 'npc'.)
 
   test('quest combat spawn is sequence-gated, spawns `count`, and is once-per-session', async () => {
     const { w, p } = await mkWorldPlayer();
