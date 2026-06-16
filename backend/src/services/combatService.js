@@ -647,11 +647,22 @@ class CombatService {
       }
       await this.updateQuestCombatObjectives(encounter);
 
-      // Store rewards in encounter metadata for frontend display
-      if (rewards) {
+      // Faction reputation on kill (Phase 8.1): killing faction-tagged enemies lowers your
+      // standing with their faction. Best-effort and isolated from rewards — a rep failure
+      // must never roll back XP/credits/loot or leave the encounter stuck.
+      let reputation = [];
+      try {
+        reputation = await this.applyFactionReputationForKills(encounter);
+      } catch (error) {
+        console.warn('[Combat Service] Faction reputation update failed (encounter still ended):', error);
+      }
+
+      // Store rewards in encounter metadata for frontend display. Fold reputation into the
+      // same `rewards` object so it rides the existing realtime reward-toast path.
+      if (rewards || reputation.length) {
         encounter.metadata = {
           ...encounter.metadata,
-          rewards: rewards
+          rewards: { ...(rewards || {}), reputation }
         };
         await encounter.save();
       }
@@ -902,6 +913,62 @@ class CombatService {
       console.error('Failed to update quest combat objectives:', error);
       // Don't throw - quest updates shouldn't break combat
     }
+  }
+
+  /**
+   * Apply faction reputation changes for the enemies a player killed in this encounter
+   * (Phase 8.1). Killing faction-tagged enemies lowers your standing with that faction.
+   *
+   * - Only DEAD enemy combatants with a non-null `faction` count (untagged enemies — droids,
+   *   wild animals — are politically neutral and grant no rep change).
+   * - Deltas are tier-scaled (combatReputation.repDeltaForKill) and accumulated per faction,
+   *   so three smuggler kills apply one summed change rather than three writes.
+   * - Each faction write is best-effort: one faction failing must not block the others.
+   * - In multiplayer the realtime engine finalizes per-player off that player's own
+   *   `engagedEnemies`, so `encounter.combatants` only holds the kills attributable to THIS
+   *   character — attribution is correct without extra bookkeeping.
+   *
+   * @param {CombatEncounter} encounter
+   * @returns {Promise<Array<{factionId:string,name:string,delta:number,newTier:string,tierChanged:boolean}>>}
+   *          per-faction summary for the reward toast (empty when nothing applied / feature off).
+   */
+  async applyFactionReputationForKills(encounter) {
+    const { repDeltaForKill } = require('../config/combatReputation');
+    const combatants = Array.isArray(encounter.combatants) ? encounter.combatants : [];
+
+    // Accumulate tier-scaled deltas per faction across all of this character's kills.
+    const deltaByFaction = new Map();
+    for (const c of combatants) {
+      if (!c || c.type !== 'enemy') continue;
+      if (!(c.stats && c.stats.health <= 0)) continue; // only the dead grant rep
+      if (!c.faction) continue;                          // untagged = neutral, no change
+      const delta = repDeltaForKill(c);
+      if (!delta) continue;                              // feature off / zero-weighted
+      deltaByFaction.set(c.faction, (deltaByFaction.get(c.faction) || 0) + delta);
+    }
+    if (deltaByFaction.size === 0) return [];
+
+    const factionService = require('./factionService');
+    const { getFactionProfile } = require('../config/factionProfiles');
+    const changes = [];
+    for (const [factionId, delta] of deltaByFaction) {
+      try {
+        const result = await factionService.applyReputationChange(
+          encounter.characterId, factionId, delta, { reason: 'combat_kill' }
+        );
+        const profile = getFactionProfile(factionId);
+        changes.push({
+          factionId,
+          name: (profile && profile.name) || factionId, // display name for the toast
+          delta: result.delta,
+          newTier: result.newTier,
+          tierChanged: result.tierChanged,
+        });
+      } catch (error) {
+        console.warn(`[Combat Service] rep change failed for faction ${factionId}:`, error.message);
+      }
+    }
+    return changes;
   }
 
   /**

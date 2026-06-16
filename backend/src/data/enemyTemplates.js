@@ -31,7 +31,7 @@ const enemyTemplates = {
     ],
     xpReward: 25,
     creditsReward: 50,
-    faction: 'empire'
+    faction: 'iron_dominion' // was 'empire' (not a canonical id); Ironclads serve the Iron Dominion
   },
 
   ironclad_sergeant: {
@@ -62,7 +62,7 @@ const enemyTemplates = {
     ],
     xpReward: 50,
     creditsReward: 100,
-    faction: 'empire'
+    faction: 'iron_dominion' // was 'empire' (not a canonical id)
   },
 
   pirate: {
@@ -92,7 +92,7 @@ const enemyTemplates = {
     ],
     xpReward: 35,
     creditsReward: 75,
-    faction: null
+    faction: 'smugglers' // pirates answer to the Smugglers faction
   },
 
   syndicate_thug: {
@@ -119,7 +119,7 @@ const enemyTemplates = {
     ],
     xpReward: 40,
     creditsReward: 80,
-    faction: null
+    faction: 'vorr' // syndicate muscle aligned with the Vorr
   },
 
   pirate_captain: {
@@ -146,7 +146,7 @@ const enemyTemplates = {
     ],
     xpReward: 100,
     creditsReward: 200,
-    faction: null
+    faction: 'smugglers'
   },
 
   droid_security: {
@@ -173,7 +173,7 @@ const enemyTemplates = {
     ],
     xpReward: 30,
     creditsReward: 60,
-    faction: null
+    faction: null // unaligned security automaton — no faction rep on kill
   },
 
   bounty_hunter: {
@@ -200,7 +200,7 @@ const enemyTemplates = {
     ],
     xpReward: 75,
     creditsReward: 150,
-    faction: null
+    faction: 'the_tally' // bounty hunters of the Tally
   },
 
   wild_animal: {
@@ -227,7 +227,7 @@ const enemyTemplates = {
     ],
     xpReward: 20,
     creditsReward: 30,
-    faction: null
+    faction: null // beast — no faction rep on kill
   }
 };
 

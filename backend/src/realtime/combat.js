@@ -389,7 +389,7 @@ class CombatManager {
         try { await this._refreshCombatant(player); } catch (e) { /* keep stale rather than crash the tick */ }
         // Victory feedback: a non-blocking reward toast (xp / credits / loot / level-up).
         const rw = result && result.metadata && result.metadata.rewards;
-        if (rw) this._send(player, { t: 'reward', xp: rw.xp || 0, credits: rw.credits || 0, loot: rw.loot || [], leveledUp: rw.leveledUp || [], newLevel: rw.newLevel });
+        if (rw) this._send(player, { t: 'reward', xp: rw.xp || 0, credits: rw.credits || 0, loot: rw.loot || [], leveledUp: rw.leveledUp || [], newLevel: rw.newLevel, reputation: rw.reputation || [] });
       }
       // The tutorial HP floor is scoped to the live drone fight — lift it on ANY finalize so it
       // can never leak into a later in-world fight (e.g. a spaceport NPC/POI/quest spawn) and make

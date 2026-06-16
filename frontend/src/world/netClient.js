@@ -127,8 +127,10 @@ export class NetClient {
         if (typeof m.hp === 'number') this.selfHp = m.hp;
         this._pushToast({ kind: 'death', area: m.area || null, fee: m.fee || 0, restored: m.restored });
       } else if (m.t === 'reward') {
-        // Victory: non-blocking reward toast (xp / credits / loot / level-up).
-        this._pushToast({ kind: 'reward', xp: m.xp || 0, credits: m.credits || 0, loot: m.loot || [], leveledUp: m.leveledUp || [], newLevel: m.newLevel });
+        // Victory: non-blocking reward toast (xp / credits / loot / level-up / faction rep).
+        // reputation: [{ factionId, name, delta, newTier, tierChanged }] — display name comes
+        // from the backend so the HUD needs no faction registry.
+        this._pushToast({ kind: 'reward', xp: m.xp || 0, credits: m.credits || 0, loot: m.loot || [], leveledUp: m.leveledUp || [], newLevel: m.newLevel, reputation: Array.isArray(m.reputation) ? m.reputation : [] });
       } else if (m.t === 'hotbar') {
         // Server pushed a refreshed kit (e.g. a mid-session ability unlock after a level-up).
         if (Array.isArray(m.hotbar)) this.hotbar = m.hotbar;
