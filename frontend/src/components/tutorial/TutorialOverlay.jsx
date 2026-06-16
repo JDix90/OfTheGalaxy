@@ -7,13 +7,12 @@ import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTutorial } from '../../contexts/TutorialContext';
 import { useCharacterStore } from '../../state/characterSlice';
-import { useCombatStore } from '../../state/combatSlice';
 import { TUTORIAL_STATES } from '../../services/tutorialStateMachine';
 import { tutorialApi } from '../../services/api/tutorialApi';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import tutorialMetrics from '../../services/tutorialMetrics';
 import { notify } from '../hud/NotificationCenter';
-import { isCombat3DOnly, COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
+import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import TutorialTooltip from './TutorialTooltip';
 import TutorialHighlight from './TutorialHighlight';
 import './TutorialOverlay.css';
@@ -413,7 +412,6 @@ export default function TutorialOverlay() {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentCharacter } = useCharacterStore();
-  const { startEncounter } = useCombatStore();
   const { currentState, isActive, skipTutorial, transitionTo, isLoading, isStateCompleted, completeStep, stateMachine } = useTutorial();
   const [dismissedSteps, setDismissedSteps] = useState(new Set());
 
@@ -442,7 +440,6 @@ export default function TutorialOverlay() {
   const isOnPlanetSurface = location.pathname.startsWith('/game/planet/');
   const isOnSubmap = location.pathname.startsWith('/game/location/') || location.pathname.startsWith('/game/submap/');
   const isOnGameWorld = location.pathname === '/game';
-  const isOnCombat = location.pathname.startsWith('/game/combat/');
   const isOnVendor = location.pathname.startsWith('/game/vendor/');
   
   // Track if we've already navigated for this tutorial state to prevent loops
@@ -608,8 +605,8 @@ export default function TutorialOverlay() {
   
   // Don't render tutorial on /game page - it should only show on spaceport submap
   // This prevents the tutorial from appearing when player navigates back to /game
-  // BUT allow it to show on submap, planet surface, and combat page
-  if (isOnGameWorld && currentState !== TUTORIAL_STATES.TUTORIAL_COMPLETE && !isOnCombat) {
+  // BUT allow it to show on submap + planet surface (combat is now in-world 3D, no /game/combat).
+  if (isOnGameWorld && currentState !== TUTORIAL_STATES.TUTORIAL_COMPLETE) {
     return null;
   }
   
@@ -964,15 +961,11 @@ export default function TutorialOverlay() {
   // Check if inventory is open - if so, show inventory tutorial states
   const isInventoryOpen = document.querySelector('.inventory-overlay') !== null;
   
-  const shouldShow = isActive || 
+  const shouldShow = isActive ||
                      earlyTutorialStates.includes(currentState) ||
                      (currentState === TUTORIAL_STATES.NOT_STARTED && isOnSubmap) ||
-                     (isOnCombat && [
-                       TUTORIAL_STATES.COMBAT_STARTED,
-                       TUTORIAL_STATES.COMBAT_TURN_ORDER_EXPLAINED,
-                       TUTORIAL_STATES.COMBAT_ACTION_MENU_EXPLAINED,
-                       TUTORIAL_STATES.COMBAT_TARGETING_EXPLAINED
-                     ].includes(currentState)) ||
+                     // (combat tutorial states display via earlyTutorialStates now — combat is
+                     // in-world 3D on the submap/surface, no dedicated /game/combat route.)
                      (isOnVendor && [
                        TUTORIAL_STATES.VENDOR_OPENED,
                        TUTORIAL_STATES.VENDOR_ITEM_HOVER_EXPLAINED,
@@ -1379,150 +1372,11 @@ export default function TutorialOverlay() {
         return;
       }
 
-      // Phase 7: turn-based combat is retired. The 3D spawn didn't reach an online realtime world,
-      // so don't navigate to the old card screen — surface a graceful message and STAY at
-      // COMBAT_INTRO so the player can press Next again once reconnected.
-      if (isCombat3DOnly()) {
-        console.warn('[TutorialOverlay] realtime unavailable — cannot start the 3D tutorial fight; waiting for reconnect');
-        notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
-        return;
-      }
-
-      // --- Legacy fallback: turn-based card combat (realtime server unavailable / offline) ---
-      // Launch tutorial combat encounter
-      if (currentCharacter && startEncounter) {
-        console.log('[TutorialOverlay] Launching tutorial combat encounter');
-        
-        // Start tutorial combat encounter with a simple enemy
-        // Map tutorial enemy IDs to actual enemy templates
-        // The backend tutorial config defines enemy IDs like 'enemy_tutorial_training_droid',
-        // but we need to use actual enemy template IDs from enemyTemplates.js
-        const tutorialEnemyMap = {
-          'enemy_tutorial_training_droid': 'droid_security',
-          'enemy_tutorial_customs_drone': 'droid_security',
-          'enemy_tutorial_data_scavenger': 'pirate',
-          'enemy_tutorial_security_droid': 'droid_security',
-          'enemy_tutorial_hostile_patient': 'pirate',
-          'enemy_tutorial_assassin': 'bounty_hunter',
-          'enemy_tutorial_rogue_pilot': 'pirate'
-        };
-        
-        // Use droid_security as default tutorial enemy (simple, level-appropriate)
-        const tutorialEnemy = 'droid_security';
-        console.log('[TutorialOverlay] Starting tutorial combat with enemy:', tutorialEnemy);
-        
-        startEncounter(
-          currentCharacter.id,
-          'scripted', // Use scripted encounter type for tutorial
-          [tutorialEnemy] // Use a simple security droid for tutorial
-        ).then((encounter) => {
-          if (encounter && encounter.id) {
-            console.log('[TutorialOverlay] Tutorial combat encounter created:', encounter.id);
-            
-            // Store return location (submap where player was)
-            // Extract submap information from URL params or location state
-            let returnLocation = null;
-            
-            if (isOnSubmap) {
-              // Extract from URL path: /game/location/:planetId/:parentLocationId/:parentLocationType/:type
-              const pathMatch = location.pathname.match(/\/game\/location\/([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)/);
-              
-              if (pathMatch) {
-                const [, planetId, parentLocationId, parentLocationType, type] = pathMatch;
-                const subMapId = location.state?.subMapId || currentCharacter.currentLocation?.subMapId;
-                
-                returnLocation = {
-                  planetId: decodeURIComponent(planetId),
-                  parentLocationId: decodeURIComponent(parentLocationId),
-                  parentLocationType: decodeURIComponent(parentLocationType),
-                  type: decodeURIComponent(type),
-                  subMapId: subMapId,
-                  location: currentCharacter.currentLocation || { 
-                    x: 50, 
-                    y: 50,
-                    area: 'submap',
-                    subMapId: subMapId
-                  }
-                };
-              } else {
-                // Fallback: try to get from location.state (set when navigating to submap)
-                const stateSubMapId = location.state?.subMapId;
-                const statePlanetId = location.state?.planetId;
-                const stateParentLocationId = location.state?.parentLocationId;
-                const stateParentLocationType = location.state?.parentLocationType;
-                const stateType = location.state?.type;
-                
-                if (stateSubMapId && statePlanetId && stateParentLocationId) {
-                  returnLocation = {
-                    planetId: statePlanetId,
-                    parentLocationId: stateParentLocationId,
-                    parentLocationType: stateParentLocationType || 'poi',
-                    type: stateType || 'spaceport',
-                    subMapId: stateSubMapId,
-                    location: currentCharacter.currentLocation || { 
-                      x: 50, 
-                      y: 50,
-                      area: 'submap',
-                      subMapId: stateSubMapId
-                    }
-                  };
-                } else {
-                  // Last resort: use character's current location
-                  const charLocation = currentCharacter.currentLocation || {};
-                  returnLocation = {
-                    planetId: currentCharacter.currentPlanet,
-                    parentLocationId: charLocation.parentLocationId || 'spaceport',
-                    parentLocationType: 'poi',
-                    type: 'spaceport',
-                    subMapId: charLocation.subMapId,
-                    location: {
-                      x: charLocation.x || 50,
-                      y: charLocation.y || 50,
-                      area: 'submap',
-                      subMapId: charLocation.subMapId
-                    }
-                  };
-                }
-              }
-            } else {
-              // Not on submap, return to planet surface
-              returnLocation = {
-                planetId: currentCharacter.currentPlanet,
-                location: currentCharacter.currentLocation || { x: 50, y: 50 }
-              };
-            }
-            
-            console.log('[TutorialOverlay] Constructed return location:', returnLocation);
-            
-            // Navigate to combat view
-            navigate(`/game/combat/${encounter.id}`, {
-              state: {
-                returnLocation: returnLocation,
-                isTutorial: true
-              }
-            });
-            
-            // Emit COMBAT_STARTED event for tutorial tracking
-            tutorialEventBus.emit(TUTORIAL_EVENTS.COMBAT_STARTED, {
-              encounterId: encounter.id,
-              characterId: currentCharacter.id,
-              isTutorial: true
-            });
-            
-            // Transition to COMBAT_STARTED state
-            transitionTo(TUTORIAL_STATES.COMBAT_STARTED);
-          } else {
-            console.error('[TutorialOverlay] Failed to create combat encounter - no encounter ID');
-            alert('Failed to start combat tutorial. Please try again.');
-          }
-        }).catch((error) => {
-          console.error('[TutorialOverlay] Failed to start tutorial combat:', error);
-          alert(`Failed to start combat tutorial: ${error.message || 'Unknown error'}`);
-        });
-      } else {
-        console.error('[TutorialOverlay] Cannot start combat - missing character or startEncounter function');
-      }
-      
+      // Phase 7: turn-based combat is retired — the real-time engine is the only path. If the 3D
+      // spawn didn't reach an online world, surface a graceful message and STAY at COMBAT_INTRO so
+      // the player can press Next again once reconnected (no turn-based card-screen fallback).
+      console.warn('[TutorialOverlay] realtime unavailable — cannot start the 3D tutorial fight; waiting for reconnect');
+      notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
       return;
     }
     

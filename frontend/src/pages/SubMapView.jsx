@@ -43,8 +43,6 @@ import {
 } from '../utils/collisionDetection';
 import { animateMovement } from '../utils/movementAnimator';
 import { drawDungeonEnemies, getEnemyAtPoint } from '../utils/dungeonEnemyRenderer';
-import { checkCombatProximity } from '../utils/dungeonCombatTrigger';
-import { combatApi } from '../services/api/combatApi';
 import DungeonDepthIndicator from '../components/dungeon/DungeonDepthIndicator';
 import lockpickingApi from '../services/api/lockpickingApi';
 import PauseMenu from '../features/menus/PauseMenu';
@@ -3033,70 +3031,8 @@ export default function SubMapView() {
         // Check for resource encounter after movement
         await checkForResourceEncounter(updatedCharacter, subMap);
         
-        // Check for combat proximity in dungeons
-        if (subMap.type === 'dungeon' && dungeonEnemies.length > 0 && layout.grid) {
-          const gridWidth = layout.size?.width || layout.width || 20;
-          const gridHeight = layout.size?.height || layout.height || 20;
-          const playerGridPos = percentToGrid(clampedX, clampedY, gridWidth, gridHeight);
-          
-          const combatCheck = checkCombatProximity(playerGridPos, dungeonEnemies);
-          
-          if (combatCheck.shouldTrigger && combatCheck.enemy) {
-            // Create combat encounter first (before marking enemy as in combat)
-            try {
-              const encounterResponse = await combatApi.startEncounter(
-                updatedCharacter.id,
-                'dungeon',
-                null,
-                {
-                  dungeonEnemy: combatCheck.enemy,
-                  subMapId: subMap.id
-                }
-              );
-              
-              // Check response structure - API client returns response.data
-              const encounter = encounterResponse?.data || encounterResponse;
-              
-              if (encounter && encounter.id) {
-                // Mark enemy as in combat (only if encounter was created successfully)
-                try {
-                  await subMapApi.updateEnemyState(subMap.id, combatCheck.enemy.id, { inCombat: true });
-                } catch (updateError) {
-                  console.warn('[Dungeon] Failed to update enemy combat state (non-critical):', updateError);
-                  // Continue anyway - combat is more important than state update
-                }
-                
-                // Navigate to combat view with return location
-                navigate(`/game/combat/${encounter.id}`, {
-                  state: {
-                    returnLocation: {
-                      planetId: effectivePlanetId,
-                      location: currentCharacter.currentLocation,
-                      subMapId: subMap.id,
-                      parentLocationId: effectiveParentLocationId,
-                      parentLocationType: effectiveParentLocationType,
-                      type: effectiveType
-                    }
-                  }
-                });
-              } else {
-                console.error('[Dungeon] Invalid encounter response:', encounterResponse);
-                notify({
-                  type: 'error',
-                  title: 'Combat Error',
-                  message: 'Failed to initiate combat. Invalid response from server.'
-                });
-              }
-            } catch (combatError) {
-              console.error('[Dungeon] Failed to create combat encounter:', combatError);
-              notify({
-                type: 'error',
-                title: 'Combat Error',
-                message: 'Failed to initiate combat. Please try again.'
-              });
-            }
-          }
-        }
+        // (Dungeon combat-proximity trigger removed in Phase 7 — dungeon combat is real-time +
+        // 3D-only via SubMapView3D/DungeonView3D; this 2D fallback no longer starts combat.)
       }
     } catch (error) {
       console.error('Failed to update player location in sub-map:', error);

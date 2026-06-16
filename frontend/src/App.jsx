@@ -34,7 +34,6 @@ const FactionView = lazy(() => import('./features/factions/FactionView'));
 const TradingView = lazy(() => import('./features/trading/TradingView'));
 const CraftingView = lazy(() => import('./features/crafting/CraftingView'));
 const ExplorationJournal = lazy(() => import('./features/exploration/ExplorationJournal'));
-const CombatView = lazy(() => import('./features/combat/CombatView'));
 // Phase-0 3D spike (standalone, unauthenticated throwaway route).
 const SpikePage = lazy(() => import('./spike/SpikePage'));
 // Phase-1 walkable surface harness (standalone, unauthenticated — synthetic data).
@@ -196,15 +195,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/game/combat/:encounterId?" 
-          element={
-            <ProtectedRoute>
-              {currentCharacter ? <CombatView /> : <Navigate to="/character/select" />}
-            </ProtectedRoute>
-          } 
-        />
-        
         {/* Catch-all redirect */}
         {/* Phase-0 3D spike — standalone, no auth/character required */}
         <Route path="/spike" element={<SpikePage />} />
