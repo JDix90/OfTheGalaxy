@@ -347,10 +347,13 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
         } else if (actionType === 'harvest' && data.rewards) {
           // Show harvest results
           const itemCount = data.rewards.items?.length || 0;
-          const itemNames = data.rewards.items?.map(item => {
-            const itemDef = require('../../data/items').find(i => i.id === item.itemId);
-            return `${item.quantity}x ${itemDef?.name || item.itemId}`;
-          }).join(', ') || 'resources';
+          // The backend's `data.message` already lists resources by name and
+          // takes precedence below; this is a defensive fallback. (Note: there is
+          // no frontend item catalog to look names up in — a CommonJS require here
+          // throws in the browser bundle — so format the id directly.)
+          const itemNames = data.rewards.items?.map(item =>
+            `${item.quantity}x ${item.name || formatDisplayName(item.itemId)}`
+          ).join(', ') || 'resources';
           
           notify({
             type: 'success',
