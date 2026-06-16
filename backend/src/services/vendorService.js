@@ -15,6 +15,55 @@ class VendorService {
   // the player never pays more than the listed price.
   static MARKUP = 1.2;
 
+  // How many distinct sold items a vendor remembers for buyback.
+  static MAX_BUYBACK_ENTRIES = 12;
+
+  /**
+   * Pure: record a just-sold item into a buyback ledger, returning a NEW ledger.
+   * Entries are keyed by itemId (re-selling the same item sums quantity and
+   * refreshes the buyback price to the latest sell price), newest first, capped.
+   * @param {Array} ledger
+   * @param {{ itemId: string, quantity: number, unitPrice: number }} sale
+   * @returns {Array}
+   */
+  static recordBuyback(ledger, { itemId, quantity, unitPrice }) {
+    const list = Array.isArray(ledger) ? ledger.slice() : [];
+    const qty = Math.max(1, Math.floor(quantity || 1));
+    const price = Math.max(1, Math.floor(unitPrice || 1));
+    const idx = list.findIndex((e) => e && e.itemId === itemId);
+    const soldAt = new Date().toISOString();
+    if (idx >= 0) {
+      const merged = { itemId, quantity: list[idx].quantity + qty, unitPrice: price, soldAt };
+      list.splice(idx, 1);
+      list.unshift(merged);
+    } else {
+      list.unshift({ itemId, quantity: qty, unitPrice: price, soldAt });
+    }
+    return list.slice(0, VendorService.MAX_BUYBACK_ENTRIES);
+  }
+
+  /**
+   * Pure: consume `quantity` of `itemId` from a buyback ledger. Throws if the
+   * item isn't present or there isn't enough. Returns the new ledger plus the
+   * locked-in price (what the player originally sold it for).
+   * @returns {{ ledger: Array, unitPrice: number, totalCost: number }}
+   */
+  static consumeBuyback(ledger, itemId, quantity) {
+    const list = Array.isArray(ledger) ? ledger.slice() : [];
+    const idx = list.findIndex((e) => e && e.itemId === itemId);
+    if (idx < 0) throw new Error('No buyback record for this item');
+    const entry = list[idx];
+    const qty = Math.max(1, Math.floor(quantity || 1));
+    if (entry.quantity < qty) throw new Error(`Only ${entry.quantity} available to buy back`);
+    const remaining = entry.quantity - qty;
+    if (remaining > 0) {
+      list[idx] = { ...entry, quantity: remaining };
+    } else {
+      list.splice(idx, 1);
+    }
+    return { ledger: list, unitPrice: entry.unitPrice, totalCost: entry.unitPrice * qty };
+  }
+
   /**
    * Get vendor inventory
    * @param {string} npcId - NPC ID
@@ -386,13 +435,16 @@ class VendorService {
       });
     }
     await npc.save();
-    
-    // Small relationship increase for successful trade
+
+    // Small relationship increase for successful trade + remember the sale so the
+    // player can buy it back at the price they sold it for.
     if (relationship) {
       relationship.increaseRelationship(1);
+      relationship.buybackItems = VendorService.recordBuyback(relationship.buybackItems, { itemId, quantity, unitPrice });
+      relationship.changed('buybackItems', true);
       await relationship.save();
     }
-    
+
     // Track quest objectives for interact type (e.g., tutorial_vendor)
     try {
       const questService = require('./questService');
@@ -446,6 +498,98 @@ class VendorService {
       unitPrice,
       totalValue,
       newCredits: character.credits
+    };
+  }
+
+  /**
+   * Get the buyback list for a character at a vendor (items they previously sold
+   * here). Enriched + shaped like getVendorInventory so the UI can reuse the same
+   * item rendering. The buyback price is the price the item was sold for.
+   * @param {string} characterId
+   * @param {string} npcId
+   * @returns {Promise<Object>}
+   */
+  async getBuyback(characterId, npcId) {
+    const npc = await NPC.findByPk(npcId);
+    if (!npc) {
+      throw new Error('NPC not found');
+    }
+
+    const { relationship } = await npcService.getNPCWithRelationship(npcId, characterId);
+    const ledger = Array.isArray(relationship?.buybackItems) ? relationship.buybackItems : [];
+
+    const items = ledger.map((entry) => {
+      const itemDef = getItemDefinition(entry.itemId);
+      return {
+        itemId: entry.itemId,
+        quantity: entry.quantity,
+        // Buyback costs exactly what the player got for it — no vendor markup.
+        buyPrice: entry.unitPrice,
+        unitPrice: entry.unitPrice,
+        soldAt: entry.soldAt,
+        itemDefinition: itemDef || {
+          id: entry.itemId,
+          name: entry.itemId,
+          type: 'misc',
+          value: entry.unitPrice,
+          description: 'Previously sold item'
+        }
+      };
+    });
+
+    return {
+      vendorId: npcId,
+      vendorName: npc.name,
+      items,
+      currency: 'credits'
+    };
+  }
+
+  /**
+   * Buy back a previously-sold item at the price it was sold for.
+   * @param {string} characterId
+   * @param {string} npcId
+   * @param {string} itemId
+   * @param {number} quantity
+   * @returns {Promise<Object>}
+   */
+  async buybackItem(characterId, npcId, itemId, quantity = 1) {
+    const character = await PlayerCharacter.findByPk(characterId);
+    if (!character) {
+      throw new Error('Character not found');
+    }
+
+    const npc = await NPC.findByPk(npcId);
+    if (!npc) {
+      throw new Error('NPC not found');
+    }
+
+    const { relationship } = await npcService.getNPCWithRelationship(npcId, characterId);
+
+    // Lock in the price from the ledger (throws if not present / not enough).
+    const { ledger, unitPrice, totalCost } = VendorService.consumeBuyback(relationship.buybackItems, itemId, quantity);
+
+    if (character.credits < totalCost) {
+      throw new Error(`Insufficient credits. Need ${totalCost}, have ${character.credits}`);
+    }
+
+    // Deduct credits + return the item to the player.
+    character.credits -= totalCost;
+    await character.save();
+    await PlayerInventory.addItem(characterId, itemId, quantity, `bought back from ${npc.name}`);
+
+    // Persist the shrunken ledger.
+    relationship.buybackItems = ledger;
+    relationship.changed('buybackItems', true);
+    await relationship.save();
+
+    const itemDef = getItemDefinition(itemId);
+    return {
+      item: itemDef || { id: itemId, name: itemId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), value: unitPrice },
+      quantity,
+      unitPrice,
+      totalCost,
+      remainingCredits: character.credits
     };
   }
 

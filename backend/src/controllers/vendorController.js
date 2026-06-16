@@ -109,6 +109,60 @@ class VendorController {
   }
 
   /**
+   * Get buyback list (items the character previously sold here)
+   * GET /api/vendors/:npcId/buyback?characterId=
+   */
+  async getBuyback(req, res, next) {
+    try {
+      const { npcId } = req.params;
+      const { characterId } = req.query;
+
+      if (!characterId) {
+        return res.status(400).json({
+          success: false,
+          error: 'characterId is required'
+        });
+      }
+
+      const buyback = await vendorService.getBuyback(characterId, npcId);
+
+      res.json({
+        success: true,
+        data: buyback
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Buy back a previously-sold item
+   * POST /api/vendors/:npcId/buyback
+   */
+  async buybackItem(req, res, next) {
+    try {
+      const { npcId } = req.params;
+      const { characterId, itemId, quantity = 1 } = req.body;
+
+      if (!characterId || !itemId) {
+        return res.status(400).json({
+          success: false,
+          error: 'characterId and itemId are required'
+        });
+      }
+
+      const result = await vendorService.buybackItem(characterId, npcId, itemId, quantity);
+
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Sell item to vendor
    * POST /api/vendors/:npcId/sell
    */

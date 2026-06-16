@@ -102,6 +102,7 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
   const { items, loadInventory } = useInventoryStore();
 
   const [vendorInventory, setVendorInventory] = useState(null);
+  const [buybackInventory, setBuybackInventory] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [priceQuote, setPriceQuote] = useState(null);
@@ -154,7 +155,13 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
   }, [vendorInventory, npcId, currentCharacter]);
 
   useEffect(() => {
-    if (selectedItem && currentCharacter && activeTab) {
+    if (!selectedItem || !currentCharacter || !activeTab) return;
+    if (activeTab === 'buyback') {
+      // Buyback price is fixed (what the player sold it for) — quote locally.
+      const unit = selectedItem.unitPrice ?? selectedItem.buyPrice ?? 0;
+      const totalCost = unit * quantity;
+      setPriceQuote({ unitPrice: unit, totalCost, canAfford: (currentCharacter.credits || 0) >= totalCost, breakdown: null });
+    } else {
       loadPriceQuote();
     }
   }, [selectedItem, quantity, activeTab, currentCharacter]);
@@ -180,6 +187,15 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
       const vendorResponse = await vendorApi.getVendorInventory(npcId);
       const inventory = vendorResponse.data || vendorResponse;
       setVendorInventory(inventory);
+
+      // Load buyback list (items the player previously sold here). Non-fatal.
+      try {
+        const buybackResponse = await vendorApi.getBuyback(npcId, currentCharacter.id);
+        setBuybackInventory(buybackResponse.data || buybackResponse);
+      } catch (bbErr) {
+        console.warn('Failed to load buyback list:', bbErr?.message);
+        setBuybackInventory({ items: [] });
+      }
     } catch (err) {
       console.error('Failed to load vendor data:', err);
       setError(err.message || 'Failed to load vendor');
@@ -280,6 +296,32 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
       setQuantity(1);
     } catch (err) {
       pushToast({ type: 'error', message: `Couldn't sell item: ${err.message}` });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBuyback = async () => {
+    if (!selectedItem || !currentCharacter) return;
+
+    try {
+      setIsLoading(true);
+      const result = await vendorApi.buybackItem(npcId, currentCharacter.id, selectedItem.itemId, quantity);
+      const buybackResult = result.data || result;
+
+      await loadData();
+      await loadInventory(currentCharacter.id);
+
+      const { loadCharacter } = useCharacterStore.getState();
+      if (loadCharacter) {
+        await loadCharacter(currentCharacter.id);
+      }
+
+      pushToast({ type: 'success', message: `Bought back ${quantity}× ${buybackResult.item.name} for ${buybackResult.totalCost} credits` });
+      setSelectedItem(null);
+      setQuantity(1);
+    } catch (err) {
+      pushToast({ type: 'error', message: `Couldn't buy back item: ${err.message}` });
     } finally {
       setIsLoading(false);
     }
@@ -403,16 +445,54 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
             >
               Sell
             </button>
+            {buybackInventory?.items?.length > 0 && (
+              <button
+                className={`tab-button ${activeTab === 'buyback' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('buyback');
+                  setSelectedItem(null);
+                  setQuantity(1);
+                }}
+              >
+                Buyback
+              </button>
+            )}
           </div>
 
           <div className="trading-panels">
             {/* Item List Panel */}
             <div className="item-list-panel">
-              <h3>{activeTab === 'buy' ? 'Vendor Inventory' : 'Your Inventory'}</h3>
+              <h3>{activeTab === 'buy' ? 'Vendor Inventory' : activeTab === 'buyback' ? 'Buy Back' : 'Your Inventory'}</h3>
               <div className="item-list" ref={itemListRef} data-tutorial-target={TUTORIAL_TARGETS.VENDOR_ITEM_LIST}>
-                {activeTab === 'buy' ? (
-                  vendorInventory.items && vendorInventory.items.length > 0 ? (
-                    vendorInventory.items.map((vendorItem, index) => {
+                {activeTab === 'sell' ? (
+                  playerItems.length > 0 ? (
+                    playerItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`item-card ${selectedItem?.itemId === item.itemId ? 'selected' : ''}`}
+                        data-tutorial-target={item.itemId === 'droid_parts' ? 'vendor-item-droid-parts' : `vendor-item-${item.itemId}`}
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setQuantity(1);
+                        }}
+                        onMouseEnter={() => handleItemHover(item)}
+                      >
+                        <div className="item-name">{item.itemDefinition?.name || formatDisplayName(item.itemId)}</div>
+                        <div className="item-details">
+                          <span className="item-quantity">Qty: {item.quantity}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="empty-list">No items to sell</div>
+                  )
+                ) : (
+                  (() => {
+                    const listItems = activeTab === 'buyback'
+                      ? (buybackInventory?.items || [])
+                      : (vendorInventory.items || []);
+                    return listItems.length > 0 ? (
+                      listItems.map((vendorItem, index) => {
                       const stock = stockInfo(vendorItem.quantity);
                       return (
                         <div
@@ -448,30 +528,9 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
                       );
                     })
                   ) : (
-                    <div className="empty-list">No items available</div>
-                  )
-                ) : (
-                  playerItems.length > 0 ? (
-                    playerItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className={`item-card ${selectedItem?.itemId === item.itemId ? 'selected' : ''}`}
-                        data-tutorial-target={item.itemId === 'droid_parts' ? 'vendor-item-droid-parts' : `vendor-item-${item.itemId}`}
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setQuantity(1);
-                        }}
-                        onMouseEnter={() => handleItemHover(item)}
-                      >
-                        <div className="item-name">{item.itemDefinition?.name || formatDisplayName(item.itemId)}</div>
-                        <div className="item-details">
-                          <span className="item-quantity">Qty: {item.quantity}</span>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="empty-list">No items to sell</div>
-                  )
+                    <div className="empty-list">{activeTab === 'buyback' ? 'Nothing to buy back' : 'No items available'}</div>
+                  );
+                  })()
                 )}
               </div>
             </div>
@@ -487,7 +546,7 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
                     </div>
 
                     {/* Item Description */}
-                    {activeTab === 'buy' && selectedItem.itemDefinition?.description && (
+                    {activeTab !== 'sell' && selectedItem.itemDefinition?.description && (
                       <div className="item-description-trade">
                         {selectedItem.itemDefinition.description}
                       </div>
@@ -553,10 +612,10 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
                         <div className="price-line total">
                           <span>Total:</span>
                           <span>
-                            {activeTab === 'buy' ? priceQuote.totalCost : priceQuote.totalValue} credits
+                            {activeTab === 'sell' ? priceQuote.totalValue : priceQuote.totalCost} credits
                           </span>
                         </div>
-                        {activeTab === 'buy' && priceQuote.canAfford === false && (
+                        {activeTab !== 'sell' && priceQuote.canAfford === false && (
                           <div className="price-warning">
                             Insufficient credits!
                           </div>
@@ -565,7 +624,7 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
                     )}
 
                     <div className="transaction-actions">
-                      {activeTab === 'buy' ? (
+                      {activeTab === 'buy' && (
                         <button
                           className="btn-primary buy-button"
                           data-tutorial-target={TUTORIAL_TARGETS.VENDOR_BUY_BUTTON}
@@ -574,7 +633,8 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
                         >
                           {isLoading ? 'Processing...' : `Buy ${quantity}x`}
                         </button>
-                      ) : (
+                      )}
+                      {activeTab === 'sell' && (
                         <button
                           className="btn-primary sell-button"
                           data-tutorial-target={TUTORIAL_TARGETS.VENDOR_SELL_BUTTON}
@@ -584,12 +644,21 @@ export default function VendorPanel({ npcId, npc: npcProp, onClose }) {
                           {isLoading ? 'Processing...' : `Sell ${quantity}x`}
                         </button>
                       )}
+                      {activeTab === 'buyback' && (
+                        <button
+                          className="btn-primary buy-button"
+                          onClick={handleBuyback}
+                          disabled={isLoading || (priceQuote && !priceQuote.canAfford)}
+                        >
+                          {isLoading ? 'Processing...' : `Buy back ${quantity}x`}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </>
               ) : (
                 <div className="no-selection">
-                  <p>Select an item to {activeTab === 'buy' ? 'buy' : 'sell'}</p>
+                  <p>Select an item to {activeTab === 'sell' ? 'sell' : activeTab === 'buyback' ? 'buy back' : 'buy'}</p>
                 </div>
               )}
             </div>
