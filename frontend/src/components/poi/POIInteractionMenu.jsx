@@ -9,6 +9,7 @@ import { useCharacterStore } from '../../state/characterSlice';
 import { useCombatStore } from '../../state/combatSlice';
 import { useDiscoveryStore } from '../../state/discoverySlice';
 import { useInventoryStore } from '../../state/inventorySlice';
+import { useQuestStore } from '../../state/questSlice';
 import poiApi from '../../services/api/poiApi';
 import { notify } from '../hud/NotificationCenter';
 import InvestigationModal from './InvestigationModal';
@@ -179,6 +180,28 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
       const shouldShowNotification = !['enter', 'quest', 'investigate'].includes(actionType);
 
       if (isSuccess) {
+        // Quest-item collection feedback (a `collect` POI grants items + credits the objective on
+        // Investigate / Explore / Enter). Surface what was found + whether the objective completed,
+        // and refresh the quest tracker + inventory so the player sees the progress immediately.
+        const credited = data?.objectivesCredited || [];
+        const granted = data?.itemsGranted || [];
+        if (credited.length > 0 || granted.length > 0) {
+          const anyComplete = credited.some(o => o.completed);
+          const found = granted.length > 0
+            ? `Found ${granted.map(i => `${i.count}× ${String(i.itemId).replace(/_/g, ' ')}`).join(', ')}`
+            : null;
+          notify({
+            type: 'success',
+            title: anyComplete ? 'Objective Complete' : 'Quest Item Collected',
+            message: found || (anyComplete ? 'Quest objective complete — return to the quest giver.' : 'Quest progress updated.')
+          });
+          try {
+            const { loadActiveQuests } = useQuestStore.getState();
+            if (loadActiveQuests && currentCharacter) await loadActiveQuests(currentCharacter.id);
+          } catch (e) { /* non-fatal */ }
+          try { if (currentCharacter) await loadInventory(currentCharacter.id); } catch (e) { /* non-fatal */ }
+        }
+
         // Handle different action results
         if (actionType === 'combat' && data.combatEncounter) {
           // Navigate to combat
