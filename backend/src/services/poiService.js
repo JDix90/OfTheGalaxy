@@ -335,16 +335,29 @@ class POIService {
       }
     );
 
+    // Explore/Discover on a quest POI must ALSO collect its items + credit the bound objective
+    // (this is the action a player naturally takes to "go find the items / reach the place");
+    // previously only Investigate/Enter collected, so Exploring a quest POI did nothing.
+    const { itemsGranted, objectivesCredited } = await this.collectQuestItemsFromPOI(character, poi);
+    objectivesCredited.push(...await this.creditQuestPOIObjective(character, poi));
+
     interaction.state = 'discovered';
     interaction.metadata = {
       ...interaction.metadata,
       discovered: true
     };
 
+    let message = `Discovered ${poi.name}`;
+    if (itemsGranted.length > 0) {
+      message += `. Found: ${itemsGranted.map(i => `${i.count}x ${i.itemId}`).join(', ')}`;
+    }
+
     return {
       success: true,
       interaction,
-      message: `Discovered ${poi.name}`
+      message: message,
+      itemsGranted: itemsGranted,
+      objectivesCredited: objectivesCredited
     };
   }
 
@@ -381,10 +394,11 @@ class POIService {
    */
   async handleEnterPOI(character, planet, poi, interaction) {
     const subMapService = require('./subMapService');
-    
-    // Check for quest items at this POI (before entering sub-map)
-    const itemsGranted = await this.collectQuestItemsFromPOI(character, poi);
-    
+
+    // Check for quest items at this POI (before entering sub-map) + credit any bound reach objective
+    const { itemsGranted, objectivesCredited } = await this.collectQuestItemsFromPOI(character, poi);
+    objectivesCredited.push(...await this.creditQuestPOIObjective(character, poi));
+
     // Determine sub-map type from POI type
     // Check if this is a dungeon POI first
     const isDungeon = poi.type === 'danger' || 
@@ -444,81 +458,106 @@ class POIService {
       interaction,
       subMap,
       message: message,
-      itemsGranted: itemsGranted
+      itemsGranted: itemsGranted,
+      objectivesCredited: objectivesCredited
     };
   }
 
   /**
-   * Collect quest items from a POI (shared function for Enter and Investigate)
+   * Collect quest items from a POI (shared by Enter / Investigate / Explore).
+   * Returns { itemsGranted, objectivesCredited } so callers can give the player feedback.
+   *
+   * A quest-`collect` POI carries `questItems: [{ itemId, count, questId, objectiveId }]` (stamped
+   * by questPOIService) where `count` is the FULL amount the objective needs. Interacting with the
+   * POI is the "find the items" gameplay beat, so this:
+   *   - grants the real item BEST-EFFORT (a missing/flavor item id must NOT block the objective);
+   *   - credits the objective, accumulating progress and marking it COMPLETE when the target is met
+   *     (previously hard-coded `completed:false`, which soft-locked the quest — it could never be
+   *     turned in even after collecting).
    */
   async collectQuestItemsFromPOI(character, poi) {
     const questItems = poi.questItems || [];
     const itemsGranted = [];
-    
-    if (questItems.length > 0) {
-      const { QuestProgress, Quest } = require('../models');
-      const inventoryService = require('./inventoryService');
-      
-      // Get character's active quests
-      const activeQuests = await QuestProgress.findAll({
-        where: {
-          characterId: character.id,
-          status: 'active'
-        },
-        include: [{
-          model: Quest,
-          as: 'quest'
-        }]
-      });
-      
-      // Check each quest item
-      for (const questItem of questItems) {
-        // Find matching active quest
-        const matchingQuest = activeQuests.find(qp => 
-          qp.quest && qp.quest.id === questItem.questId
-        );
-        
-        if (matchingQuest) {
-          const quest = matchingQuest.quest || await Quest.findByPk(matchingQuest.questId);
-          if (quest) {
-            // Find the objective this item belongs to
-            const objective = quest.objectives?.find(obj => obj.id === questItem.objectiveId);
-            if (objective && !matchingQuest.objectivesCompleted?.[objective.id]) {
-              // Grant items to player
-              try {
-                await inventoryService.addItem(
-                  character.id,
-                  questItem.itemId,
-                  questItem.count || 1,
-                  `quest_${quest.id}`
-                );
-                
-                itemsGranted.push({
-                  itemId: questItem.itemId,
-                  count: questItem.count || 1
-                });
-                
-                // Update quest objective progress
-                const questService = require('./questService');
-                await questService.updateObjective(
-                  character.id,
-                  quest.id,
-                  objective.id,
-                  false, // Not completed yet, just progress
-                  questItem.count || 1
-                );
-                
-                console.log(`[POI Service] Granted ${questItem.count || 1}x ${questItem.itemId} to character ${character.id} from quest POI`);
-              } catch (itemError) {
-                console.error(`[POI Service] Error granting quest item:`, itemError);
-              }
-            }
-          }
-        }
+    const objectivesCredited = []; // { questId, objectiveId, questTitle, itemId, count, completed }
+    if (questItems.length === 0) return { itemsGranted, objectivesCredited };
+
+    const { QuestProgress, Quest } = require('../models');
+    const inventoryService = require('./inventoryService');
+    const questService = require('./questService');
+
+    const activeQuests = await QuestProgress.findAll({
+      where: { characterId: character.id, status: 'active' },
+      include: [{ model: Quest, as: 'quest' }]
+    });
+
+    for (const questItem of questItems) {
+      const matchingQuest = activeQuests.find(qp => qp.quest && qp.quest.id === questItem.questId);
+      if (!matchingQuest) continue;
+      const quest = matchingQuest.quest || await Quest.findByPk(matchingQuest.questId);
+      if (!quest) continue;
+      const objective = (quest.objectives || []).find(obj => obj.id === questItem.objectiveId);
+      if (!objective) continue;
+      if (matchingQuest.objectivesCompleted?.[objective.id]) continue; // already done
+
+      const count = questItem.count || 1;
+
+      // Best-effort grant the actual item — never let a missing/invalid item id (some quest targets
+      // are flavor strings, not real item ids) block the objective credit below.
+      try {
+        await inventoryService.addItem(character.id, questItem.itemId, count, `quest_${quest.id}`);
+        itemsGranted.push({ itemId: questItem.itemId, count });
+        console.log(`[POI Service] Granted ${count}x ${questItem.itemId} to character ${character.id} from quest POI`);
+      } catch (itemError) {
+        console.warn(`[POI Service] quest item '${questItem.itemId}' not grantable (${itemError.message}); crediting objective anyway`);
+      }
+
+      // Credit the objective: accumulate against the target and complete when met.
+      const target = objective.count || objective.quantity || 1;
+      const prevProgress = Number(matchingQuest.objectiveProgress?.[objective.id]) || 0;
+      const newProgress = Math.min(target, prevProgress + count);
+      const completed = newProgress >= target;
+      try {
+        await questService.updateObjective(character.id, quest.id, objective.id, completed, newProgress);
+        objectivesCredited.push({ questId: quest.id, objectiveId: objective.id, questTitle: quest.title, itemId: questItem.itemId, count, completed });
+        console.log(`[POI Service] Credited collect objective ${quest.id}/${objective.id}: ${newProgress}/${target}${completed ? ' (COMPLETE)' : ''}`);
+      } catch (credErr) {
+        console.error(`[POI Service] Failed to credit collect objective ${quest.id}/${objective.id}:`, credErr.message);
       }
     }
-    
-    return itemsGranted;
+
+    return { itemsGranted, objectivesCredited };
+  }
+
+  /**
+   * Credit a quest POI's BOUND objective directly via `poi.questRelated` ({questId, objectiveId}).
+   * Used for `discover` / `travel` objectives that are satisfied simply by reaching/interacting
+   * with the POI (collect is count-based → handled by collectQuestItemsFromPOI; defeat is credited
+   * by the combat kill funnel). This binding is reliable where the old discover-by-name/locationId
+   * matching was not (POI ids never matched objective.target). Returns objectivesCredited entries.
+   */
+  async creditQuestPOIObjective(character, poi) {
+    const qr = poi.questRelated;
+    if (!qr || !qr.questId || !qr.objectiveId) return [];
+    const { QuestProgress, Quest } = require('../models');
+    const questService = require('./questService');
+
+    const qp = await QuestProgress.findOne({ where: { characterId: character.id, questId: qr.questId, status: 'active' } });
+    if (!qp) return [];
+    if (qp.objectivesCompleted?.[qr.objectiveId]) return [];
+    const quest = await Quest.findByPk(qr.questId);
+    const objective = quest && (quest.objectives || []).find(o => o.id === qr.objectiveId);
+    if (!objective) return [];
+    // Only auto-complete reach/find objectives here.
+    if (!['discover', 'travel'].includes(objective.type)) return [];
+
+    try {
+      await questService.updateObjective(character.id, qr.questId, qr.objectiveId, true, 1);
+      console.log(`[POI Service] Completed ${objective.type} objective ${qr.questId}/${qr.objectiveId} on POI interaction`);
+      return [{ questId: qr.questId, objectiveId: qr.objectiveId, questTitle: quest.title, completed: true }];
+    } catch (e) {
+      console.error(`[POI Service] Failed to credit quest-POI objective ${qr.questId}/${qr.objectiveId}:`, e.message);
+      return [];
+    }
   }
 
   /**
@@ -527,25 +566,27 @@ class POIService {
   async handleInvestigatePOI(character, planet, poi, interaction) {
     // Generic investigation
     interaction.state = 'discovered';
-    
-    // Check for quest items at this POI
-    const itemsGranted = await this.collectQuestItemsFromPOI(character, poi);
-    
+
+    // Check for quest items at this POI + credit any bound reach (discover/travel) objective
+    const { itemsGranted, objectivesCredited } = await this.collectQuestItemsFromPOI(character, poi);
+    objectivesCredited.push(...await this.creditQuestPOIObjective(character, poi));
+
     // Get lore-accurate description for the POI
     const loreDescription = this.getPOILoreDescription(poi, planet);
-    
+
     let message = `Investigated ${poi.name}`;
     if (itemsGranted.length > 0) {
       const itemNames = itemsGranted.map(item => `${item.count}x ${item.itemId}`).join(', ');
       message += `. Found: ${itemNames}`;
     }
-    
+
     return {
       success: true,
       interaction,
       lore: loreDescription,
       message: message,
-      itemsGranted: itemsGranted
+      itemsGranted: itemsGranted,
+      objectivesCredited: objectivesCredited
     };
   }
 
