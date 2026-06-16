@@ -49,6 +49,19 @@ const ACHIEVEMENT_DEFINITIONS = {
   }
 };
 
+/**
+ * Does this defeated enemy combatant count as a "boss" for the defeat_boss achievement?
+ * Pure (no DB) so it's unit-testable. A boss is an explicit scripted boss (`isBoss`, or
+ * `tier === 'boss'`) or an elite-tier foe — keeping the achievement reachable in normal
+ * play while leaving room for designated set-piece bosses.
+ * @param {{ isBoss?: boolean, tier?: string }} combatant
+ * @returns {boolean}
+ */
+function isBossEnemy(combatant) {
+  if (!combatant) return false;
+  return !!(combatant.isBoss || combatant.tier === 'boss' || combatant.tier === 'elite');
+}
+
 class AchievementService {
   /**
    * Get or create achievement record
@@ -197,9 +210,14 @@ class AchievementService {
     });
 
     let totalEnemiesDefeated = 0;
+    let defeatedBoss = false;
     for (const encounter of encounters) {
       const enemies = encounter.combatants?.filter(c => c.type === 'enemy' && c.stats.health <= 0) || [];
       totalEnemiesDefeated += enemies.length;
+      // A "boss" is an explicit scripted boss (combatant.isBoss / tier:'boss') or an elite-tier
+      // foe (pirate captain, bounty hunter) — so the achievement is reachable in normal play and
+      // extensible to designated bosses via spawnScriptedEnemy({ isBoss: true }).
+      if (enemies.some(isBossEnemy)) defeatedBoss = true;
     }
 
     // Update combat achievements
@@ -208,6 +226,11 @@ class AchievementService {
     }
     if (totalEnemiesDefeated >= 100) {
       await this.updateProgress(characterId, 'defeat_100_enemies', totalEnemiesDefeated);
+    }
+    // defeat_boss (target 1) — idempotent: updateProgress no-ops once completed, so re-scanning
+    // every win is harmless.
+    if (defeatedBoss) {
+      await this.updateProgress(characterId, 'defeat_boss', 1);
     }
   }
 
@@ -246,6 +269,10 @@ class AchievementService {
   }
 }
 
-module.exports = new AchievementService();
+const achievementService = new AchievementService();
+// Exposed for unit tests (pure helper + definitions) without changing the singleton export.
+achievementService.isBossEnemy = isBossEnemy;
+achievementService.ACHIEVEMENT_DEFINITIONS = ACHIEVEMENT_DEFINITIONS;
+module.exports = achievementService;
 
 

@@ -62,6 +62,9 @@ function Card({ children, accent }) {
 function RewardCard({ t }) {
   const leveled = Array.isArray(t.leveledUp) && t.leveledUp.length > 0;
   const loot = Array.isArray(t.loot) ? t.loot : [];
+  // Faction standing lost for killing tagged enemies (Phase 8.1). Deltas are negative;
+  // `name` + `newTier` are server-provided so no faction registry is needed here.
+  const rep = (Array.isArray(t.reputation) ? t.reputation : []).filter((r) => r && r.delta);
   return (
     <Card accent={leveled ? '#ffd24a' : '#6cf0c2'}>
       <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, color: '#9affa0' }}>VICTORY</div>
@@ -77,6 +80,16 @@ function RewardCard({ t }) {
             <span key={i} style={{ color: RARITY[l.rarity] || RARITY.common }}>
               {l.name || l.itemId}{l.quantity > 1 ? ` ×${l.quantity}` : ''}{i < loot.length - 1 ? ', ' : ''}
             </span>
+          ))}
+        </div>
+      )}
+      {rep.length > 0 && (
+        <div style={{ fontSize: 11, marginTop: 5, color: '#9fb3d1' }}>
+          {rep.map((r, i) => (
+            <div key={r.factionId || i} style={{ color: r.delta < 0 ? '#ff9a8a' : '#7ce0a0' }}>
+              {r.name || r.factionId} {r.delta > 0 ? `+${r.delta}` : r.delta}
+              {r.tierChanged && r.newTier ? <span style={{ color: '#cfa0ff' }}> · now {r.newTier}</span> : null}
+            </div>
           ))}
         </div>
       )}

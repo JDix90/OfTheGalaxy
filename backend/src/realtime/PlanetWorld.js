@@ -137,7 +137,7 @@ class PlanetWorld {
    * The combatant carries `enemyType` (for type-based quest matching) and optional
    * `questId`/`objectiveId` (for precise objective crediting in updateQuestCombatObjectives).
    * Returns the world enemy id, or null. `spec`: { level?, name?, enemyType?, templateId?,
-   * difficulty?, near?:{x,z}, questId?, objectiveId?, ownerId?, tutorial?, passive? }.
+   * difficulty?, near?:{x,z}, questId?, objectiveId?, ownerId?, tutorial?, passive?, isBoss? }.
    * `ownerId` instances the enemy (only that player can engage / is chased); `passive` makes it
    * wait until struck (low-aggro tutorial drone); `tutorial` tags the combatant so the kill is
    * detectable in finalize.
@@ -158,6 +158,7 @@ class PlanetWorld {
     if (spec.questId) combatant.questId = spec.questId;             // precise objective credit
     if (spec.objectiveId) combatant.objectiveId = spec.objectiveId;
     if (spec.tutorial) combatant.tutorial = true;                   // finalize detects tutorial kills
+    if (spec.isBoss) combatant.isBoss = true;                       // credits the defeat_boss achievement
     const home = (spec.near && Number.isFinite(spec.near.x)) ? this._nearWalkable(spec.near) : this._farWalkable();
     const id = `s${this._enemySeq++}`; // 's' = scripted (vs 'e' ambient)
     this.enemies.set(id, {
