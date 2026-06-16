@@ -103,9 +103,10 @@ async function attachRealtime(server) {
             try { ws.close(4006, 'planet-mismatch'); } catch (_) {}
             return;
           }
-          // Dungeon submap → its own authoritative world (real-time combat); else the surface.
+          // Any submap (dungeon OR hub like the spaceport) → its own authoritative real-time
+          // world; else the planet surface.
           world = msg.subMapId
-            ? await manager.getOrCreateDungeon(String(msg.subMapId), { planetId }) // validates submap↔planet
+            ? await manager.getOrCreateSubmapWorld(String(msg.subMapId), { planetId }) // validates submap↔planet
             : await manager.getOrCreateWorld(planetId); // throws on bad planet / world cap
           playerId = String(character.id);
           // Replace any stale session for this character (e.g. a second tab / reconnect).

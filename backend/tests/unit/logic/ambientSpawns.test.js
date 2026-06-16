@@ -76,6 +76,18 @@ describe('PlanetWorld ambient spawns', () => {
     expect(w.enemies.size).toBe(w._targetCount());
     expect(w.enemies.size).toBe(3);
   });
+
+  test('ambient:false (hub submap like the spaceport) spawns no enemies, ever', () => {
+    const w = new PlanetWorld('spaceport', stub, {}, { dangerLevel: 6, ambient: false });
+    expect(w.enemies.size).toBe(0);          // no initial ambient spawn
+    w.players.set('p1', fakePlayer());
+    const now = Date.now();
+    for (let i = 0; i < 20; i++) w.step(8, now);
+    expect(w.enemies.size).toBe(0);          // no ambient respawn either
+    // ...but scripted spawns still work (NPC/POI/quest/tutorial)
+    expect(w.spawnScriptedEnemy({ name: 'Drone' })).toBeTruthy();
+    expect(w.enemies.size).toBe(1);
+  });
 });
 
 describe('spawnScriptedEnemy (Phase 5)', () => {

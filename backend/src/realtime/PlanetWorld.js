@@ -51,9 +51,10 @@ class PlanetWorld {
     this._decayAcc = 0;        // accumulator for periodic status-effect decay
     this.dangerLevel = options.dangerLevel || 1;
     this.enemyPool = (Array.isArray(options.enemyPool) && options.enemyPool.length) ? options.enemyPool : null; // faction/planet-appropriate template ids
+    this.ambient = options.ambient !== false; // safe hubs (e.g. the spaceport) pass ambient:false — no auto enemies, but scripted spawns (NPC/POI/quest/tutorial) still work
     this._enemySeq = 0;        // monotonic id source so respawned enemies get fresh ids
     this._respawnAcc = 0;      // accumulator for ambient respawn (replaces the old random-encounter roll)
-    this.spawnEnemies();
+    if (this.ambient) this.spawnEnemies();
   }
 
   pushFx(ev) { if (this.fx.length < 256) this.fx.push(ev); }
@@ -374,10 +375,12 @@ class PlanetWorld {
     // Ambient respawn: keep the world populated over time (this replaces the old movement-driven
     // random-encounter roll). Trickle one hostile in every RESPAWN_INTERVAL, away from players,
     // only while someone is here and below the danger/escort-scaled target.
-    this._respawnAcc += dt;
-    if (this._respawnAcc >= RESPAWN_INTERVAL) {
-      this._respawnAcc = 0;
-      if (this.players.size > 0 && this.enemies.size < this._targetCount()) this._spawnOne(this._farWalkable());
+    if (this.ambient) {
+      this._respawnAcc += dt;
+      if (this._respawnAcc >= RESPAWN_INTERVAL) {
+        this._respawnAcc = 0;
+        if (this.players.size > 0 && this.enemies.size < this._targetCount()) this._spawnOne(this._farWalkable());
+      }
     }
   }
 
