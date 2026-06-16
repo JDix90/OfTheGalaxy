@@ -115,7 +115,9 @@ class ProgressionSystem {
           for (const [prereqSkillId, requiredLevel] of Object.entries(prereqSkills)) {
             const prereqLevel = this.getSkillLevel(prereqTree, prereqSkillId);
             if (prereqLevel < requiredLevel) {
-              return { can: false, reason: `Requires ${prereqSkillId} level ${requiredLevel}` };
+              const prereqName = getSkillDefinition(prereqTree, prereqSkillId)?.name
+                || prereqSkillId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+              return { can: false, reason: `Requires ${prereqName} level ${requiredLevel}` };
             }
           }
         }

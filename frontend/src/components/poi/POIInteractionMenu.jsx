@@ -12,6 +12,7 @@ import { useQuestStore } from '../../state/questSlice';
 import poiApi from '../../services/api/poiApi';
 import { notify } from '../hud/NotificationCenter';
 import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
+import { formatDisplayName } from '../../utils/formatName';
 import InvestigationModal from './InvestigationModal';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
@@ -189,7 +190,7 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
         if (credited.length > 0 || granted.length > 0) {
           const anyComplete = credited.some(o => o.completed);
           const found = granted.length > 0
-            ? `Found ${granted.map(i => `${i.count}× ${String(i.itemId).replace(/_/g, ' ')}`).join(', ')}`
+            ? `Found ${granted.map(i => `${i.count}× ${i.name || formatDisplayName(i.itemId)}`).join(', ')}`
             : null;
           notify({
             type: 'success',

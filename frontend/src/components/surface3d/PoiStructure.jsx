@@ -15,6 +15,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import GltfModel from './GltfModel';
 import { useAtmosphere } from './atmosphere/AtmosphereContext';
+import { formatDisplayName } from '../../utils/formatName';
 
 function Box({ w, h, d, y = 0, color, emissive, ei = 0, ...rest }) {
   return (
@@ -235,7 +236,7 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
     }
   });
 
-  const label = poi.name || poi.type;
+  const label = poi.name || formatDisplayName(poi.type);
 
   return (
     <group position={[poi.wx, 0, poi.wz]}>

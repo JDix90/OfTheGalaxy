@@ -6,6 +6,7 @@
 const { PlayerInventory, PlayerCharacter, Item, FactionReputation } = require('../models');
 const { getItemDefinition } = require('../data/items');
 const { calculateSetBonuses } = require('../data/itemSets');
+const factionService = require('./factionService');
 
 class InventoryService {
   /**
@@ -287,6 +288,10 @@ class InventoryService {
         return { canEquip: false, reason: 'Character not found' };
       }
 
+      // Resolve to the faction's display name so the gate message reads
+      // "...with Commerce League" rather than the raw "commerce_league" id.
+      const factionName = factionService.getFactionProfile(itemData.factionId)?.name || itemData.factionId;
+
       const reputation = await FactionReputation.findOne({
         where: { characterId, factionId: itemData.factionId }
       });
@@ -294,14 +299,14 @@ class InventoryService {
       if (!reputation) {
         return {
           canEquip: false,
-          reason: `Requires ${itemData.minReputationTier} reputation with ${itemData.factionId}`
+          reason: `Requires ${itemData.minReputationTier} reputation with ${factionName}`
         };
       }
 
       if (!this.meetsReputationTier(reputation.tier, itemData.minReputationTier)) {
         return {
           canEquip: false,
-          reason: `Requires ${itemData.minReputationTier} reputation with ${itemData.factionId}. Current: ${reputation.tier}`
+          reason: `Requires ${itemData.minReputationTier} reputation with ${factionName}. Current: ${reputation.tier}`
         };
       }
     }
