@@ -6,6 +6,7 @@
  */
 
 const { PlanetWorld } = require('../../../src/realtime/PlanetWorld');
+const { WorldManager } = require('../../../src/realtime/WorldManager');
 const { buildEncounterMeta, enemyTryAttack, resolveCast, buildEnemyActorCombatant } = require('../../../src/realtime/combat');
 const { enemyTemplates } = require('../../../src/data/enemyTemplates');
 
@@ -103,6 +104,32 @@ describe('passive + owner-scoped enemy AI', () => {
     const before = e.combatant.stats.health;
     resolveCast(w, other, { ability: 'basic_attack', targetId: e.id }, Date.now());
     expect(e.combatant.stats.health).toBe(before); // rejected by the owner guard — no damage
+  });
+});
+
+describe('spawnFromRequest — tutorial floor lifecycle (no leak, no drone-stacking)', () => {
+  const manager = () => new WorldManager({ DEFAULTS: { tickHz: 20 } }, {});
+
+  test('a tutorial spawn sets the HP floor and is idempotent (never stacks a 2nd drone)', async () => {
+    const m = manager();
+    const w = new PlanetWorld('sp', stub, {}, { ambient: false });
+    const p = player({ id: 'p1' });
+    w.players.set('p1', p);
+    await m.spawnFromRequest(w, p, { kind: 'tutorial' });
+    expect(w.enemies.size).toBe(1);
+    expect(p._hpFloor).toBeGreaterThan(0);
+    await m.spawnFromRequest(w, p, { kind: 'tutorial' }); // repeated trigger
+    expect(w.enemies.size).toBe(1);                        // no second drone
+  });
+
+  test('a NON-tutorial spawn lifts a leftover tutorial floor (no immortality in later fights)', async () => {
+    const m = manager();
+    const w = new PlanetWorld('sp', stub, {}, { ambient: false });
+    const p = player({ id: 'p1' });
+    p._hpFloor = 50;                                       // floor left over from an abandoned drone
+    w.players.set('p1', p);
+    await m.spawnFromRequest(w, p, { kind: 'noop' });      // any non-tutorial spawn request
+    expect(p._hpFloor).toBe(0);
   });
 });
 

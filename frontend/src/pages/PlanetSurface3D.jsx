@@ -136,13 +136,15 @@ export default function PlanetSurface3D() {
   // venue is the spaceport, but the surface keeps this for robustness). Returns true only when
   // issued to an online realtime world; false → overlay falls back to the legacy turn-based fight.
   useEffect(() => {
-    window.__otgTutorialCombat = () => {
+    const fn = () => {
       const w = worldRef.current;
       if (!w || !w.requestSpawn || (w.isOffline && w.isOffline())) return false;
       w.requestSpawn({ kind: 'tutorial' });
       return true;
     };
-    return () => { if (window.__otgTutorialCombat) delete window.__otgTutorialCombat; };
+    window.__otgTutorialCombat = fn;
+    // Delete only our own handler (identity guard) so a sibling page's teardown can't clobber it.
+    return () => { if (window.__otgTutorialCombat === fn) delete window.__otgTutorialCombat; };
   }, [worldRef]);
 
   const pois = useMemo(() => buildPois(planet, sim), [planet, sim]);

@@ -141,13 +141,15 @@ export default function SubMapView3D() {
   // false the overlay falls back to the legacy turn-based tutorial fight (kept until Phase 7).
   useEffect(() => {
     if (!isRealtime) return undefined;
-    window.__otgTutorialCombat = () => {
+    const fn = () => {
       const w = worldRef.current;
       if (!w || !w.requestSpawn || (w.isOffline && w.isOffline())) return false;
       w.requestSpawn({ kind: 'tutorial' });
       return true;
     };
-    return () => { if (window.__otgTutorialCombat) delete window.__otgTutorialCombat; };
+    window.__otgTutorialCombat = fn;
+    // Delete only our own handler (identity guard) so a sibling page's teardown can't clobber it.
+    return () => { if (window.__otgTutorialCombat === fn) delete window.__otgTutorialCombat; };
   }, [isRealtime, worldRef]);
 
   const pois = useMemo(() => buildSubmapPois(subMap, sim), [subMap, sim]);

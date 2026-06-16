@@ -391,13 +391,12 @@ class CombatManager {
         const rw = result && result.metadata && result.metadata.rewards;
         if (rw) this._send(player, { t: 'reward', xp: rw.xp || 0, credits: rw.credits || 0, loot: rw.loot || [], leveledUp: rw.leveledUp || [], newLevel: rw.newLevel });
       }
-      // Tutorial scripted-fight completion: signal the client so the tutorial state machine
-      // advances (COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO). Lift the tutorial HP floor on
-      // any tutorial-fight finalize (won or otherwise) so it never leaks past the fight.
-      if (hadTutorial) {
-        player._hpFloor = 0;
-        if (outcome === 'won') this._send(player, { t: 'combat_done', tutorial: true });
-      }
+      // The tutorial HP floor is scoped to the live drone fight — lift it on ANY finalize so it
+      // can never leak into a later in-world fight (e.g. a spaceport NPC/POI/quest spawn) and make
+      // the player immortal. The combat_done signal stays gated on an actual tutorial-tagged win,
+      // which advances the tutorial state machine (COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO).
+      player._hpFloor = 0;
+      if (hadTutorial && outcome === 'won') this._send(player, { t: 'combat_done', tutorial: true });
       // On loss, restore the in-world player. With an encounter (id), endEncounter already did
       // the authoritative DB respawn (40% heal / fee / location) and this mirrors it (+ a death
       // toast). Without an id (cross-engine guard suppressed a spurious 3D death while a turn-
