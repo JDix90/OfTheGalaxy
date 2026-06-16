@@ -1182,6 +1182,68 @@ const itemDefinitions = {
     weight: 5.0,
     factionId: null
   },
+  // Salvaged armor worn by common enemies — looted from their corpses, so it
+  // resolves to a real definition instead of a generic "Unknown item" at vendors.
+  'leather_armor': {
+    id: 'leather_armor',
+    name: 'Leather Armor',
+    type: ITEM_TYPES.ARMOR,
+    rarity: ITEM_RARITIES.COMMON,
+    description: 'Crude hide-and-leather protection. Cheap, but better than nothing.',
+    stats: {
+      defense: 10,
+      mobility: 6
+    },
+    equipmentSlot: 'armor',
+    value: 150,
+    weight: 4.0,
+    factionId: null
+  },
+  'reinforced_armor': {
+    id: 'reinforced_armor',
+    name: 'Reinforced Armor',
+    type: ITEM_TYPES.ARMOR,
+    rarity: ITEM_RARITIES.UNCOMMON,
+    description: 'Combat plating reinforced with salvaged composite panels.',
+    stats: {
+      defense: 25,
+      mobility: 2
+    },
+    equipmentSlot: 'armor',
+    value: 650,
+    weight: 7.0,
+    factionId: null
+  },
+  'droid_armor': {
+    id: 'droid_armor',
+    name: 'Droid Plating',
+    type: ITEM_TYPES.ARMOR,
+    rarity: ITEM_RARITIES.UNCOMMON,
+    description: 'Stripped armor plating from a combat droid chassis. Heavy but durable.',
+    stats: {
+      defense: 25,
+      mobility: 1
+    },
+    equipmentSlot: 'armor',
+    value: 600,
+    weight: 8.0,
+    factionId: null
+  },
+  'bounty_hunter_armor': {
+    id: 'bounty_hunter_armor',
+    name: "Bounty Hunter's Rig",
+    type: ITEM_TYPES.ARMOR,
+    rarity: ITEM_RARITIES.UNCOMMON,
+    description: 'Lightweight tactical armor favored by bounty hunters — balanced for mobility and protection.',
+    stats: {
+      defense: 22,
+      mobility: 8
+    },
+    equipmentSlot: 'armor',
+    value: 700,
+    weight: 5.5,
+    factionId: null
+  },
   'armor_medium_01': {
     id: 'armor_medium_01',
     name: 'Medium Combat Armor',
@@ -2480,7 +2542,50 @@ const itemDefinitions = {
     weight: 0.5,
     stackSize: 50
   },
-  
+  // Salvage & creature materials dropped by enemies. Defined so looted drops
+  // (and the tutorial's "sell droid parts" beat) show a real name/value at vendors
+  // instead of falling back to a generic value-10 "Unknown item".
+  'droid_parts': {
+    id: 'droid_parts',
+    name: 'Droid Parts',
+    type: ITEM_TYPES.RESOURCE,
+    rarity: ITEM_RARITIES.COMMON,
+    description: 'Salvaged servos, actuators, and circuitry from a disassembled droid. A staple of any scrapper\'s trade.',
+    value: 30,
+    weight: 2.0,
+    stackSize: 50
+  },
+  'animal_parts': {
+    id: 'animal_parts',
+    name: 'Animal Parts',
+    type: ITEM_TYPES.RESOURCE,
+    rarity: ITEM_RARITIES.COMMON,
+    description: 'Assorted parts harvested from a wild creature. Sells to vendors and crafters.',
+    value: 12,
+    weight: 1.0,
+    stackSize: 100
+  },
+  'hide': {
+    id: 'hide',
+    name: 'Beast Hide',
+    type: ITEM_TYPES.RESOURCE,
+    rarity: ITEM_RARITIES.COMMON,
+    description: 'Tough hide stripped from a wild beast. Used in leatherworking and crude armor.',
+    value: 15,
+    weight: 1.5,
+    stackSize: 100
+  },
+  'claws': {
+    id: 'claws',
+    name: 'Beast Claws',
+    type: ITEM_TYPES.RESOURCE,
+    rarity: ITEM_RARITIES.COMMON,
+    description: 'Sharp claws taken from a predator. A modest trophy and a crafting material.',
+    value: 18,
+    weight: 0.5,
+    stackSize: 100
+  },
+
   // Accessories
   'datapad_01': {
     id: 'datapad_01',
