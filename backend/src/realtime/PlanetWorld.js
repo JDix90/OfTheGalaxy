@@ -218,8 +218,13 @@ class PlanetWorld {
 
   /** Resolve a character's spawn (world units) — mirrors the client's useSurfaceWorld. */
   spawnFor(character) {
-    // Dungeon: spawn just inside the entrance (or resume saved position on this submap).
-    if (this.zone.type === 'dungeon') {
+    // ANY submap world (dungeon OR hub like the spaceport): spawn just inside the entrance, or
+    // resume the saved position ONLY if it belongs to THIS submap, and always fall back to a
+    // walkable cell. This mirrors the client's submapSpawn exactly — essential because in realtime
+    // the client adopts this welcome.spawn, so a mismatch (or an in-wall spawn) pins the player and
+    // they can't move. The surface else-branch below misapplies a stale surface coord with no
+    // walkability guard, which is why hub submaps must take this path too.
+    if (this.zone.subMapId) {
       const dims = this.zone.dims || { w: 12, h: 12 };
       const gridToPct = (v, dim) => (v > dim ? (v > 100 ? v / 10 : v) : ((v + 0.5) / dim) * 100);
       let sx = 50, sy = 50;

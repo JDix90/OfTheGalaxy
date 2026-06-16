@@ -133,6 +133,35 @@ describe('spawnFromRequest — tutorial floor lifecycle (no leak, no drone-stack
   });
 });
 
+describe('spawnFor — hub submaps spawn at the entrance + are walkability-safe (realtime move fix)', () => {
+  // The spaceport is a real-time submap (Phase 6a). In realtime the client ADOPTS the server's
+  // welcome.spawn, so spawnFor must mirror the client submapSpawn (entrance + subMapId-guarded
+  // resume + walkable fallback) — else a misapplied/in-wall spawn pins the player (can't move).
+  const zone = { type: 'spaceport', subMapId: 'sp', planetId: 'solenne', entrance: { x: 2, y: 2 }, dims: { w: 12, h: 12 } };
+
+  test('a stale SURFACE currentLocation is NOT misapplied — spawn is entrance-derived, not (50,50)', () => {
+    const w = new PlanetWorld('sp', stub, {}, { ambient: false, zone });
+    const sp = w.spawnFor({ id: 'c', currentPlanet: 'solenne', currentLocation: { x: 50, y: 50, area: 'surface' } });
+    // entrance (2,2) in a 12-grid → ~20.8%, nudged toward center → ~26.8% — well clear of 50%.
+    expect(sp.x).toBeLessThan(40);
+    expect(sp.z).toBeLessThan(40);
+  });
+
+  test('a matching submap currentLocation resumes there', () => {
+    const w = new PlanetWorld('sp', stub, {}, { ambient: false, zone });
+    const sp = w.spawnFor({ id: 'c', currentPlanet: 'solenne', currentLocation: { x: 30, y: 40, area: 'submap', subMapId: 'sp' } });
+    expect(sp.x).toBeCloseTo(30, 1);
+    expect(sp.z).toBeCloseTo(40, 1);
+  });
+
+  test('falls back to a walkable cell when the entrance-derived spot is blocked', () => {
+    const blocked = { ...stub, isWalkableSurface: (x, y) => y >= 60 }; // entrance (~27) blocked
+    const w = new PlanetWorld('sp', blocked, {}, { ambient: false, zone });
+    const sp = w.spawnFor({ id: 'c', currentPlanet: 'solenne', currentLocation: null });
+    expect(blocked.isWalkableSurface(sp.x, sp.z)).toBe(true); // never spawns in a wall
+  });
+});
+
 describe('tutorial HP floor — a first-timer cannot die', () => {
   test('enemyTryAttack never drops an _hpFloor player below the floor (and never kills them)', () => {
     const w = new PlanetWorld('sp', stub, {}, { ambient: false });
