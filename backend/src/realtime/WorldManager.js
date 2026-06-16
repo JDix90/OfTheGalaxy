@@ -85,13 +85,18 @@ class WorldManager {
     });
   }
 
-  /** Lazily create (or fetch) a dungeon submap's authoritative world (real-time combat). */
-  async getOrCreateDungeon(subMapId, opts = {}) {
+  /**
+   * Lazily create (or fetch) a submap's authoritative real-time world. Generalizes the dungeon
+   * path to any submap: dungeons populate with ambient enemies; "hub" submaps (e.g. the spaceport)
+   * are safe — no ambient spawns, but scripted spawns (NPC/POI/quest/tutorial) still work. Client
+   * and server build the SAME sim via the shared submapToMapData, so prediction reconciles.
+   */
+  async getOrCreateSubmapWorld(subMapId, opts = {}) {
     return this._getOrCreate(subMapId, async () => {
       const subMap = await loadSubmap(subMapId);
-      // Guard: a dungeon world must belong to the joining character's planet.
+      // Guard: a submap world must belong to the joining character's planet.
       if (opts.planetId && subMap.planetId && String(subMap.planetId) !== String(opts.planetId)) {
-        throw new Error('dungeon-planet-mismatch');
+        throw new Error('submap-planet-mismatch');
       }
       if (!this.submapToMapData) throw new Error('submap-sim-unavailable');
       const { mapData, scale } = this.submapToMapData(subMap);
@@ -101,13 +106,18 @@ class WorldManager {
       // Padded dims (square-padded for dungeon grids) so spawn coords match the sim + client.
       const dims = this.submapCoordDims ? this.submapCoordDims(subMap)
         : { w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 };
-      const dangerLevel = opts.dangerLevel || (subMap.metadata && subMap.metadata.dangerLevel) || 6;
+      const isDungeon = subMap.type === 'dungeon';
+      const dangerLevel = opts.dangerLevel || (subMap.metadata && subMap.metadata.dangerLevel) || (isDungeon ? 6 : 1);
       return new PlanetWorld(subMapId, sim, mapData, {
         dangerLevel,
-        zone: { type: 'dungeon', subMapId, planetId: subMap.planetId || opts.planetId, parentLocationId: subMap.parentLocationId, entrance, dims },
+        ambient: isDungeon, // dungeons populate; hub submaps (spaceport/city/...) don't auto-spawn
+        zone: { type: isDungeon ? 'dungeon' : (subMap.type || 'submap'), subMapId, planetId: subMap.planetId || opts.planetId, parentLocationId: subMap.parentLocationId, entrance, dims },
       });
     });
   }
+
+  /** Back-compat alias — dungeons are just a submap world that populates. */
+  async getOrCreateDungeon(subMapId, opts = {}) { return this.getOrCreateSubmapWorld(subMapId, opts); }
 
   start() {
     if (this._loop) return;
