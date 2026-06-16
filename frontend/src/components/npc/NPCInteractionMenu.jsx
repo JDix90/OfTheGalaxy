@@ -10,6 +10,8 @@ import { useCharacterStore } from '../../state/characterSlice';
 import { useCombatStore } from '../../state/combatSlice';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
+import { notify } from '../hud/NotificationCenter';
+import { isCombat3DOnly, COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import QuestList from '../quest/QuestList';
 import './NPCInteractionMenu.css';
 
@@ -93,6 +95,14 @@ export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTal
     // false (e.g. realtime server offline) — or isn't supplied (2D view) — fall back to the legacy
     // turn-based encounter below.
     if (onAttack && onAttack(npc)) {
+      onClose && onClose();
+      return;
+    }
+
+    // Phase 7: turn-based combat is retired. The 3D handler returned false (realtime offline, or
+    // no in-world handler supplied), so instead of the old card screen surface a graceful message.
+    if (isCombat3DOnly()) {
+      notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
       onClose && onClose();
       return;
     }

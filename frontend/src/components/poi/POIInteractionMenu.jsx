@@ -12,6 +12,7 @@ import { useInventoryStore } from '../../state/inventorySlice';
 import { useQuestStore } from '../../state/questSlice';
 import poiApi from '../../services/api/poiApi';
 import { notify } from '../hud/NotificationCenter';
+import { isCombat3DOnly, COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import InvestigationModal from './InvestigationModal';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
@@ -151,6 +152,14 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
     // circuiting BEFORE the POI interact call so the server doesn't also create a turn-based
     // encounter). If it returns false (realtime offline) or isn't supplied (2D), fall through.
     if (actionType === 'combat' && onCombat && onCombat(poi)) {
+      onClose && onClose();
+      return;
+    }
+
+    // Phase 7: turn-based combat is retired. If the realtime layer couldn't take this POI combat
+    // (offline / no in-world handler), surface a graceful message instead of the old card screen.
+    if (actionType === 'combat' && isCombat3DOnly()) {
+      notify({ type: 'warning', title: 'Combat unavailable', message: COMBAT_OFFLINE_MESSAGE });
       onClose && onClose();
       return;
     }
