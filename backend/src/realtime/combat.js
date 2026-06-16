@@ -71,6 +71,9 @@ function resolveCast(world, player, msg, now) {
   if (!player || player.dead || !player.combatant) return;
   const enemy = world.enemies.get(String(msg.targetId)); // may be null for self-cast abilities
   const abilityId = msg.ability || BASIC;
+  // Instanced (e.g. tutorial) enemies can only be engaged by their owner — no kill-stealing the
+  // training drone in a shared spaceport world.
+  if (enemy && enemy.ownerId && enemy.ownerId !== player.id) return;
 
   if (abilityId === BASIC) {
     if (!enemy || enemy.dead) return;
@@ -139,6 +142,7 @@ function resolveCast(world, player, msg, now) {
 
 function afterPlayerHit(world, player, enemy, res, now, abilityId) {
   player.lastCombatAt = now;
+  enemy.aggressive = true; // a struck enemy fights back — wakes a passive/tutorial drone
   if (!player.engagedEnemies.has(enemy.id)) player.engagedEnemies.set(enemy.id, enemy.combatant);
   world.pushFx({ type: 'hit', sourceId: player.id, targetId: enemy.id, x: enemy.x, z: enemy.z, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit, ability: abilityId });
   world.pushIntent({ type: 'engage', playerId: player.id });
@@ -168,6 +172,11 @@ function enemyTryAttack(world, enemy, target, now) {
   }
   const res = combatService.calculateDamage(enemy.combatant, target.combatant);
   applyDamage(target.combatant, res);
+  // Tutorial safety floor: a first-timer can't be killed by the training drone (set while the
+  // tutorial fight is live; cleared on finalize). No effect on normal players (_hpFloor unset).
+  if (target._hpFloor && target.combatant.stats.health < target._hpFloor) {
+    target.combatant.stats.health = target._hpFloor;
+  }
   target.lastCombatAt = now;
   if (!target.engagedEnemies.has(enemy.id)) target.engagedEnemies.set(enemy.id, enemy.combatant);
   world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit });
@@ -188,16 +197,19 @@ const FRESH_TURNBASED_MS = 60 * 1000;
 
 /**
  * Derive a realtime encounter's `encounterType` + `metadata` from the world it happens in.
- * Surface → 'random'; dungeon → 'dungeon' + subMapId/parentLocationId (so endEncounter runs the
- * dungeon-service branch: clear_dungeon tracking, enemy-state, 0.5× penalty) + a `respawn` point
- * (the entrance, as 0–100 surface %) so a dungeon death respawns coherently in the dungeon.
+ * Surface → 'random'. ANY submap world (dungeon OR hub like the spaceport) → subMapId/
+ * parentLocationId + a `respawn` point (the entrance, as 0–100 surface %) so a death stays
+ * COHERENT in the submap instead of being kicked to a surface POI (the data-integrity fix).
+ * Only true dungeons get encounterType 'dungeon' (which also runs endEncounter's dungeon-service
+ * branch: clear_dungeon tracking, enemy-state, 0.5× penalty); hub submaps stay 'random'.
  * Pure (no I/O) so it can be unit-tested without a DB.
  */
 function buildEncounterMeta(world) {
   const zone = (world && world.zone) || { type: 'surface' };
   const metadata = { realtime: true, planetId: world && world.planetId };
-  if (zone.type !== 'dungeon') return { encounterType: 'random', metadata };
-  metadata.subMapId = zone.subMapId || (world && world.subMapId) || null;
+  const subMapId = zone.subMapId || (world && world.subMapId) || null;
+  if (!subMapId) return { encounterType: 'random', metadata }; // pure surface
+  metadata.subMapId = subMapId;
   metadata.parentLocationId = zone.parentLocationId || null;
   const dims = zone.dims || { w: 12, h: 12 };
   const e = zone.entrance;
@@ -206,7 +218,7 @@ function buildEncounterMeta(world) {
     const g2p = (v, dim) => (v > dim ? (v > 100 ? v / 10 : v) : ((v + 0.5) / dim) * 100);
     metadata.respawn = { x: g2p(e.x, dims.w), y: g2p(e.y, dims.h) };
   }
-  return { encounterType: 'dungeon', metadata };
+  return { encounterType: zone.type === 'dungeon' ? 'dungeon' : 'random', metadata };
 }
 
 /** Build the client ability hotbar from a character's known, combat-usable abilities. */
@@ -349,6 +361,9 @@ class CombatManager {
       }
       const id = player.encounterId;
       const enemyCombatants = [...player.engagedEnemies.values()];
+      // A scripted tutorial drone was in this fight? (the combatant carries `tutorial`.) Used to
+      // signal the tutorial state machine on a win + to lift the tutorial HP floor.
+      const hadTutorial = enemyCombatants.some((c) => c && c.tutorial);
       // Clear engagement up-front so a new fight starts fresh.
       player.encounterId = null;
       player.engagedEnemies.clear();
@@ -376,6 +391,12 @@ class CombatManager {
         const rw = result && result.metadata && result.metadata.rewards;
         if (rw) this._send(player, { t: 'reward', xp: rw.xp || 0, credits: rw.credits || 0, loot: rw.loot || [], leveledUp: rw.leveledUp || [], newLevel: rw.newLevel });
       }
+      // The tutorial HP floor is scoped to the live drone fight — lift it on ANY finalize so it
+      // can never leak into a later in-world fight (e.g. a spaceport NPC/POI/quest spawn) and make
+      // the player immortal. The combat_done signal stays gated on an actual tutorial-tagged win,
+      // which advances the tutorial state machine (COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO).
+      player._hpFloor = 0;
+      if (hadTutorial && outcome === 'won') this._send(player, { t: 'combat_done', tutorial: true });
       // On loss, restore the in-world player. With an encounter (id), endEncounter already did
       // the authoritative DB respawn (40% heal / fee / location) and this mirrors it (+ a death
       // toast). Without an id (cross-engine guard suppressed a spurious 3D death while a turn-
@@ -438,6 +459,7 @@ class CombatManager {
     } catch (e) { /* ignore */ }
     player.dead = false;
     player.abilityCdUntil = {};
+    player._hpFloor = 0; // tutorial safety floor never survives a respawn
     // Clear dodge timers so an in-progress dodge can't grant invulnerability post-respawn.
     player.iFrameUntil = 0;
     player.dashUntil = 0;

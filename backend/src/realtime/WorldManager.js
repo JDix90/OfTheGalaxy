@@ -204,8 +204,13 @@ class WorldManager {
       if (!force && moved < SAVE_MIN_MOVE) return;
       player._lastSavedSurf = { x: s.x, y: s.y };
       const zone = world.zone || { type: 'surface' };
-      const loc = { x: Math.max(0, Math.min(100, s.x)), y: Math.max(0, Math.min(100, s.y)), area: zone.type === 'dungeon' ? 'submap' : 'surface' };
-      if (zone.type === 'dungeon') { loc.subMapId = zone.subMapId; loc.parentLocationId = zone.parentLocationId; }
+      // Key on submap PRESENCE, not zone.type==='dungeon': hub submaps (spaceport/city) are
+      // real-time submap worlds too (Phase 6a), so their location must persist as area:'submap'
+      // with subMapId — else normal walking saves a subMapId-less 'surface' location and a
+      // reconnect/resume loses the submap context (mirrors buildEncounterMeta's "any submap").
+      const subMapId = zone.subMapId || world.subMapId || null;
+      const loc = { x: Math.max(0, Math.min(100, s.x)), y: Math.max(0, Math.min(100, s.y)), area: subMapId ? 'submap' : 'surface' };
+      if (subMapId) { loc.subMapId = subMapId; loc.parentLocationId = zone.parentLocationId || null; }
       await characterService.updateLocation(player.characterId, world.planetId, loc);
     } catch (e) {
       // Non-fatal: retry next interval / on disconnect.
@@ -256,6 +261,33 @@ class WorldManager {
   async spawnFromRequest(world, player, msg) {
     if (!world || !player || !msg || player.dead) return;
     const near = { x: player.x, z: player.z };
+
+    // Any NON-tutorial in-world fight starting means the tutorial drone fight is over (or was
+    // abandoned) — lift the tutorial HP floor so a passive drone left un-killed can't make the
+    // player immortal in an unrelated NPC/POI/quest fight.
+    if (msg.kind !== 'tutorial') player._hpFloor = 0;
+
+    if (msg.kind === 'tutorial') {
+      // Idempotent: never stack a second training drone (or reset the HP floor) while one of this
+      // player's is still live — repeated COMBAT_INTRO triggers shouldn't flood the dock.
+      for (const e of world.enemies.values()) {
+        if (e.tutorial && e.ownerId === player.id && !e.dead) return;
+      }
+      // The 3D onboarding fight: one weak, instanced training drone. It's PASSIVE until struck
+      // (so a first-timer can read the coaching cards unharried), only the tutorial player can
+      // engage it (no shared-world leakage / kill-stealing), and that player gets an HP floor so
+      // the fight cannot kill them. The killed drone carries `tutorial` → finalize emits
+      // `t:'combat_done'` which drives COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO.
+      const id = world.spawnScriptedEnemy({
+        templateId: 'droid_security', name: 'Training Drone', enemyType: 'training_drone',
+        level: Math.max(1, player.level || 1), difficulty: 'easy',
+        near, tutorial: true, ownerId: player.id, passive: true,
+      });
+      if (id && player.combatant && player.combatant.stats) {
+        player._hpFloor = Math.max(1, Math.ceil(player.combatant.stats.maxHealth * 0.5));
+      }
+      return;
+    }
 
     if (msg.kind === 'npc' && msg.npcId) {
       const { NPC } = require('../models');

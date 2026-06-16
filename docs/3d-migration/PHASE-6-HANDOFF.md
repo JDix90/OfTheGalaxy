@@ -1,5 +1,13 @@
 # Phase 6 Handoff — Tutorial → 3D real-time combat (make the spaceport real-time)
 
+> **STATUS: COMPLETE** (branch `feat/combat-migration-phase-6-tutorial`, PR pending merge).
+> 6a backend + 6a frontend + 6b tutorial are all implemented, adversarially reviewed (6 lenses,
+> 4 fixes applied), and verified (90 DB-free logic tests green; frontend + backend builds green).
+> The only thing left is an **authed live play-test** of the end-to-end onboarding flow (the
+> realtime/authed path can't be verified headlessly) and then **Phase 7** (retire the turn-based
+> route — the offline fallback in `TutorialOverlay` COMBAT_INTRO is the last consumer to remove).
+> The sections below are the original plan, kept for reference.
+
 Resume doc for a fresh session. Pairs with the living tracker in
 `docs/3d-migration/COMBAT-MIGRATION-PLAN.md` (read that first for the full picture).
 

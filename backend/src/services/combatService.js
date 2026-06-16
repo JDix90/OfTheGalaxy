@@ -2059,9 +2059,11 @@ class CombatService {
       // surface POI. The entrance %-coords + ids come from the encounter metadata that the
       // realtime _createRecord stamped (buildEncounterMeta).
       const md = encounter.metadata || {};
-      // Only the realtime engine's dungeon deaths get the entrance-respawn (it stamps
-      // metadata.respawn). The legacy turn-based path is left untouched.
-      const dungeon = (md.realtime && encounter.encounterType === 'dungeon' && md.subMapId) ? {
+      // Any realtime SUBMAP death (dungeon OR hub like the spaceport) respawns at the submap
+      // entrance so the saved location stays coherent (keeps subMapId) instead of being kicked to
+      // a surface POI. The %-coords + ids come from the metadata that realtime _createRecord
+      // stamped (buildEncounterMeta). The legacy turn-based path is left untouched.
+      const dungeon = (md.realtime && md.subMapId) ? {
         subMapId: md.subMapId,
         parentLocationId: md.parentLocationId || null,
         x: md.respawn && Number.isFinite(md.respawn.x) ? md.respawn.x : undefined,
