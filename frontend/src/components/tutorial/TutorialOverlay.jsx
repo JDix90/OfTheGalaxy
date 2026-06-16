@@ -440,7 +440,12 @@ export default function TutorialOverlay() {
   const isOnPlanetSurface = location.pathname.startsWith('/game/planet/');
   const isOnSubmap = location.pathname.startsWith('/game/location/') || location.pathname.startsWith('/game/submap/');
   const isOnGameWorld = location.pathname === '/game';
-  const isOnVendor = location.pathname.startsWith('/game/vendor/');
+  // The vendor now opens as an in-world overlay (VendorPanel) on the 3D pages as
+  // well as via the legacy /game/vendor route — so the vendor tutorial steps must
+  // gate on the panel being present, not just the URL. (Matches this file's
+  // existing DOM-query idiom for `.inventory-overlay`.)
+  const isOnVendor = location.pathname.startsWith('/game/vendor/')
+    || (typeof document !== 'undefined' && !!document.querySelector('.vendor-panel'));
   
   // Track if we've already navigated for this tutorial state to prevent loops
   const navigationRef = useRef({ state: null, hasNavigated: false });

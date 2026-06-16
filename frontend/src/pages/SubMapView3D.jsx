@@ -34,6 +34,7 @@ import CombatToasts from '../components/hud/CombatToasts';
 import ConsumableQuickslot from '../components/hud/ConsumableQuickslot';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import DialogueInterface from '../features/dialogue/DialogueInterface';
+import VendorPanel from '../features/trading/VendorPanel';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import SubMapView from './SubMapView';     // 2D fallback (no submap types delegate here now; kept defensive)
@@ -64,6 +65,7 @@ export default function SubMapView3D() {
   const [proxPrompt, setProxPrompt] = useState(null); // { poi, x, y, isExit }
   const [npcMenu, setNpcMenu] = useState(null);
   const [selectedNPC, setSelectedNPC] = useState(null);
+  const [vendorNpc, setVendorNpc] = useState(null); // vendor NPC for the in-world trading overlay
 
   const inputEnabledRef = useRef(true);
 
@@ -161,7 +163,7 @@ export default function SubMapView3D() {
 
   const planetLike = useMemo(() => ({ terrain: subMap?.type === 'spaceport' ? 'urban' : (subMap?.type || 'urban') }), [subMap]);
 
-  const modalOpen = !!(npcMenu || selectedNPC);
+  const modalOpen = !!(npcMenu || selectedNPC || vendorNpc);
   useEffect(() => {
     inputEnabledRef.current = !modalOpen;
     if (modalOpen && input.current) {
@@ -350,10 +352,18 @@ export default function SubMapView3D() {
           onClose={() => setNpcMenu(null)}
           onTalk={() => { setSelectedNPC(npcMenu.npc); setNpcMenu(null); }}
           onAttack={isRealtime ? onAttackNpc : undefined}
+          onShop={(n) => { setVendorNpc(n); setNpcMenu(null); }}
           position={{ x: npcMenu.x, y: npcMenu.y }} />
       )}
       {selectedNPC && !npcMenu && (
-        <DialogueInterface npc={selectedNPC} onClose={() => setSelectedNPC(null)} />
+        <DialogueInterface
+          npc={selectedNPC}
+          onClose={() => setSelectedNPC(null)}
+          onShop={(n) => { setVendorNpc(n); setSelectedNPC(null); }}
+        />
+      )}
+      {vendorNpc && (
+        <VendorPanel npc={vendorNpc} npcId={vendorNpc.id} onClose={() => setVendorNpc(null)} />
       )}
 
       {/* Combat HUD (Phase 4.3/4.4) — health bar + ability hotbar + consumable quickslot
