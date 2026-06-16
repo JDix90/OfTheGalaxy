@@ -25,6 +25,7 @@ import CombatFx from './CombatFx';
 import QuestWaypoint from './QuestWaypoint';
 import Weather, { getWeatherPreset } from './Weather';
 import Atmosphere from './atmosphere/Atmosphere';
+import DistantSkyline from './atmosphere/DistantSkyline';
 import PostFX from './atmosphere/PostFX';
 import { AtmosphereContext } from './atmosphere/AtmosphereContext';
 
@@ -159,6 +160,7 @@ export default function SurfaceScene({
       />
 
       <Ground planet={planet} size={groundSize} textureUrl={textureUrl} />
+      <DistantSkyline worldHalf={worldHalf} />
 
       {pois.map((poi) => (
         <PoiStructure
