@@ -13,6 +13,9 @@ import Ground from '../surface3d/Ground';
 import PoiStructure from '../surface3d/PoiStructure';
 import NpcActor from '../surface3d/NpcActor';
 import PlayerActor from '../surface3d/PlayerActor';
+import RemotePlayers from '../surface3d/RemotePlayers';
+import RemoteEnemies from '../surface3d/RemoteEnemies';
+import CombatFx from '../surface3d/CombatFx';
 import QuestWaypoint from '../surface3d/QuestWaypoint';
 import Atmosphere from '../surface3d/atmosphere/Atmosphere';
 import PostFX from '../surface3d/atmosphere/PostFX';
@@ -39,6 +42,7 @@ export default function SubmapScene({
   onProximity, onMoved, onPoiActivate, onNpcActivate, onExitActivate,
   subMap, sim, furniture, interior = false,
   startTime = 0.4, postQuality = 'high',
+  realtime = false, combatTarget = null, onCombatTarget = () => {},
 }) {
   const groundSize = worldHalf * 2;
   const atmoRef = useRef({ nightFactor: 0, dayFactor: 1, time: startTime });
@@ -86,6 +90,16 @@ export default function SubmapScene({
       {(waypoints || []).map((wp) => <QuestWaypoint key={wp.id} wp={wp} />)}
 
       <PlayerActor world={world} input={input} pois={proximityPois} onProximity={onProximity} onMoved={onMoved} />
+
+      {/* Real-time hub submaps (spaceport): server-driven players + hostiles + combat fx,
+          reusing the surface/dungeon net-combat leaf components over the submap NetWorld. */}
+      {realtime && (
+        <>
+          <RemotePlayers world={world} />
+          <RemoteEnemies world={world} targetId={combatTarget} onTarget={onCombatTarget} />
+          <CombatFx world={world} targetId={combatTarget} onClearTarget={() => onCombatTarget(null)} />
+        </>
+      )}
 
       <PostFX quality={postQuality} />
       <HeadlessHook />
