@@ -191,7 +191,7 @@ function placeSettlement(tileMap, planet, mapData, biomeKey) {
  * @param {number} tileSize - Size of each tile as percentage (default 2% = 50x50 grid)
  * @returns {Object} Tile map with walkable/obstacle information
  */
-function generateUrbanTileMap(mapData, tileSize = 2) {
+function generateUrbanTileMap(mapData, tileSize = 2, planet = {}) {
   const gridSize = Math.floor(100 / tileSize); // 50x50 grid for 2% tiles
   const tiles = [];
   const tileMap = { gridSize, tileSize, tiles, style: 'medina', settlement: true };
@@ -201,6 +201,12 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
   let seed = Math.abs((mapData.seed | 0) ||
     pois.reduce((s, p) => s + Math.floor((p.x || 0) * 31 + (p.y || 0) * 17), gridSize * 101)) || 12345;
   const rng = mulberry32(seed);
+
+  // Rooftop access (stairs + bridges) scales with population — a sprawling capital is a vertical
+  // playground; a small/rural urban world has only a few ways up (or nearly none).
+  const pop = Number(planet && planet.population) || 0;
+  const popTier = pop <= 0 ? 0.5 : Math.max(0.15, Math.min(1, (Math.log10(pop) - 4) / 6));
+  const accessFactor = 0.2 + 0.8 * popTier;
 
   // 1) Solid block of buildings to start.
   for (let y = 0; y < gridSize; y++) {
@@ -295,7 +301,7 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
     if (hasGround && hasRoof) stairCandidates.push({ x, y, h: t.height });
   }
   if (stairCandidates.length) {
-    const target = Math.min(20, Math.max(6, Math.round(stairCandidates.length * 0.06)));
+    const target = Math.round(Math.min(20, Math.max(6, stairCandidates.length * 0.06)) * accessFactor);
     const p = target / stairCandidates.length;
     for (const c of stairCandidates) {
       if (rng() < p) tiles[c.y][c.x] = { type: 'stair', walkable: true, visual: 'stair', height: c.h };
@@ -321,7 +327,7 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
   }
   if (bridgePlans.length) {
     const bridged = new Set();
-    const target = Math.min(22, Math.max(4, Math.round(bridgePlans.length * 0.2)));
+    const target = Math.round(Math.min(22, Math.max(4, bridgePlans.length * 0.2)) * accessFactor);
     const stride = Math.max(1, Math.floor(bridgePlans.length / target));
     let placed = 0;
     for (let i = 0; i < bridgePlans.length && placed < target; i += stride) {
@@ -1262,7 +1268,8 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 // v5: building blocks carry a `block` id + tileMap.settlement flag (for the stationed-NPC ecology).
 // v6: every biome gets a fitting built-up settlement (per-terrain layout/population/bustle).
 // v7: medina gains rooftop 'bridge' tiles (cross same-height roofs over the alleys).
-const TILEMAP_VERSION = 7;
+// v8: rooftop access (stairs+bridges) scales with population (rural = fewer).
+const TILEMAP_VERSION = 8;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);
@@ -1276,7 +1283,7 @@ function _dispatchTileMapByPlanetType(planet, mapData, tileSize = 2) {
 
   // Urban planets
   if (planetType === 'urban' || terrain === 'urban_sprawl') {
-    return generateUrbanTileMap(mapData, tileSize);
+    return generateUrbanTileMap(mapData, tileSize, planet);
   }
 
   // Desert planets — natural terrain with a built-up outpost settlement around the spaceport.
@@ -1311,7 +1318,7 @@ function _dispatchTileMapByPlanetType(planet, mapData, tileSize = 2) {
 
   // Default: use urban for unknown types (fallback)
   console.warn(`[Tile Map] Unknown planet type: ${planetType}, terrain: ${terrain}, using urban generator`);
-  return generateUrbanTileMap(mapData, tileSize);
+  return generateUrbanTileMap(mapData, tileSize, planet);
 }
 
 module.exports = {

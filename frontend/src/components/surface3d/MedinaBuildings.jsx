@@ -249,7 +249,7 @@ export default function MedinaBuildings({ planet, worldHalf }) {
   useFrame(() => {
     const night = (atmo && atmo.current && atmo.current.nightFactor) || 0;
     GLOW_MAT.opacity = night * ((data && data.glowOpacity) || 0.85);
-    if (fillRef.current) fillRef.current.intensity = night * 0.5;
+    if (fillRef.current) fillRef.current.intensity = 0.12 + night * 0.95; // keep streets readable day & night
   });
   if (!data) return null;
   return (
