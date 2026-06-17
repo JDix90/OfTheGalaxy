@@ -12,7 +12,7 @@
 
 import { createSurfaceSim, normalizeSurfaceCoord } from '../../../../shared/sim/surface.mjs';
 import { createSubmapSimWith, submapToPct, submapLayout, submapCoordDims } from '../../../../shared/sim/submap.mjs';
-import { getPoiStructure } from '../../data/modelManifest';
+import { getPoiStructure, getPoiBuilding, getPoiProps } from '../../data/modelManifest';
 
 const layoutOf = (subMap) => submapLayout(subMap);
 
@@ -107,11 +107,15 @@ export function buildSubmapPois(subMap, sim) {
     seen.add(id);
     const p = toPct(pos.x, pos.y, w, h);
     const wpos = sim.surfaceToWorld(p.x, p.y);
+    // Hangars/landing bays render as the grand glTF hangar + docked-ship props (the surface
+    // 'spaceport' kit); compact storefronts (stall/desk/room) stay as their tuned primitives.
+    const isHangar = /hangar|landing|spaceport|dock|pad/.test(String(b.type || '').toLowerCase());
     out.push({
       id, name: b.name || b.type, type: b.type, kind: 'building',
       sx: p.x, sy: p.y, wx: wpos.x, wz: wpos.z,
       enterable: !!b.opensTo || b.type === 'crafting_bench' || b.type === 'vendor_stall' || b.type === 'commercial',
       structure: submapStructure(b, w, sim),
+      ...(isHangar ? { building: getPoiBuilding(b.type, id), props: getPoiProps(b.type, id) } : {}),
       raw: b,
     });
   }
