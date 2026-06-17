@@ -17,6 +17,21 @@ const trustService = require('./trustService');
 // controlling faction so a location feels "run by" whoever holds the world.
 const SECURITY_OCCUPATION_RE = /(guard|security|enforcer|sentinel|sentry|patrol|warden|customs|militia|bouncer|official|officer)/i;
 
+// Population "bustle" tier 0.1..1 from a planet's headcount (log-scaled: ~1e4 → 0.1, ~1e10 → 1),
+// used to scale stationed-NPC counts so a dense core world feels crowded and an outpost feels quiet.
+function popTier(planet) {
+  const p = Number(planet && planet.population) || 0;
+  if (p <= 0) return 0.15;
+  return Math.max(0.1, Math.min(1, (Math.log10(p) - 4) / 6));
+}
+// Small integer hash for deterministic, non-clustered spread-sampling of placement spots.
+function hashInt(n) {
+  let h = (n | 0) ^ 0x9e3779b9;
+  h = Math.imul(h ^ (h >>> 16), 2246822507);
+  h = Math.imul(h ^ (h >>> 13), 3266489909);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
 /**
  * Map a submap's type (+ a building interior's template) to an occupation "domain" key used
  * by getOccupationForSubMap. Building interiors take their flavor from the building type.
@@ -220,13 +235,13 @@ class NPCGenerator {
    * @param {string} planetId
    * @returns {Promise<Array>} the stall-vendor NPC records (existing + newly created)
    */
-  async ensureSurfaceStallVendors(planetId) {
+  async ensureSurfaceSettlementNpcs(planetId) {
     const { Planet } = require('../models');
     const planet = await Planet.findByPk(planetId);
     if (!planet) return [];
 
-    // Prefer the cached grid (a non-medina cache bails cheaply below). Only regenerate when there's
-    // no cache at all — deterministic, so stall positions match what the renderer draws.
+    // Prefer the cached grid (a non-settlement cache bails cheaply below). Only regenerate when
+    // there's no cache at all — deterministic, so positions match what the renderer draws.
     let tileMap = (planet.tileMap && planet.tileMap.tiles) ? planet.tileMap : null;
     if (!tileMap) {
       try {
@@ -234,63 +249,109 @@ class NPCGenerator {
         tileMap = generateTileMapByPlanetType(planet, planet.mapData || {});
       } catch (_) { return []; }
     }
-    if (!tileMap || tileMap.style !== 'medina' || !Array.isArray(tileMap.tiles)) return [];
+    if (!tileMap || !Array.isArray(tileMap.tiles) || !(tileMap.settlement || tileMap.style === 'medina')) return [];
     const ts = tileMap.tileSize || 2;
 
-    const stalls = [];
+    // ---- gather settlement features: stalls, plazas, and one alley-facing tile per building block ----
+    const stalls = [], plazas = [];
+    const blocks = new Map(); // blockKey -> { tx, ty, cat }
     for (let ty = 0; ty < tileMap.tiles.length; ty++) {
       const row = tileMap.tiles[ty];
       if (!row) continue;
       for (let tx = 0; tx < row.length; tx++) {
-        if (row[tx] && row[tx].type === 'stall') stalls.push({ tx, ty });
+        const t = row[tx];
+        if (!t) continue;
+        if (t.type === 'stall') { stalls.push({ tx, ty }); continue; }
+        if (t.type === 'plaza') { plazas.push({ tx, ty }); continue; }
+        if (t.type === 'building' && t.category) {
+          let facing = false;
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const n = tileMap.tiles[ty + dy] && tileMap.tiles[ty + dy][tx + dx];
+            if (n && n.walkable) { facing = true; break; }
+          }
+          if (!facing) continue; // only storefront (alley-facing) tiles can host a doorway NPC
+          const key = t.block != null ? `b${t.block}` : `c${Math.floor(tx / 4)},${Math.floor(ty / 4)}`;
+          if (!blocks.has(key)) blocks.set(key, { tx, ty, cat: t.category });
+        }
       }
     }
-    if (!stalls.length) return [];
 
-    const ids = stalls.map((s) => `${planetId}_stall_${s.tx}_${s.ty}`);
-    const existing = await NPC.findAll({ where: { id: ids } });
-    if (existing.length >= ids.length) return existing; // all present → cheap no-op
+    const blockList = [...blocks.values()];
+    const byCat = (cats) => blockList.filter((b) => cats.includes(b.cat));
+    // Deterministic spread-sample: stride through a hash-ordered list so picks aren't clustered.
+    const pick = (arr, n) => {
+      if (n <= 0 || !arr.length) return [];
+      const sorted = [...arr].sort((a, b) => hashInt(a.tx * 131 + a.ty) - hashInt(b.tx * 131 + b.ty));
+      if (sorted.length <= n) return sorted;
+      const step = sorted.length / n, out = [];
+      for (let i = 0; i < n; i++) out.push(sorted[(i * step) | 0]);
+      return out;
+    };
 
-    const have = new Set(existing.map((n) => n.id));
+    const tier = popTier(planet);
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const targets = {
+      vendor: clamp(Math.round(4 + tier * 14), 4, 18),
+      quest: clamp(Math.round(2 + tier * 4), 2, 6),
+      faction: planet.factionControl ? clamp(Math.round(2 + tier * 5), 2, 7) : 0,
+      local: clamp(Math.round(3 + tier * 9), 3, 12),
+    };
+
+    // ---- assemble the planned roster (deterministic ids) ----
+    const planned = [];
     const planetTemplate = templates.getPlanetTemplate(planet);
-    const CATEGORIES = ['general', 'tech', 'communication', 'medical'];
-    const TITLES = { general: 'Trader', tech: 'Tech Dealer', communication: 'Comms Vendor', medical: 'Apothecary' };
+    const addPlan = (role, spots) => { for (const s of spots) planned.push({ id: `${planetId}_${role}_${s.tx}_${s.ty}`, role, tx: s.tx, ty: s.ty, cat: s.cat }); };
+    addPlan('stall', stalls.map((s) => ({ ...s, cat: 'stall' })));
+    addPlan('vendor', pick(byCat(['shop', 'market']), targets.vendor));
+    addPlan('quest', pick(byCat(['civic']).concat(plazas.map((p) => ({ ...p, cat: 'plaza' }))), targets.quest));
+    addPlan('faction', pick(byCat(['apartment', 'civic']), targets.faction));
+    addPlan('local', pick(byCat(['bar', 'restaurant']), targets.local));
+    if (!planned.length) return [];
+
+    const existing = await NPC.findAll({ where: { id: planned.map((p) => p.id) } });
+    if (existing.length >= planned.length) return existing; // all present → cheap no-op
+    const have = new Set(existing.map((n) => n.id));
+
+    const VENDOR_CATS = ['general', 'tech', 'communication', 'medical'];
+    let vci = 0;
     const created = [];
-    let ci = 0;
-    for (const s of stalls) {
-      const id = `${planetId}_stall_${s.tx}_${s.ty}`;
-      const category = CATEGORIES[ci % CATEGORIES.length];
-      ci++;
-      if (have.has(id)) continue;
-      const seed = templates.getSeed(id);
+    for (const plan of planned) {
+      if (have.has(plan.id)) continue;
+      const seed = templates.getSeed(plan.id);
       const rnd = templates.seededRandom(seed);
       const species = (planetTemplate.species && planetTemplate.species.length)
         ? planetTemplate.species[Math.floor(rnd() * planetTemplate.species.length)] : 'Human';
-      const pos = this._stallVendorPos(tileMap, s.tx, s.ty, ts); // adjacent walkable, surface 0-100
-      const occupation = TITLES[category] || 'Merchant';
-      const npc = await this.generateNPC({
-        id,
+      const pos = this._adjacentWalkable(tileMap, plan.tx, plan.ty, ts);
+      const base = {
+        id: plan.id, species, seed, rnd,
         name: templates.generateName(species, seed),
-        species,
-        occupation,
-        npcType: 'vendor',
         location: { planet: planetId, area: 'surface', subMapId: null, x: Math.round(pos.x), y: Math.round(pos.y) },
-        factionId: getFactionForNPC(planet, 'vendor', rnd),
-        vendorCategory: category,      // drives generateVendorInventory's item filter
-        subMapType: 'market',
-        dialogue: templates.generateDialogue('vendor', species, occupation, rnd),
-        biography: `A ${species} ${occupation.toLowerCase()} working a stall in the ${planet.name} souk.`,
-        seed,
-        rnd,
-      });
-      created.push(npc);
+      };
+      let spec;
+      if (plan.role === 'stall' || plan.role === 'vendor') {
+        const occ = plan.role === 'stall' ? 'Stall Vendor' : 'Shopkeeper';
+        spec = { ...base, occupation: occ, npcType: 'vendor', factionId: getFactionForNPC(planet, 'vendor', rnd), vendorCategory: VENDOR_CATS[vci++ % VENDOR_CATS.length], subMapType: 'market', dialogue: templates.generateDialogue('vendor', species, occ, rnd), biography: `A ${species} ${occ.toLowerCase()} in the ${planet.name} ${plan.role === 'stall' ? 'souk' : 'market district'}.` };
+      } else if (plan.role === 'quest') {
+        const occ = 'Official';
+        spec = { ...base, occupation: occ, npcType: 'quest_giver', factionId: getFactionForNPC(planet, 'quest_giver', rnd), dialogue: templates.generateDialogue('quest_giver', species, occ, rnd), biography: `A ${species} ${occ.toLowerCase()} with work for capable travelers on ${planet.name}.` };
+      } else if (plan.role === 'faction') {
+        const occ = 'Agent';
+        spec = { ...base, occupation: occ, npcType: 'faction_leader', factionId: planet.factionControl || getFactionForNPC(planet, 'faction_leader', rnd), dialogue: templates.generateDialogue('faction_leader', species, occ, rnd), biography: `A ${species} ${occ.toLowerCase()} representing the local powers on ${planet.name}.` };
+      } else { // local patron
+        const occ = 'Local';
+        spec = { ...base, occupation: occ, npcType: 'generic', factionId: getFactionForNPC(planet, 'generic', rnd), dialogue: templates.generateDialogue('generic', species, occ, rnd), biography: `A ${species} ${occ.toLowerCase()} passing time in the ${planet.name} ${plan.cat === 'bar' ? 'cantina' : 'quarter'}.` };
+      }
+      created.push(await this.generateNPC(spec));
     }
     return [...existing, ...created];
   }
 
-  /** Surface (0-100) position adjacent to a stall tile. Stalls are impassable, so the vendor
-   *  stands in a neighbouring walkable (plaza) tile; falls back to the stall centre. */
-  _stallVendorPos(tileMap, tx, ty, ts) {
+  /** Backwards-compatible alias. */
+  async ensureSurfaceStallVendors(planetId) { return this.ensureSurfaceSettlementNpcs(planetId); }
+
+  /** Surface (0-100) position adjacent to an impassable tile, so the NPC stands in the street/plaza
+   *  rather than inside the building/stall. Falls back to the tile centre. */
+  _adjacentWalkable(tileMap, tx, ty, ts) {
     for (const [dx, dy] of [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
       const nx = tx + dx, ny = ty + dy;
       const row = tileMap.tiles[ny];
