@@ -94,11 +94,14 @@ function submapStructure(b, w, sim) {
 // Curated glTF building meshes for concourse storefronts, so shops read as real sci-fi
 // buildings (Kenney Space Kit) instead of untextured primitive boxes — the hangars already
 // look right because they use glTF; this extends that to the storefronts.
+// `structure_detailed` is an OPEN girder frame (reads as scaffolding, not a shop), so use the
+// solid `structure_closed` paneled block for every storefront. Variety comes from the per-type
+// beacon/accent color + facing, not the mesh (the kit has no dedicated shop models).
 const STOREFRONT_GLTF = {
-  stall: 'structure_detailed', market: 'structure_detailed', stand: 'structure_detailed',
+  stall: 'structure_closed', market: 'structure_closed', stand: 'structure_closed',
   shop: 'structure_closed', store: 'structure_closed', commercial: 'structure_closed',
   cantina: 'structure_closed', bar: 'structure_closed',
-  reception: 'structure_detailed', desk: 'structure_detailed', kiosk: 'structure_detailed',
+  reception: 'structure_closed', desk: 'structure_closed', kiosk: 'structure_closed',
 };
 // Yaw correction for the modeled "front" axis of the building glTFs (radians). 0 = the mesh's
 // +Z is its front; flip to Math.PI if buildings end up facing away from the walkway once seen.
@@ -172,14 +175,17 @@ export function buildSubmapExits(subMap, sim) {
 }
 
 // Furniture / decoration / interactive presentation (typed boxes; emissive accents glow).
+// `max` caps the world-space footprint so a prop can't balloon to grid-cell size on a coarse
+// district grid (the spaceport's 12-cell grid makes one cell ~7u — a chair must not be 7u wide).
 const FURN = {
-  counter: { ht: 1.0, color: '#7a5a3a' }, table: { ht: 1.0, color: '#7a5a3a' }, desk: { ht: 1.0, color: '#6a4a2a' },
-  shelf: { ht: 2.2, color: '#5a4a3a' }, display: { ht: 1.6, color: '#3a5a7a' }, cabinet: { ht: 2.0, color: '#5a4a3a' },
-  bed: { ht: 0.8, color: '#7a4a5a' }, chair: { ht: 1.0, color: '#5a4a3a' }, stool: { ht: 0.8, color: '#5a4a3a' },
-  crate: { ht: 1.0, color: '#6a5a3a' }, barrel: { ht: 1.1, color: '#6a4a2a' }, storage: { ht: 1.4, color: '#5a5a5a' },
-  chest: { ht: 0.9, color: '#7a6a3a' }, sign: { ht: 2.4, color: '#3a4a6a', emissive: '#7db8ff' }, plant: { ht: 1.4, color: '#3a6a3a' },
-  vendor: { ht: 1.1, color: '#caa24b', emissive: '#ffcf5c' }, terminal: { ht: 1.3, color: '#2a4a6a', emissive: '#3aa0ff' },
-  default: { ht: 1.1, color: '#5a5a6a' },
+  counter: { ht: 1.0, color: '#7a5a3a', max: 2.0 }, table: { ht: 1.0, color: '#7a5a3a', max: 1.8 }, desk: { ht: 1.0, color: '#6a4a2a', max: 2.0 },
+  shelf: { ht: 2.2, color: '#5a4a3a', max: 1.6 }, display: { ht: 1.6, color: '#3a5a7a', max: 1.6 }, cabinet: { ht: 2.0, color: '#5a4a3a', max: 1.6 },
+  bed: { ht: 0.8, color: '#7a4a5a', max: 2.2 }, chair: { ht: 1.0, color: '#5a4a3a', max: 0.9 }, stool: { ht: 0.8, color: '#5a4a3a', max: 0.8 },
+  bench: { ht: 0.7, color: '#6a5a4a', max: 2.4 },
+  crate: { ht: 1.0, color: '#6a5a3a', max: 1.1 }, barrel: { ht: 1.1, color: '#6a4a2a', max: 1.0 }, storage: { ht: 1.4, color: '#5a5a5a', max: 1.4 },
+  chest: { ht: 0.9, color: '#7a6a3a', max: 1.0 }, sign: { ht: 2.4, color: '#3a4a6a', emissive: '#7db8ff', max: 1.1 }, plant: { ht: 1.4, color: '#3a6a3a', max: 1.1 },
+  vendor: { ht: 1.1, color: '#caa24b', emissive: '#ffcf5c', max: 1.4 }, terminal: { ht: 1.3, color: '#2a4a6a', emissive: '#3aa0ff', max: 1.2 },
+  default: { ht: 1.1, color: '#5a5a6a', max: 1.3 },
 };
 
 /** Furniture + decorations + interactive elements → world-positioned 3D props. */
@@ -199,11 +205,14 @@ export function buildSubmapFurniture(subMap, sim) {
     const cy = ((pos.y + sh / 2) / h) * 100;
     const wpos = sim.surfaceToWorld(cx, cy);
     const def = FURN[f.type] || FURN.default;
+    // World footprint = grid span, but CAPPED to the prop's real size so a coarse district grid
+    // doesn't inflate small props into giant slabs. min() never enlarges fine-grid interiors.
+    const cap = def.max || 1.3;
     out.push({
       id: f.id || `furn_${i}`, type: f.type,
       wx: wpos.x, wz: wpos.z,
-      wlen: Math.max(0.6, sw * cellPct * sim.scale * 0.9),
-      dlen: Math.max(0.6, sh * cellPct * sim.scale * 0.9),
+      wlen: Math.max(0.5, Math.min(sw * cellPct * sim.scale * 0.9, cap)),
+      dlen: Math.max(0.5, Math.min(sh * cellPct * sim.scale * 0.9, cap)),
       ht: def.ht, color: def.color, emissive: def.emissive || null,
       rot: (f.rotation || 0) * Math.PI / 180,
     });
