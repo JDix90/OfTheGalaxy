@@ -16,7 +16,7 @@ import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 import subMapApi from '../services/api/subMapApi';
 import { npcApi } from '../services/api/npcApi';
 import { galaxyApi } from '../services/api/galaxyApi';
-import DialogueInterface from '../features/dialogue/DialogueInterface';
+import ConversationView from '../features/dialogue/ConversationView';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import ResourceEncounterDialog from '../components/resource/ResourceEncounterDialog';
 import { renderSubMap } from '../utils/subMapRenderer';
@@ -4058,7 +4058,7 @@ export default function SubMapView() {
 
       {/* Dialogue Interface - opened when Talk is clicked */}
       {selectedNPC && !npcMenuOpen && (
-        <DialogueInterface
+        <ConversationView
           key={`${selectedNPC?.id}-${tutorialState === TUTORIAL_STATES.SPACEPORT_EXIT_EXPLAINED ? 'farewell' : 'normal'}`}
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}

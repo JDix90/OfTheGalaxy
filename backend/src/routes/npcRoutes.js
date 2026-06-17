@@ -32,6 +32,7 @@ router.post('/generate/submap/:subMapId', npcController.generateForSubMap);
 
 // NPC interactions (AI-backed -> rate limited + ownership checked)
 router.post('/:id/dialogue', dialogueLimiter, ownsCharacter, npcController.dialogue);
+router.post('/:id/dialogue/stream', dialogueLimiter, ownsCharacter, npcController.dialogueStream);
 router.post('/:id/suggested-responses', dialogueLimiter, ownsCharacter, npcController.getSuggestedResponses);
 router.post('/:id/recruit', npcController.recruit);
 router.post('/:id/dismiss', npcController.dismiss);

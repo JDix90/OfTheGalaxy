@@ -119,13 +119,80 @@ class NPCController {
       const { characterId, message } = req.body;
       
       const result = await npcService.processDialogue(id, characterId, message);
-      
+
       res.json({
         success: true,
         data: result
       });
     } catch (error) {
       next(error);
+    }
+  }
+
+  /**
+   * Process dialogue with NPC, streaming the reply token-by-token over SSE.
+   * POST /api/npcs/:id/dialogue/stream
+   *
+   * Event protocol (each frame is `data: <json>\n\n`):
+   *   { type: 'delta', text }      — a chunk of the NPC reply as it generates
+   *   { type: 'done',  data }      — the full processDialogue result (authoritative
+   *                                  reply text + relationship/quest/rep side-effects)
+   *   { type: 'error', message }   — generation failed after the stream had started
+   *
+   * The same processDialogue path runs as the non-streaming sibling, so quest
+   * offers, reputation, tutorial and golden-path side-effects are identical; only
+   * the reply text is delivered incrementally. Non-AI branches (tutorial/template/
+   * cache) simply emit no deltas and arrive whole in the `done` event.
+   */
+  async dialogueStream(req, res, next) {
+    const { id } = req.params;
+    const { characterId, message } = req.body;
+
+    // Abort upstream generation if the client disconnects. Listen on RESPONSE
+    // 'close' (genuine socket teardown) — NOT request 'close', which fires as
+    // soon as Express finishes reading the body and would suppress every reply.
+    // `finished` guards the post-res.end() 'close' so a normal turn isn't
+    // mistaken for an abort.
+    const ac = new AbortController();
+    let closed = false;
+    let finished = false;
+    let headersSent = false;
+    res.on('close', () => { if (!finished) { closed = true; ac.abort(); } });
+
+    const send = (obj) => {
+      if (closed) return;
+      try { res.write(`data: ${JSON.stringify(obj)}\n\n`); } catch (_) { /* socket gone */ }
+    };
+
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no', // defeat proxy buffering if any is added later
+      });
+      headersSent = true;
+      if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+      const result = await npcService.processDialogue(id, characterId, message, {
+        onToken: (delta) => send({ type: 'delta', text: delta }),
+        signal: ac.signal,
+      });
+
+      if (!closed) {
+        finished = true; // mark before res.end() so the 'close' handler no-ops
+        send({ type: 'done', data: result });
+        res.end();
+      }
+    } catch (error) {
+      console.error('[NPC] dialogue stream error:', error);
+      if (headersSent) {
+        // Stream already open — can't fall back to JSON; emit an SSE error + close.
+        send({ type: 'error', message: 'Failed to generate dialogue.' });
+        try { res.end(); } catch (_) { /* already closed */ }
+      } else {
+        next(error); // pre-stream failure → normal JSON error handler
+      }
     }
   }
 

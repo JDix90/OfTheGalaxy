@@ -44,7 +44,7 @@ export default function SubmapScene({
   onProximity, onMoved, onPoiActivate, onNpcActivate, onExitActivate,
   subMap, sim, furniture, interior = false,
   startTime = 0.4, postQuality = 'high',
-  realtime = false, combatTarget = null, onCombatTarget = () => {},
+  realtime = false, combatTarget = null, onCombatTarget = () => {}, focus = null,
 }) {
   const groundSize = worldHalf * 2;
   const atmoRef = useRef({ nightFactor: 0, dayFactor: 1, time: startTime });
@@ -109,7 +109,7 @@ export default function SubmapScene({
 
       {(waypoints || []).map((wp) => <QuestWaypoint key={wp.id} wp={wp} />)}
 
-      <PlayerActor world={world} input={input} pois={proximityPois} onProximity={onProximity} onMoved={onMoved} />
+      <PlayerActor world={world} input={input} pois={proximityPois} onProximity={onProximity} onMoved={onMoved} focus={focus} />
 
       {/* Real-time hub submaps (spaceport): server-driven players + hostiles + combat fx,
           reusing the surface/dungeon net-combat leaf components over the submap NetWorld. */}

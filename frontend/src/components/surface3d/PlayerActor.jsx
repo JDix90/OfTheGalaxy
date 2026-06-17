@@ -21,12 +21,23 @@ const YAW_RATE = 2.0;
 const PROXIMITY_WORLD = 7;     // how close (world units) to "enter" a location
 const PROXIMITY_PERIOD = 0.15; // s
 const MOVE_REPORT_PERIOD = 0.4; // s
+// Conversation framing: an over-the-shoulder shot of the NPC, blended in/out.
+const CONV_DIST = 6.2;
+const CONV_HEIGHT = 4.0;
+const CONV_LATERAL = 2.2;
 
-export default function PlayerActor({ world, input, pois, onProximity, onMoved }) {
+export default function PlayerActor({ world, input, pois, onProximity, onMoved, focus = null }) {
   const group = useRef();
   const motion = useRef({ speed: 0 });
   const model = useMemo(() => getCharacterModel('char.player'), []);
   const camTarget = useRef(new THREE.Vector3());
+  // Camera framing scratch + blend factor (0 follow → 1 conversation).
+  const defPos = useRef(new THREE.Vector3());
+  const defTgt = useRef(new THREE.Vector3());
+  const convPos = useRef(new THREE.Vector3());
+  const convTgt = useRef(new THREE.Vector3());
+  const blendPos = useRef(new THREE.Vector3());
+  const focusBlend = useRef(0);
   const playerY = useRef(0); // smoothed walk height (0 ground / roof top on the medina upper level)
   const proxAcc = useRef(0);
   const moveAcc = useRef(0);
@@ -66,12 +77,41 @@ export default function PlayerActor({ world, input, pois, onProximity, onMoved }
       group.current.rotation.y = p.facing + (model.facingOffset || 0);
     }
 
-    // Third-person follow camera (behind the camera-yaw, looking at the player; rises with them).
+    // Third-person follow camera, blended toward a conversation framing when a
+    // dialogue NPC is in focus. Default follow target:
     const fwdX = -Math.sin(i.yaw), fwdZ = -Math.cos(i.yaw);
-    tmp.current.set(p.x - fwdX * CAM_DIST, py + CAM_HEIGHT, p.z - fwdZ * CAM_DIST);
-    if (!inited.current) { camera.position.copy(tmp.current); inited.current = true; }
-    else camera.position.lerp(tmp.current, 1 - Math.pow(0.0016, dt));
-    camTarget.current.set(p.x, py + 1.6, p.z);
+    defPos.current.set(p.x - fwdX * CAM_DIST, py + CAM_HEIGHT, p.z - fwdZ * CAM_DIST);
+    defTgt.current.set(p.x, py + 1.6, p.z);
+
+    // Ease the framing blend toward 1 while focused, back to 0 when it clears.
+    focusBlend.current += ((focus ? 1 : 0) - focusBlend.current) * (1 - Math.pow(0.05, dt));
+
+    if (focus) {
+      const dx = focus.x - p.x, dz = focus.z - p.z;
+      const len = Math.hypot(dx, dz) || 1;
+      const dirX = dx / len, dirZ = dz / len;
+      const perpX = -dirZ, perpZ = dirX;
+      // Camera behind the player (away from the NPC), nudged to one side for a 3/4 shot.
+      convPos.current.set(
+        p.x - dirX * CONV_DIST + perpX * CONV_LATERAL,
+        py + CONV_HEIGHT,
+        p.z - dirZ * CONV_DIST + perpZ * CONV_LATERAL,
+      );
+      // Frame the gap between player and NPC at roughly chest height.
+      const look = Math.min(len * 0.5, 2.4);
+      convTgt.current.set(p.x + dirX * look, py + 1.45, p.z + dirZ * look);
+      // Turn the player to face whoever they're talking to (movement is locked here).
+      if (group.current) group.current.rotation.y = Math.atan2(dirX, dirZ) + (model.facingOffset || 0);
+    } else if (focusBlend.current < 0.01) {
+      convPos.current.copy(defPos.current);
+      convTgt.current.copy(defTgt.current);
+    }
+
+    const fb = focusBlend.current;
+    blendPos.current.lerpVectors(defPos.current, convPos.current, fb);
+    if (!inited.current) { camera.position.copy(blendPos.current); inited.current = true; }
+    else camera.position.lerp(blendPos.current, 1 - Math.pow(0.0016, dt));
+    camTarget.current.lerpVectors(defTgt.current, convTgt.current, fb);
     camera.lookAt(camTarget.current);
 
     // --- throttled proximity to enterable POIs ---

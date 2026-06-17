@@ -4,6 +4,7 @@
  */
 
 const { Planet } = require('../models');
+const { deriveSuggestionTone } = require('./suggestionTone');
 
 class SuggestedResponseService {
   /**
@@ -25,12 +26,16 @@ class SuggestedResponseService {
       const tutorialState = tutorialProgress?.state || 'dialogue_started';
       const tutorialSuggestions = tutorialDialogueService.getSuggestedResponses(tutorialState, character.background);
       
-      // Convert to expected format
+      // Convert to expected format. Spread the original first so `action`
+      // (accept_quest / open_vendor / ready_for_combat) survives to the client —
+      // ConversationView.handleChoose routes on it. Only category/intent/icon
+      // are normalized; tone is derived from the original suggestion.
       return tutorialSuggestions.map(s => ({
-        text: s.text,
+        ...s,
         category: s.action || 'tutorial',
         intent: s.action || 'tutorial',
-        icon: s.icon || '💬'
+        icon: s.icon || '💬',
+        tone: deriveSuggestionTone(s) // backend-authored intent label
       }));
     }
     
@@ -160,8 +165,8 @@ class SuggestedResponseService {
       });
     }
 
-    // Limit to 6 suggestions
-    return suggestions.slice(0, 6);
+    // Limit to 6 suggestions, tagging each with a backend-authored tone label.
+    return suggestions.slice(0, 6).map(s => ({ ...s, tone: s.tone || deriveSuggestionTone(s) }));
   }
 
   /**

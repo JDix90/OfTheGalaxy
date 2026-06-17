@@ -11,7 +11,7 @@ import React from 'react';
 import {
   Sword, Shield, Target, Wind, FlaskConical, Sparkles, Star, GraduationCap,
   Dumbbell, Heart, Rocket, Check, TriangleAlert, Info, Handshake, PartyPopper,
-  Skull, Coins, Hammer, Backpack, Crosshair, Zap
+  Skull, Coins, Hammer, Backpack, Crosshair, Zap, ShoppingCart, History
 } from 'lucide-react';
 
 const ICONS = {
@@ -31,6 +31,8 @@ const ICONS = {
   // Navigation / standing
   course: Rocket,
   credits: Coins,
+  shop: ShoppingCart,
+  history: History,
   rep: Handshake,
   crafting: Hammer,
   inventory: Backpack,
