@@ -91,6 +91,23 @@ function submapStructure(b, w, sim) {
   return { ...s, height: Math.min(s.height, 3.6), footprint: Math.min(s.footprint, Math.max(fp, 3.0)) };
 }
 
+// Curated glTF building meshes for concourse storefronts, so shops read as real sci-fi
+// buildings (Kenney Space Kit) instead of untextured primitive boxes — the hangars already
+// look right because they use glTF; this extends that to the storefronts.
+const STOREFRONT_GLTF = {
+  stall: 'structure_detailed', market: 'structure_detailed', stand: 'structure_detailed',
+  shop: 'structure_closed', store: 'structure_closed', commercial: 'structure_closed',
+  cantina: 'structure_closed', bar: 'structure_closed',
+  reception: 'structure_detailed', desk: 'structure_detailed', kiosk: 'structure_detailed',
+};
+const hashish = (s) => { let h = 0; for (let i = 0; i < String(s).length; i++) h = (h * 31 + String(s).charCodeAt(i)) | 0; return Math.abs(h); };
+function storefrontBuilding(type, id) {
+  const model = STOREFRONT_GLTF[String(type || '').toLowerCase()];
+  if (!model) return null;
+  const h = hashish(id);
+  return { url: `/models/buildings/${model}.glb`, fit: 5, yaw: (h % 4) * (Math.PI / 2) };
+}
+
 /** Buildings (+ POIs) as world-positioned, enterable POI structures. */
 export function buildSubmapPois(subMap, sim) {
   if (!sim) return [];
@@ -107,15 +124,16 @@ export function buildSubmapPois(subMap, sim) {
     seen.add(id);
     const p = toPct(pos.x, pos.y, w, h);
     const wpos = sim.surfaceToWorld(p.x, p.y);
-    // Hangars/landing bays render as the grand glTF hangar + docked-ship props (the surface
-    // 'spaceport' kit); compact storefronts (stall/desk/room) stay as their tuned primitives.
+    // Hangars/landing bays render as the grand glTF hangar + docked-ship props; storefronts get
+    // a curated glTF building mesh; anything else falls back to its tuned primitive shape.
     const isHangar = /hangar|landing|spaceport|dock|pad/.test(String(b.type || '').toLowerCase());
+    const storefront = isHangar ? null : storefrontBuilding(b.type, id);
     out.push({
       id, name: b.name || b.type, type: b.type, kind: 'building',
       sx: p.x, sy: p.y, wx: wpos.x, wz: wpos.z,
       enterable: !!b.opensTo || b.type === 'crafting_bench' || b.type === 'vendor_stall' || b.type === 'commercial',
       structure: submapStructure(b, w, sim),
-      ...(isHangar ? { building: getPoiBuilding(b.type, id), props: getPoiProps(b.type, id) } : {}),
+      ...(isHangar ? { building: getPoiBuilding(b.type, id), props: getPoiProps(b.type, id) } : (storefront ? { building: storefront } : {})),
       raw: b,
     });
   }

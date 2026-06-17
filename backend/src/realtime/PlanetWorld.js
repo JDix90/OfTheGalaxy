@@ -29,11 +29,11 @@ const DECAY_INTERVAL = 1.2;  // seconds ≈ one "turn" — decays combat status/
 // Ambient crowd (Phase 6b) — non-combat background walkers for "bustling" hub submaps
 // (the spaceport). Purely cosmetic presence: they path between waypoints, never fight, and
 // are streamed in the snapshot so every player sees the same crowd.
-const CROWD_SPEED = 2.6;            // ambient walk speed (m/s)
-const CROWD_PAUSE_MIN_MS = 1200;    // dwell range once a walker reaches a destination
-const CROWD_PAUSE_MAX_MS = 4200;
+const CROWD_SPEED = 2.9;            // ambient walk speed (m/s)
+const CROWD_PAUSE_MIN_MS = 600;     // dwell range once a walker reaches a destination (short =
+const CROWD_PAUSE_MAX_MS = 2400;    // more walking, less standing around → reads as bustling)
 const CROWD_ROLES = 6;              // tint buckets (client maps to muted civilian colors)
-const MAX_CROWD = 48;              // hard cap per world (bandwidth + render backstop)
+const MAX_CROWD = 64;              // hard cap per world (bandwidth + render backstop)
 const r2 = (n) => Math.round(n * 100) / 100;
 const normYaw = (y) => (typeof y === 'number' && Number.isFinite(y) ? ((y % TWO_PI) + TWO_PI) % TWO_PI : null);
 
@@ -500,7 +500,7 @@ class PlanetWorld {
       this.crowd.set(id, {
         id, x: start.x, z: start.z, facing: Math.random() * TWO_PI,
         role: (Math.random() * CROWD_ROLES) | 0,
-        speed: CROWD_SPEED * (0.8 + Math.random() * 0.5),
+        speed: CROWD_SPEED * (0.72 + Math.random() * 0.7),
         tx: t.x, tz: t.z, pauseUntil: 0,
       });
     }
