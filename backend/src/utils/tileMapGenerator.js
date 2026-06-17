@@ -308,10 +308,10 @@ function generateUrbanTileMap(mapData, tileSize = 2, planet = {}) {
     }
   }
 
-  // 7.5) Rooftop bridges: span a 2-wide alley between two SAME-HEIGHT building roofs so the flush
-  // roof network reconnects across the city. A 'bridge' tile stays ground-walkable (you pass under
-  // it) and becomes a roof deck at the buildings' height (you cross it) — see the sim's isRoofTile.
-  const bridgePlans = [];
+  // 7.5) Rooftop spans across a 2-wide alley between two building roofs — reconnecting the flush roof
+  // network across the city. A 'bridge' joins SAME-height roofs (flush deck); a 'ramp' SLOPES between
+  // roofs 1-2 storeys apart. Both stay ground-walkable (you pass under) and become a roof deck above.
+  const bridgePlans = [], rampPlans = [];
   for (let y = 1; y < gridSize - 1; y++) for (let x = 1; x < gridSize - 1; x++) {
     const t = tiles[y][x];
     if (t.type !== 'building' || !t.height) continue;
@@ -320,23 +320,40 @@ function generateUrbanTileMap(mapData, tileSize = 2, planet = {}) {
       const c2 = tiles[y + 2 * dy] && tiles[y + 2 * dy][x + 2 * dx];
       const far = tiles[y + 3 * dy] && tiles[y + 3 * dy][x + 3 * dx];
       const street = (c) => c && c.walkable && (c.type === 'street' || c.type === 'plaza');
-      if (street(c1) && street(c2) && far && far.type === 'building' && far.height === t.height) {
-        bridgePlans.push({ cells: [[x + dx, y + dy], [x + 2 * dx, y + 2 * dy]], h: t.height });
+      if (!(street(c1) && street(c2) && far && far.type === 'building' && far.height)) continue;
+      const cells = [[x + dx, y + dy], [x + 2 * dx, y + 2 * dy]];
+      if (far.height === t.height) {
+        bridgePlans.push({ cells, h: t.height });
+      } else if (Math.abs(far.height - t.height) <= 2) {
+        // slope from this building's roof (nearH, at the lower-coord side) up/down to far (farH)
+        rampPlans.push({ cells, axis: dx ? 'x' : 'z', nearH: t.height, farH: far.height });
       }
     }
   }
-  if (bridgePlans.length) {
-    const bridged = new Set();
-    const target = Math.round(Math.min(22, Math.max(4, bridgePlans.length * 0.2)) * accessFactor);
-    const stride = Math.max(1, Math.floor(bridgePlans.length / target));
+  const spanTaken = new Set();
+  const placeSampled = (plans, makeTiles) => {
+    if (!plans.length) return;
+    const target = Math.round(Math.min(22, Math.max(4, plans.length * 0.2)) * accessFactor);
+    if (target <= 0) return;
+    const stride = Math.max(1, Math.floor(plans.length / target));
     let placed = 0;
-    for (let i = 0; i < bridgePlans.length && placed < target; i += stride) {
-      const plan = bridgePlans[i];
-      if (plan.cells.some(([cx, cy]) => bridged.has(cx + ',' + cy))) continue;
-      for (const [cx, cy] of plan.cells) { tiles[cy][cx] = { type: 'bridge', walkable: true, visual: 'bridge', height: plan.h }; bridged.add(cx + ',' + cy); }
+    for (let i = 0; i < plans.length && placed < target; i += stride) {
+      const plan = plans[i];
+      if (plan.cells.some(([cx, cy]) => spanTaken.has(cx + ',' + cy))) continue;
+      makeTiles(plan);
+      for (const [cx, cy] of plan.cells) spanTaken.add(cx + ',' + cy);
       placed++;
     }
-  }
+  };
+  placeSampled(bridgePlans, (plan) => {
+    for (const [cx, cy] of plan.cells) tiles[cy][cx] = { type: 'bridge', walkable: true, visual: 'bridge', height: plan.h };
+  });
+  placeSampled(rampPlans, (plan) => {
+    const mid = (plan.nearH + plan.farH) / 2;
+    const [a, b] = plan.cells; // a is nearer the base building (lower coord), b nearer far
+    tiles[a[1]][a[0]] = { type: 'ramp', walkable: true, visual: 'ramp', axis: plan.axis, y0: plan.nearH, y1: mid };
+    tiles[b[1]][b[0]] = { type: 'ramp', walkable: true, visual: 'ramp', axis: plan.axis, y0: mid, y1: plan.farH };
+  });
 
   // 8) Market stalls at plaza corners (small obstacles; the plaza centre stays passable).
   plazas.forEach(pl => {
@@ -1269,7 +1286,8 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 // v6: every biome gets a fitting built-up settlement (per-terrain layout/population/bustle).
 // v7: medina gains rooftop 'bridge' tiles (cross same-height roofs over the alleys).
 // v8: rooftop access (stairs+bridges) scales with population (rural = fewer).
-const TILEMAP_VERSION = 8;
+// v9: ramped spans connect adjacent DIFFERENT-height roofs.
+const TILEMAP_VERSION = 9;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);

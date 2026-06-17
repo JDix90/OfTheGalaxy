@@ -104,6 +104,7 @@ function InstancedBoxes({ geometry = BOX, material, items, cast = true }) {
     const d = new THREE.Object3D();
     items.forEach((it, i) => {
       d.position.set(it.x, it.y || 0, it.z);
+      d.rotation.set(it.rx || 0, it.ry || 0, it.rz || 0);
       d.scale.set(it.w, it.h, it.d ?? it.w);
       d.updateMatrix();
       mesh.setMatrixAt(i, d.matrix);
@@ -145,7 +146,7 @@ function buildMedina(planet, worldHalf) {
   const pavingBase = new THREE.Color(BIOME_PAVING[biome] || '#3a3a3a');
   const pavingShades = [pavingBase, pavingBase.clone().multiplyScalar(1.07), pavingBase.clone().multiplyScalar(0.93)];
 
-  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [], paving = [], bridges = [];
+  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [], paving = [], bridges = [], ramps = [];
   const blocks = new Map(); // blockId -> { minx,maxx,miny,maxy,h } for per-block roofs
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
@@ -212,6 +213,14 @@ function buildMedina(planet, worldHalf) {
         const by = (t.height || 1) * STORY;
         bridges.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.22, y: by - 0.22 });
         glow.push({ x: wx, z: wz, w: tileW * 1.08, d: tileW * 1.08, h: 0.3, y: by - 0.16, color: BRIDGE_GLOW });
+      } else if (t.type === 'ramp') {
+        // Sloped deck rising from y0 to y1 across the tile (a tilted thin slab); walkable under too.
+        paving.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.05, y: 0.02, color: pavingShades[hashTile(tx, ty) % 3] });
+        const y0 = t.y0 * STORY, y1 = t.y1 * STORY;
+        const rise = y1 - y0, run = tileW, ang = Math.atan2(rise, run), len = Math.hypot(run, rise), midY = (y0 + y1) / 2;
+        if (t.axis === 'x') ramps.push({ x: wx, z: wz, w: len, h: 0.22, d: tileW, y: midY, rz: ang });
+        else ramps.push({ x: wx, z: wz, w: tileW, h: 0.22, d: len, y: midY, rx: -ang });
+        glow.push({ x: wx, z: wz, w: tileW * 1.06, d: tileW * 1.06, h: 0.28, y: midY, color: BRIDGE_GLOW });
       } else if (t.walkable && (t.type === 'street' || t.type === 'plaza')) {
         // Pave the navigable floor so it's unmistakably walkable (a road/deck), not terrain/water.
         paving.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.05, y: 0.02, color: pavingShades[hashTile(tx, ty) % 3] });
@@ -237,7 +246,7 @@ function buildMedina(planet, worldHalf) {
 
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
   const glowOpacity = biome === 'medina' ? 1.0 : 0.8; // medina = punchier neon
-  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, bridges, glowOpacity, roofDomes, roofPitch, roofStacks, fillSky: fill[0], fillGround: fill[1] };
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, bridges, glowOpacity, roofDomes, roofPitch, roofStacks, ramps, fillSky: fill[0], fillGround: fill[1] };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
@@ -264,6 +273,7 @@ export default function MedinaBuildings({ planet, worldHalf }) {
       {data.stairs.length > 0 && <InstancedBoxes material={BLDG_MAT} items={data.stairs} />}
       {data.stairCaps.length > 0 && <InstancedBoxes material={STAIR_CAP_MAT} items={data.stairCaps} cast={false} />}
       {data.bridges.length > 0 && <InstancedBoxes material={BRIDGE_MAT} items={data.bridges} />}
+      {data.ramps.length > 0 && <InstancedBoxes material={BRIDGE_MAT} items={data.ramps} />}
       {data.stallBases.length > 0 && <InstancedBoxes material={STALL_MAT} items={data.stallBases} />}
       {data.awnings.length > 0 && <InstancedBoxes material={AWNING_MAT} items={data.awnings} cast={false} />}
       {data.shopAwnings.length > 0 && <InstancedBoxes material={SHOP_AWNING_MAT} items={data.shopAwnings} cast={false} />}
