@@ -13,8 +13,12 @@
  * coords, so the layout is stable across renders.
  */
 
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { Suspense, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import InstancedGLTF from './InstancedGLTF';
+
+// Modeled terrain rock variants (CC0 kit) — replace the old faceted dodecahedrons.
+const ROCK_MODELS = ['/models/props/rock_largeA.glb', '/models/props/rock_crystalsLargeA.glb'];
 
 // Shared geometries/materials (built once). Base sits at y=0 where it matters (trees), so an
 // instance's Y position puts the prop's foot on the ground.
@@ -66,7 +70,7 @@ function buildObstacleInstances(planet, worldHalf) {
   const tileW = tileSize * scale;
   const s2w = (sx, sy) => [(sx - 50) * scale, (sy - 50) * scale];
 
-  const rocks = [], trunks = [], foliage = [], water = [], lava = [], vents = [], pits = [];
+  const rocksA = [], rocksB = [], trunks = [], foliage = [], water = [], lava = [], vents = [], pits = [];
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
     if (!row) continue;
@@ -84,8 +88,9 @@ function buildObstacleInstances(planet, worldHalf) {
       const [wx, wz] = s2w((tx + 0.5) * tileSize + jx, (ty + 0.5) * tileSize + jy);
 
       if (type === 'rock' || type === 'canyon') {
-        const sz = tileW * (0.42 + 0.34 * r) * (type === 'canyon' ? 1.35 : 1);
-        rocks.push({ x: wx, y: sz * 0.5, z: wz, sx: sz, sy: sz * (0.7 + 0.4 * r), sz, ry: yaw });
+        // modeled rock, sized as a fraction of a tile; ~1/5 use the crystal variant for variety
+        const s = (0.55 + 0.4 * r) * (type === 'canyon' ? 1.4 : 1);
+        (((h >> 20) & 7) === 0 ? rocksB : rocksA).push({ x: wx, z: wz, s, ry: yaw });
       } else if (type === 'tree') {
         const ht = tileW * (1.1 + 0.6 * r);
         const tw = tileW * (0.5 + 0.2 * r);
@@ -107,7 +112,8 @@ function buildObstacleInstances(planet, worldHalf) {
   // Cap each category (dense biomes can flood) by deterministic decimation.
   const cap = (a, n) => (a.length > n ? a.filter((_, i) => i % Math.ceil(a.length / n) === 0) : a);
   return {
-    rocks: cap(rocks, 600), trunks: cap(trunks, 600), foliage: cap(foliage, 600),
+    rocksA: cap(rocksA, 520), rocksB: cap(rocksB, 120), tileW,
+    trunks: cap(trunks, 600), foliage: cap(foliage, 600),
     water: cap(water, 1200), lava: cap(lava, 400), vents: cap(vents, 200), pits: cap(pits, 500),
   };
 }
@@ -117,7 +123,11 @@ export default function SurfaceObstacles({ planet, worldHalf }) {
   if (!data) return null;
   return (
     <>
-      {data.rocks.length > 0 && <InstancedProps geometry={ROCK_GEOM} material={ROCK_MAT} items={data.rocks} />}
+      {/* Modeled rocks (glTF, instanced). Suspense so a still-loading model never breaks the scene. */}
+      <Suspense fallback={null}>
+        {data.rocksA.length > 0 && <InstancedGLTF url={ROCK_MODELS[0]} items={data.rocksA} size={data.tileW} />}
+        {data.rocksB.length > 0 && <InstancedGLTF url={ROCK_MODELS[1]} items={data.rocksB} size={data.tileW} />}
+      </Suspense>
       {data.trunks.length > 0 && <InstancedProps geometry={TRUNK_GEOM} material={TRUNK_MAT} items={data.trunks} />}
       {data.foliage.length > 0 && <InstancedProps geometry={FOLIAGE_GEOM} material={FOLIAGE_MAT} items={data.foliage} />}
       {data.lava.length > 0 && <InstancedProps geometry={FLAT_GEOM} material={LAVA_MAT} items={data.lava} cast={false} />}
