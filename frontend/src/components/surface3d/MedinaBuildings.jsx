@@ -13,21 +13,47 @@
  */
 
 import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { STORY } from '../../../../shared/sim/surface.mjs'; // world units per storey (shared w/ the sim's roof Y)
+import { useAtmosphere } from './atmosphere/AtmosphereContext';
 
-// Sandy / sun-baked medina palette, indexed by tile.style (0..4).
+// Sandy / sun-baked medina palette, indexed by tile.style (0..4). (Fallback when a tile has no use.)
 const PALETTE = ['#cdbb9a', '#c7a079', '#b9a98c', '#d8c6a8', '#a98c6f'].map((c) => new THREE.Color(c));
 const STALL_AWNINGS = ['#b5483b', '#3b6db5', '#37915a', '#c79a3a'].map((c) => new THREE.Color(c));
 const STAIR_COLOR = new THREE.Color('#b9b2a2'); // pale stone stairwell, distinct from buildings
+
+// Per building-use looks: a base wall colour, a night-glow hue, and (for storefronts) an awning
+// fabric — so the city reads as varied apartments / shops / markets / bars / etc.
+const CAT_WALL = {
+  apartment: '#cdbb9a', shop: '#c79a63', market: '#cbb083', bar: '#6f6486',
+  restaurant: '#bd8f6e', civic: '#b7bcc4', warehouse: '#9a9488',
+};
+const CAT_GLOW = {
+  apartment: '#ffcf9e', shop: '#ffd27a', market: '#9dffd0', bar: '#6af0ff',
+  restaurant: '#ff9e6a', civic: '#bfe0ff', warehouse: '#7fc0b0',
+};
+const CAT_AWNING = { shop: '#c0563f', market: '#3f7bb5', restaurant: '#37915a', bar: '#8a3fb5' };
+const COMMERCIAL = new Set(['shop', 'market', 'restaurant', 'bar']);
+const toColorMap = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, new THREE.Color(v)]));
+const CAT_WALL_C = toColorMap(CAT_WALL), CAT_GLOW_C = toColorMap(CAT_GLOW), CAT_AWNING_C = toColorMap(CAT_AWNING);
+const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
 // Unit box with its base at y=0 (so an instance's Y scale grows upward from the ground).
 const BOX = new THREE.BoxGeometry(1, 1, 1); BOX.translate(0, 0.5, 0);
 const BLDG_MAT = new THREE.MeshStandardMaterial({ roughness: 0.96, metalness: 0 });
 const STALL_MAT = new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 0.9 });
 const AWNING_MAT = new THREE.MeshStandardMaterial({ roughness: 0.7 });
+const SHOP_AWNING_MAT = new THREE.MeshStandardMaterial({ roughness: 0.65 }); // storefront awnings (per-instance colour)
 // Bright marker capping each stairwell — signals a climbable rooftop access point.
 const STAIR_CAP_MAT = new THREE.MeshStandardMaterial({ color: '#1a3a36', emissive: '#39e0c8', emissiveIntensity: 0.9, roughness: 0.5 });
+
+// Night city-glow: each building gets a low, street-level skirt of soft self-lit colour, varied
+// per building (iridescent) — shopfronts/lanterns lining the alleys. Additive + toneMapped:false so
+// it pushes past the bloom threshold and reads as glow after dark. Opacity ramps with nightFactor.
+const GLOW_PALETTE = ['#ffcf9e', '#8fe6ff', '#c7a6ff', '#9dffd0', '#ff9ec4', '#bfe0ff', '#ffe79a'].map((c) => new THREE.Color(c));
+const GLOW_MAT = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+const hashTile = (x, y) => { let h = (x * 73856093) ^ (y * 19349663); return ((h ^ (h >>> 13)) >>> 0); };
 
 // Instanced boxes with optional per-instance color. `items`: {x,z,w,d,h,color?,y?}.
 function InstancedBoxes({ material, items, cast = true }) {
@@ -60,7 +86,7 @@ function buildMedina(planet, worldHalf) {
   const tileW = tileSize * scale;
   const s2w = (sx, sy) => [(sx - 50) * scale, (sy - 50) * scale];
 
-  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [];
+  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [];
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
     if (!row) continue;
@@ -69,7 +95,24 @@ function buildMedina(planet, worldHalf) {
       if (!t) continue;
       const [wx, wz] = s2w((tx + 0.5) * tileSize, (ty + 0.5) * tileSize);
       if (t.type === 'building' && t.height) {
-        buildings.push({ x: wx, z: wz, w: tileW * 0.995, h: t.height * STORY, color: PALETTE[(t.style || 0) % PALETTE.length] });
+        const cat = t.category || 'apartment';
+        buildings.push({ x: wx, z: wz, w: tileW * 0.995, h: t.height * STORY, color: CAT_WALL_C[cat] || PALETTE[(t.style || 0) % PALETTE.length] });
+        // Street-level glow skirt (use-tinted), slightly oversized so it spills into the alleys.
+        glow.push({ x: wx, z: wz, w: tileW * 1.05, d: tileW * 1.05, h: Math.min(t.height * STORY, 2.2), color: CAT_GLOW_C[cat] || GLOW_PALETTE[hashTile(tx, ty) % GLOW_PALETTE.length] });
+        // Storefront awnings: a fabric ledge over each alley-facing facade of a commercial building.
+        if (COMMERCIAL.has(cat)) {
+          const awnColor = CAT_AWNING_C[cat];
+          for (const [dx, dy] of DIRS4) {
+            const n = row[tx] && tm.tiles[ty + dy] && tm.tiles[ty + dy][tx + dx];
+            if (n && n.walkable) {
+              const depth = tileW * 0.4, along = tileW * 0.92;
+              shopAwnings.push({
+                x: wx + dx * tileW * 0.5, z: wz + dy * tileW * 0.5,
+                w: dx ? depth : along, d: dy ? depth : along, h: 0.16, y: 2.3, color: awnColor,
+              });
+            }
+          }
+        }
       } else if (t.type === 'stair') {
         // An oriented flight of steps rising toward the roof it serves (distinct stone), capped by a
         // glowing marker. The street-side stays low so you can step onto it; the sim handles the
@@ -102,11 +145,20 @@ function buildMedina(planet, worldHalf) {
     }
   }
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
-  return { buildings, stallBases, awnings, stairs, stairCaps };
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
   const data = useMemo(() => buildMedina(planet, worldHalf), [planet, worldHalf]);
+  const atmo = useAtmosphere();
+  const fillRef = useRef();
+  // Ramp the building glow + a soft fill light with nightfall (read from the shared atmosphere ref,
+  // no re-render). By day both are off, so the medina looks normal; after dusk the city lights up.
+  useFrame(() => {
+    const night = (atmo && atmo.current && atmo.current.nightFactor) || 0;
+    GLOW_MAT.opacity = night * 0.85;
+    if (fillRef.current) fillRef.current.intensity = night * 0.5;
+  });
   if (!data) return null;
   return (
     <>
@@ -115,6 +167,12 @@ export default function MedinaBuildings({ planet, worldHalf }) {
       {data.stairCaps.length > 0 && <InstancedBoxes material={STAIR_CAP_MAT} items={data.stairCaps} cast={false} />}
       {data.stallBases.length > 0 && <InstancedBoxes material={STALL_MAT} items={data.stallBases} />}
       {data.awnings.length > 0 && <InstancedBoxes material={AWNING_MAT} items={data.awnings} cast={false} />}
+      {data.shopAwnings.length > 0 && <InstancedBoxes material={SHOP_AWNING_MAT} items={data.shopAwnings} cast={false} />}
+      {/* Iridescent night glow lining the alleys (additive, blooms after dusk). */}
+      {data.glow.length > 0 && <InstancedBoxes material={GLOW_MAT} items={data.glow} cast={false} />}
+      {/* Low cool/warm fill so alleys aren't pitch-black at night — medina-only (this whole
+          component renders nothing on non-urban planets). */}
+      <hemisphereLight ref={fillRef} args={['#a9c8ff', '#ffb583', 0]} />
     </>
   );
 }
