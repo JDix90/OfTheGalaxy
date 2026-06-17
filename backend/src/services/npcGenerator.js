@@ -212,6 +212,94 @@ class NPCGenerator {
   }
 
   /**
+   * Idempotently ensure a VENDOR NPC stands at each market 'stall' tile on an urban (medina)
+   * surface, so the souk has working shopkeepers that reuse the normal vendor inventory + UI.
+   * Ids are deterministic per stall tile, so this is safe to call on every surface load (cheap
+   * no-op once the stalls exist). Positions are deterministic (same seed as the rendered medina),
+   * so each vendor stands beside its drawn stall.
+   * @param {string} planetId
+   * @returns {Promise<Array>} the stall-vendor NPC records (existing + newly created)
+   */
+  async ensureSurfaceStallVendors(planetId) {
+    const { Planet } = require('../models');
+    const planet = await Planet.findByPk(planetId);
+    if (!planet) return [];
+
+    // Prefer the cached grid (a non-medina cache bails cheaply below). Only regenerate when there's
+    // no cache at all — deterministic, so stall positions match what the renderer draws.
+    let tileMap = (planet.tileMap && planet.tileMap.tiles) ? planet.tileMap : null;
+    if (!tileMap) {
+      try {
+        const { generateTileMapByPlanetType } = require('../utils/tileMapGenerator');
+        tileMap = generateTileMapByPlanetType(planet, planet.mapData || {});
+      } catch (_) { return []; }
+    }
+    if (!tileMap || tileMap.style !== 'medina' || !Array.isArray(tileMap.tiles)) return [];
+    const ts = tileMap.tileSize || 2;
+
+    const stalls = [];
+    for (let ty = 0; ty < tileMap.tiles.length; ty++) {
+      const row = tileMap.tiles[ty];
+      if (!row) continue;
+      for (let tx = 0; tx < row.length; tx++) {
+        if (row[tx] && row[tx].type === 'stall') stalls.push({ tx, ty });
+      }
+    }
+    if (!stalls.length) return [];
+
+    const ids = stalls.map((s) => `${planetId}_stall_${s.tx}_${s.ty}`);
+    const existing = await NPC.findAll({ where: { id: ids } });
+    if (existing.length >= ids.length) return existing; // all present → cheap no-op
+
+    const have = new Set(existing.map((n) => n.id));
+    const planetTemplate = templates.getPlanetTemplate(planet);
+    const CATEGORIES = ['general', 'tech', 'communication', 'medical'];
+    const TITLES = { general: 'Trader', tech: 'Tech Dealer', communication: 'Comms Vendor', medical: 'Apothecary' };
+    const created = [];
+    let ci = 0;
+    for (const s of stalls) {
+      const id = `${planetId}_stall_${s.tx}_${s.ty}`;
+      const category = CATEGORIES[ci % CATEGORIES.length];
+      ci++;
+      if (have.has(id)) continue;
+      const seed = templates.getSeed(id);
+      const rnd = templates.seededRandom(seed);
+      const species = (planetTemplate.species && planetTemplate.species.length)
+        ? planetTemplate.species[Math.floor(rnd() * planetTemplate.species.length)] : 'Human';
+      const pos = this._stallVendorPos(tileMap, s.tx, s.ty, ts); // adjacent walkable, surface 0-100
+      const occupation = TITLES[category] || 'Merchant';
+      const npc = await this.generateNPC({
+        id,
+        name: templates.generateName(species, seed),
+        species,
+        occupation,
+        npcType: 'vendor',
+        location: { planet: planetId, area: 'surface', subMapId: null, x: Math.round(pos.x), y: Math.round(pos.y) },
+        factionId: getFactionForNPC(planet, 'vendor', rnd),
+        vendorCategory: category,      // drives generateVendorInventory's item filter
+        subMapType: 'market',
+        dialogue: templates.generateDialogue('vendor', species, occupation, rnd),
+        biography: `A ${species} ${occupation.toLowerCase()} working a stall in the ${planet.name} souk.`,
+        seed,
+        rnd,
+      });
+      created.push(npc);
+    }
+    return [...existing, ...created];
+  }
+
+  /** Surface (0-100) position adjacent to a stall tile. Stalls are impassable, so the vendor
+   *  stands in a neighbouring walkable (plaza) tile; falls back to the stall centre. */
+  _stallVendorPos(tileMap, tx, ty, ts) {
+    for (const [dx, dy] of [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+      const nx = tx + dx, ny = ty + dy;
+      const row = tileMap.tiles[ny];
+      if (row && row[nx] && row[nx].walkable) return { x: (nx + 0.5) * ts, y: (ny + 0.5) * ts };
+    }
+    return { x: (tx + 0.5) * ts, y: (ty + 0.5) * ts };
+  }
+
+  /**
    * Generate NPCs for a sub-map
    */
   async generateSubMapNPCs(subMap, planet, count = null) {

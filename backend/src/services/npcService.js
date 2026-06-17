@@ -1553,6 +1553,12 @@ class NPCService {
    * Get NPCs by location
    */
   async getNPCsByLocation(planet, area = null) {
+    // Lazily ensure medina market-stall vendors exist on urban surfaces (idempotent + a cheap
+    // no-op once created). Non-fatal — stall vendors are a nicety, never block the NPC list.
+    if (!area || area === 'surface') {
+      try { await require('./npcGenerator').ensureSurfaceStallVendors(planet); }
+      catch (e) { console.warn('[NPC Service] stall-vendor ensure failed:', e.message); }
+    }
     return await NPC.findByLocation(planet, area);
   }
 
