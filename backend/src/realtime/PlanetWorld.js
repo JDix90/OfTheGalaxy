@@ -618,7 +618,9 @@ class PlanetWorld {
     }
   }
 
-  /** Walk each crowd member toward its destination; dwell on arrival, then pick a new one. */
+  /** Walk each crowd member toward its destination; dwell on arrival, then pick a new one.
+   *  Routes through the alleys via _routeSteer (same as enemies) so a medina-surface crowd
+   *  ambles the souks instead of grinding against building walls. */
   stepCrowd(dt, now) {
     if (this.crowd.size === 0) return;
     for (const c of this.crowd.values()) {
@@ -626,15 +628,19 @@ class PlanetWorld {
       const dx = c.tx - c.x, dz = c.tz - c.z, dd = Math.hypot(dx, dz);
       if (dd < 0.6) { // arrived: dwell, then choose a new destination
         c.pauseUntil = now + CROWD_PAUSE_MIN_MS + Math.random() * (CROWD_PAUSE_MAX_MS - CROWD_PAUSE_MIN_MS);
-        const t = this._pickWaypoint(); c.tx = t.x; c.tz = t.z;
+        const t = this._pickWaypoint(); c.tx = t.x; c.tz = t.z; c._path = null;
         continue;
       }
-      const ux = dx / dd, uz = dz / dd;
-      c.facing = Math.atan2(ux, uz); // 0 = +Z (sim convention)
       const bx = c.x, bz = c.z;
-      this._tryMove(c, ux * c.speed * dt, uz * c.speed * dt);
+      const steer = this._routeSteer(c, c.tx, c.tz, now);
+      const sx = steer.x - c.x, sz = steer.z - c.z, sd = Math.hypot(sx, sz);
+      if (sd > 1e-3) {
+        const ux = sx / sd, uz = sz / sd;
+        c.facing = Math.atan2(ux, uz); // 0 = +Z (sim convention)
+        this._tryMove(c, ux * c.speed * dt, uz * c.speed * dt);
+      }
       // Stuck against a wall (no progress) → repick a destination so they don't grind in place.
-      if (Math.abs(c.x - bx) < 1e-4 && Math.abs(c.z - bz) < 1e-4) { const t = this._pickWaypoint(); c.tx = t.x; c.tz = t.z; }
+      if (Math.abs(c.x - bx) < 1e-4 && Math.abs(c.z - bz) < 1e-4) { const t = this._pickWaypoint(); c.tx = t.x; c.tz = t.z; c._path = null; }
     }
   }
 

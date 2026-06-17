@@ -22,6 +22,7 @@ import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
 import PlayerActor from './PlayerActor';
 import RemotePlayers from './RemotePlayers';
+import CrowdActors from './CrowdActors';
 import RemoteEnemies from './RemoteEnemies';
 import CombatFx from './CombatFx';
 import QuestWaypoint from './QuestWaypoint';
@@ -193,6 +194,9 @@ export default function SurfaceScene({
 
       {/* Other players sharing the planet (Phase 4.1 — online only). */}
       <RemotePlayers world={world} />
+
+      {/* Server-authoritative ambient crowd (urban/medina surfaces — online only). */}
+      <CrowdActors world={world} />
 
       {/* Server-driven hostile actors (Phase 4.2/4.3 — online only). */}
       <RemoteEnemies world={world} targetId={combatTarget} onTarget={onCombatTarget} />
