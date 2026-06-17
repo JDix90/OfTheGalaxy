@@ -18,6 +18,7 @@ import Ground from './Ground';
 import SurfaceObstacles from './SurfaceObstacles';
 import MedinaBuildings from './MedinaBuildings';
 import SurfaceProps from './SurfaceProps';
+import SurfaceVehicles from './SurfaceVehicles';
 import PoiStructure from './PoiStructure';
 import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
@@ -167,6 +168,7 @@ export default function SurfaceScene({
       <SurfaceObstacles planet={planet} worldHalf={worldHalf} />
       <MedinaBuildings planet={planet} worldHalf={worldHalf} />
       <SurfaceProps planet={planet} worldHalf={worldHalf} />
+      <SurfaceVehicles planet={planet} worldHalf={worldHalf} />
       <DistantSkyline worldHalf={worldHalf} />
 
       {pois.map((poi) => (
