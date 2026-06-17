@@ -15,6 +15,7 @@ import NpcActor from '../surface3d/NpcActor';
 import PlayerActor from '../surface3d/PlayerActor';
 import RemotePlayers from '../surface3d/RemotePlayers';
 import RemoteEnemies from '../surface3d/RemoteEnemies';
+import CrowdActors from '../surface3d/CrowdActors';
 import CombatFx from '../surface3d/CombatFx';
 import QuestWaypoint from '../surface3d/QuestWaypoint';
 import Atmosphere from '../surface3d/atmosphere/Atmosphere';
@@ -77,7 +78,8 @@ export default function SubmapScene({
       {!interior && <SubmapEnclosure sim={sim} mode={enclosureMode} />}
 
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}
-      {interior && <Furniture items={furniture} />}
+      {/* Furniture/props dress both enclosed interiors and open districts (spaceport concourse). */}
+      {furniture && furniture.length > 0 && <Furniture items={furniture} />}
 
       {pois.map((poi) => (
         <PoiStructure key={poi.id} poi={poi} active={poi.id === activePoiId} lit onActivate={onPoiActivate} />
@@ -101,6 +103,7 @@ export default function SubmapScene({
         <>
           <RemotePlayers world={world} />
           <RemoteEnemies world={world} targetId={combatTarget} onTarget={onCombatTarget} />
+          <CrowdActors world={world} />
           <CombatFx world={world} targetId={combatTarget} onClearTarget={() => onCombatTarget(null)} />
         </>
       )}

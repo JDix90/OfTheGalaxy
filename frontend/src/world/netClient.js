@@ -46,6 +46,7 @@ export class NetClient {
     this.serverSelf = null;
     this.remotes = new Map();    // id -> { x,z,f,m,name,c, px,pz,pf, at }  (other players)
     this.enemies = new Map();    // id -> { x,z,f,hp,maxHp,name,level,st, px,pz,pf, at }
+    this.crowd = new Map();      // id -> { x,z,f,r, px,pz,pf, at }  (ambient cosmetic walkers)
     this.selfHp = null;          // authoritative player hp (Phase 4.3)
     this.selfMaxHp = null;
     this.selfDead = false;
@@ -226,6 +227,22 @@ export class NetClient {
       }
     }
     for (const id of [...this.enemies.keys()]) if (!eseen.has(id)) this.enemies.delete(id);
+
+    // --- ambient crowd (cosmetic background walkers; same interpolation anchoring) ---
+    if (m.crowd) {
+      const cseen = new Set();
+      for (const c of m.crowd) {
+        cseen.add(c.id);
+        const prev = this.crowd.get(c.id);
+        if (prev) {
+          prev.px = prev.x; prev.pz = prev.z; prev.pf = prev.f;
+          prev.x = c.x; prev.z = c.z; prev.f = c.f; prev.r = c.r; prev.at = now;
+        } else {
+          this.crowd.set(c.id, { ...c, px: c.x, pz: c.z, pf: c.f, at: now });
+        }
+      }
+      for (const id of [...this.crowd.keys()]) if (!cseen.has(id)) this.crowd.delete(id);
+    }
   }
 
   /** Called every frame from world.step (predict happens in the caller). Throttles the send. */
@@ -299,6 +316,7 @@ export class NetClient {
     this.serverSelf = null;
     this.remotes.clear();
     this.enemies.clear();
+    this.crowd.clear();
     this.fxQueue.length = 0;
     this.selfHp = null; this.selfDead = false;
     this.pending.length = 0;

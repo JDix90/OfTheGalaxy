@@ -322,17 +322,73 @@ function generateSpaceportMap(planet, parentLocationId, variant = 'medium', seed
     }
   });
 
-  // NPC spawn points
-  for (let i = 0; i < 3 + Math.floor(random() * 3); i++) {
-    npcSpawnPoints.push({
-      id: `npc_spawn_${i}`,
-      position: {
-        x: Math.floor(random() * size.width),
-        y: Math.floor(random() * size.height)
-      },
-      npcIds: [],
-      spawnChance: 0.6
-    });
+  // --- Populate a grand, furnished concourse + open hangar bays -----------------
+  // Positions are PROPORTIONAL to the grid so every variant (small→military) reads the
+  // same way. The terminal/concourse occupies the left; hangar bays sit on the right.
+  const W = size.width, H = size.height;
+  const gx = (fx) => Math.max(0, Math.min(W - 1, Math.round(W * fx)));
+  const gy = (fy) => Math.max(0, Math.min(H - 1, Math.round(H * fy)));
+
+  // Concourse storefronts (NPC vendors stand at these; not enterable — no authored interiors).
+  // `stall`/`shop`/`cantina`/`reception` map to low storefront shapes in the 3D submap kit.
+  buildings.push({ id: 'sp_parts', name: 'Ship Parts & Outfitters', type: 'stall', position: { x: gx(0.14), y: gy(0.16) }, size: { width: 2, height: 2 } });
+  buildings.push({ id: 'sp_cantina', name: "Spacers' Cantina", type: 'cantina', position: { x: gx(0.14), y: gy(0.62) }, size: { width: 2, height: 2 } });
+  buildings.push({ id: 'sp_customs', name: 'Port Authority', type: 'reception', position: { x: gx(0.32), y: gy(0.42) }, size: { width: 2, height: 1 } });
+  buildings.push({ id: 'sp_services', name: 'Travel Services', type: 'shop', position: { x: gx(0.32), y: gy(0.72) }, size: { width: 2, height: 2 } });
+  // Open hangar bays with docked ships (glTF hangar + parked craft via the 'landing_pad' kit).
+  buildings.push({ id: 'sp_hangar_a', name: 'Hangar Bay A', type: 'landing_pad', position: { x: gx(0.70), y: gy(0.10) }, size: { width: 3, height: 3 } });
+  buildings.push({ id: 'sp_hangar_b', name: 'Hangar Bay B', type: 'landing_pad', position: { x: gx(0.70), y: gy(0.60) }, size: { width: 3, height: 3 } });
+
+  // Furniture / decoration / interactive props (rendered as typed boxes; emissive = glow).
+  // Kept off the entrance spine + central lanes. These are visual-only (not added to the
+  // collision map below) so they can't box the player in.
+  const furniture = [
+    // Waiting-area seating clusters (two lounges flanking the concourse).
+    { id: 'seat_a1', type: 'chair', position: { x: gx(0.42), y: gy(0.26) }, size: { width: 1, height: 1 } },
+    { id: 'seat_a2', type: 'chair', position: { x: gx(0.47), y: gy(0.26) }, size: { width: 1, height: 1 } },
+    { id: 'seat_a3', type: 'bench', position: { x: gx(0.42), y: gy(0.32) }, size: { width: 2, height: 1 } },
+    { id: 'seat_b1', type: 'chair', position: { x: gx(0.42), y: gy(0.74) }, size: { width: 1, height: 1 } },
+    { id: 'seat_b2', type: 'chair', position: { x: gx(0.47), y: gy(0.74) }, size: { width: 1, height: 1 } },
+    { id: 'seat_b3', type: 'bench', position: { x: gx(0.42), y: gy(0.80) }, size: { width: 2, height: 1 } },
+    // Greenery to soften the concourse.
+    { id: 'plant_1', type: 'plant', position: { x: gx(0.50), y: gy(0.48) }, size: { width: 1, height: 1 } },
+    { id: 'plant_2', type: 'plant', position: { x: gx(0.22), y: gy(0.30) }, size: { width: 1, height: 1 } },
+    { id: 'plant_3', type: 'plant', position: { x: gx(0.22), y: gy(0.70) }, size: { width: 1, height: 1 } },
+    // Cargo near the hangars.
+    { id: 'crate_1', type: 'crate', position: { x: gx(0.60), y: gy(0.30) }, size: { width: 1, height: 1 } },
+    { id: 'crate_2', type: 'crate', position: { x: gx(0.62), y: gy(0.34) }, size: { width: 1, height: 1 } },
+    { id: 'crate_3', type: 'crate', position: { x: gx(0.60), y: gy(0.72) }, size: { width: 1, height: 1 } },
+  ];
+  const decorations = [
+    // Glowing departure/arrivals signage over the concourse.
+    { id: 'sign_dep', type: 'sign', position: { x: gx(0.26), y: gy(0.34) }, size: { width: 1, height: 1 } },
+    { id: 'sign_arr', type: 'sign', position: { x: gx(0.26), y: gy(0.60) }, size: { width: 1, height: 1 } },
+  ];
+  const interactiveElements = [
+    // Self-serve info kiosks (glow; type 'terminal' is not treated as a collision obstacle).
+    { id: 'kiosk_1', type: 'terminal', position: { x: gx(0.20), y: gy(0.48) }, size: { width: 1, height: 1 } },
+    { id: 'kiosk_2', type: 'terminal', position: { x: gx(0.52), y: gy(0.52) }, size: { width: 1, height: 1 } },
+  ];
+
+  // NPC spawn points — a bustling concourse needs people at the shops, lounges, and gates.
+  const spawnFracs = [
+    [0.20, 0.20], [0.20, 0.66], [0.36, 0.46], [0.36, 0.74],   // near the storefronts
+    [0.44, 0.30], [0.44, 0.78], [0.40, 0.52],                  // lounges + concourse center
+    [0.62, 0.20], [0.62, 0.70], [0.55, 0.48],                  // toward the hangar gates
+  ];
+  spawnFracs.forEach(([fx, fy], i) => {
+    npcSpawnPoints.push({ id: `npc_spawn_${i}`, position: { x: gx(fx), y: gy(fy) }, npcIds: [], spawnChance: 0.85 });
+  });
+
+  // Collision: wall ONLY the large structures (shops + hangars), leaving the concourse, lanes,
+  // and prop areas freely walkable. (Building-only input keeps small props walk-through so the
+  // player can never be boxed in by a chair or crate.)
+  let collisionMap = null;
+  try {
+    const collisionMapService = require('./collisionMapService');
+    collisionMap = collisionMapService.generateCollisionMap({ layoutData: { width: W, height: H, buildings } });
+  } catch (e) {
+    collisionMap = null; // degrade gracefully to an open (all-walkable) spaceport
   }
 
   return {
@@ -341,10 +397,14 @@ function generateSpaceportMap(planet, parentLocationId, variant = 'medium', seed
     gridSize: 40,
     zones,
     buildings,
+    furniture,
+    decorations,
+    interactiveElements,
     entryPoints,
     exitPoints,
     npcSpawnPoints,
-    pointsOfInterest: []
+    pointsOfInterest: [],
+    ...(collisionMap ? { collisionMap } : {}),
   };
 }
 

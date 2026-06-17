@@ -12,7 +12,7 @@
 
 import { createSurfaceSim, normalizeSurfaceCoord } from '../../../../shared/sim/surface.mjs';
 import { createSubmapSimWith, submapToPct, submapLayout, submapCoordDims } from '../../../../shared/sim/submap.mjs';
-import { getPoiStructure } from '../../data/modelManifest';
+import { getPoiStructure, getPoiBuilding, getPoiProps } from '../../data/modelManifest';
 
 const layoutOf = (subMap) => submapLayout(subMap);
 
@@ -74,6 +74,12 @@ function submapStructure(b, w, sim) {
   // room casts a soft colored glow, not a wash. Low glow for the same reason.
   const fp = Math.max(2.2, Math.min(cells * cellW * 0.8, 6));
   const mk = (shape, palKey, h) => ({ shape, ...SUBMAP_PALETTE[palKey], height: h, footprint: fp, glow: 0.28 });
+  // Hangars / landing pads read as GRAND open-bay structures (glTF hangar + docked ship from the
+  // surface 'spaceport' kit), so they keep the surface footprint rather than the compact room cap.
+  if (/hangar|landing|spaceport|dock|pad/.test(t)) {
+    const s = getPoiStructure(b.type);
+    return { ...s, height: Math.min(s.height, 6), footprint: Math.min(s.footprint, 9), glow: 0.5 };
+  }
   if (/vendor|stall|stand|market/.test(t)) return mk('stall', 'vendor', Math.min(2.6, cellW));
   if (/crafting|reception|desk|terminal|counter|kiosk|info/.test(t)) return mk('desk', 'tech', Math.min(1.9, cellW * 0.9));
   if (/treatment|surgery|patient|ward|exam|medical|clinic/.test(t)) return mk('room', 'medical', Math.min(3.4, Math.max(2.4, cellW * 0.7)));
@@ -101,11 +107,15 @@ export function buildSubmapPois(subMap, sim) {
     seen.add(id);
     const p = toPct(pos.x, pos.y, w, h);
     const wpos = sim.surfaceToWorld(p.x, p.y);
+    // Hangars/landing bays render as the grand glTF hangar + docked-ship props (the surface
+    // 'spaceport' kit); compact storefronts (stall/desk/room) stay as their tuned primitives.
+    const isHangar = /hangar|landing|spaceport|dock|pad/.test(String(b.type || '').toLowerCase());
     out.push({
       id, name: b.name || b.type, type: b.type, kind: 'building',
       sx: p.x, sy: p.y, wx: wpos.x, wz: wpos.z,
       enterable: !!b.opensTo || b.type === 'crafting_bench' || b.type === 'vendor_stall' || b.type === 'commercial',
       structure: submapStructure(b, w, sim),
+      ...(isHangar ? { building: getPoiBuilding(b.type, id), props: getPoiProps(b.type, id) } : {}),
       raw: b,
     });
   }

@@ -27,6 +27,7 @@ import { useDungeonWorld } from '../world/useDungeonWorld';
 import { getAuthToken } from '../services/api/client';
 import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import SubmapScene from '../components/submap3d/SubmapScene';
+import SpaceportPA from '../components/submap3d/SpaceportPA';
 import { createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture } from '../components/submap3d/submapData';
 
 import HUD from '../components/hud/HUD';
@@ -159,7 +160,9 @@ export default function SubMapView3D() {
   const npcs3d = useMemo(() => buildSubmapNpcs(npcs, subMap, sim), [npcs, subMap, sim]);
   const waypoints = useMemo(() => buildSubmapWaypoints(activeQuests, subMap, sim), [activeQuests, subMap, sim]);
   const isInterior = subMap?.type === 'building_interior';
-  const furniture = useMemo(() => (isInterior ? buildSubmapFurniture(subMap, sim) : []), [isInterior, subMap, sim]);
+  // Furniture/decorations now also dress open districts (the spaceport concourse), not just
+  // enclosed building interiors — buildSubmapFurniture is a no-op when the layout has none.
+  const furniture = useMemo(() => buildSubmapFurniture(subMap, sim), [subMap, sim]);
 
   const planetLike = useMemo(() => ({ terrain: subMap?.type === 'spaceport' ? 'urban' : (subMap?.type || 'urban') }), [subMap]);
 
@@ -337,6 +340,8 @@ export default function SubMapView3D() {
       </Canvas>
 
       <HUD />
+
+      {subMap?.type === 'spaceport' && <SpaceportPA spaceportName={subMap?.name} />}
 
       {proxPrompt && !modalOpen && (
         <div style={{ position: 'fixed', left: proxPrompt.x, top: proxPrompt.y, transform: 'translate(-50%, -130%)', zIndex: 45 }}>
