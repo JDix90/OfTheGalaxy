@@ -146,8 +146,9 @@ async function refurnishSpaceportIfStale(subMap) {
     const variant = w >= 18 ? 'military' : w >= 15 ? 'large' : w <= 10 ? 'small' : 'medium';
     const seed = subMapGenerator.getSeed(`${subMap.planetId}_${subMap.parentLocationId}_spaceport`);
     const newLayout = subMapGenerator.generateSpaceportMap(planet, subMap.parentLocationId, variant, seed);
-    // Match the creation path: collision from the full layout (buildings + props).
-    newLayout.collisionMap = collisionMapService.generateCollisionMap({ id: subMap.id, type: 'spaceport', layoutData: newLayout, layout: newLayout });
+    // The generator already builds the correct collisionMap (buildings + small solid props); keep
+    // it as the single source of truth — do NOT override with a full-layout pass (that re-created
+    // the giant prop-walls / invisible barriers).
     await subMap.update({ layoutData: newLayout });
     subMap.layoutData = newLayout;
     subMap.layout = newLayout;
