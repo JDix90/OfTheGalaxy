@@ -38,7 +38,9 @@ function buildProps(planet, worldHalf) {
       const [wx, wz] = s2w((tx + 0.5) * ts, (ty + 0.5) * ts);
       const item = { x: wx + jx, z: wz + jz, s: 0.5 + ((h >> 22) & 3) * 0.13, ry: ((h >> 4) & 0xff) / 255 * Math.PI * 2 };
       if ((h & 0x100) && dishes.length < 12) dishes.push({ ...item, s: 0.7 });
-      else clutter[(h >> 3) % CLUTTER.length].push(item);
+      // `>>>` (unsigned): a signed `>>` makes high hashes negative → clutter[-n]
+      // is undefined and .push() crashes the whole surface (e.g. on drydock).
+      else clutter[(h >>> 3) % CLUTTER.length].push(item);
     }
   }
   // A parked speeder + rover near the spaceport (player spawn), if there is one.
