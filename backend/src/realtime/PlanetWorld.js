@@ -96,6 +96,19 @@ class PlanetWorld {
     return { x: 50, y: 50 };
   }
 
+  /** Nearest walkable 0–100 point to (sx,sy) — spirals outward, falls back to a global scan.
+   *  Keeps a snapped spawn near its intended spot (vs _scanWalkable's top-left-most cell). */
+  _nearestWalkableSurface(sx, sy) {
+    for (let r = 2; r <= 60; r += 2) {
+      for (let a = 0; a < 24; a++) {
+        const ang = (a / 24) * TWO_PI;
+        const nx = sx + Math.cos(ang) * r, ny = sy + Math.sin(ang) * r;
+        if (nx >= 0 && ny >= 0 && nx <= 100 && ny <= 100 && this.sim.isWalkableSurface(nx, ny)) return { x: nx, y: ny };
+      }
+    }
+    return this._scanWalkable();
+  }
+
   /** Find a random walkable world position for enemy placement (scans if random fails). */
   _randomWalkable() {
     for (let i = 0; i < 24; i++) {
@@ -237,8 +250,8 @@ class PlanetWorld {
     // resume the saved position ONLY if it belongs to THIS submap, and always fall back to a
     // walkable cell. This mirrors the client's submapSpawn exactly — essential because in realtime
     // the client adopts this welcome.spawn, so a mismatch (or an in-wall spawn) pins the player and
-    // they can't move. The surface else-branch below misapplies a stale surface coord with no
-    // walkability guard, which is why hub submaps must take this path too.
+    // they can't move. (The surface else-branch below now snaps to walkable too, but hubs still
+    // take this entrance-aware path.)
     if (this.zone.subMapId) {
       const dims = this.zone.dims || { w: 12, h: 12 };
       const gridToPct = (v, dim) => (v > dim ? (v > 100 ? v / 10 : v) : ((v + 0.5) / dim) * 100);
@@ -269,6 +282,10 @@ class PlanetWorld {
     } else if (sp && finite(sp.x)) {
       sx = sp.x; sy = sp.y;
     }
+    // Guard against an in-wall spawn: a saved position from before the planet's tileMap changed
+    // (e.g. the dense medina rewrite turned old open ground into buildings), or a spaceport coord
+    // that lands on a building. Snap to the nearest walkable cell so the player is never boxed in.
+    if (!this.sim.isWalkableSurface(sx, sy)) { const p = this._nearestWalkableSurface(sx, sy); sx = p.x; sy = p.y; }
     const w = this.sim.surfaceToWorld(sx, sy);
     return { x: w.x, z: w.z, facing: Math.PI };
   }
