@@ -39,6 +39,15 @@ const toColorMap = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) 
 const CAT_WALL_C = toColorMap(CAT_WALL), CAT_GLOW_C = toColorMap(CAT_GLOW), CAT_AWNING_C = toColorMap(CAT_AWNING);
 const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
+// Per-biome look, keyed on tileMap.style (set by the settlement generators). The per-use wall/glow
+// colours are blended toward the biome's base so each world reads distinctly — sandstone outpost,
+// timber hamlet, weathered docks, frosted ice colony, basalt+ember mining camp, rusty scrap town —
+// while keeping building-type variety. medina = strength 0 (pure use colours, the original look).
+const BIOME_BASE = { medina: '#c7ab86', outpost: '#d3ba8a', hamlet: '#6e5a3e', docks: '#6e8088', dome_colony: '#e2ebf2', mining_camp: '#3c352f', scrap_town: '#7a6a52' };
+const BIOME_GLOW = { medina: '#ffcf9e', outpost: '#ffd9a0', hamlet: '#ffd09a', docks: '#7fe6ff', dome_colony: '#bfe8ff', mining_camp: '#ff6a2e', scrap_town: '#ffc066' };
+const BIOME_FILL = { medina: ['#a9c8ff', '#ffb583'], outpost: ['#bcd2ff', '#ffcf9e'], hamlet: ['#9fc0e0', '#caa46e'], docks: ['#8fd0ff', '#6fb0c0'], dome_colony: ['#cfe6ff', '#9fc4e8'], mining_camp: ['#ff8a5a', '#ff5a2e'], scrap_town: ['#bdb0d0', '#caa46e'] };
+const BIOME_STRENGTH = 0.62; // how strongly the biome base overrides the per-use wall colour
+
 // Unit box with its base at y=0 (so an instance's Y scale grows upward from the ground).
 const BOX = new THREE.BoxGeometry(1, 1, 1); BOX.translate(0, 0.5, 0);
 const BLDG_MAT = new THREE.MeshStandardMaterial({ roughness: 0.96, metalness: 0 });
@@ -86,6 +95,18 @@ function buildMedina(planet, worldHalf) {
   const tileW = tileSize * scale;
   const s2w = (sx, sy) => [(sx - 50) * scale, (sy - 50) * scale];
 
+  // Biome-tinted per-use palettes (computed once for this planet's settlement style).
+  const biome = tm.style || 'medina';
+  const baseC = new THREE.Color(BIOME_BASE[biome] || BIOME_BASE.medina);
+  const glowC = new THREE.Color(BIOME_GLOW[biome] || BIOME_GLOW.medina);
+  const strength = biome === 'medina' ? 0 : BIOME_STRENGTH;
+  const wallFor = {}, glowFor = {};
+  for (const cat of Object.keys(CAT_WALL_C)) {
+    const w = CAT_WALL_C[cat].clone(); if (strength > 0) w.lerp(baseC, strength); wallFor[cat] = w;
+    const g = CAT_GLOW_C[cat].clone(); if (strength > 0) g.lerp(glowC, 0.55); glowFor[cat] = g;
+  }
+  const fill = BIOME_FILL[biome] || BIOME_FILL.medina;
+
   const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [];
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
@@ -96,9 +117,9 @@ function buildMedina(planet, worldHalf) {
       const [wx, wz] = s2w((tx + 0.5) * tileSize, (ty + 0.5) * tileSize);
       if (t.type === 'building' && t.height) {
         const cat = t.category || 'apartment';
-        buildings.push({ x: wx, z: wz, w: tileW * 0.995, h: t.height * STORY, color: CAT_WALL_C[cat] || PALETTE[(t.style || 0) % PALETTE.length] });
-        // Street-level glow skirt (use-tinted), slightly oversized so it spills into the alleys.
-        glow.push({ x: wx, z: wz, w: tileW * 1.05, d: tileW * 1.05, h: Math.min(t.height * STORY, 2.2), color: CAT_GLOW_C[cat] || GLOW_PALETTE[hashTile(tx, ty) % GLOW_PALETTE.length] });
+        buildings.push({ x: wx, z: wz, w: tileW * 0.995, h: t.height * STORY, color: wallFor[cat] || PALETTE[(t.style || 0) % PALETTE.length] });
+        // Street-level glow skirt (use + biome tinted), slightly oversized so it spills into the alleys.
+        glow.push({ x: wx, z: wz, w: tileW * 1.05, d: tileW * 1.05, h: Math.min(t.height * STORY, 2.2), color: glowFor[cat] || GLOW_PALETTE[hashTile(tx, ty) % GLOW_PALETTE.length] });
         // Storefront awnings: a fabric ledge over each alley-facing facade of a commercial building.
         if (COMMERCIAL.has(cat)) {
           const awnColor = CAT_AWNING_C[cat];
@@ -145,7 +166,7 @@ function buildMedina(planet, worldHalf) {
     }
   }
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
-  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings };
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, fillSky: fill[0], fillGround: fill[1] };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
@@ -170,9 +191,9 @@ export default function MedinaBuildings({ planet, worldHalf }) {
       {data.shopAwnings.length > 0 && <InstancedBoxes material={SHOP_AWNING_MAT} items={data.shopAwnings} cast={false} />}
       {/* Iridescent night glow lining the alleys (additive, blooms after dusk). */}
       {data.glow.length > 0 && <InstancedBoxes material={GLOW_MAT} items={data.glow} cast={false} />}
-      {/* Low cool/warm fill so alleys aren't pitch-black at night — medina-only (this whole
-          component renders nothing on non-urban planets). */}
-      <hemisphereLight ref={fillRef} args={['#a9c8ff', '#ffb583', 0]} />
+      {/* Low biome-tinted fill so streets aren't pitch-black at night (ember on volcanic, cold on
+          ice, etc.). Renders only where there's a settlement. */}
+      <hemisphereLight ref={fillRef} args={[data.fillSky, data.fillGround, 0]} />
     </>
   );
 }
