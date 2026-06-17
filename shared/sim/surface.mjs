@@ -34,9 +34,11 @@ export const DEFAULTS = {
 // World height of one building storey — the medina renderer (MedinaBuildings) draws building boxes
 // `height * STORY` tall, and a player on a roof stands at that same Y. Single source of truth.
 export const STORY = 2.4;
-// Most storeys you can step up/down between adjacent rooftops (keeps the roof network coherent and
-// stops teleport-falls between very different heights). 1 = a single-storey clamber.
-const MAX_ROOF_STEP = 1;
+// Rooftop traversal rule: you may only walk between rooftops that are FLUSH (same height) — there's
+// a literal storey-tall wall between roofs of different heights, so stepping across one would read as
+// climbing a wall / dropping off a ledge. All level changes go through 'stair' tiles instead. (0 =
+// flush-only. Connecting different-height roofs is a future "rooftop bridges" feature.)
+const MAX_ROOF_STEP = 0;
 
 /**
  * Build a surface sim bound to one planet's mapData.
