@@ -46,10 +46,16 @@ const CYBER_WALL = {
   restaurant: '#52505b', civic: '#6b7079', warehouse: '#44474d',
 };
 const CYBER_GLOW = {
-  apartment: '#6fc8ff', shop: '#ff4fd8', market: '#3ffbe0', bar: '#ff2e88',
-  restaurant: '#ff8a3d', civic: '#9b8cff', warehouse: '#39e0c8',
+  apartment: '#7fd4ff', shop: '#ff5ee0', market: '#4dffe6', bar: '#ff3d96',
+  restaurant: '#ff9a4d', civic: '#ab9cff', warehouse: '#4dffd8',
 };
 const CYBER_WALL_C = toColorMap(CYBER_WALL), CYBER_GLOW_C = toColorMap(CYBER_GLOW);
+
+// Walkable "paving" so the navigable ground is obvious in EVERY biome — fixes the ocean case where
+// the navy water-coloured ground read as water. A thin coloured deck/road on each street/plaza tile,
+// clearly distinct from impassable terrain (water/rock) and from the buildings.
+const BIOME_PAVING = { medina: '#26282d', outpost: '#c2a878', hamlet: '#6a5236', docks: '#6b6960', dome_colony: '#b9c6d2', mining_camp: '#3e3833', scrap_town: '#6f6354' };
+const PAVING_MAT = new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0 });
 
 // Per-biome look, keyed on tileMap.style (set by the settlement generators). The per-use wall/glow
 // colours are blended toward the biome's base so each world reads distinctly — sandstone outpost,
@@ -69,6 +75,16 @@ const SHOP_AWNING_MAT = new THREE.MeshStandardMaterial({ roughness: 0.65 }); // 
 // Bright marker capping each stairwell — signals a climbable rooftop access point.
 const STAIR_CAP_MAT = new THREE.MeshStandardMaterial({ color: '#1a3a36', emissive: '#39e0c8', emissiveIntensity: 0.9, roughness: 0.5 });
 
+// Per-biome ROOF geometry (one per building block) so the skyline silhouette differs by world:
+// ice = frosted domes, forest = pitched timber roofs, cyber-medina = rooftop tech units, mining =
+// smokestacks. Other biomes keep flat box-tops. Geometries have their base at y=0 (scaled per block).
+const DOME_GEO = new THREE.SphereGeometry(0.5, 14, 7, 0, Math.PI * 2, 0, Math.PI / 2); // top hemisphere
+const PITCH_GEO = new THREE.ConeGeometry(0.66, 1, 4); PITCH_GEO.rotateY(Math.PI / 4); PITCH_GEO.translate(0, 0.5, 0); // square pyramid
+const STACK_GEO = new THREE.CylinderGeometry(0.5, 0.6, 1, 8); STACK_GEO.translate(0, 0.5, 0); // smokestack
+const DOME_MAT = new THREE.MeshStandardMaterial({ color: '#e2edf6', roughness: 0.35, metalness: 0.1 });
+const PITCH_MAT = new THREE.MeshStandardMaterial({ color: '#7c4536', roughness: 0.85 }); // terracotta/timber
+const STACK_MAT = new THREE.MeshStandardMaterial({ color: '#2f2a26', roughness: 0.9 });
+
 // Night city-glow: each building gets a low, street-level skirt of soft self-lit colour, varied
 // per building (iridescent) — shopfronts/lanterns lining the alleys. Additive + toneMapped:false so
 // it pushes past the bloom threshold and reads as glow after dark. Opacity ramps with nightFactor.
@@ -76,8 +92,8 @@ const GLOW_PALETTE = ['#ffcf9e', '#8fe6ff', '#c7a6ff', '#9dffd0', '#ff9ec4', '#b
 const GLOW_MAT = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
 const hashTile = (x, y) => { let h = (x * 73856093) ^ (y * 19349663); return ((h ^ (h >>> 13)) >>> 0); };
 
-// Instanced boxes with optional per-instance color. `items`: {x,z,w,d,h,color?,y?}.
-function InstancedBoxes({ material, items, cast = true }) {
+// Instanced geometry with optional per-instance color. `items`: {x,z,w,d,h,color?,y?}.
+function InstancedBoxes({ geometry = BOX, material, items, cast = true }) {
   const ref = useRef();
   useLayoutEffect(() => {
     const mesh = ref.current;
@@ -93,9 +109,9 @@ function InstancedBoxes({ material, items, cast = true }) {
     mesh.count = items.length;
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [items]);
+  }, [items, geometry]);
   return (
-    <instancedMesh ref={ref} args={[BOX, material, Math.max(1, items.length)]} castShadow={cast} receiveShadow frustumCulled={false} />
+    <instancedMesh ref={ref} args={[geometry, material, Math.max(1, items.length)]} castShadow={cast} receiveShadow frustumCulled={false} />
   );
 }
 
@@ -122,8 +138,12 @@ function buildMedina(planet, worldHalf) {
     }
   }
   const fill = BIOME_FILL[biome] || BIOME_FILL.medina;
+  // Paving shades (a little variation so the floor isn't a flat sheet).
+  const pavingBase = new THREE.Color(BIOME_PAVING[biome] || '#3a3a3a');
+  const pavingShades = [pavingBase, pavingBase.clone().multiplyScalar(1.07), pavingBase.clone().multiplyScalar(0.93)];
 
-  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [];
+  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [], paving = [];
+  const blocks = new Map(); // blockId -> { minx,maxx,miny,maxy,h } for per-block roofs
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
     if (!row) continue;
@@ -134,6 +154,11 @@ function buildMedina(planet, worldHalf) {
       if (t.type === 'building' && t.height) {
         const cat = t.category || 'apartment';
         buildings.push({ x: wx, z: wz, w: tileW * 0.995, h: t.height * STORY, color: wallFor[cat] || PALETTE[(t.style || 0) % PALETTE.length] });
+        // accumulate this tile into its building block (for one roof per block)
+        const bId = t.block != null ? t.block : ty * 1000 + tx;
+        const bb = blocks.get(bId);
+        if (!bb) blocks.set(bId, { minx: tx, maxx: tx, miny: ty, maxy: ty, h: t.height });
+        else { if (tx < bb.minx) bb.minx = tx; if (tx > bb.maxx) bb.maxx = tx; if (ty < bb.miny) bb.miny = ty; if (ty > bb.maxy) bb.maxy = ty; if (t.height > bb.h) bb.h = t.height; }
         // Street-level glow skirt (use + biome tinted), slightly oversized so it spills into the alleys.
         glow.push({ x: wx, z: wz, w: tileW * 1.05, d: tileW * 1.05, h: Math.min(t.height * STORY, 2.2), color: glowFor[cat] || GLOW_PALETTE[hashTile(tx, ty) % GLOW_PALETTE.length] });
         // Storefront awnings: a fabric ledge over each alley-facing facade of a commercial building.
@@ -178,11 +203,32 @@ function buildMedina(planet, worldHalf) {
         const sw = tileW * 0.7;
         stallBases.push({ x: wx, z: wz, w: sw, d: sw, h: 1.1 });
         awnings.push({ x: wx, z: wz, w: tileW * 0.92, d: tileW * 0.92, h: 0.18, y: 1.25, color: STALL_AWNINGS[(t.stallStyle || 0) % STALL_AWNINGS.length] });
+      } else if (t.walkable && (t.type === 'street' || t.type === 'plaza')) {
+        // Pave the navigable floor so it's unmistakably walkable (a road/deck), not terrain/water.
+        paving.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.05, y: 0.02, color: pavingShades[hashTile(tx, ty) % 3] });
       }
     }
   }
+  // Per-biome roofs — one shaped cap per building block.
+  const roofDomes = [], roofPitch = [], roofStacks = [];
+  for (const bb of blocks.values()) {
+    const ctx = (bb.minx + bb.maxx + 1) / 2, cty = (bb.miny + bb.maxy + 1) / 2;
+    const [cx, cz] = s2w(ctx * tileSize, cty * tileSize);
+    const bw = (bb.maxx - bb.minx + 1) * tileW, bd = (bb.maxy - bb.miny + 1) * tileW;
+    const roofY = bb.h * STORY;
+    if (biome === 'dome_colony') {
+      roofDomes.push({ x: cx, y: roofY - 0.05, z: cz, w: bw * 0.98, h: Math.min(bw, bd) * 0.42, d: bd * 0.98 });
+    } else if (biome === 'hamlet') {
+      roofPitch.push({ x: cx, y: roofY - 0.05, z: cz, w: bw * 1.04, h: Math.min(bw, bd) * 0.55, d: bd * 1.04 });
+    } else if (biome === 'mining_camp') {
+      roofStacks.push({ x: cx + bw * 0.2, y: roofY, z: cz + bd * 0.2, w: tileW * 0.4, h: STORY * 1.2, d: tileW * 0.4 });
+    }
+    // medina roofs are WALKABLE (stairs) — left flat/clean so the player isn't clipping rooftop props.
+  }
+
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
-  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, fillSky: fill[0], fillGround: fill[1] };
+  const glowOpacity = biome === 'medina' ? 1.0 : 0.8; // medina = punchier neon
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, glowOpacity, roofDomes, roofPitch, roofStacks, fillSky: fill[0], fillGround: fill[1] };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
@@ -193,13 +239,19 @@ export default function MedinaBuildings({ planet, worldHalf }) {
   // no re-render). By day both are off, so the medina looks normal; after dusk the city lights up.
   useFrame(() => {
     const night = (atmo && atmo.current && atmo.current.nightFactor) || 0;
-    GLOW_MAT.opacity = night * 0.85;
+    GLOW_MAT.opacity = night * ((data && data.glowOpacity) || 0.85);
     if (fillRef.current) fillRef.current.intensity = night * 0.5;
   });
   if (!data) return null;
   return (
     <>
+      {/* Paved navigable floor — drawn first so everything else sits on it. */}
+      {data.paving.length > 0 && <InstancedBoxes material={PAVING_MAT} items={data.paving} cast={false} />}
       {data.buildings.length > 0 && <InstancedBoxes material={BLDG_MAT} items={data.buildings} />}
+      {/* Per-biome roof silhouettes (one per block). */}
+      {data.roofDomes.length > 0 && <InstancedBoxes geometry={DOME_GEO} material={DOME_MAT} items={data.roofDomes} />}
+      {data.roofPitch.length > 0 && <InstancedBoxes geometry={PITCH_GEO} material={PITCH_MAT} items={data.roofPitch} />}
+      {data.roofStacks.length > 0 && <InstancedBoxes geometry={STACK_GEO} material={STACK_MAT} items={data.roofStacks} />}
       {data.stairs.length > 0 && <InstancedBoxes material={BLDG_MAT} items={data.stairs} />}
       {data.stairCaps.length > 0 && <InstancedBoxes material={STAIR_CAP_MAT} items={data.stairCaps} cast={false} />}
       {data.stallBases.length > 0 && <InstancedBoxes material={STALL_MAT} items={data.stallBases} />}
