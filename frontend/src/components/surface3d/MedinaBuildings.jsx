@@ -12,11 +12,23 @@
  * their POI structures — this component simply renders nothing there.
  */
 
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { Suspense, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { STORY } from '../../../../shared/sim/surface.mjs'; // world units per storey (shared w/ the sim's roof Y)
 import { useAtmosphere } from './atmosphere/AtmosphereContext';
+import InstancedGLTF from './InstancedGLTF';
+
+// Modeled rooftop landmark per biome (CC0 building kit) — crowns the most prominent blocks of a
+// biome settlement so the skyline has real modeled architecture. Non-walkable biome roofs only;
+// the cyber-medina's roofs are walkable, so it gets none (would clip the player).
+const BIOME_LANDMARK = {
+  mining_camp: '/models/buildings/machine_generatorLarge.glb',
+  scrap_town: '/models/buildings/machine_generatorLarge.glb',
+  docks: '/models/buildings/satelliteDish_large.glb',
+  dome_colony: '/models/buildings/satelliteDish_large.glb',
+  outpost: '/models/buildings/turret_double.glb',
+};
 
 // Sandy / sun-baked medina palette, indexed by tile.style (0..4). (Fallback when a tile has no use.)
 const PALETTE = ['#cdbb9a', '#c7a079', '#b9a98c', '#d8c6a8', '#a98c6f'].map((c) => new THREE.Color(c));
@@ -227,13 +239,27 @@ function buildMedina(planet, worldHalf) {
       }
     }
   }
-  // Per-biome roofs — one shaped cap per building block.
-  const roofDomes = [], roofPitch = [], roofStacks = [];
+  // Per-biome roofs — one shaped cap per building block; the few biggest blocks get a modeled
+  // landmark installation instead (biome settlements only).
+  const roofDomes = [], roofPitch = [], roofStacks = [], landmarks = [];
+  const landmarkUrl = BIOME_LANDMARK[biome];
+  const blockArr = [];
   for (const bb of blocks.values()) {
     const ctx = (bb.minx + bb.maxx + 1) / 2, cty = (bb.miny + bb.maxy + 1) / 2;
     const [cx, cz] = s2w(ctx * tileSize, cty * tileSize);
     const bw = (bb.maxx - bb.minx + 1) * tileW, bd = (bb.maxy - bb.miny + 1) * tileW;
-    const roofY = bb.h * STORY;
+    blockArr.push({ cx, cz, bw, bd, roofY: bb.h * STORY, area: bw * bd });
+  }
+  const landmarkSet = new Set();
+  if (landmarkUrl) {
+    [...blockArr].sort((a, b) => b.area - a.area).slice(0, 3).forEach((s) => {
+      landmarkSet.add(s);
+      landmarks.push({ x: s.cx, y: s.roofY, z: s.cz, s: Math.min(s.bw, s.bd) * 0.85, ry: 0 });
+    });
+  }
+  for (const blk of blockArr) {
+    if (landmarkSet.has(blk)) continue; // a modeled landmark stands here instead of the default roof
+    const { cx, cz, bw, bd, roofY } = blk;
     if (biome === 'dome_colony') {
       roofDomes.push({ x: cx, y: roofY - 0.05, z: cz, w: bw * 0.98, h: Math.min(bw, bd) * 0.42, d: bd * 0.98 });
     } else if (biome === 'hamlet') {
@@ -246,7 +272,7 @@ function buildMedina(planet, worldHalf) {
 
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
   const glowOpacity = biome === 'medina' ? 1.0 : 0.8; // medina = punchier neon
-  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, bridges, glowOpacity, roofDomes, roofPitch, roofStacks, ramps, fillSky: fill[0], fillGround: fill[1] };
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, bridges, glowOpacity, roofDomes, roofPitch, roofStacks, ramps, landmarks, landmarkUrl, fillSky: fill[0], fillGround: fill[1] };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
@@ -270,6 +296,10 @@ export default function MedinaBuildings({ planet, worldHalf }) {
       {data.roofDomes.length > 0 && <InstancedBoxes geometry={DOME_GEO} material={DOME_MAT} items={data.roofDomes} />}
       {data.roofPitch.length > 0 && <InstancedBoxes geometry={PITCH_GEO} material={PITCH_MAT} items={data.roofPitch} />}
       {data.roofStacks.length > 0 && <InstancedBoxes geometry={STACK_GEO} material={STACK_MAT} items={data.roofStacks} />}
+      {/* Modeled rooftop landmarks crowning the biggest biome-settlement blocks (glTF kit). */}
+      {data.landmarkUrl && data.landmarks.length > 0 && (
+        <Suspense fallback={null}><InstancedGLTF url={data.landmarkUrl} items={data.landmarks} size={1} /></Suspense>
+      )}
       {data.stairs.length > 0 && <InstancedBoxes material={BLDG_MAT} items={data.stairs} />}
       {data.stairCaps.length > 0 && <InstancedBoxes material={STAIR_CAP_MAT} items={data.stairCaps} cast={false} />}
       {data.bridges.length > 0 && <InstancedBoxes material={BRIDGE_MAT} items={data.bridges} />}
