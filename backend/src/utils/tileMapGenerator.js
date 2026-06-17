@@ -87,6 +87,101 @@ function connectWalkable(tiles, gridSize, mustReach) {
   }
 }
 
+// ---- per-terrain settlements (Stage 3) ----
+// A building-use mix + max storeys + style per biome, so each settlement reads in-character: a
+// low desert outpost, a forest hamlet, ocean docks, an ice dome-colony, a volcanic mining camp,
+// a barren scrap town. Weights are over building categories shared with the urban renderer.
+const SETTLEMENT_PROFILES = {
+  desert:   { style: 'outpost',     maxStorey: 2, weights: { apartment: 26, shop: 22, market: 14, bar: 12, warehouse: 18, civic: 8 } },
+  forest:   { style: 'hamlet',      maxStorey: 3, weights: { apartment: 34, shop: 20, market: 12, bar: 8,  warehouse: 16, civic: 10 } },
+  ocean:    { style: 'docks',       maxStorey: 2, weights: { apartment: 24, shop: 18, market: 16, bar: 10, warehouse: 26, civic: 6 } },
+  ice:      { style: 'dome_colony', maxStorey: 2, weights: { apartment: 30, shop: 18, market: 10, bar: 8,  warehouse: 24, civic: 10 } },
+  volcanic: { style: 'mining_camp', maxStorey: 2, weights: { apartment: 20, shop: 16, market: 8,  bar: 12, warehouse: 36, civic: 8 } },
+  barren:   { style: 'scrap_town',  maxStorey: 2, weights: { apartment: 22, shop: 20, market: 8,  bar: 14, warehouse: 30, civic: 6 } },
+};
+
+function pickWeighted(weights, r) {
+  let total = 0; for (const k in weights) total += weights[k];
+  let t = r * total;
+  for (const k in weights) { t -= weights[k]; if (t <= 0) return k; }
+  return Object.keys(weights)[0];
+}
+
+/**
+ * Carve a bounded settlement — a street grid of use-tagged buildings around a central market plaza
+ * — into an existing terrain tilemap, around the spaceport/first POI, sized by the planet's
+ * population. The surrounding terrain (rocks/trees/water) is left intact outside the radius, and the
+ * outskirts fade into open lots so it doesn't read as a hard disc. Deterministic (seeded) so the
+ * cached + regenerated grids agree and the NPC ecology lines up with what's drawn.
+ * @returns the same tileMap (mutated), now flagged `settlement` with a biome `style`.
+ */
+function placeSettlement(tileMap, planet, mapData, biomeKey) {
+  if (!tileMap || !Array.isArray(tileMap.tiles)) return tileMap;
+  const tiles = tileMap.tiles, gridSize = tileMap.gridSize, tileSize = tileMap.tileSize || 2;
+  const profile = SETTLEMENT_PROFILES[biomeKey] || SETTLEMENT_PROFILES.desert;
+  const pois = (mapData && mapData.pointsOfInterest) || [];
+  const seed = Math.abs(((mapData && mapData.seed) | 0) ||
+    pois.reduce((s, p) => s + Math.floor((p.x || 0) * 31 + (p.y || 0) * 17), gridSize * 101)) || 4242;
+  const rng = mulberry32(seed);
+
+  // Population → town radius (tiles). A megacity sprawls; an outpost is a tight cluster.
+  const pop = Number(planet && planet.population) || 0;
+  const tier = pop <= 0 ? 0.2 : Math.max(0.12, Math.min(1, (Math.log10(pop) - 4) / 6));
+  const radius = Math.round(5 + tier * 15); // 6..20
+
+  // Centre near the spaceport (where the player spawns), else the first POI, else map centre.
+  let cx = gridSize >> 1, cy = gridSize >> 1;
+  const sp = mapData && mapData.spaceport;
+  if (sp && Number.isFinite(sp.x)) { cx = Math.floor(sp.x / tileSize); cy = Math.floor(sp.y / tileSize); }
+  else if (pois[0] && Number.isFinite(pois[0].x)) { cx = Math.floor(pois[0].x / tileSize); cy = Math.floor(pois[0].y / tileSize); }
+  cx = Math.max(radius + 1, Math.min(gridSize - radius - 2, cx));
+  cy = Math.max(radius + 1, Math.min(gridSize - radius - 2, cy));
+
+  const inB = (x, y) => x >= 0 && y >= 0 && x < gridSize && y < gridSize;
+  const STREET = 2, PITCH = 5; // 3-tile blocks separated by 2-wide streets
+  const x0 = cx - radius, y0 = cy - radius;
+  for (let y = cy - radius; y <= cy + radius; y++) {
+    for (let x = cx - radius; x <= cx + radius; x++) {
+      if (!inB(x, y)) continue;
+      const dist = Math.hypot(x - cx, y - cy);
+      if (dist > radius) continue;                 // outside town → leave terrain untouched
+      const lx = ((x - x0) % PITCH + PITCH) % PITCH, ly = ((y - y0) % PITCH + PITCH) % PITCH;
+      if (lx < STREET || ly < STREET) { tiles[y][x] = { type: 'street', walkable: true, visual: 'street' }; continue; }
+      const edge = dist / radius;
+      const bh = hash2(Math.floor((x - x0) / PITCH), Math.floor((y - y0) / PITCH), seed);
+      if (edge > 0.55 && ((bh & 0xff) / 255) < (edge - 0.55) * 1.6) { tiles[y][x] = { type: 'street', walkable: true, visual: 'street' }; continue; } // thinned outskirts
+      const cat = pickWeighted(profile.weights, ((bh >>> 8) & 0xffff) / 0xffff);
+      const baseH = cat === 'apartment' ? 2 : 1;
+      const h = Math.min(profile.maxStorey, baseH + (((bh >>> 24) & 0xff) / 255 < 0.4 ? 0 : 1));
+      const blk = Math.floor((y - y0) / PITCH) * 1000 + Math.floor((x - x0) / PITCH);
+      tiles[y][x] = { type: 'building', walkable: false, visual: 'building', category: cat, height: h, style: (h * 7) % 5, block: blk };
+    }
+  }
+
+  // Central market plaza (the souk square).
+  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const x = cx + dx, y = cy + dy; if (inB(x, y)) tiles[y][x] = { type: 'plaza', walkable: true, visual: 'plaza' }; }
+
+  // POI pockets + connectivity: clear a walkable pocket at each POI/centre/spaceport, then flood-fill
+  // and carve stubs so nothing is sealed off (esp. important when the town meets impassable terrain).
+  const anchors = pois.map(p => ({ x: Math.floor((p.x ?? 50) / tileSize), y: Math.floor((p.y ?? 50) / tileSize) }));
+  anchors.push({ x: cx, y: cy });
+  if (sp && Number.isFinite(sp.x)) anchors.push({ x: Math.floor(sp.x / tileSize), y: Math.floor(sp.y / tileSize) });
+  anchors.forEach(a => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const x = a.x + dx, y = a.y + dy; if (inB(x, y) && !tiles[y][x].walkable) tiles[y][x] = { type: 'plaza', walkable: true, visual: 'plaza' }; } });
+  connectWalkable(tiles, gridSize, anchors);
+
+  // Market stalls around the square's RIM (after connectivity, so the pocket pass can't erase them
+  // and a single small obstacle in an open square can't seal anything).
+  let placed = 0;
+  for (const [sx, sy] of [[cx - 2, cy], [cx + 2, cy], [cx, cy - 2], [cx, cy + 2], [cx - 2, cy - 2], [cx + 2, cy + 2]]) {
+    if (placed >= 3) break;
+    if (inB(sx, sy) && tiles[sy][sx].walkable && rng() < 0.85) { tiles[sy][sx] = { type: 'stall', walkable: false, visual: 'stall', stallStyle: (rng() * 4) | 0 }; placed++; }
+  }
+
+  tileMap.settlement = true;
+  tileMap.style = profile.style;
+  return tileMap;
+}
+
 /**
  * Generate a tile map for an urban planet — a dense, maze-like medina.
  * The whole map starts as buildings; a braided maze of narrow alleys is carved through it,
@@ -1135,7 +1230,8 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 // v3: medina gains 'stair' tiles → walkable rooftops (multi-level traversal).
 // v4: building blocks tagged with a use `category` (apartment/shop/market/bar/...) + use-driven heights.
 // v5: building blocks carry a `block` id + tileMap.settlement flag (for the stationed-NPC ecology).
-const TILEMAP_VERSION = 5;
+// v6: every biome gets a fitting built-up settlement (per-terrain layout/population/bustle).
+const TILEMAP_VERSION = 6;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);
@@ -1152,34 +1248,34 @@ function _dispatchTileMapByPlanetType(planet, mapData, tileSize = 2) {
     return generateUrbanTileMap(mapData, tileSize);
   }
 
-  // Desert planets
+  // Desert planets — natural terrain with a built-up outpost settlement around the spaceport.
   if (planetType === 'desert' || terrain === 'desert') {
-    return generateDesertTileMap(mapData, tileSize);
+    return placeSettlement(generateDesertTileMap(mapData, tileSize), planet, mapData, 'desert');
   }
 
-  // Forest/Jungle planets
+  // Forest/Jungle planets — a hamlet among the trees.
   if (planetType === 'jungle' || planetType === 'forest' || terrain === 'jungle' || terrain === 'forest') {
-    return generateForestTileMap(mapData, tileSize);
+    return placeSettlement(generateForestTileMap(mapData, tileSize), planet, mapData, 'forest');
   }
 
-  // Ocean planets
+  // Ocean planets — a dock town on the platforms.
   if (planetType === 'ocean' || terrain === 'ocean') {
-    return generateOceanTileMap(mapData, tileSize);
+    return placeSettlement(generateOceanTileMap(mapData, tileSize), planet, mapData, 'ocean');
   }
 
-  // Ice/Snow planets
+  // Ice/Snow planets — a hardy dome colony.
   if (planetType === 'ice' || terrain === 'ice') {
-    return generateIceTileMap(mapData, tileSize);
+    return placeSettlement(generateIceTileMap(mapData, tileSize), planet, mapData, 'ice');
   }
 
-  // Volcanic planets
+  // Volcanic planets — an industrial mining camp.
   if (planetType === 'volcanic' || terrain === 'volcanic') {
-    return generateVolcanicTileMap(mapData, tileSize);
+    return placeSettlement(generateVolcanicTileMap(mapData, tileSize), planet, mapData, 'volcanic');
   }
 
-  // Barren planets
+  // Barren planets — a sparse scrap town.
   if (planetType === 'barren' || terrain === 'barren' || terrain === 'wasteland') {
-    return generateBarrenTileMap(mapData, tileSize);
+    return placeSettlement(generateBarrenTileMap(mapData, tileSize), planet, mapData, 'barren');
   }
 
   // Default: use urban for unknown types (fallback)
