@@ -184,10 +184,11 @@ export class NetClient {
 
     // --- reconcile our predicted player: server pos + replay of unacked inputs ---
     this.pending = this.pending.filter((p) => p.seq > m.ack);
-    let pos = { x: m.self.x, z: m.self.z, facing: m.self.f };
+    let pos = { x: m.self.x, z: m.self.z, facing: m.self.f, level: m.self.l || 0 };
     for (const p of this.pending) pos = this.sim.integrate(pos, p.input, p.dt);
     // Snap to the reconciled prediction (≈ current predicted pos → imperceptible).
     this.player.x = pos.x; this.player.z = pos.z; this.player.facing = pos.facing;
+    this.player.level = pos.level || 0; // rooftop level reconciles like position (replayed through integrate)
 
     // Stale-ack watchdog: if we have unacked inputs but the server stops advancing the ack
     // despite still sending snapshots, the connection is degraded → drop offline + reconnect.
@@ -206,9 +207,10 @@ export class NetClient {
       if (prev) {
         prev.px = prev.x; prev.pz = prev.z; prev.pf = prev.f;
         prev.x = rp.x; prev.z = rp.z; prev.f = rp.f; prev.m = rp.m; prev.c = rp.c; prev.name = rp.name;
+        prev.l = rp.l || 0; // rooftop level (for render Y)
         prev.at = now;
       } else {
-        this.remotes.set(rp.id, { ...rp, px: rp.x, pz: rp.z, pf: rp.f, at: now });
+        this.remotes.set(rp.id, { ...rp, l: rp.l || 0, px: rp.x, pz: rp.z, pf: rp.f, at: now });
       }
     }
     for (const id of [...this.remotes.keys()]) if (!seen.has(id)) this.remotes.delete(id);

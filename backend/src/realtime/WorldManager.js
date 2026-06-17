@@ -237,7 +237,7 @@ class WorldManager {
           serverMs,
           ack: p.lastSeq,
           actMs: p.lastClientTime,
-          self: { x: r2(p.x), z: r2(p.z), f: r2(p.facing), hp: p.combatant ? p.combatant.stats.health : p.maxHp, maxHp: p.maxHp, dead: p.dead ? 1 : 0 },
+          self: { x: r2(p.x), z: r2(p.z), f: r2(p.facing), l: p.level || 0, hp: p.combatant ? p.combatant.stats.health : p.maxHp, maxHp: p.maxHp, dead: p.dead ? 1 : 0 },
           players,
           enemies,
           ...(crowd ? { crowd } : {}),

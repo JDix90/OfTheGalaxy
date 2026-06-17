@@ -31,6 +31,13 @@ export const DEFAULTS = {
   tickHz: 20,        // authoritative-ready fixed step (used by the server path later)
 };
 
+// World height of one building storey — the medina renderer (MedinaBuildings) draws building boxes
+// `height * STORY` tall, and a player on a roof stands at that same Y. Single source of truth.
+export const STORY = 2.4;
+// Most storeys you can step up/down between adjacent rooftops (keeps the roof network coherent and
+// stops teleport-falls between very different heights). 1 = a single-storey clamber.
+const MAX_ROOF_STEP = 1;
+
 /**
  * Build a surface sim bound to one planet's mapData.
  * @param mapData  planet.mapData ({ tileMap?, ... })  — tileMap optional (open planets).
@@ -52,29 +59,76 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
   const surfaceToWorld = (sx, sy) => ({ x: (sx - 50) * scale, z: (sy - 50) * scale });
   const worldToSurface = (x, z) => ({ x: x / scale + 50, y: z / scale + 50 });
 
-  // ---- walkability ----
+  // ---- tile lookup + per-level walkability ----
+  function tileAt(sx, sy) {
+    if (!tileMap || sx < 0 || sx > 100 || sy < 0 || sy > 100) return null;
+    const tx = Math.floor(sx / tileSize), ty = Math.floor(sy / tileSize);
+    if (tx < 0 || ty < 0 || tx >= gridSize || ty >= gridSize) return null;
+    const row = tileMap.tiles && tileMap.tiles[ty];
+    return (row && row[tx]) || null;
+  }
+  const groundWalkable = (t) => !!t && t.walkable === true && !OBSTACLE_TILE_TYPES.has(t.type);
+  // Tiles you can stand ON at roof level: building tops + stair landings.
+  const isRoofTile = (t) => !!t && (t.type === 'building' || t.type === 'stair');
+  const storeysOf = (t) => (t && t.height) ? t.height : 0;
+
+  // Ground walkability (level 0) — the long-standing surface collision used by enemies, crowd,
+  // pathfinding, and spawns. Unchanged: 'stair' tiles read as walkable, buildings as blocked.
   function isWalkableSurface(sx, sy) {
     if (sx < 0 || sx > 100 || sy < 0 || sy > 100) return false;
     if (!tileMap) return true; // open planet — anywhere in bounds is fine
-    const tx = Math.floor(sx / tileSize);
-    const ty = Math.floor(sy / tileSize);
-    if (tx < 0 || ty < 0 || tx >= gridSize || ty >= gridSize) return false;
-    const row = tileMap.tiles && tileMap.tiles[ty];
-    const tile = row && row[tx];
-    if (!tile) return false; // missing tile = blocked (matches 2D surface)
-    return tile.walkable === true && !OBSTACLE_TILE_TYPES.has(tile.type);
+    return groundWalkable(tileAt(sx, sy));
   }
   function isWalkableWorld(x, z) {
     const s = worldToSurface(x, z);
     return isWalkableSurface(s.x, s.y);
   }
 
+  /** World Y a body stands at for a given level at (sx,sy): 0 on the ground, the roof top
+   *  (storeys * STORY) when up on a building/stair. Used by the renderer for player height. */
+  function surfaceLevelY(sx, sy, level) {
+    if (!level) return 0;
+    const t = tileAt(sx, sy);
+    return (t && t.height ? t.height : 1) * STORY;
+  }
+
+  /**
+   * Resolve a single attempted move (world from→to) at the player's current level, returning the
+   * landing { x, z, level } or null if blocked. Ground↔roof transitions happen only via 'stair'
+   * tiles; roof↔roof steps are capped at MAX_ROOF_STEP storeys. On planets without rooftops (no
+   * stair/building-roof reachability) this only ever yields level 0 — identical to the old 2D move.
+   */
+  function resolveStep(fromX, fromZ, toX, toZ, level) {
+    const ts = worldToSurface(toX, toZ);
+    if (ts.x < 0 || ts.x > 100 || ts.y < 0 || ts.y > 100) return null;
+    if (!tileMap) return level ? null : { x: toX, z: toZ, level: 0 }; // open planet = ground only
+    const toT = tileAt(ts.x, ts.y);
+    if (!toT) return null;
+    const fs = worldToSurface(fromX, fromZ);
+    const fromT = tileAt(fs.x, fs.y);
+    if (level === 0) {
+      if (groundWalkable(toT)) return { x: toX, z: toZ, level: 0 };
+      // ascend: step off a stair onto the adjacent roof (≤ MAX_ROOF_STEP storeys)
+      if (fromT && fromT.type === 'stair' && isRoofTile(toT) && Math.abs(storeysOf(toT) - storeysOf(fromT)) <= MAX_ROOF_STEP) {
+        return { x: toX, z: toZ, level: 1 };
+      }
+      return null;
+    }
+    // level 1 (on the rooftops)
+    if (isRoofTile(toT) && fromT && Math.abs(storeysOf(toT) - storeysOf(fromT)) <= MAX_ROOF_STEP) {
+      return { x: toX, z: toZ, level: 1 };
+    }
+    // descend: step off a stair down to the ground
+    if (fromT && fromT.type === 'stair' && groundWalkable(toT)) return { x: toX, z: toZ, level: 0 };
+    return null;
+  }
+
   /**
    * Authoritative movement step (identical wherever it runs).
-   * @param state {x, z, facing}   world-space position + heading (radians)
+   * @param state {x, z, facing, level?}   world-space position + heading (radians) + level (0 ground)
    * @param input {f,b,l,r, run, yaw}  button flags + run + camera yaw
    * @param dt    seconds
-   * @returns new {x, z, facing, moving, speed}  (speed in world units/s)
+   * @returns new {x, z, facing, moving, speed, level}  (speed in world units/s)
    */
   function integrate(state, input, dt) {
     const yaw = input.yaw || 0;
@@ -93,6 +147,7 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
     let speed = 0;
     let nx = state.x;
     let nz = state.z;
+    let level = state.level || 0;
 
     if (len > 1e-4) {
       mx /= len; mz /= len;
@@ -100,12 +155,20 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
       const dx = mx * speed * dt;
       const dz = mz * speed * dt;
 
-      // Attempt full move; if blocked, slide along each axis independently.
-      if (isWalkableWorld(state.x + dx, state.z + dz)) {
-        nx = state.x + dx; nz = state.z + dz;
+      // Attempt the full move; if blocked, slide along each axis independently. resolveStep also
+      // resolves ground↔roof level transitions (via stairs) — on flat planets it never changes level.
+      const full = resolveStep(state.x, state.z, state.x + dx, state.z + dz, level);
+      if (full) {
+        nx = full.x; nz = full.z; level = full.level;
       } else {
-        if (isWalkableWorld(state.x + dx, state.z)) nx = state.x + dx;
-        if (isWalkableWorld(state.x, state.z + dz)) nz = state.z + dz;
+        const sX = resolveStep(state.x, state.z, state.x + dx, state.z, level);
+        const sZ = resolveStep(state.x, state.z, state.x, state.z + dz, level);
+        if (sX) nx = sX.x;
+        if (sZ) nz = sZ.z;
+        // Slides run along walls and almost never cross a level boundary; if one does, adopt it
+        // (deterministic, so client + server agree).
+        if (sX && sX.level !== level) level = sX.level;
+        else if (sZ && sZ.level !== level) level = sZ.level;
       }
       facing = Math.atan2(mx, mz); // atan2(x, z): 0 faces +Z
       moving = (nx !== state.x || nz !== state.z);
@@ -115,7 +178,7 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
     nx = Math.max(-worldLimit, Math.min(worldLimit, nx));
     nz = Math.max(-worldLimit, Math.min(worldLimit, nz));
 
-    return { x: nx, z: nz, facing, moving, speed };
+    return { x: nx, z: nz, facing, moving, speed, level };
   }
 
   return {
@@ -123,6 +186,7 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
     hasTileMap: !!tileMap,
     surfaceToWorld, worldToSurface,
     isWalkableSurface, isWalkableWorld,
+    surfaceLevelY,
     integrate,
   };
 }
