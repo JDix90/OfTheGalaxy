@@ -67,12 +67,15 @@ describe('generateTileMapByPlanetType', () => {
     }
   });
 
-  it('routes forest planets to the forest generator (trees), not the urban fallback', () => {
+  it('routes forest planets to the forest generator (trees) + a hamlet, not the urban fallback', () => {
     const tm = generateTileMapByPlanetType({ planetType: 'forest' }, sampleMap());
     const types = new Set();
-    for (const row of tm.tiles) for (const t of row) types.add(t.type);
-    expect(types.has('tree')).toBe(true);
-    expect(types.has('building')).toBe(false); // urban fallback would have produced buildings
+    let buildings = 0;
+    for (const row of tm.tiles) for (const t of row) { types.add(t.type); if (t.type === 'building') buildings++; }
+    expect(types.has('tree')).toBe(true);                       // forest terrain ran (urban fallback has no trees)
+    expect(tm.settlement).toBe(true);                            // a fitting settlement was placed
+    // a hamlet has SOME buildings, but nowhere near a full-map medina (~50% buildings)
+    expect(buildings).toBeLessThan(tm.gridSize * tm.gridSize * 0.3);
   });
 });
 
