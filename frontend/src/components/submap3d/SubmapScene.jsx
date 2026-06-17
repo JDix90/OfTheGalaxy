@@ -54,6 +54,7 @@ export default function SubmapScene({
   // by compound walls. Only the enclosed/open facility submaps get the SubmapEnclosure shell.
   const enclosureMode = ENCLOSED_TYPES.has(subMap?.type) ? 'enclosed' : 'open';
   const isEnclosed = !interior && enclosureMode === 'enclosed';
+  const isSpaceport = subMap?.type === 'spaceport';
   // Enclosed rooms render at "night" so the global sun never floods through the ceiling; the
   // room is lit by its ceiling strips, fill, and POI lights (which rise at night).
   const atmoTime = isEnclosed ? 0.02 : startTime;
@@ -80,6 +81,19 @@ export default function SubmapScene({
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}
       {/* Furniture/props dress both enclosed interiors and open districts (spaceport concourse). */}
       {furniture && furniture.length > 0 && <Furniture items={furniture} />}
+
+      {/* Spaceport concourse lighting: the daytime POI lights stay dim, so add a warm fill +
+          sky hemisphere and a soft always-on accent over each structure so the terminal reads
+          bright and lively instead of dark and flat. */}
+      {isSpaceport && (
+        <>
+          <hemisphereLight args={['#cfe0fb', '#26304a', 0.55]} />
+          <pointLight position={[0, 16, 0]} intensity={0.55} distance={worldHalf * 2.4} decay={2} color="#ffe7c4" />
+          {pois.map((poi) => (
+            <pointLight key={`acc_${poi.id}`} position={[poi.wx, 3.4, poi.wz]} intensity={0.6} distance={15} decay={2} color="#ffd9a8" />
+          ))}
+        </>
+      )}
 
       {pois.map((poi) => (
         <PoiStructure key={poi.id} poi={poi} active={poi.id === activePoiId} lit onActivate={onPoiActivate} />

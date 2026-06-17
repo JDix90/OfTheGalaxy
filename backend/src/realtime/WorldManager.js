@@ -133,8 +133,10 @@ class WorldManager {
     const points = [];
     for (const sp of (d.npcSpawnPoints || [])) { const p = sp.position || {}; if (Number.isFinite(p.x)) points.push(pct(p.x, p.y)); }
     for (const e of (d.entryPoints || [])) { const p = e.position || {}; if (Number.isFinite(p.x)) points.push(pct(p.x, p.y)); }
-    points.push({ x: 35, y: 40 }, { x: 40, y: 60 }, { x: 30, y: 50 }); // cross the concourse, don't just hug spawns
-    return { count: 28, points };
+    // Destinations spread along the central walkway + toward the hangar gates, so walkers
+    // traverse the whole concourse instead of clustering on the spawn points.
+    points.push({ x: 18, y: 50 }, { x: 30, y: 46 }, { x: 42, y: 54 }, { x: 54, y: 48 }, { x: 66, y: 52 }, { x: 74, y: 40 }, { x: 74, y: 62 });
+    return { count: 36, points };
   }
 
   start() {
