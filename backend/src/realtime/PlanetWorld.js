@@ -11,6 +11,7 @@
 
 const { generateRandomEnemy } = require('../data/enemyTemplates');
 const { resolveCast, resolveDodge, enemyTryAttack, buildEnemyActorCombatant, DISENGAGE_MS } = require('./combat');
+const { findPath } = require('../utils/gridPathfinder');
 
 const PALETTE = ['#ffcf5c', '#6cf0c2', '#7db8ff', '#ff8d6c', '#d18cff', '#9affa0', '#ff5a8a', '#5ad1ff'];
 const TWO_PI = Math.PI * 2;
@@ -20,6 +21,7 @@ const AGGRO_RADIUS = 16;   // world units: a player this close pulls an enemy in
 const LEASH = 24;          // enemies won't chase beyond this from home
 const PATROL_SPEED = 3.2;
 const CHASE_SPEED = 5.4;
+const REPATH_MS = 500;     // how often a chasing enemy re-solves its maze route to the player
 const STAMINA_REGEN = 3;     // stamina per second regenerated in-world (no rejoin-to-refill)
 const HEALTH_REGEN = 4;          // hp/sec regenerated OUT of combat (authoritative; flushed to DB)
 const OOC_REGEN_DELAY_MS = 5000; // wait this long after the last combat before health regen kicks in
@@ -419,6 +421,57 @@ class PlanetWorld {
     else if (this.sim.isWalkableWorld(e.x, e.z + mz)) { e.z += mz; }
   }
 
+  /** True if the straight world-space segment a→b stays on walkable ground (sampled ~1u apart). */
+  _lineOfSight(ax, az, bx, bz) {
+    const dx = bx - ax, dz = bz - az;
+    const steps = Math.max(1, Math.ceil(Math.hypot(dx, dz)));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      if (!this.sim.isWalkableWorld(ax + dx * t, az + dz * t)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Chase steering: returns the world point an enemy should head toward this tick. On open ground or
+   * with clear line-of-sight it's just the player (cheap, and the final approach). When buildings
+   * occlude the player (the medina maze), it BFS-routes on the tile grid and steers to the next
+   * waypoint, so the enemy rounds corners instead of grinding against a wall. The route is cached and
+   * only re-solved when the player changes tile or every REPATH_MS.
+   */
+  _chaseSteer(e, target, now) {
+    if (!this.sim.hasTileMap || this._lineOfSight(e.x, e.z, target.x, target.z)) {
+      e._path = null;
+      return { x: target.x, z: target.z };
+    }
+    const ts = this.sim.tileSize, gs = this.sim.gridSize;
+    const toTile = (wx, wz) => {
+      const s = this.sim.worldToSurface(wx, wz);
+      return { x: Math.min(gs - 1, Math.max(0, Math.floor(s.x / ts))), y: Math.min(gs - 1, Math.max(0, Math.floor(s.y / ts))) };
+    };
+    const tileToWorld = (tile) => this.sim.surfaceToWorld((tile.x + 0.5) * ts, (tile.y + 0.5) * ts);
+    const startTile = toTile(e.x, e.z), goalTile = toTile(target.x, target.z);
+
+    if (!e._path || !e._pathGoal || e._pathGoal.x !== goalTile.x || e._pathGoal.y !== goalTile.y || (now - (e._pathAt || 0)) > REPATH_MS) {
+      const path = findPath((x, y) => this.sim.isWalkableSurface((x + 0.5) * ts, (y + 0.5) * ts), gs, startTile, goalTile);
+      e._path = path && path.length ? path : null;
+      e._pathGoal = goalTile; e._pathAt = now; e._pathIdx = 0;
+    }
+    if (!e._path) return { x: target.x, z: target.z }; // unreachable → straight (best effort)
+
+    // Pop waypoints we've effectively reached, then steer to the next.
+    const reach = ts * this.sim.scale * 0.6;
+    let wp = e._path[e._pathIdx];
+    while (wp) {
+      const w = tileToWorld(wp);
+      if (Math.hypot(w.x - e.x, w.z - e.z) <= reach) { e._pathIdx++; wp = e._path[e._pathIdx]; }
+      else break;
+    }
+    if (!wp) return { x: target.x, z: target.z };
+    const w = tileToWorld(wp);
+    return { x: w.x, z: w.z };
+  }
+
   /** Enemy AI: chase the nearest in-range player, else patrol around home. Attacks in melee. */
   stepEnemies(dt, now) {
     if (this.enemies.size === 0) return;
@@ -438,7 +491,11 @@ class PlanetWorld {
       const distHome = Math.hypot(e.x - e.home.x, e.z - e.home.z);
       let tx, tz, speed;
       if (target && !passive && best < AGGRO_RADIUS && distHome < LEASH) {
-        e.state = 'chase'; e.targetId = target.id; tx = target.x; tz = target.z; speed = CHASE_SPEED;
+        e.state = 'chase'; e.targetId = target.id; speed = CHASE_SPEED;
+        // Steer along a maze route when the player is occluded by buildings; head straight on open
+        // ground / clear line-of-sight (the common case, and the final approach).
+        const steer = this._chaseSteer(e, target, now);
+        tx = steer.x; tz = steer.z;
       } else if (distHome > e.patrolRadius * 1.5) {
         e.state = 'patrol'; e.targetId = null; tx = e.home.x; tz = e.home.z; speed = PATROL_SPEED; // leash home
       } else {
