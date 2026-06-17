@@ -99,7 +99,7 @@ function connectWalkable(tiles, gridSize, mustReach) {
 function generateUrbanTileMap(mapData, tileSize = 2) {
   const gridSize = Math.floor(100 / tileSize); // 50x50 grid for 2% tiles
   const tiles = [];
-  const tileMap = { gridSize, tileSize, tiles, style: 'medina' };
+  const tileMap = { gridSize, tileSize, tiles, style: 'medina', settlement: true };
 
   const pois = mapData.pointsOfInterest || [];
   // Deterministic per-planet RNG so a planet always regenerates the same medina.
@@ -179,6 +179,7 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
     t.category = pickBuildingCategory(hh);
     t.height = buildingHeightFor(t.category, hh);
     t.style = (hh >>> 16) % 5;
+    t.block = sby * 1000 + sbx; // block id → lets the NPC ecology place one shopkeeper per building
   }
 
   // 7) Stairwells: convert some street-adjacent building EDGE tiles into stairs up to the roof, so
@@ -1133,7 +1134,8 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 // v2: urban planets become a dense maze-like medina (height/style-tagged buildings + stalls).
 // v3: medina gains 'stair' tiles → walkable rooftops (multi-level traversal).
 // v4: building blocks tagged with a use `category` (apartment/shop/market/bar/...) + use-driven heights.
-const TILEMAP_VERSION = 4;
+// v5: building blocks carry a `block` id + tileMap.settlement flag (for the stationed-NPC ecology).
+const TILEMAP_VERSION = 5;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);
