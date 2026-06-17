@@ -128,6 +128,36 @@ async function ensureCollisionMap(subMap) {
   return subMap;
 }
 
+/**
+ * Re-furnish an older, already-persisted spaceport in place. The spaceport layout used to be
+ * an empty plaza; existing rows keep that stale layout, so when the version is behind we
+ * regenerate the furnished concourse + hangar layout (deterministic seed) and persist it.
+ * No-op for non-spaceports or current-version rows. Used by BOTH submap load paths
+ * (getSubMapById and getSubMapForLocation) so any way into a stale port upgrades it.
+ */
+async function refurnishSpaceportIfStale(subMap) {
+  if (!subMap || subMap.type !== 'spaceport') return subMap;
+  const layout = subMap.layoutData || subMap.layout || {};
+  const cur = layout.spaceportVersion || 0;
+  if (cur >= subMapGenerator.SPACEPORT_LAYOUT_VERSION) return subMap;
+  try {
+    const planet = subMap.planet || await Planet.findByPk(subMap.planetId) || { id: subMap.planetId };
+    const w = layout.width || 12;
+    const variant = w >= 18 ? 'military' : w >= 15 ? 'large' : w <= 10 ? 'small' : 'medium';
+    const seed = subMapGenerator.getSeed(`${subMap.planetId}_${subMap.parentLocationId}_spaceport`);
+    const newLayout = subMapGenerator.generateSpaceportMap(planet, subMap.parentLocationId, variant, seed);
+    // Match the creation path: collision from the full layout (buildings + props).
+    newLayout.collisionMap = collisionMapService.generateCollisionMap({ id: subMap.id, type: 'spaceport', layoutData: newLayout, layout: newLayout });
+    await subMap.update({ layoutData: newLayout });
+    subMap.layoutData = newLayout;
+    subMap.layout = newLayout;
+    console.log(`[SubMap Service] Re-furnished spaceport ${subMap.id} (layout v${cur} -> v${subMapGenerator.SPACEPORT_LAYOUT_VERSION})`);
+  } catch (e) {
+    console.warn(`[SubMap Service] Spaceport re-furnish failed for ${subMap.id}:`, e.message);
+  }
+  return subMap;
+}
+
 async function getSubMapById(subMapId) {
   try {
     const subMap = await SubMap.findByPk(subMapId, {
@@ -174,30 +204,8 @@ async function getSubMapById(subMapId) {
       }
     }
 
-    // Re-furnish older spaceports in place. The spaceport layout used to be an empty plaza;
-    // existing rows persist that stale layout, so upgrade them to the current furnished
-    // concourse + hangars when their version is behind (mirrors the dungeon-regen hook above).
-    if (subMap.type === 'spaceport') {
-      const layout = subMap.layoutData || subMap.layout || {};
-      const cur = layout.spaceportVersion || 0;
-      if (cur < subMapGenerator.SPACEPORT_LAYOUT_VERSION) {
-        try {
-          const planet = subMap.planet || await Planet.findByPk(subMap.planetId) || { id: subMap.planetId };
-          const w = layout.width || 12;
-          const variant = w >= 18 ? 'military' : w >= 15 ? 'large' : w <= 10 ? 'small' : 'medium';
-          const seed = subMapGenerator.getSeed(`${subMap.planetId}_${subMap.parentLocationId}_spaceport`);
-          const newLayout = subMapGenerator.generateSpaceportMap(planet, subMap.parentLocationId, variant, seed);
-          // Match the creation path: collision from the full layout (buildings + props).
-          newLayout.collisionMap = collisionMapService.generateCollisionMap({ id: subMap.id, type: 'spaceport', layoutData: newLayout, layout: newLayout });
-          await subMap.update({ layoutData: newLayout });
-          subMap.layoutData = newLayout;
-          subMap.layout = newLayout;
-          console.log(`[SubMap Service] Re-furnished spaceport ${subMap.id} (layout v${cur} -> v${subMapGenerator.SPACEPORT_LAYOUT_VERSION})`);
-        } catch (e) {
-          console.warn(`[SubMap Service] Spaceport re-furnish failed for ${subMap.id}:`, e.message);
-        }
-      }
-    }
+    // Re-furnish an older, already-persisted spaceport in place (applies to BOTH load paths).
+    await refurnishSpaceportIfStale(subMap);
 
     // Ensure collision map exists before returning
     const subMapWithCollision = await ensureCollisionMap(subMap);
@@ -518,6 +526,10 @@ async function getSubMapForLocation(planetId, parentLocationId, parentLocationTy
         }
       }
     }
+
+    // Re-furnish a found-but-stale spaceport (entering from the surface lands here, not in
+    // getSubMapById) so the furnished layout reaches the renderer on every entry path.
+    await refurnishSpaceportIfStale(subMap);
 
     // For dungeons, ensure metadata structure exists (enemies will be spawned by frontend)
     if (subMap && subMap.type === 'dungeon') {
