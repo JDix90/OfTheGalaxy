@@ -13,8 +13,10 @@
  */
 
 import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { STORY } from '../../../../shared/sim/surface.mjs'; // world units per storey (shared w/ the sim's roof Y)
+import { useAtmosphere } from './atmosphere/AtmosphereContext';
 
 // Sandy / sun-baked medina palette, indexed by tile.style (0..4).
 const PALETTE = ['#cdbb9a', '#c7a079', '#b9a98c', '#d8c6a8', '#a98c6f'].map((c) => new THREE.Color(c));
@@ -28,6 +30,13 @@ const STALL_MAT = new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 
 const AWNING_MAT = new THREE.MeshStandardMaterial({ roughness: 0.7 });
 // Bright marker capping each stairwell — signals a climbable rooftop access point.
 const STAIR_CAP_MAT = new THREE.MeshStandardMaterial({ color: '#1a3a36', emissive: '#39e0c8', emissiveIntensity: 0.9, roughness: 0.5 });
+
+// Night city-glow: each building gets a low, street-level skirt of soft self-lit colour, varied
+// per building (iridescent) — shopfronts/lanterns lining the alleys. Additive + toneMapped:false so
+// it pushes past the bloom threshold and reads as glow after dark. Opacity ramps with nightFactor.
+const GLOW_PALETTE = ['#ffcf9e', '#8fe6ff', '#c7a6ff', '#9dffd0', '#ff9ec4', '#bfe0ff', '#ffe79a'].map((c) => new THREE.Color(c));
+const GLOW_MAT = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+const hashTile = (x, y) => { let h = (x * 73856093) ^ (y * 19349663); return ((h ^ (h >>> 13)) >>> 0); };
 
 // Instanced boxes with optional per-instance color. `items`: {x,z,w,d,h,color?,y?}.
 function InstancedBoxes({ material, items, cast = true }) {
@@ -60,7 +69,7 @@ function buildMedina(planet, worldHalf) {
   const tileW = tileSize * scale;
   const s2w = (sx, sy) => [(sx - 50) * scale, (sy - 50) * scale];
 
-  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [];
+  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [];
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
     if (!row) continue;
@@ -70,6 +79,8 @@ function buildMedina(planet, worldHalf) {
       const [wx, wz] = s2w((tx + 0.5) * tileSize, (ty + 0.5) * tileSize);
       if (t.type === 'building' && t.height) {
         buildings.push({ x: wx, z: wz, w: tileW * 0.995, h: t.height * STORY, color: PALETTE[(t.style || 0) % PALETTE.length] });
+        // Street-level glow skirt, slightly oversized so it spills into the abutting alleys.
+        glow.push({ x: wx, z: wz, w: tileW * 1.05, d: tileW * 1.05, h: Math.min(t.height * STORY, 2.2), color: GLOW_PALETTE[hashTile(tx, ty) % GLOW_PALETTE.length] });
       } else if (t.type === 'stair') {
         // An oriented flight of steps rising toward the roof it serves (distinct stone), capped by a
         // glowing marker. The street-side stays low so you can step onto it; the sim handles the
@@ -102,11 +113,20 @@ function buildMedina(planet, worldHalf) {
     }
   }
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
-  return { buildings, stallBases, awnings, stairs, stairCaps };
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
   const data = useMemo(() => buildMedina(planet, worldHalf), [planet, worldHalf]);
+  const atmo = useAtmosphere();
+  const fillRef = useRef();
+  // Ramp the building glow + a soft fill light with nightfall (read from the shared atmosphere ref,
+  // no re-render). By day both are off, so the medina looks normal; after dusk the city lights up.
+  useFrame(() => {
+    const night = (atmo && atmo.current && atmo.current.nightFactor) || 0;
+    GLOW_MAT.opacity = night * 0.85;
+    if (fillRef.current) fillRef.current.intensity = night * 0.5;
+  });
   if (!data) return null;
   return (
     <>
@@ -115,6 +135,11 @@ export default function MedinaBuildings({ planet, worldHalf }) {
       {data.stairCaps.length > 0 && <InstancedBoxes material={STAIR_CAP_MAT} items={data.stairCaps} cast={false} />}
       {data.stallBases.length > 0 && <InstancedBoxes material={STALL_MAT} items={data.stallBases} />}
       {data.awnings.length > 0 && <InstancedBoxes material={AWNING_MAT} items={data.awnings} cast={false} />}
+      {/* Iridescent night glow lining the alleys (additive, blooms after dusk). */}
+      {data.glow.length > 0 && <InstancedBoxes material={GLOW_MAT} items={data.glow} cast={false} />}
+      {/* Low cool/warm fill so alleys aren't pitch-black at night — medina-only (this whole
+          component renders nothing on non-urban planets). */}
+      <hemisphereLight ref={fillRef} args={['#a9c8ff', '#ffb583', 0]} />
     </>
   );
 }
