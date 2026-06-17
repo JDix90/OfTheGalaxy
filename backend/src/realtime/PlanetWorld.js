@@ -11,6 +11,7 @@
 
 const { generateRandomEnemy } = require('../data/enemyTemplates');
 const { resolveCast, resolveDodge, enemyTryAttack, buildEnemyActorCombatant, DISENGAGE_MS } = require('./combat');
+const { findPath } = require('../utils/gridPathfinder');
 
 const PALETTE = ['#ffcf5c', '#6cf0c2', '#7db8ff', '#ff8d6c', '#d18cff', '#9affa0', '#ff5a8a', '#5ad1ff'];
 const TWO_PI = Math.PI * 2;
@@ -20,6 +21,7 @@ const AGGRO_RADIUS = 16;   // world units: a player this close pulls an enemy in
 const LEASH = 24;          // enemies won't chase beyond this from home
 const PATROL_SPEED = 3.2;
 const CHASE_SPEED = 5.4;
+const REPATH_MS = 500;     // how often a chasing enemy re-solves its maze route to the player
 const STAMINA_REGEN = 3;     // stamina per second regenerated in-world (no rejoin-to-refill)
 const HEALTH_REGEN = 4;          // hp/sec regenerated OUT of combat (authoritative; flushed to DB)
 const OOC_REGEN_DELAY_MS = 5000; // wait this long after the last combat before health regen kicks in
@@ -436,6 +438,90 @@ class PlanetWorld {
     else if (this.sim.isWalkableWorld(e.x, e.z + mz)) { e.z += mz; }
   }
 
+  /** True if the straight world-space segment a→b stays on walkable ground (sampled ~1u apart). */
+  _lineOfSight(ax, az, bx, bz) {
+    const dx = bx - ax, dz = bz - az;
+    const steps = Math.max(1, Math.ceil(Math.hypot(dx, dz)));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      if (!this.sim.isWalkableWorld(ax + dx * t, az + dz * t)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Route steering: returns the world point an actor should head toward this tick to reach (tx,tz).
+   * On open ground or with clear line-of-sight it's the target itself (cheap, and the final approach).
+   * When buildings occlude it (the medina maze), it BFS-routes on the tile grid and steers to the next
+   * waypoint, so the actor rounds corners instead of grinding against a wall. The route is cached and
+   * only re-solved when the goal changes tile or every REPATH_MS. Shared by chase (target = player)
+   * and patrol (target = a wander point near home).
+   */
+  _routeSteer(e, tx, tz, now) {
+    if (!this.sim.hasTileMap || this._lineOfSight(e.x, e.z, tx, tz)) {
+      e._path = null;
+      return { x: tx, z: tz };
+    }
+    const ts = this.sim.tileSize, gs = this.sim.gridSize;
+    const toTile = (wx, wz) => {
+      const s = this.sim.worldToSurface(wx, wz);
+      return { x: Math.min(gs - 1, Math.max(0, Math.floor(s.x / ts))), y: Math.min(gs - 1, Math.max(0, Math.floor(s.y / ts))) };
+    };
+    const tileToWorld = (tile) => this.sim.surfaceToWorld((tile.x + 0.5) * ts, (tile.y + 0.5) * ts);
+    const startTile = toTile(e.x, e.z), goalTile = toTile(tx, tz);
+
+    if (!e._path || !e._pathGoal || e._pathGoal.x !== goalTile.x || e._pathGoal.y !== goalTile.y || (now - (e._pathAt || 0)) > REPATH_MS) {
+      const path = findPath((x, y) => this.sim.isWalkableSurface((x + 0.5) * ts, (y + 0.5) * ts), gs, startTile, goalTile);
+      e._path = path && path.length ? path : null;
+      e._pathGoal = goalTile; e._pathAt = now; e._pathIdx = 0;
+    }
+    if (!e._path) return { x: tx, z: tz }; // unreachable → straight (best effort)
+
+    // Pop waypoints we've effectively reached, then steer to the next.
+    const reach = ts * this.sim.scale * 0.6;
+    let wp = e._path[e._pathIdx];
+    while (wp) {
+      const w = tileToWorld(wp);
+      if (Math.hypot(w.x - e.x, w.z - e.z) <= reach) { e._pathIdx++; wp = e._path[e._pathIdx]; }
+      else break;
+    }
+    if (!wp) return { x: tx, z: tz };
+    const w = tileToWorld(wp);
+    return { x: w.x, z: w.z };
+  }
+
+  /** A reachable wander destination within ~patrolRadius of home (for natural alley roaming). */
+  _wanderPoint(e) {
+    const R = e.patrolRadius;
+    for (let i = 0; i < 12; i++) {
+      const a = Math.random() * TWO_PI;
+      const r = R * (0.45 + Math.random() * 0.85); // 0.45R..1.3R — varied, stays inside the leash
+      const x = e.home.x + Math.cos(a) * r, z = e.home.z + Math.sin(a) * r;
+      if (this.sim.isWalkableWorld(x, z)) return { x, z };
+    }
+    return { x: e.home.x, z: e.home.z };
+  }
+
+  /**
+   * Patrol steering: amble between reachable points near home, ROUTING through the alleys (via
+   * _routeSteer) and pausing briefly on arrival — like the ambient crowd. Replaces the old
+   * parametric circle that cut straight through medina buildings and left enemies grinding walls.
+   */
+  _patrolSteer(e, now) {
+    // Shoved too far from home (e.g. knockback) → route straight back before resuming the amble.
+    if (Math.hypot(e.x - e.home.x, e.z - e.home.z) > e.patrolRadius * 1.5) {
+      if (!e._wander || (e._wander.x !== e.home.x || e._wander.z !== e.home.z)) { e._wander = { x: e.home.x, z: e.home.z }; e._path = null; }
+      e._wanderPauseUntil = 0;
+    }
+    // Reached the current destination → start a short dwell, then pick a new one.
+    if (e._wander && Math.hypot(e.x - e._wander.x, e.z - e._wander.z) < 0.8) {
+      e._wander = null; e._path = null; e._wanderPauseUntil = now + 600 + Math.random() * 2200;
+    }
+    if (e._wanderPauseUntil && now < e._wanderPauseUntil) return { x: e.x, z: e.z }; // dwell in place
+    if (!e._wander) { e._wander = this._wanderPoint(e); e._path = null; }
+    return this._routeSteer(e, e._wander.x, e._wander.z, now);
+  }
+
   /** Enemy AI: chase the nearest in-range player, else patrol around home. Attacks in melee. */
   stepEnemies(dt, now) {
     if (this.enemies.size === 0) return;
@@ -454,24 +540,32 @@ class PlanetWorld {
       const passive = e.aggressive === false; // passive (unstruck tutorial drone) → patrol only
       const distHome = Math.hypot(e.x - e.home.x, e.z - e.home.z);
       let tx, tz, speed;
+      let patrolling = false;
       if (target && !passive && best < AGGRO_RADIUS && distHome < LEASH) {
-        e.state = 'chase'; e.targetId = target.id; tx = target.x; tz = target.z; speed = CHASE_SPEED;
-      } else if (distHome > e.patrolRadius * 1.5) {
-        e.state = 'patrol'; e.targetId = null; tx = e.home.x; tz = e.home.z; speed = PATROL_SPEED; // leash home
+        e.state = 'chase'; e.targetId = target.id; speed = CHASE_SPEED;
+        // Steer along a maze route when the player is occluded by buildings; head straight on open
+        // ground / clear line-of-sight (the common case, and the final approach).
+        const steer = this._routeSteer(e, target.x, target.z, now);
+        tx = steer.x; tz = steer.z;
       } else {
-        e.state = 'patrol'; e.targetId = null;
-        const a = e._t * 0.5 + e.phase;
-        tx = e.home.x + Math.cos(a) * e.patrolRadius;
-        tz = e.home.z + Math.sin(a) * e.patrolRadius;
-        speed = PATROL_SPEED;
+        e.state = 'patrol'; e.targetId = null; speed = PATROL_SPEED; patrolling = true;
+        // Amble between reachable points near home, routing through the alleys (not a circle that
+        // cuts through buildings).
+        const steer = this._patrolSteer(e, now);
+        tx = steer.x; tz = steer.z;
       }
       const dx = tx - e.x, dz = tz - e.z, dd = Math.hypot(dx, dz);
+      const bx = e.x, bz = e.z;
       if (dd > 0.15) {
         const ux = dx / dd, uz = dz / dd;
         e.facing = Math.atan2(ux, uz); // 0 = +Z (sim convention)
         const stp = speed * dt;
         this._tryMove(e, ux * stp, uz * stp);
       }
+      // Stuck against a wall while patrolling (no progress, not dwelling) → drop the destination so
+      // the next tick picks a fresh reachable one (mirrors the crowd's anti-grind guard).
+      if (patrolling && !(e._wanderPauseUntil && now < e._wanderPauseUntil) &&
+          Math.abs(e.x - bx) < 1e-4 && Math.abs(e.z - bz) < 1e-4) { e._wander = null; e._path = null; }
       // Attack when chasing a player in melee range (combat.js handles range/cooldown/death).
       if (e.state === 'chase' && target) enemyTryAttack(this, e, target, now);
     }
