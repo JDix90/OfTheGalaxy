@@ -70,11 +70,11 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
     return (row && row[tx]) || null;
   }
   const groundWalkable = (t) => !!t && t.walkable === true && !OBSTACLE_TILE_TYPES.has(t.type);
-  // Tiles you can stand ON at roof level: building tops, stair landings, and bridge decks. A
-  // 'bridge' is dual-level — ground-walkable below (you walk under it) AND a roof deck above (you
-  // cross it), connecting two same-height roofs over an alley.
-  const isRoofTile = (t) => !!t && (t.type === 'building' || t.type === 'stair' || t.type === 'bridge');
-  const storeysOf = (t) => (t && t.height) ? t.height : 0;
+  // Tiles you can stand ON at roof level: building tops, stair landings, bridge decks, and ramps. A
+  // 'bridge'/'ramp' is dual-level — ground-walkable below (you walk under it) AND a roof deck above.
+  // A 'bridge' connects two SAME-height roofs (flush); a 'ramp' slopes between DIFFERENT heights.
+  const isRoofTile = (t) => !!t && (t.type === 'building' || t.type === 'stair' || t.type === 'bridge' || t.type === 'ramp');
+  const storeysOf = (t) => (t && t.type === 'ramp') ? (t.y0 + t.y1) / 2 : ((t && t.height) ? t.height : 0);
 
   // Ground walkability (level 0) — the long-standing surface collision used by enemies, crowd,
   // pathfinding, and spawns. Unchanged: 'stair' tiles read as walkable, buildings as blocked.
@@ -93,6 +93,12 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
   function surfaceLevelY(sx, sy, level) {
     if (!level) return 0;
     const t = tileAt(sx, sy);
+    if (t && t.type === 'ramp') {
+      // Interpolate up the slope across the tile: y0 at the low-coord edge, y1 at the high-coord edge.
+      const tx = Math.floor(sx / tileSize), ty = Math.floor(sy / tileSize);
+      const f = t.axis === 'x' ? (sx / tileSize - tx) : (sy / tileSize - ty);
+      return (t.y0 + Math.max(0, Math.min(1, f)) * (t.y1 - t.y0)) * STORY;
+    }
     return (t && t.height ? t.height : 1) * STORY;
   }
 
@@ -119,6 +125,11 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
       return null;
     }
     // level 1 (on the rooftops)
+    // Ramps bridge different heights: allow roof↔ramp and ramp↔ramp freely (a ramp's only roof
+    // neighbours are its matched low/high ends — its sides are alley gaps, blocked below).
+    if ((toT.type === 'ramp' || (fromT && fromT.type === 'ramp')) && isRoofTile(toT)) {
+      return { x: toX, z: toZ, level: 1 };
+    }
     if (isRoofTile(toT) && fromT && Math.abs(storeysOf(toT) - storeysOf(fromT)) <= MAX_ROOF_STEP) {
       return { x: toX, z: toZ, level: 1 };
     }

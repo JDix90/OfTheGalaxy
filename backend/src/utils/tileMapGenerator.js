@@ -191,7 +191,7 @@ function placeSettlement(tileMap, planet, mapData, biomeKey) {
  * @param {number} tileSize - Size of each tile as percentage (default 2% = 50x50 grid)
  * @returns {Object} Tile map with walkable/obstacle information
  */
-function generateUrbanTileMap(mapData, tileSize = 2) {
+function generateUrbanTileMap(mapData, tileSize = 2, planet = {}) {
   const gridSize = Math.floor(100 / tileSize); // 50x50 grid for 2% tiles
   const tiles = [];
   const tileMap = { gridSize, tileSize, tiles, style: 'medina', settlement: true };
@@ -201,6 +201,12 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
   let seed = Math.abs((mapData.seed | 0) ||
     pois.reduce((s, p) => s + Math.floor((p.x || 0) * 31 + (p.y || 0) * 17), gridSize * 101)) || 12345;
   const rng = mulberry32(seed);
+
+  // Rooftop access (stairs + bridges) scales with population — a sprawling capital is a vertical
+  // playground; a small/rural urban world has only a few ways up (or nearly none).
+  const pop = Number(planet && planet.population) || 0;
+  const popTier = pop <= 0 ? 0.5 : Math.max(0.15, Math.min(1, (Math.log10(pop) - 4) / 6));
+  const accessFactor = 0.2 + 0.8 * popTier;
 
   // 1) Solid block of buildings to start.
   for (let y = 0; y < gridSize; y++) {
@@ -295,17 +301,17 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
     if (hasGround && hasRoof) stairCandidates.push({ x, y, h: t.height });
   }
   if (stairCandidates.length) {
-    const target = Math.min(20, Math.max(6, Math.round(stairCandidates.length * 0.06)));
+    const target = Math.round(Math.min(20, Math.max(6, stairCandidates.length * 0.06)) * accessFactor);
     const p = target / stairCandidates.length;
     for (const c of stairCandidates) {
       if (rng() < p) tiles[c.y][c.x] = { type: 'stair', walkable: true, visual: 'stair', height: c.h };
     }
   }
 
-  // 7.5) Rooftop bridges: span a 2-wide alley between two SAME-HEIGHT building roofs so the flush
-  // roof network reconnects across the city. A 'bridge' tile stays ground-walkable (you pass under
-  // it) and becomes a roof deck at the buildings' height (you cross it) — see the sim's isRoofTile.
-  const bridgePlans = [];
+  // 7.5) Rooftop spans across a 2-wide alley between two building roofs — reconnecting the flush roof
+  // network across the city. A 'bridge' joins SAME-height roofs (flush deck); a 'ramp' SLOPES between
+  // roofs 1-2 storeys apart. Both stay ground-walkable (you pass under) and become a roof deck above.
+  const bridgePlans = [], rampPlans = [];
   for (let y = 1; y < gridSize - 1; y++) for (let x = 1; x < gridSize - 1; x++) {
     const t = tiles[y][x];
     if (t.type !== 'building' || !t.height) continue;
@@ -314,23 +320,40 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
       const c2 = tiles[y + 2 * dy] && tiles[y + 2 * dy][x + 2 * dx];
       const far = tiles[y + 3 * dy] && tiles[y + 3 * dy][x + 3 * dx];
       const street = (c) => c && c.walkable && (c.type === 'street' || c.type === 'plaza');
-      if (street(c1) && street(c2) && far && far.type === 'building' && far.height === t.height) {
-        bridgePlans.push({ cells: [[x + dx, y + dy], [x + 2 * dx, y + 2 * dy]], h: t.height });
+      if (!(street(c1) && street(c2) && far && far.type === 'building' && far.height)) continue;
+      const cells = [[x + dx, y + dy], [x + 2 * dx, y + 2 * dy]];
+      if (far.height === t.height) {
+        bridgePlans.push({ cells, h: t.height });
+      } else if (Math.abs(far.height - t.height) <= 2) {
+        // slope from this building's roof (nearH, at the lower-coord side) up/down to far (farH)
+        rampPlans.push({ cells, axis: dx ? 'x' : 'z', nearH: t.height, farH: far.height });
       }
     }
   }
-  if (bridgePlans.length) {
-    const bridged = new Set();
-    const target = Math.min(22, Math.max(4, Math.round(bridgePlans.length * 0.2)));
-    const stride = Math.max(1, Math.floor(bridgePlans.length / target));
+  const spanTaken = new Set();
+  const placeSampled = (plans, makeTiles) => {
+    if (!plans.length) return;
+    const target = Math.round(Math.min(22, Math.max(4, plans.length * 0.2)) * accessFactor);
+    if (target <= 0) return;
+    const stride = Math.max(1, Math.floor(plans.length / target));
     let placed = 0;
-    for (let i = 0; i < bridgePlans.length && placed < target; i += stride) {
-      const plan = bridgePlans[i];
-      if (plan.cells.some(([cx, cy]) => bridged.has(cx + ',' + cy))) continue;
-      for (const [cx, cy] of plan.cells) { tiles[cy][cx] = { type: 'bridge', walkable: true, visual: 'bridge', height: plan.h }; bridged.add(cx + ',' + cy); }
+    for (let i = 0; i < plans.length && placed < target; i += stride) {
+      const plan = plans[i];
+      if (plan.cells.some(([cx, cy]) => spanTaken.has(cx + ',' + cy))) continue;
+      makeTiles(plan);
+      for (const [cx, cy] of plan.cells) spanTaken.add(cx + ',' + cy);
       placed++;
     }
-  }
+  };
+  placeSampled(bridgePlans, (plan) => {
+    for (const [cx, cy] of plan.cells) tiles[cy][cx] = { type: 'bridge', walkable: true, visual: 'bridge', height: plan.h };
+  });
+  placeSampled(rampPlans, (plan) => {
+    const mid = (plan.nearH + plan.farH) / 2;
+    const [a, b] = plan.cells; // a is nearer the base building (lower coord), b nearer far
+    tiles[a[1]][a[0]] = { type: 'ramp', walkable: true, visual: 'ramp', axis: plan.axis, y0: plan.nearH, y1: mid };
+    tiles[b[1]][b[0]] = { type: 'ramp', walkable: true, visual: 'ramp', axis: plan.axis, y0: mid, y1: plan.farH };
+  });
 
   // 8) Market stalls at plaza corners (small obstacles; the plaza centre stays passable).
   plazas.forEach(pl => {
@@ -1262,7 +1285,9 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 // v5: building blocks carry a `block` id + tileMap.settlement flag (for the stationed-NPC ecology).
 // v6: every biome gets a fitting built-up settlement (per-terrain layout/population/bustle).
 // v7: medina gains rooftop 'bridge' tiles (cross same-height roofs over the alleys).
-const TILEMAP_VERSION = 7;
+// v8: rooftop access (stairs+bridges) scales with population (rural = fewer).
+// v9: ramped spans connect adjacent DIFFERENT-height roofs.
+const TILEMAP_VERSION = 9;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);
@@ -1276,7 +1301,7 @@ function _dispatchTileMapByPlanetType(planet, mapData, tileSize = 2) {
 
   // Urban planets
   if (planetType === 'urban' || terrain === 'urban_sprawl') {
-    return generateUrbanTileMap(mapData, tileSize);
+    return generateUrbanTileMap(mapData, tileSize, planet);
   }
 
   // Desert planets — natural terrain with a built-up outpost settlement around the spaceport.
@@ -1311,7 +1336,7 @@ function _dispatchTileMapByPlanetType(planet, mapData, tileSize = 2) {
 
   // Default: use urban for unknown types (fallback)
   console.warn(`[Tile Map] Unknown planet type: ${planetType}, terrain: ${terrain}, using urban generator`);
-  return generateUrbanTileMap(mapData, tileSize);
+  return generateUrbanTileMap(mapData, tileSize, planet);
 }
 
 module.exports = {
