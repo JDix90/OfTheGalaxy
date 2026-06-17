@@ -238,6 +238,10 @@ function generateCityMap(planet, parentLocationId, variant = 'medium', seed) {
 /**
  * Generate spaceport sub-map
  */
+// Bump when the spaceport layout shape changes so getSubMapById can re-furnish older,
+// already-persisted spaceport submaps in place (v1 = the original empty plaza).
+const SPACEPORT_LAYOUT_VERSION = 2;
+
 function generateSpaceportMap(planet, parentLocationId, variant = 'medium', seed) {
   const random = seededRandom(seed);
   const size = variant === 'small' ? { width: 10, height: 10 } :
@@ -395,6 +399,7 @@ function generateSpaceportMap(planet, parentLocationId, variant = 'medium', seed
     width: size.width,
     height: size.height,
     gridSize: 40,
+    spaceportVersion: SPACEPORT_LAYOUT_VERSION,
     zones,
     buildings,
     furniture,
@@ -902,6 +907,9 @@ async function generateSubMap({ planet, parentLocationId, parentLocationType, ty
 }
 
 module.exports = {
-  generateSubMap
+  generateSubMap,
+  generateSpaceportMap,
+  getSeed,
+  SPACEPORT_LAYOUT_VERSION,
 };
 
