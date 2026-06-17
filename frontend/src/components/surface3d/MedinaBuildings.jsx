@@ -46,10 +46,16 @@ const CYBER_WALL = {
   restaurant: '#52505b', civic: '#6b7079', warehouse: '#44474d',
 };
 const CYBER_GLOW = {
-  apartment: '#6fc8ff', shop: '#ff4fd8', market: '#3ffbe0', bar: '#ff2e88',
-  restaurant: '#ff8a3d', civic: '#9b8cff', warehouse: '#39e0c8',
+  apartment: '#7fd4ff', shop: '#ff5ee0', market: '#4dffe6', bar: '#ff3d96',
+  restaurant: '#ff9a4d', civic: '#ab9cff', warehouse: '#4dffd8',
 };
 const CYBER_WALL_C = toColorMap(CYBER_WALL), CYBER_GLOW_C = toColorMap(CYBER_GLOW);
+
+// Walkable "paving" so the navigable ground is obvious in EVERY biome — fixes the ocean case where
+// the navy water-coloured ground read as water. A thin coloured deck/road on each street/plaza tile,
+// clearly distinct from impassable terrain (water/rock) and from the buildings.
+const BIOME_PAVING = { medina: '#26282d', outpost: '#c2a878', hamlet: '#6a5236', docks: '#6b6960', dome_colony: '#b9c6d2', mining_camp: '#3e3833', scrap_town: '#6f6354' };
+const PAVING_MAT = new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0 });
 
 // Per-biome look, keyed on tileMap.style (set by the settlement generators). The per-use wall/glow
 // colours are blended toward the biome's base so each world reads distinctly — sandstone outpost,
@@ -122,8 +128,11 @@ function buildMedina(planet, worldHalf) {
     }
   }
   const fill = BIOME_FILL[biome] || BIOME_FILL.medina;
+  // Paving shades (a little variation so the floor isn't a flat sheet).
+  const pavingBase = new THREE.Color(BIOME_PAVING[biome] || '#3a3a3a');
+  const pavingShades = [pavingBase, pavingBase.clone().multiplyScalar(1.07), pavingBase.clone().multiplyScalar(0.93)];
 
-  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [];
+  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [], paving = [];
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
     if (!row) continue;
@@ -178,11 +187,15 @@ function buildMedina(planet, worldHalf) {
         const sw = tileW * 0.7;
         stallBases.push({ x: wx, z: wz, w: sw, d: sw, h: 1.1 });
         awnings.push({ x: wx, z: wz, w: tileW * 0.92, d: tileW * 0.92, h: 0.18, y: 1.25, color: STALL_AWNINGS[(t.stallStyle || 0) % STALL_AWNINGS.length] });
+      } else if (t.walkable && (t.type === 'street' || t.type === 'plaza')) {
+        // Pave the navigable floor so it's unmistakably walkable (a road/deck), not terrain/water.
+        paving.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.05, y: 0.02, color: pavingShades[hashTile(tx, ty) % 3] });
       }
     }
   }
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
-  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, fillSky: fill[0], fillGround: fill[1] };
+  const glowOpacity = biome === 'medina' ? 1.0 : 0.8; // medina = punchier neon
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, glowOpacity, fillSky: fill[0], fillGround: fill[1] };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
@@ -193,12 +206,14 @@ export default function MedinaBuildings({ planet, worldHalf }) {
   // no re-render). By day both are off, so the medina looks normal; after dusk the city lights up.
   useFrame(() => {
     const night = (atmo && atmo.current && atmo.current.nightFactor) || 0;
-    GLOW_MAT.opacity = night * 0.85;
+    GLOW_MAT.opacity = night * ((data && data.glowOpacity) || 0.85);
     if (fillRef.current) fillRef.current.intensity = night * 0.5;
   });
   if (!data) return null;
   return (
     <>
+      {/* Paved navigable floor — drawn first so everything else sits on it. */}
+      {data.paving.length > 0 && <InstancedBoxes material={PAVING_MAT} items={data.paving} cast={false} />}
       {data.buildings.length > 0 && <InstancedBoxes material={BLDG_MAT} items={data.buildings} />}
       {data.stairs.length > 0 && <InstancedBoxes material={BLDG_MAT} items={data.stairs} />}
       {data.stairCaps.length > 0 && <InstancedBoxes material={STAIR_CAP_MAT} items={data.stairCaps} cast={false} />}
