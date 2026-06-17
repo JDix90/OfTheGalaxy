@@ -103,13 +103,13 @@ describe('urban medina generator', () => {
     expect(reachableNear(seen, tm, Math.floor(md.spaceport.x / ts), Math.floor(md.spaceport.y / ts))).toBe(true);
   });
 
-  it('tags building tiles with a render height (1-4 storeys) and a style', () => {
+  it('tags building tiles with a render height (1-5 storeys) and a style', () => {
     const tm = generateUrbanTileMap(sampleMap());
     const heights = new Set();
     for (const row of tm.tiles) for (const t of row) {
       if (t.type === 'building') {
         expect(t.height).toBeGreaterThanOrEqual(1);
-        expect(t.height).toBeLessThanOrEqual(4);
+        expect(t.height).toBeLessThanOrEqual(5); // apartment towers reach 5 storeys
         expect(t.style).toBeGreaterThanOrEqual(0);
         heights.add(t.height);
       }
