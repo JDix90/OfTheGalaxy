@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCharacterStore } from '../../state/characterSlice';
 import fastTravelApi from '../../services/api/fastTravelApi';
+import { characterApi } from '../../services/api/characterApi';
 import { notify } from '../hud/NotificationCenter';
 import './FastTravelMenu.css';
 
@@ -61,7 +62,6 @@ export default function FastTravelMenu({ planet, isOpen, onClose }) {
         });
 
         // Reload character to get updated location
-        const { characterApi } = require('../../services/api/characterApi');
         const charResponse = await characterApi.getById(currentCharacter.id);
         const updatedCharacter = charResponse.data || charResponse;
         setCurrentCharacter(updatedCharacter);

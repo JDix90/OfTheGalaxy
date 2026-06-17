@@ -11,6 +11,7 @@ import { useCharacterStore } from '../../state/characterSlice';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import MoralAlignmentBadge from './MoralAlignmentBadge';
+import { formatDisplayName } from '../../utils/formatName';
 import './QuestOfferModal.css';
 
 export default function QuestOfferModal({ isOpen, onClose, questId, npcName, onQuestAccepted }) {
@@ -185,7 +186,7 @@ export default function QuestOfferModal({ isOpen, onClose, questId, npcName, onQ
                       className={isPreCompleted ? 'objective-completed' : ''}
                     >
                       {isPreCompleted && <span className="objective-check">✓</span>}
-                      {objective.description || objective.type}
+                      {objective.description || formatDisplayName(objective.type)}
                     </li>
                   );
                 })}

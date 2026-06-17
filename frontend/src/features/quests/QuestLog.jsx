@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { useQuestStore } from '../../state/questSlice';
 import { useCharacterStore } from '../../state/characterSlice';
+import { getFactionDisplayName } from '../../utils/factionNames';
 import './QuestLog.css';
 
 export default function QuestLog() {
@@ -87,7 +88,7 @@ export default function QuestLog() {
             <div className="quest-header">
               <h4>{quest.title}</h4>
               {quest.factionId && (
-                <span className="quest-faction">{quest.factionId}</span>
+                <span className="quest-faction">{getFactionDisplayName(quest.factionId)}</span>
               )}
             </div>
             <p className="quest-short-desc">{quest.shortDescription}</p>
@@ -125,7 +126,7 @@ export default function QuestLog() {
         <div className="quest-meta">
           {quest.factionId && (
             <span className="meta-item">
-              <strong>Faction:</strong> {quest.factionId}
+              <strong>Faction:</strong> {getFactionDisplayName(quest.factionId)}
             </span>
           )}
           {quest.difficulty && (

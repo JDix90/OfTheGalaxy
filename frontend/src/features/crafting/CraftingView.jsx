@@ -9,6 +9,7 @@ import { useCharacterStore } from '../../state/characterSlice';
 import { useInventoryStore } from '../../state/inventorySlice';
 import { craftingApi } from '../../services/api/craftingApi';
 import { getRarityColor, getRarityName } from '../../utils/itemRarity';
+import { formatDisplayName } from '../../utils/formatName';
 import { notify } from '../../components/hud/NotificationCenter';
 import CraftingSuccessTooltip from '../../components/tooltips/CraftingSuccessTooltip';
 import './CraftingView.css';
@@ -311,10 +312,10 @@ export default function CraftingView() {
                       </div>
                       <div className="item-card-info">
                         <span className={`item-rarity rarity-${itemRarity}`}>
-                          {itemRarity}
+                          {getRarityName(itemRarity)}
                         </span>
                         {itemType && (
-                          <span className="item-type">{itemType}</span>
+                          <span className="item-type">{formatDisplayName(itemType)}</span>
                         )}
                       </div>
                     </div>
@@ -437,8 +438,8 @@ export default function CraftingView() {
                   <div className="recipe-section">
                     <h4>Skill Requirement</h4>
                     <p>
-                      {selectedRecipe.skillRequirement.skillId} Level {selectedRecipe.skillRequirement.level} 
-                      {' '}in {selectedRecipe.skillRequirement.tree} tree
+                      {formatDisplayName(selectedRecipe.skillRequirement.skillId)} Level {selectedRecipe.skillRequirement.level}
+                      {' '}in {formatDisplayName(selectedRecipe.skillRequirement.tree)} tree
                     </p>
                   </div>
                 )}

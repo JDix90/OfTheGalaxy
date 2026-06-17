@@ -14,7 +14,7 @@ import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import QuestList from '../quest/QuestList';
 import './NPCInteractionMenu.css';
 
-export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTalk, onAttack, position }) {
+export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTalk, onAttack, onShop, position }) {
   const navigate = useNavigate();
   const { currentCharacter } = useCharacterStore();
   const [showQuestList, setShowQuestList] = useState(false);
@@ -72,8 +72,16 @@ export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTal
       alert('No character selected');
       return;
     }
-    
-    // Navigate to trading view
+
+    // 3D hosts pass onShop to open the vendor as an in-world overlay (no navigation,
+    // the live scene stays mounted). Legacy 2D pages omit it and fall back to the
+    // full-page /game/vendor route.
+    if (onShop) {
+      onShop(npc);
+      onClose();
+      return;
+    }
+
     navigate(`/game/vendor/${npc.id}`);
     onClose(); // Close the interaction menu
   };

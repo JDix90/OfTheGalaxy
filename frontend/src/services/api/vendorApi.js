@@ -73,6 +73,34 @@ export const vendorApi = {
       itemId,
       quantity
     });
+  },
+
+  /**
+   * Get buyback list (items the character previously sold to this vendor)
+   * @param {string} npcId - NPC ID
+   * @param {string} characterId - Character UUID
+   * @returns {Promise} API response
+   */
+  getBuyback: async (npcId, characterId) => {
+    return apiClient.get(`/vendors/${npcId}/buyback`, {
+      params: { characterId }
+    });
+  },
+
+  /**
+   * Buy back a previously-sold item at the price it was sold for
+   * @param {string} npcId - NPC ID
+   * @param {string} characterId - Character UUID
+   * @param {string} itemId - Item ID
+   * @param {number} quantity - Quantity
+   * @returns {Promise} API response
+   */
+  buybackItem: async (npcId, characterId, itemId, quantity = 1) => {
+    return apiClient.post(`/vendors/${npcId}/buyback`, {
+      characterId,
+      itemId,
+      quantity
+    });
   }
 };
 

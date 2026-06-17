@@ -96,6 +96,14 @@ module.exports = (sequelize) => {
       type: DataTypes.DATE,
       allowNull: true,
       field: 'last_quest_offer'
+    },
+    // Per-vendor buyback ledger: items the player sold to this NPC, repurchasable
+    // at the price they were sold for. Newest first, capped length.
+    // Entry shape: { itemId, quantity, unitPrice, soldAt }
+    buybackItems: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+      field: 'buyback_items'
     }
   }, {
     tableName: 'npc_relationships',

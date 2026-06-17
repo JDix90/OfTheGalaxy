@@ -212,8 +212,10 @@ export const useQuestStore = create((set, get) => ({
         // Use dynamic import to avoid circular dependency
         import('../services/api/characterApi').then(({ characterApi }) => {
           characterApi.getById(characterId)
-            .then(response => {
-              const { useCharacterStore } = require('./characterSlice');
+            .then(async (response) => {
+              // Dynamic import (not require) — keeps the circular-dependency break
+              // while staying valid in the browser ESM bundle.
+              const { useCharacterStore } = await import('./characterSlice');
               const { setCurrentCharacter } = useCharacterStore.getState();
               const updated = response.data || response;
               if (setCurrentCharacter && updated) {
@@ -297,8 +299,10 @@ export const useQuestStore = create((set, get) => ({
         // Use dynamic import to avoid circular dependency
         import('../services/api/characterApi').then(({ characterApi }) => {
           characterApi.getById(characterId)
-            .then(response => {
-              const { useCharacterStore } = require('./characterSlice');
+            .then(async (response) => {
+              // Dynamic import (not require) — keeps the circular-dependency break
+              // while staying valid in the browser ESM bundle.
+              const { useCharacterStore } = await import('./characterSlice');
               const { setCurrentCharacter } = useCharacterStore.getState();
               const updated = response.data || response;
               if (setCurrentCharacter && updated) {

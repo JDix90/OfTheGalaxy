@@ -210,7 +210,7 @@ export default function ExplorationJournal() {
                   <div className="planet-breakdown">
                     {Object.entries(stats.byPlanet || {}).map(([planetId, count]) => (
                       <div key={planetId} className="planet-item">
-                        <span className="planet-name">{planetId}</span>
+                        <span className="planet-name">{formatDisplayName(planetId)}</span>
                         <span className="planet-count">{count}</span>
                       </div>
                     ))}
@@ -227,7 +227,7 @@ export default function ExplorationJournal() {
                   >
                     <option value="">All Planets</option>
                     {uniquePlanets.map(planetId => (
-                      <option key={planetId} value={planetId}>{planetId}</option>
+                      <option key={planetId} value={planetId}>{formatDisplayName(planetId)}</option>
                     ))}
                   </select>
                 </div>
@@ -285,7 +285,7 @@ export default function ExplorationJournal() {
                         )}
                       </div>
                       <div className="discovery-details">
-                        <span className="discovery-planet">{discovery.planetId}</span>
+                        <span className="discovery-planet">{formatDisplayName(discovery.planetId)}</span>
                         <span className="discovery-type">{getLocationTypeLabel(discovery.locationType)}</span>
                         <span className="discovery-date">{formatDate(discovery.discoveredAt)}</span>
                       </div>
@@ -375,7 +375,7 @@ export default function ExplorationJournal() {
                         )}
                       </div>
                       <div className="discovery-details">
-                        <span className="discovery-planet">{discovery.planetId}</span>
+                        <span className="discovery-planet">{formatDisplayName(discovery.planetId)}</span>
                         <span className="discovery-type">{getLocationTypeLabel(discovery.locationType)}</span>
                         <span className="discovery-date">{formatDate(discovery.discoveredAt)}</span>
                       </div>

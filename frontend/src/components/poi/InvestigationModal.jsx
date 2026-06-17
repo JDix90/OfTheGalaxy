@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { formatDisplayName } from '../../utils/formatName';
 import './InvestigationModal.css';
 
 export default function InvestigationModal({ isOpen, onClose, poi, lore }) {
@@ -19,7 +20,7 @@ export default function InvestigationModal({ isOpen, onClose, poi, lore }) {
         <div className="investigation-modal-content">
           <div className="poi-type-badge">
             <span className="poi-type-label">Type:</span>
-            <span className="poi-type-value">{poi.type || 'Unknown'}</span>
+            <span className="poi-type-value">{poi.type ? formatDisplayName(poi.type) : 'Unknown'}</span>
           </div>
           <div className="lore-description">
             <h3>Investigation Results</h3>

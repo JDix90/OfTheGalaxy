@@ -49,7 +49,7 @@ const getFactionDisplayName = (factionId) => {
   return displayNames[factionId] || factionId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 };
 
-export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
+export default function DialogueInterface({ npc, onClose, autoSendMessage, onShop }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentCharacter } = useCharacterStore();
@@ -936,7 +936,7 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
       
       console.log('[Dialogue] Navigating to vendor interface:', { npcId: npc.id, vendorId, isTutorialNPC, path: `/game/vendor/${vendorId}` });
       
-      // Emit tutorial event for vendor opened BEFORE navigation
+      // Emit tutorial event for vendor opened BEFORE opening
       if (isTutorialNPC) {
         tutorialEventBus.emit(TUTORIAL_EVENTS.UI_OPENED_VENDOR, {
           npcId: npc.id,
@@ -944,9 +944,15 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
           characterId: currentCharacter?.id
         });
       }
-      
-      // Navigate to vendor interface
-      navigate(`/game/vendor/${vendorId}`);
+
+      // In a 3D host, open the vendor as an in-world overlay (no navigation, scene
+      // stays mounted); legacy 2D pages omit onShop and fall back to the route.
+      if (onShop) {
+        onShop(npc);
+        onClose?.();
+      } else {
+        navigate(`/game/vendor/${vendorId}`);
+      }
     } else {
       // Default: send the message text
       console.log('[Dialogue] No special action, sending message text:', suggestion.text);
@@ -1134,7 +1140,8 @@ export default function DialogueInterface({ npc, onClose, autoSendMessage }) {
           <button
             className="btn-primary shop-button"
             onClick={() => {
-              navigate(`/game/vendor/${npc.id}`);
+              if (onShop) { onShop(npc); onClose?.(); }
+              else navigate(`/game/vendor/${npc.id}`);
             }}
           >
             🛒 Shop

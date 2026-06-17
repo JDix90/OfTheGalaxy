@@ -18,9 +18,13 @@ router.get('/:npcId', vendorController.getVendorInventory);
 router.get('/:npcId/buy/:itemId', vendorController.getBuyPrice);
 router.get('/:npcId/sell/:itemId', vendorController.getSellPrice);
 
+// Buyback (items the character previously sold here)
+router.get('/:npcId/buyback', vendorController.getBuyback);
+
 // Trading operations
 router.post('/:npcId/buy', vendorController.buyItem);
 router.post('/:npcId/sell', vendorController.sellItem);
+router.post('/:npcId/buyback', vendorController.buybackItem);
 
 module.exports = router;
 

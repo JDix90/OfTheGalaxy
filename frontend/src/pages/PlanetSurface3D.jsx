@@ -38,6 +38,7 @@ import SubMapEntryMenu from '../components/submap/SubMapEntryMenu';
 import POIInteractionMenu from '../components/poi/POIInteractionMenu';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import DialogueInterface from '../features/dialogue/DialogueInterface';
+import VendorPanel from '../features/trading/VendorPanel';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 
@@ -61,6 +62,7 @@ export default function PlanetSurface3D() {
   const [poiMenu, setPoiMenu] = useState(null);     // { poi, x, y } (click; modal)
   const [npcMenu, setNpcMenu] = useState(null);     // { npc, x, y } (click; modal)
   const [selectedNPC, setSelectedNPC] = useState(null);
+  const [vendorNpc, setVendorNpc] = useState(null); // vendor NPC for the in-world trading overlay
 
   const inputEnabledRef = useRef(true);
   const questSpawnReqRef = useRef(new Map()); // (quest:objective) -> last-requested ts (retry w/ cooldown)
@@ -155,7 +157,7 @@ export default function PlanetSurface3D() {
   );
 
   // Modal menus block movement; the passive proximity prompt does not.
-  const modalOpen = !!(poiMenu || npcMenu || selectedNPC);
+  const modalOpen = !!(poiMenu || npcMenu || selectedNPC || vendorNpc);
   useEffect(() => {
     inputEnabledRef.current = !modalOpen;
     if (modalOpen) {
@@ -378,12 +380,21 @@ export default function PlanetSurface3D() {
           onClose={() => setNpcMenu(null)}
           onTalk={() => { setSelectedNPC(npcMenu.npc); setNpcMenu(null); }}
           onAttack={onAttackNpc}
+          onShop={(n) => { setVendorNpc(n); setNpcMenu(null); }}
           position={{ x: npcMenu.x, y: npcMenu.y }}
         />
       )}
 
       {selectedNPC && !npcMenu && (
-        <DialogueInterface npc={selectedNPC} onClose={() => setSelectedNPC(null)} />
+        <DialogueInterface
+          npc={selectedNPC}
+          onClose={() => setSelectedNPC(null)}
+          onShop={(n) => { setVendorNpc(n); setSelectedNPC(null); }}
+        />
+      )}
+
+      {vendorNpc && (
+        <VendorPanel npc={vendorNpc} npcId={vendorNpc.id} onClose={() => setVendorNpc(null)} />
       )}
 
       {/* Combat HUD (Phase 4.3/4.4) — health bar + ability hotbar (online only). */}

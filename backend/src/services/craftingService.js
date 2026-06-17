@@ -8,6 +8,7 @@ const { getRecipe, getAvailableRecipes } = require('../data/craftingRecipes');
 const inventoryService = require('./inventoryService');
 const { getItemDefinition } = require('../data/items');
 const { ProgressionSystem } = require('../utils/progressionSystem');
+const { getSkillDefinition } = require('../data/skills');
 
 class CraftingService {
   /**
@@ -43,9 +44,14 @@ class CraftingService {
       const skill = treeSkills[skillId];
       
       if (!skill || skill.level < level) {
+        // Show the skill's natural-language name ("Advanced Weapons") instead of
+        // the raw "advanced_weapons" / "combat" ids in the requirement message.
+        const skillName = getSkillDefinition(tree, skillId)?.name
+          || skillId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+        const treeName = tree.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
         return {
           canCraft: false,
-          reason: `Requires ${skillId} level ${level} in ${tree} tree`
+          reason: `Requires ${skillName} level ${level} in the ${treeName} tree`
         };
       }
     }

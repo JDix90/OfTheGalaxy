@@ -1,0 +1,179 @@
+/**
+ * VendorPanel — in-world overlay chrome.
+ *
+ * Reuses the inner trading classes from TradingView.css (item cards, price quote,
+ * tabs, breakdown) but swaps the full-page wrapper for a right-docked panel that
+ * floats over the live, dimmed 3D scene — so the merchant model stays visible
+ * center-left and the world reads as "soft-paused" behind the panel.
+ */
+
+/* Dim/blur scrim between the canvas and the panel (the "soft-pause" feel). */
+.vendor-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 14, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 1003;
+  animation: vendor-scrim-in 0.18s ease-out;
+}
+
+@keyframes vendor-scrim-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Right-docked column. DialogueInterface owns the bottom edge, so docking right
+   avoids a clash and keeps the vendor NPC visible. */
+.vendor-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(560px, 46vw);
+  z-index: 1004;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem 1.75rem;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, rgba(26, 31, 46, 0.97) 0%, rgba(22, 33, 62, 0.97) 100%);
+  border-left: 3px solid var(--primary-color);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: vendor-panel-in 0.22s ease-out;
+}
+
+@keyframes vendor-panel-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Narrow dock → always single column (overrides the route's two-column grid). */
+.vendor-panel .trading-panels {
+  grid-template-columns: 1fr;
+}
+
+/* Header tuned for the panel (the shared .trading-header still provides the frame). */
+.vendor-panel .vendor-panel-header {
+  margin-bottom: 1.25rem;
+  align-items: flex-start;
+}
+
+.vendor-panel-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+/* Standing meter (per-NPC relationship + faction tier). */
+.vendor-standing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.standing-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.standing-tier {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+}
+
+.standing-bar {
+  flex: 1;
+  max-width: 140px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.standing-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), #6ee79a);
+  transition: width 0.3s ease;
+}
+
+.vendor-greeting {
+  margin: 0.7rem 0 0 0;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Stock states on the buy list. */
+.item-card.out-of-stock {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.item-quantity.stock-low { color: #ffce6b; }
+.item-quantity.stock-out { color: var(--error-color); }
+
+/* Quantity stepper. */
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qty-btn:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.item-description-trade {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* On narrow screens, take the full width. */
+@media (max-width: 768px) {
+  .vendor-panel {
+    width: 100vw;
+    border-left: none;
+    border-top: 3px solid var(--primary-color);
+  }
+}
+
+/* Legacy full-page route wrapper (TradingView.jsx adapter). */
+.trading-view-route {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 2rem;
+}

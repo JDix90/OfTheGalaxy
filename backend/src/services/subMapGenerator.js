@@ -796,10 +796,14 @@ async function generateSubMap({ planet, parentLocationId, parentLocationType, ty
       layout = generateCityMap(planet, parentLocationId, variant, seed);
   }
 
+  // Natural-language labels so generated names/descriptions don't surface raw
+  // ids like "building_interior" / "medical_center_123" to the player.
+  const titleCase = (s) => String(s).replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+
   // Generate metadata
   let metadata = {
-    description: `${type} sub-map for ${parentLocationId} on ${planet.name}`,
-    lore: `A ${type} location on ${planet.name}`,
+    description: `${titleCase(type)} sub-map for ${titleCase(parentLocationId)} on ${planet.name}`,
+    lore: `A ${titleCase(type)} location on ${planet.name}`,
     faction: planet.factionControl || null,
     dangerLevel: planet.dangerLevel || 1,
     restrictions: {}
@@ -829,7 +833,7 @@ async function generateSubMap({ planet, parentLocationId, parentLocationType, ty
 
   return {
     id,
-    name: `${parentLocationId} ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+    name: `${titleCase(parentLocationId)} ${titleCase(type)}`,
     type,
     template: variant,
     layout,

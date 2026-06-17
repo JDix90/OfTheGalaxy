@@ -12,6 +12,7 @@ import { useQuestStore } from '../../state/questSlice';
 import poiApi from '../../services/api/poiApi';
 import { notify } from '../hud/NotificationCenter';
 import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
+import { formatDisplayName } from '../../utils/formatName';
 import InvestigationModal from './InvestigationModal';
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
@@ -189,7 +190,7 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
         if (credited.length > 0 || granted.length > 0) {
           const anyComplete = credited.some(o => o.completed);
           const found = granted.length > 0
-            ? `Found ${granted.map(i => `${i.count}× ${String(i.itemId).replace(/_/g, ' ')}`).join(', ')}`
+            ? `Found ${granted.map(i => `${i.count}× ${i.name || formatDisplayName(i.itemId)}`).join(', ')}`
             : null;
           notify({
             type: 'success',
@@ -346,10 +347,13 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
         } else if (actionType === 'harvest' && data.rewards) {
           // Show harvest results
           const itemCount = data.rewards.items?.length || 0;
-          const itemNames = data.rewards.items?.map(item => {
-            const itemDef = require('../../data/items').find(i => i.id === item.itemId);
-            return `${item.quantity}x ${itemDef?.name || item.itemId}`;
-          }).join(', ') || 'resources';
+          // The backend's `data.message` already lists resources by name and
+          // takes precedence below; this is a defensive fallback. (Note: there is
+          // no frontend item catalog to look names up in — a CommonJS require here
+          // throws in the browser bundle — so format the id directly.)
+          const itemNames = data.rewards.items?.map(item =>
+            `${item.quantity}x ${item.name || formatDisplayName(item.itemId)}`
+          ).join(', ') || 'resources';
           
           notify({
             type: 'success',
