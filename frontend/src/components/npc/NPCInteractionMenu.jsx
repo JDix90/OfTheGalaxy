@@ -11,6 +11,7 @@ import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTarg
 import { tutorialEventBus, TUTORIAL_EVENTS } from '../../services/tutorialEventBus';
 import { notify } from '../hud/NotificationCenter';
 import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
+import { Z } from '../hud/hudTokens';
 import QuestList from '../quest/QuestList';
 import './NPCInteractionMenu.css';
 
@@ -150,7 +151,7 @@ export default function NPCInteractionMenu({ npc, planet, isOpen, onClose, onTal
         position: 'fixed',
         left: `${position.x}px`,
         top: `${position.y}px`,
-        zIndex: 1000
+        zIndex: Z.CONTEXT_MENUS
       }}
       onClick={(e) => e.stopPropagation()}
     >

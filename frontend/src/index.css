@@ -1,3 +1,5 @@
+@import './components/hud/hud-tokens.css';
+
 /* Global Styles */
 * {
   margin: 0;

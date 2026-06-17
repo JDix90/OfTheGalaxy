@@ -22,7 +22,10 @@ import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import DungeonScene from '../components/submap3d/DungeonScene';
 import HUD from '../components/hud/HUD';
 import CombatToasts from '../components/hud/CombatToasts';
-import ConsumableQuickslot from '../components/hud/ConsumableQuickslot';
+import ActionCluster from '../components/hud/ActionCluster';
+import LowHpVignette from '../components/hud/LowHpVignette';
+import HitFlash from '../components/hud/HitFlash';
+import { Z } from '../components/hud/hudTokens';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 
 useGLTF.preload(CHARACTER_GLTF_URLS[0]);
@@ -119,16 +122,6 @@ export default function DungeonView3D({ subMap }) {
 
       <HUD />
 
-      {/* Server-authoritative health (Phase 4.3) */}
-      {hp && (
-        <div style={{ position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 45, width: 240, textAlign: 'center', fontFamily: 'system-ui, sans-serif' }}>
-          <div style={{ height: 12, background: 'rgba(8,12,22,0.8)', border: '1px solid #3a1f28', borderRadius: 6, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${Math.max(0, Math.min(100, (hp.hp / hp.maxHp) * 100))}%`, background: hp.dead ? '#5a2030' : 'linear-gradient(90deg,#ff5a6a,#ff8d6c)' }} />
-          </div>
-          <div style={{ color: '#e6c0c8', fontSize: 11, marginTop: 2, textShadow: '0 1px 3px #000' }}>{hp.dead ? 'DOWN' : `${Math.round(hp.hp)} / ${hp.maxHp}`}</div>
-        </div>
-      )}
-
       {/* Combat log */}
       {log.length > 0 && (
         <div style={{ position: 'fixed', bottom: 96, right: 16, width: 260, zIndex: 40, fontFamily: 'system-ui, sans-serif', fontSize: 12, pointerEvents: 'none' }}>
@@ -138,24 +131,24 @@ export default function DungeonView3D({ subMap }) {
         </div>
       )}
 
-      {/* consumable quickslot + ability hotbar (Phase 3 / 4.4) */}
-      <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6, zIndex: 50 }}>
-        <ConsumableQuickslot world={worldRef} characterId={currentCharacter?.id} enabledRef={inputEnabledRef} />
-        {hotbar.map((ab, i) => {
-            const cdLeft = Math.max(0, ((cdSnap[ab.id] || 0) - now) / 1000);
-            return (
-              <button key={ab.id} title={`${ab.name} (${ab.stam} stamina)`} onClick={() => castAbility(ab)}
-                style={{ position: 'relative', width: 46, height: 46, background: 'rgba(12,18,32,0.9)', color: '#cfe3ff', border: '1px solid #2a3654', borderRadius: 8, cursor: 'pointer', fontFamily: 'system-ui, sans-serif', fontSize: 11, overflow: 'hidden' }}>
-                <div style={{ fontSize: 14, fontWeight: 700 }}>{i + 1}</div>
-                <div style={{ fontSize: 8, lineHeight: 1, opacity: 0.8, whiteSpace: 'nowrap', overflow: 'hidden' }}>{ab.name.split(' ')[0]}</div>
-                {cdLeft > 0 && <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,6,12,0.7)', display: 'grid', placeItems: 'center', color: '#ffd24a', fontWeight: 700 }}>{cdLeft.toFixed(1)}</div>}
-              </button>
-            );
-        })}
-      </div>
+      {/* In-world combat feedback: low-HP danger vignette + on-hit flash. */}
+      <LowHpVignette combat={hp} />
+      <HitFlash combat={hp} />
+
+      {/* Bottom action lane: hotbar + unified live vitals; yields to dialogue. */}
+      <ActionCluster
+        worldRef={worldRef}
+        characterId={currentCharacter?.id}
+        inputEnabledRef={inputEnabledRef}
+        combat={hp}
+        hotbar={hotbar}
+        cdSnap={cdSnap}
+        castAbility={castAbility}
+        hint={(<><b>WASD</b> move · <b>Shift</b> run · click a hostile to target</>)}
+      />
 
       {proxPrompt && (
-        <div style={{ position: 'fixed', left: proxPrompt.x, top: proxPrompt.y, transform: 'translate(-50%, -130%)', zIndex: 45 }}>
+        <div style={{ position: 'fixed', left: proxPrompt.x, top: proxPrompt.y, transform: 'translate(-50%, -130%)', zIndex: Z.WORLD_PROMPTS }}>
           <button style={{ ...btnStyle, background: 'rgba(12,18,32,0.92)', borderColor: '#2f7a64' }} onClick={handleExit}>▸ {proxPrompt.poi.label || 'Exit'}</button>
         </div>
       )}
@@ -164,14 +157,11 @@ export default function DungeonView3D({ subMap }) {
 
       <TutorialOverlay />
 
-      <div style={{ position: 'fixed', top: 16, right: 16, display: 'flex', gap: 8, zIndex: 50 }}>
+      <div style={{ position: 'fixed', top: 16, right: 16, display: 'flex', gap: 8, zIndex: Z.STATUS }}>
         <button style={btnStyle} onClick={handleExit}>Exit Dungeon</button>
         <button style={btnStyle} onClick={() => navigate('/game/galaxy')}>Galaxy</button>
       </div>
 
-      <div style={{ position: 'fixed', bottom: 70, left: '50%', transform: 'translateX(-50%)', padding: '6px 12px', background: 'rgba(8,12,22,0.72)', border: '1px solid #1d2742', borderRadius: 8, color: '#9fb3d1', fontFamily: 'system-ui, sans-serif', fontSize: 11, pointerEvents: 'none', zIndex: 40, whiteSpace: 'nowrap' }}>
-        <b style={{ color: '#cfe3ff' }}>WASD</b> move · <b style={{ color: '#cfe3ff' }}>Shift</b> run · <b style={{ color: '#cfe3ff' }}>1–9</b> abilities · <b style={{ color: '#cfe3ff' }}>Space</b> dodge · click a hostile to target
-      </div>
     </div>
   );
 }

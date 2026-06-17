@@ -31,8 +31,13 @@ import SpaceportPA from '../components/submap3d/SpaceportPA';
 import { createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture } from '../components/submap3d/submapData';
 
 import HUD from '../components/hud/HUD';
+import Minimap from '../components/hud/Minimap';
+import MinimapCanvas from '../components/hud/MinimapCanvas';
+import { Z } from '../components/hud/hudTokens';
 import CombatToasts from '../components/hud/CombatToasts';
-import ConsumableQuickslot from '../components/hud/ConsumableQuickslot';
+import ActionCluster from '../components/hud/ActionCluster';
+import LowHpVignette from '../components/hud/LowHpVignette';
+import HitFlash from '../components/hud/HitFlash';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import ConversationView from '../features/dialogue/ConversationView';
 import DialogueVignette from '../features/dialogue/DialogueVignette';
@@ -349,10 +354,18 @@ export default function SubMapView3D() {
 
       <HUD />
 
+      {/* Functional top-down minimap from the live scene; the global HUD's label
+          minimap stands down on this 3D route. */}
+      <Minimap>
+        {({ expanded }) => (
+          <MinimapCanvas worldRef={worldRef} worldHalf={sim.worldHalf} pois={pois} npcs3d={npcs3d} exits={exits} waypoints={waypoints} expanded={expanded} />
+        )}
+      </Minimap>
+
       {subMap?.type === 'spaceport' && <SpaceportPA spaceportName={subMap?.name} />}
 
       {proxPrompt && !modalOpen && (
-        <div style={{ position: 'fixed', left: proxPrompt.x, top: proxPrompt.y, transform: 'translate(-50%, -130%)', zIndex: 45 }}>
+        <div style={{ position: 'fixed', left: proxPrompt.x, top: proxPrompt.y, transform: 'translate(-50%, -130%)', zIndex: Z.WORLD_PROMPTS }}>
           <button style={{ ...btnStyle, background: 'rgba(12,18,32,0.92)', borderColor: proxPrompt.isExit ? '#2f7a64' : '#2a3654' }}
             onClick={() => (proxPrompt.isExit ? handleExit() : handleEnterBuilding(proxPrompt.poi))}>
             {proxPrompt.isExit ? `▸ ${proxPrompt.poi.label || 'Exit'}` : `▸ Enter ${proxPrompt.poi.name || ''}`}
@@ -380,36 +393,23 @@ export default function SubMapView3D() {
         <VendorPanel npc={vendorNpc} npcId={vendorNpc.id} onClose={() => setVendorNpc(null)} />
       )}
 
-      {/* Combat HUD (Phase 4.3/4.4) — health bar + ability hotbar + consumable quickslot
-          (realtime spaceport only; online). */}
-      {isRealtime && combat && (
-        <div style={{ position: 'fixed', bottom: 56, left: '50%', transform: 'translateX(-50%)', zIndex: 45, fontFamily: 'system-ui, sans-serif', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <ConsumableQuickslot world={worldRef} characterId={currentCharacter?.id} enabledRef={inputEnabledRef} />
-            {hotbar.slice(0, 9).map((ab, i) => {
-              const ready = (cdSnap[ab.id] || 0) <= Date.now();
-              const cdLeft = Math.max(0, ((cdSnap[ab.id] || 0) - Date.now()) / 1000);
-              const accent = ab.type === 'heal' ? '#6cf0c2' : ab.type === 'buff' ? '#ffd24a' : ab.type === 'debuff' ? '#d18cff' : '#ff8d6c';
-              return (
-                <button key={ab.id} title={`${ab.name} (${ab.stam} stamina)`} onClick={() => castAbility(ab)}
-                  style={{ position: 'relative', width: 48, height: 48, borderRadius: 8, background: 'rgba(10,15,28,0.92)', border: `1px solid ${ready ? accent : '#2a3654'}`, color: ready ? '#e6eefc' : '#6f7c98', cursor: 'pointer', overflow: 'hidden', fontFamily: 'system-ui' }}>
-                  <div style={{ position: 'absolute', top: 2, left: 4, fontSize: 10, color: '#8aa0c4' }}>{i + 1}</div>
-                  <div style={{ fontSize: 9, lineHeight: 1.05, padding: '14px 3px 0', fontWeight: 600 }}>{ab.name.replace(/ (Mastery|Insight)$/, '')}</div>
-                  {!ready && <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,6,12,0.66)', display: 'grid', placeItems: 'center', color: '#cfe3ff', fontWeight: 700, fontSize: 14 }}>{cdLeft.toFixed(1)}</div>}
-                </button>
-              );
-            })}
-          </div>
-          <div style={{ width: 240 }}>
-            <div style={{ height: 14, background: 'rgba(8,12,22,0.8)', border: '1px solid #2a3654', borderRadius: 7, overflow: 'hidden' }}>
-              <div style={{ width: `${Math.max(0, Math.min(100, (combat.hp / combat.maxHp) * 100))}%`, height: '100%', background: (combat.hp / combat.maxHp) < 0.3 ? '#ff5a4a' : '#6cf0c2', transition: 'width .15s' }} />
-            </div>
-            <div style={{ color: '#cfe3ff', fontSize: 11, marginTop: 2, textShadow: '0 1px 3px #000' }}>
-              {Math.max(0, Math.round(combat.hp))}/{combat.maxHp} HP · click a hostile · <b style={{ color: '#cfe3ff' }}>1–9</b> abilities · <b style={{ color: '#cfe3ff' }}>Space</b> dodge
-            </div>
-          </div>
-        </div>
-      )}
+      {/* In-world combat feedback: low-HP danger vignette + on-hit flash. */}
+      <LowHpVignette combat={combat} />
+      <HitFlash combat={combat} />
+
+      {/* Bottom action lane: hotbar (realtime only) + unified live vitals; yields to dialogue. */}
+      <ActionCluster
+        worldRef={worldRef}
+        characterId={currentCharacter?.id}
+        inputEnabledRef={inputEnabledRef}
+        combat={combat}
+        hotbar={hotbar}
+        cdSnap={cdSnap}
+        castAbility={castAbility}
+        hint={(
+          <><b>WASD</b> move · <b>Shift</b> run · <b>Q/E</b> turn · click an NPC to talk · walk to a portal to leave</>
+        )}
+      />
 
       {/* Combat log */}
       {isRealtime && combat && log.length > 0 && (
@@ -420,7 +420,7 @@ export default function SubMapView3D() {
         </div>
       )}
       {isRealtime && combat && combat.dead && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(24,4,6,0.5)', display: 'grid', placeItems: 'center', zIndex: 60, pointerEvents: 'none' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(24,4,6,0.5)', display: 'grid', placeItems: 'center', zIndex: Z.DEFEAT, pointerEvents: 'none' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ color: '#ff8a7a', fontFamily: 'system-ui, sans-serif', fontSize: 44, fontWeight: 800, textShadow: '0 2px 14px #000' }}>Defeated</div>
             <div style={{ color: '#cfe3ff', fontFamily: 'system-ui, sans-serif', fontSize: 14, marginTop: 6, textShadow: '0 1px 4px #000' }}>respawning…</div>
@@ -433,7 +433,7 @@ export default function SubMapView3D() {
 
       <TutorialOverlay />
 
-      <div style={{ position: 'fixed', top: 16, right: 16, display: 'flex', gap: 8, alignItems: 'center', zIndex: 50 }}>
+      <div style={{ position: 'fixed', top: 16, right: 16, display: 'flex', gap: 8, alignItems: 'center', zIndex: Z.STATUS }}>
         {isRealtime && netOptions.enabled && netStatus && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'rgba(12,18,32,0.85)', border: '1px solid #2a3654', borderRadius: 8, fontFamily: 'system-ui, sans-serif', fontSize: 12, color: '#cfe3ff' }}
             title={netStatus.mode === 'online' ? `Server-authoritative · ${netStatus.rtt}ms RTT · ${netStatus.online} online` : 'Single-player (server unavailable)'}>
@@ -445,9 +445,6 @@ export default function SubMapView3D() {
         <button style={btnStyle} onClick={() => navigate('/game/galaxy')}>Galaxy</button>
       </div>
 
-      <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', padding: '8px 14px', background: 'rgba(8,12,22,0.72)', border: '1px solid #1d2742', borderRadius: 8, color: '#9fb3d1', fontFamily: 'system-ui, sans-serif', fontSize: 12, pointerEvents: 'none', zIndex: 40, whiteSpace: 'nowrap' }}>
-        <b style={{ color: '#cfe3ff' }}>WASD</b> move · <b style={{ color: '#cfe3ff' }}>Shift</b> run · <b style={{ color: '#cfe3ff' }}>Q/E</b> turn · click an NPC to talk · walk to a portal to leave
-      </div>
     </div>
   );
 }

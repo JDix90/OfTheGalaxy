@@ -6,7 +6,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1004; /* above HUD, below inventory overlay (3000) */
+  z-index: var(--hud-z-dialogue); /* above HUD; inventory overlay still covers via :has rule below */
   display: flex;
   justify-content: center;
   padding: 72px 16px 18px;

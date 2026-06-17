@@ -4,12 +4,12 @@
   right: 20px; /* Default position, overridden by context */
   width: 250px;
   max-height: 280px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
-  backdrop-filter: blur(10px);
-  border: 2px solid var(--primary-color);
-  border-radius: 8px;
+  background: var(--hud-surface);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-  z-index: 1002;
+  z-index: var(--hud-z-panels);
   transition: all 0.3s ease;
 }
 

@@ -1,0 +1,59 @@
+/* ActionCluster — bottom-center action lane (hotbar + vitals + hint). */
+.ac {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: system-ui, -apple-system, sans-serif;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+/* Yield to the dialogue lower-third. */
+.ac-hidden {
+  transform: translate(-50%, 130%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ac-hotbar { display: flex; gap: 6px; }
+
+.ac-ability {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--hud-radius-sm);
+  background: var(--hud-surface-strong);
+  border: 1px solid var(--hud-border);
+  cursor: pointer;
+  overflow: hidden;
+  font-family: inherit;
+}
+.ac-ability-key { position: absolute; top: 2px; left: 4px; font-size: 10px; color: var(--hud-text-muted); }
+.ac-ability-name { display: block; font-size: 9px; line-height: 1.05; padding: 14px 3px 0; font-weight: 600; }
+.ac-ability-cd {
+  position: absolute; inset: 0;
+  background: rgba(4, 6, 12, 0.66);
+  display: grid; place-items: center;
+  color: #cfe3ff; font-weight: 700; font-size: 14px;
+}
+
+.ac-hint {
+  padding: 5px 12px;
+  border-radius: var(--hud-radius-sm);
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
+  color: var(--hud-text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+}
+.ac-hint b { color: #cfe3ff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ac { transition: none; }
+}

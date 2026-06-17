@@ -1,19 +1,22 @@
+/* Meta only now (credits / level / xp) → a compact right-anchored cluster,
+   not the old full-width gradient bar. */
 .stats-bar {
   position: fixed;
-  top: 60px; /* Account for Navigation bar */
-  left: 1rem; /* Add left margin to prevent overflow */
-  right: 80px; /* Account for HUD menu button */
-  height: 65px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--primary-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  top: 60px;
+  right: 80px; /* left of the HUD menu button */
+  left: auto;
+  height: auto;
+  background: var(--hud-surface);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  padding: 0 1.25rem;
-  z-index: 1002; /* Above HUD container (1001) */
+  gap: 14px;
+  padding: 7px 14px;
+  z-index: var(--hud-z-status);
 }
 
 .stats-left {

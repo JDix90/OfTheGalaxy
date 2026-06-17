@@ -1,0 +1,95 @@
+/* PlayerVitals — two slim bars (HP / stamina) for the bottom action cluster. */
+.pv {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 248px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.pv-row { display: flex; align-items: center; gap: 8px; }
+
+.pv-tag {
+  flex-shrink: 0;
+  width: 22px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--hud-text-muted);
+  text-shadow: 0 1px 2px #000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pv-status {
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--hud-warn);
+}
+
+.pv-bar {
+  position: relative;
+  flex: 1;
+  height: 15px;
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius-sm);
+  overflow: hidden;
+}
+
+.pv-fill {
+  height: 100%;
+  border-radius: var(--hud-radius-sm);
+  transition: width 0.15s ease, background 0.2s ease;
+}
+
+.pv-hp { background: var(--hud-heal); }
+.pv-hp-low { background: var(--hud-danger); }
+.pv-sp { background: var(--hud-accent); }
+.pv-sp-warning { background: var(--hud-warn); }
+.pv-sp-critical { background: var(--hud-danger); }
+
+.pv-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--hud-text-primary);
+  text-shadow: 0 1px 2px #000, 0 0 3px #000;
+  pointer-events: none;
+}
+
+.pv-flash {
+  position: absolute;
+  right: 4px;
+  top: -14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--hud-heal);
+  text-shadow: 0 1px 3px #000;
+  animation: pvFlash 1.2s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes pvFlash {
+  0% { opacity: 0; transform: translateY(6px); }
+  20% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.pv-warning {
+  font-size: 10px;
+  color: var(--hud-warn);
+  text-align: center;
+  text-shadow: 0 1px 2px #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-fill { transition: none; }
+  .pv-flash { animation: none; }
+}
