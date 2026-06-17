@@ -50,6 +50,7 @@ export function useDungeonWorld(subMap, sharedSim, netOptions) {
         return this.player;
       },
       remotes() { return this._net ? this._net.remotes : null; },
+      crowd() { return this._net ? this._net.crowd : null; },
       cast(a, t) { if (this._net) this._net.cast(a, t); },
       dodge() { if (this._net) this._net.dodge(); },
       useItem(itemId) { if (this._net) this._net.useItem(itemId); },

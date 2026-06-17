@@ -108,9 +108,14 @@ class WorldManager {
         : { w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 };
       const isDungeon = subMap.type === 'dungeon';
       const dangerLevel = opts.dangerLevel || (subMap.metadata && subMap.metadata.dangerLevel) || (isDungeon ? 6 : 1);
+      // Bustling hubs get a server-authoritative ambient crowd (cosmetic walkers) that path
+      // between the concourse's people-places — the storefronts, lounges, and hangar gates
+      // (its NPC spawn points + entrance), so every player sees the same lively port.
+      const crowd = (subMap.type === 'spaceport') ? this._buildCrowdConfig(d, dims) : null;
       return new PlanetWorld(subMapId, sim, mapData, {
         dangerLevel,
         ambient: isDungeon, // dungeons populate; hub submaps (spaceport/city/...) don't auto-spawn
+        crowd,
         zone: { type: isDungeon ? 'dungeon' : (subMap.type || 'submap'), subMapId, planetId: subMap.planetId || opts.planetId, parentLocationId: subMap.parentLocationId, entrance, dims },
       });
     });
@@ -118,6 +123,19 @@ class WorldManager {
 
   /** Back-compat alias — dungeons are just a submap world that populates. */
   async getOrCreateDungeon(subMapId, opts = {}) { return this.getOrCreateSubmapWorld(subMapId, opts); }
+
+  /** Ambient-crowd config for a hub layout: destination waypoints (surface %) drawn from the
+   *  NPC spawn points + entrance + a few concourse-center crossings, plus a target headcount. */
+  _buildCrowdConfig(d, dims) {
+    const W = d.width || (d.size && d.size.width) || dims.w || 12;
+    const H = d.height || (d.size && d.size.height) || dims.h || 12;
+    const pct = (gx, gy) => ({ x: ((gx + 0.5) / W) * 100, y: ((gy + 0.5) / H) * 100 });
+    const points = [];
+    for (const sp of (d.npcSpawnPoints || [])) { const p = sp.position || {}; if (Number.isFinite(p.x)) points.push(pct(p.x, p.y)); }
+    for (const e of (d.entryPoints || [])) { const p = e.position || {}; if (Number.isFinite(p.x)) points.push(pct(p.x, p.y)); }
+    points.push({ x: 35, y: 40 }, { x: 40, y: 60 }, { x: 30, y: 50 }); // cross the concourse, don't just hug spawns
+    return { count: 28, points };
+  }
 
   start() {
     if (this._loop) return;
@@ -169,6 +187,7 @@ class WorldManager {
       if (w.isEmpty()) continue;
       const players = w.playersWire();
       const enemies = w.enemiesWire();
+      const crowd = w.crowdWire(); // shared ambient walkers (null when none → field omitted)
       const fx = w.drainFx(); // combat events this tick (shared by all recipients)
       for (const p of w.players.values()) {
         const ws = p.ws;
@@ -182,6 +201,7 @@ class WorldManager {
           self: { x: r2(p.x), z: r2(p.z), f: r2(p.facing), hp: p.combatant ? p.combatant.stats.health : p.maxHp, maxHp: p.maxHp, dead: p.dead ? 1 : 0 },
           players,
           enemies,
+          ...(crowd ? { crowd } : {}),
           fx,
           n: w.players.size,
         }));

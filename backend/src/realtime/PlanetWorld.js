@@ -26,6 +26,14 @@ const OOC_REGEN_DELAY_MS = 5000; // wait this long after the last combat before 
 const RESPAWN_INTERVAL = 8;      // seconds between ambient enemy respawns (replaces the encounter roll)
 const MAX_WORLD_ENEMIES = 30;    // hard cap on live enemies per world (scripted-spawn DoS backstop)
 const DECAY_INTERVAL = 1.2;  // seconds ≈ one "turn" — decays combat status/temporary effects
+// Ambient crowd (Phase 6b) — non-combat background walkers for "bustling" hub submaps
+// (the spaceport). Purely cosmetic presence: they path between waypoints, never fight, and
+// are streamed in the snapshot so every player sees the same crowd.
+const CROWD_SPEED = 2.6;            // ambient walk speed (m/s)
+const CROWD_PAUSE_MIN_MS = 1200;    // dwell range once a walker reaches a destination
+const CROWD_PAUSE_MAX_MS = 4200;
+const CROWD_ROLES = 6;              // tint buckets (client maps to muted civilian colors)
+const MAX_CROWD = 48;              // hard cap per world (bandwidth + render backstop)
 const r2 = (n) => Math.round(n * 100) / 100;
 const normYaw = (y) => (typeof y === 'number' && Number.isFinite(y) ? ((y % TWO_PI) + TWO_PI) % TWO_PI : null);
 
@@ -54,7 +62,13 @@ class PlanetWorld {
     this.ambient = options.ambient !== false; // safe hubs (e.g. the spaceport) pass ambient:false — no auto enemies, but scripted spawns (NPC/POI/quest/tutorial) still work
     this._enemySeq = 0;        // monotonic id source so respawned enemies get fresh ids
     this._respawnAcc = 0;      // accumulator for ambient respawn (replaces the old random-encounter roll)
+    // Ambient crowd (cosmetic background walkers; e.g. spaceport concourse).
+    this.crowd = new Map();    // crowdId -> walker
+    this._crowdSeq = 0;
+    this._crowdWps = [];       // world-space destination waypoints
+    this.crowdCfg = (options.crowd && options.crowd.count > 0) ? options.crowd : null;
     if (this.ambient) this.spawnEnemies();
+    if (this.crowdCfg) this.spawnCrowd();
   }
 
   pushFx(ev) { if (this.fx.length < 256) this.fx.push(ev); }
@@ -383,6 +397,7 @@ class PlanetWorld {
     }
     if (decayNow) for (const e of this.enemies.values()) this._decay(e.combatant);
     this.stepEnemies(dt, now);
+    this.stepCrowd(dt, now);
 
     // Ambient respawn: keep the world populated over time (this replaces the old movement-driven
     // random-encounter roll). Trickle one hostile in every RESPAWN_INTERVAL, away from players,
@@ -453,6 +468,69 @@ class PlanetWorld {
         hp: p.combatant ? p.combatant.stats.health : p.maxHp, maxHp: p.maxHp, dead: p.dead ? 1 : 0,
       });
     }
+    return out;
+  }
+
+  /** Resolve the crowd's destination waypoints (world coords) from the configured surface
+   *  points, dropping any that aren't walkable; always leaves at least a few fallbacks. */
+  _crowdWaypoints() {
+    const pts = [];
+    for (const p of (this.crowdCfg.points || [])) {
+      if (Number.isFinite(p.x) && Number.isFinite(p.y) && this.sim.isWalkableSurface(p.x, p.y)) {
+        pts.push(this.sim.surfaceToWorld(p.x, p.y));
+      }
+    }
+    let guard = 0;
+    while (pts.length < 4 && guard++ < 8) pts.push(this._randomWalkable());
+    return pts;
+  }
+
+  _pickWaypoint() {
+    return this._crowdWps[(Math.random() * this._crowdWps.length) | 0] || this._randomWalkable();
+  }
+
+  /** Populate the ambient crowd at random walkable points, each headed to a waypoint. */
+  spawnCrowd() {
+    this._crowdWps = this._crowdWaypoints();
+    const n = Math.min(MAX_CROWD, this.crowdCfg.count | 0);
+    for (let i = 0; i < n; i++) {
+      const start = this._randomWalkable();
+      const t = this._pickWaypoint();
+      const id = `c${this._crowdSeq++}`;
+      this.crowd.set(id, {
+        id, x: start.x, z: start.z, facing: Math.random() * TWO_PI,
+        role: (Math.random() * CROWD_ROLES) | 0,
+        speed: CROWD_SPEED * (0.8 + Math.random() * 0.5),
+        tx: t.x, tz: t.z, pauseUntil: 0,
+      });
+    }
+  }
+
+  /** Walk each crowd member toward its destination; dwell on arrival, then pick a new one. */
+  stepCrowd(dt, now) {
+    if (this.crowd.size === 0) return;
+    for (const c of this.crowd.values()) {
+      if (c.pauseUntil && now < c.pauseUntil) continue;
+      const dx = c.tx - c.x, dz = c.tz - c.z, dd = Math.hypot(dx, dz);
+      if (dd < 0.6) { // arrived: dwell, then choose a new destination
+        c.pauseUntil = now + CROWD_PAUSE_MIN_MS + Math.random() * (CROWD_PAUSE_MAX_MS - CROWD_PAUSE_MIN_MS);
+        const t = this._pickWaypoint(); c.tx = t.x; c.tz = t.z;
+        continue;
+      }
+      const ux = dx / dd, uz = dz / dd;
+      c.facing = Math.atan2(ux, uz); // 0 = +Z (sim convention)
+      const bx = c.x, bz = c.z;
+      this._tryMove(c, ux * c.speed * dt, uz * c.speed * dt);
+      // Stuck against a wall (no progress) → repick a destination so they don't grind in place.
+      if (Math.abs(c.x - bx) < 1e-4 && Math.abs(c.z - bz) < 1e-4) { const t = this._pickWaypoint(); c.tx = t.x; c.tz = t.z; }
+    }
+  }
+
+  /** Wire array of the ambient crowd for snapshots (null when empty → field omitted). */
+  crowdWire() {
+    if (this.crowd.size === 0) return null;
+    const out = [];
+    for (const c of this.crowd.values()) out.push({ id: c.id, x: r2(c.x), z: r2(c.z), f: r2(c.facing), r: c.role });
     return out;
   }
 

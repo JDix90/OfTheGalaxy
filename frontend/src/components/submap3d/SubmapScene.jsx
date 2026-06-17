@@ -15,6 +15,7 @@ import NpcActor from '../surface3d/NpcActor';
 import PlayerActor from '../surface3d/PlayerActor';
 import RemotePlayers from '../surface3d/RemotePlayers';
 import RemoteEnemies from '../surface3d/RemoteEnemies';
+import CrowdActors from '../surface3d/CrowdActors';
 import CombatFx from '../surface3d/CombatFx';
 import QuestWaypoint from '../surface3d/QuestWaypoint';
 import Atmosphere from '../surface3d/atmosphere/Atmosphere';
@@ -102,6 +103,7 @@ export default function SubmapScene({
         <>
           <RemotePlayers world={world} />
           <RemoteEnemies world={world} targetId={combatTarget} onTarget={onCombatTarget} />
+          <CrowdActors world={world} />
           <CombatFx world={world} targetId={combatTarget} onClearTarget={() => onCombatTarget(null)} />
         </>
       )}
