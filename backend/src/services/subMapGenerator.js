@@ -240,7 +240,9 @@ function generateCityMap(planet, parentLocationId, variant = 'medium', seed) {
  */
 // Bump when the spaceport layout shape changes so getSubMapById can re-furnish older,
 // already-persisted spaceport submaps in place (v1 = the original empty plaza).
-const SPACEPORT_LAYOUT_VERSION = 3;
+// v4: props get a small SOLID collision footprint (no more giant invisible barriers around
+// chairs/signs; the crowd stops clipping through props) — see collisionMapService._markPropFootprint.
+const SPACEPORT_LAYOUT_VERSION = 4;
 
 function generateSpaceportMap(planet, parentLocationId, variant = 'medium', seed) {
   const random = seededRandom(seed);
@@ -386,13 +388,14 @@ function generateSpaceportMap(planet, parentLocationId, variant = 'medium', seed
     npcSpawnPoints.push({ id: `npc_spawn_${i}`, position: { x: gx(fx), y: gy(fy) }, npcIds: [], spawnChance: 0.85 });
   });
 
-  // Collision: wall ONLY the large structures (shops + hangars), leaving the concourse, lanes,
-  // and prop areas freely walkable. (Building-only input keeps small props walk-through so the
-  // player can never be boxed in by a chair or crate.)
+  // Collision: wall the large structures (shops + hangars) AND give props a SMALL solid footprint
+  // matching what's drawn (collisionMapService caps prop footprints to ~human scale), so the
+  // concourse/lanes stay open, the player isn't boxed in by a chair, and the crowd no longer
+  // clips through props (the server crowd collides via this same map).
   let collisionMap = null;
   try {
     const collisionMapService = require('./collisionMapService');
-    collisionMap = collisionMapService.generateCollisionMap({ layoutData: { width: W, height: H, buildings } });
+    collisionMap = collisionMapService.generateCollisionMap({ layoutData: { width: W, height: H, buildings, furniture, decorations, interactiveElements } });
   } catch (e) {
     collisionMap = null; // degrade gracefully to an open (all-walkable) spaceport
   }

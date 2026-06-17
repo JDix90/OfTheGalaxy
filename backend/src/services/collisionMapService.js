@@ -88,54 +88,18 @@ class CollisionMapService {
       });
     }
 
-    // Process furniture for building interiors (mark as walls/obstacles)
-    const furniture = layout.furniture || [];
-    if (furniture.length > 0) {
-      furniture.forEach(item => {
-        const itemPos = item.position || {};
-        const itemSize = item.size || { width: 1, height: 1 };
-        
-        // Convert furniture position to collision map coordinates
-        const startX = Math.floor((itemPos.x / mapWidth) * resolution);
-        const startY = Math.floor((itemPos.y / mapHeight) * resolution);
-        const endX = Math.floor(((itemPos.x + itemSize.width) / mapWidth) * resolution);
-        const endY = Math.floor(((itemPos.y + itemSize.height) / mapHeight) * resolution);
-        
-        // Mark furniture area as wall (impassable)
-        for (let y = startY; y <= endY && y < resolution; y++) {
-          for (let x = startX; x <= endX && x < resolution; x++) {
-            if (x >= 0 && y >= 0) {
-              cells[y][x] = this.constructor.COLLISION_TYPES.WALL;
-            }
-          }
-        }
-      });
-    }
-
-    // Process interactive elements (some may be obstacles)
-    const interactiveElements = layout.interactiveElements || [];
-    if (interactiveElements.length > 0) {
-      interactiveElements.forEach(element => {
-        // Storage containers and vendors are obstacles (can't walk through them)
-        if (element.type === 'storage' || element.type === 'vendor') {
-          const elemPos = element.position || {};
-          const elemSize = element.size || { width: 1, height: 1 };
-          
-          const startX = Math.floor((elemPos.x / mapWidth) * resolution);
-          const startY = Math.floor((elemPos.y / mapHeight) * resolution);
-          const endX = Math.floor(((elemPos.x + elemSize.width) / mapWidth) * resolution);
-          const endY = Math.floor(((elemPos.y + elemSize.height) / mapHeight) * resolution);
-          
-          for (let y = startY; y <= endY && y < resolution; y++) {
-            for (let x = startX; x <= endX && x < resolution; x++) {
-              if (x >= 0 && y >= 0 && x < resolution && y < resolution) {
-                cells[y][x] = this.constructor.COLLISION_TYPES.WALL;
-              }
-            }
-          }
-        }
-      });
-    }
+    // Process props (furniture, decorations, interactive elements) as SMALL solid obstacles.
+    // Each prop blocks only its CAPPED visual footprint — matching the 3D renderer, which caps
+    // props to ~human scale (see submapData.js FURN.max). Marking a prop's whole grid cell (as
+    // the old code did) made a chair a ~7-metre invisible barrier on a coarse district grid; here
+    // the player AND the server-authoritative crowd (which also collides via the sim) stop at
+    // roughly the prop's drawn edge instead.
+    const props = [
+      ...(layout.furniture || []),
+      ...(layout.decorations || []),
+      ...(layout.interactiveElements || []),
+    ];
+    props.forEach(item => this._markPropFootprint(cells, item, mapWidth, mapHeight, resolution));
 
     return {
       resolution,
@@ -228,6 +192,40 @@ class CollisionMapService {
     }
 
     return { walls, doors };
+  }
+
+  /**
+   * Mark a prop's SMALL collision footprint (centered on the prop, capped to ~its rendered size)
+   * as WALL, without clobbering doors or building walls. The 3D renderer caps prop world-size to
+   * ~human scale, so collision must too — otherwise a 1-cell prop on a coarse district grid blocks
+   * several metres of open floor (an invisible barrier). CAP_PCT (~1.5% of the map) mirrors that
+   * world-unit cap at the submap collision scale; *0.9 matches the renderer's footprint factor.
+   * @private
+   */
+  _markPropFootprint(cells, item, mapWidth, mapHeight, resolution) {
+    const pos = item && item.position;
+    if (!pos || !Number.isFinite(pos.x) || !Number.isFinite(pos.y)) return;
+    const size = item.size || { width: 1, height: 1 };
+    const sw = size.width || 1;
+    const sh = size.height || 1;
+    const WALKABLE = this.constructor.COLLISION_TYPES.WALKABLE;
+    const WALL = this.constructor.COLLISION_TYPES.WALL;
+
+    const CAP_PCT = 1.5; // ≈1.3 world-units at the 0.85 collision scale; biased small over big
+    const fwPct = Math.max(1, Math.min((sw / mapWidth) * 100 * 0.9, CAP_PCT));
+    const fhPct = Math.max(1, Math.min((sh / mapHeight) * 100 * 0.9, CAP_PCT));
+    const cxPct = ((pos.x + sw / 2) / mapWidth) * 100;
+    const cyPct = ((pos.y + sh / 2) / mapHeight) * 100;
+
+    const x0 = Math.floor(((cxPct - fwPct / 2) / 100) * resolution);
+    const x1 = Math.floor(((cxPct + fwPct / 2) / 100) * resolution);
+    const y0 = Math.floor(((cyPct - fhPct / 2) / 100) * resolution);
+    const y1 = Math.floor(((cyPct + fhPct / 2) / 100) * resolution);
+    for (let y = Math.max(0, y0); y <= y1 && y < resolution; y++) {
+      for (let x = Math.max(0, x0); x <= x1 && x < resolution; x++) {
+        if (cells[y][x] === WALKABLE) cells[y][x] = WALL; // never overwrite doors/building walls
+      }
+    }
   }
 
   /**

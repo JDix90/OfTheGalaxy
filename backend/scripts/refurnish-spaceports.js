@@ -18,7 +18,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const { sequelize, SubMap, Planet } = require('../src/models');
 const subMapGenerator = require('../src/services/subMapGenerator');
-const collisionMapService = require('../src/services/collisionMapService');
 
 const count = (a) => (Array.isArray(a) ? a.length : 0);
 
@@ -51,7 +50,8 @@ async function main() {
     const variant = w >= 18 ? 'military' : w >= 15 ? 'large' : w <= 10 ? 'small' : 'medium';
     const seed = subMapGenerator.getSeed(`${sm.planetId}_${sm.parentLocationId}_spaceport`);
     const newLayout = subMapGenerator.generateSpaceportMap(planet, sm.parentLocationId, variant, seed);
-    newLayout.collisionMap = collisionMapService.generateCollisionMap({ id: sm.id, type: 'spaceport', layoutData: newLayout, layout: newLayout });
+    // generateSpaceportMap already builds the correct collisionMap (buildings + small solid props);
+    // keep it — overriding with a full-layout pass is what baked the giant prop-wall barriers.
 
     // Explicitly flag the JSON column dirty so Sequelize persists the new object.
     sm.set('layoutData', newLayout);
