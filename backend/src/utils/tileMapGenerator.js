@@ -19,6 +19,28 @@ function hash2(x, y, seed) {
   h = Math.imul(h, 1274126177) >>> 0;
   return h >>> 0;
 }
+// Building "use" mix for an urban block — weighted toward residences + shops, the bulk of a city,
+// with fewer bars/restaurants/civic. Deterministic from the block hash.
+function pickBuildingCategory(hh) {
+  const r = ((hh & 0xffff) / 0xffff) * 100;
+  if (r < 32) return 'apartment';   // residential towers — the bulk + the skyline
+  if (r < 52) return 'shop';        // storefronts lining the alleys
+  if (r < 66) return 'warehouse';   // squat industrial/storage
+  if (r < 76) return 'market';      // open market halls (near the souks)
+  if (r < 85) return 'restaurant';
+  if (r < 93) return 'bar';
+  return 'civic';                   // halls/offices
+}
+// Height (storeys) by use: apartments rise into towers, civic mid-rise, commercial low.
+function buildingHeightFor(category, hh) {
+  const r = ((hh >>> 8) & 0xff) / 255;
+  switch (category) {
+    case 'apartment': return 3 + Math.round(r * 2); // 3–5
+    case 'civic': return 2 + Math.round(r * 2);     // 2–4
+    case 'warehouse': return 1 + Math.round(r);     // 1–2
+    default: return 1 + (r < 0.4 ? 0 : 1);          // shop/market/bar/restaurant 1–2
+  }
+}
 // Carve a straight (L-shaped) walkable corridor between two tiles — used to rescue marooned pockets.
 function carveLine(tiles, gridSize, x0, y0, x1, y1) {
   const set = (x, y) => { if (x >= 0 && y >= 0 && x < gridSize && y < gridSize && !tiles[y][x].walkable) tiles[y][x] = { type: 'street', walkable: true, visual: 'street' }; };
@@ -146,14 +168,16 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
   // 5) Guarantee every pocket connects to the alley network (carve straight stubs if marooned).
   connectWalkable(tiles, gridSize, anchors);
 
-  // 6) Tag building tiles with a coherent per-block height + style for the 3D renderer.
+  // 6) Tag each building BLOCK with a coherent use (`category`) + a category-driven height + style,
+  // so the city reads as varied real buildings — apartment towers, shops, markets, bars, etc.,
+  // not a uniform maze. Per super-block (deterministic) so each block is one coherent building.
   for (let y = 0; y < gridSize; y++) for (let x = 0; x < gridSize; x++) {
     const t = tiles[y][x];
     if (t.type !== 'building') continue;
     const sbx = Math.floor((x - margin) / PITCH), sby = Math.floor((y - margin) / PITCH);
     const hh = hash2(sbx, sby, seed);
-    const roll = (hh & 0xffff) / 0xffff;
-    t.height = roll < 0.42 ? 1 : roll < 0.74 ? 2 : roll < 0.92 ? 3 : 4; // mostly low, a few towers
+    t.category = pickBuildingCategory(hh);
+    t.height = buildingHeightFor(t.category, hh);
     t.style = (hh >>> 16) % 5;
   }
 
@@ -1108,7 +1132,8 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 // Bump when a generator's output shape changes so cached planet.tileMap grids regenerate.
 // v2: urban planets become a dense maze-like medina (height/style-tagged buildings + stalls).
 // v3: medina gains 'stair' tiles → walkable rooftops (multi-level traversal).
-const TILEMAP_VERSION = 3;
+// v4: building blocks tagged with a use `category` (apartment/shop/market/bar/...) + use-driven heights.
+const TILEMAP_VERSION = 4;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);
