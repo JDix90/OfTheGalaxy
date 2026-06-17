@@ -15,6 +15,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import Ground from './Ground';
+import SurfaceObstacles from './SurfaceObstacles';
 import PoiStructure from './PoiStructure';
 import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
@@ -160,6 +161,7 @@ export default function SurfaceScene({
       />
 
       <Ground planet={planet} size={groundSize} textureUrl={textureUrl} />
+      <SurfaceObstacles planet={planet} worldHalf={worldHalf} />
       <DistantSkyline worldHalf={worldHalf} />
 
       {pois.map((poi) => (
