@@ -17,6 +17,7 @@ import { useThree, useFrame } from '@react-three/fiber';
 import Ground from './Ground';
 import SurfaceObstacles from './SurfaceObstacles';
 import MedinaBuildings from './MedinaBuildings';
+import SurfaceProps from './SurfaceProps';
 import PoiStructure from './PoiStructure';
 import NpcActor from './NpcActor';
 import NpcProxies from './NpcProxies';
@@ -165,6 +166,7 @@ export default function SurfaceScene({
       <Ground planet={planet} size={groundSize} textureUrl={textureUrl} />
       <SurfaceObstacles planet={planet} worldHalf={worldHalf} />
       <MedinaBuildings planet={planet} worldHalf={worldHalf} />
+      <SurfaceProps planet={planet} worldHalf={worldHalf} />
       <DistantSkyline worldHalf={worldHalf} />
 
       {pois.map((poi) => (
