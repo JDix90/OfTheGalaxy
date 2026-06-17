@@ -100,6 +100,9 @@ const STOREFRONT_GLTF = {
   cantina: 'structure_closed', bar: 'structure_closed',
   reception: 'structure_detailed', desk: 'structure_detailed', kiosk: 'structure_detailed',
 };
+// Yaw correction for the modeled "front" axis of the building glTFs (radians). 0 = the mesh's
+// +Z is its front; flip to Math.PI if buildings end up facing away from the walkway once seen.
+const BUILDING_FRONT_OFFSET = 0;
 const hashish = (s) => { let h = 0; for (let i = 0; i < String(s).length; i++) h = (h * 31 + String(s).charCodeAt(i)) | 0; return Math.abs(h); };
 function storefrontBuilding(type, id) {
   const model = STOREFRONT_GLTF[String(type || '').toLowerCase()];
@@ -128,12 +131,19 @@ export function buildSubmapPois(subMap, sim) {
     // a curated glTF building mesh; anything else falls back to its tuned primitive shape.
     const isHangar = /hangar|landing|spaceport|dock|pad/.test(String(b.type || '').toLowerCase());
     const storefront = isHangar ? null : storefrontBuilding(b.type, id);
+    // Face the building toward the district CENTER (world origin = the concourse walkway), so
+    // storefronts/hangars present their front to the walkway instead of a random seeded yaw.
+    // BUILDING_FRONT_OFFSET corrects for the glTF's modeled front axis (tune once seen).
+    const faceYaw = Math.atan2(-wpos.x, -wpos.z) + BUILDING_FRONT_OFFSET;
+    let building = null;
+    if (isHangar) building = { ...getPoiBuilding(b.type, id), yaw: faceYaw };
+    else if (storefront) building = { ...storefront, yaw: faceYaw };
     out.push({
       id, name: b.name || b.type, type: b.type, kind: 'building',
       sx: p.x, sy: p.y, wx: wpos.x, wz: wpos.z,
       enterable: !!b.opensTo || b.type === 'crafting_bench' || b.type === 'vendor_stall' || b.type === 'commercial',
       structure: submapStructure(b, w, sim),
-      ...(isHangar ? { building: getPoiBuilding(b.type, id), props: getPoiProps(b.type, id) } : (storefront ? { building: storefront } : {})),
+      ...(building ? { building, ...(isHangar ? { props: getPoiProps(b.type, id) } : {}) } : {}),
       raw: b,
     });
   }
