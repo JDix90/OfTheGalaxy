@@ -40,7 +40,7 @@ export default function SpaceportPA({ spaceportName }) {
   return (
     <div
       style={{
-        position: 'fixed', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 40,
+        position: 'fixed', top: 56, left: '50%', transform: 'translateX(-50%)', zIndex: 60,
         pointerEvents: 'none', maxWidth: 'min(620px, 86vw)',
       }}
     >

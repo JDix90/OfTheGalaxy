@@ -174,6 +174,31 @@ async function getSubMapById(subMapId) {
       }
     }
 
+    // Re-furnish older spaceports in place. The spaceport layout used to be an empty plaza;
+    // existing rows persist that stale layout, so upgrade them to the current furnished
+    // concourse + hangars when their version is behind (mirrors the dungeon-regen hook above).
+    if (subMap.type === 'spaceport') {
+      const layout = subMap.layoutData || subMap.layout || {};
+      const cur = layout.spaceportVersion || 0;
+      if (cur < subMapGenerator.SPACEPORT_LAYOUT_VERSION) {
+        try {
+          const planet = subMap.planet || await Planet.findByPk(subMap.planetId) || { id: subMap.planetId };
+          const w = layout.width || 12;
+          const variant = w >= 18 ? 'military' : w >= 15 ? 'large' : w <= 10 ? 'small' : 'medium';
+          const seed = subMapGenerator.getSeed(`${subMap.planetId}_${subMap.parentLocationId}_spaceport`);
+          const newLayout = subMapGenerator.generateSpaceportMap(planet, subMap.parentLocationId, variant, seed);
+          // Match the creation path: collision from the full layout (buildings + props).
+          newLayout.collisionMap = collisionMapService.generateCollisionMap({ id: subMap.id, type: 'spaceport', layoutData: newLayout, layout: newLayout });
+          await subMap.update({ layoutData: newLayout });
+          subMap.layoutData = newLayout;
+          subMap.layout = newLayout;
+          console.log(`[SubMap Service] Re-furnished spaceport ${subMap.id} (layout v${cur} -> v${subMapGenerator.SPACEPORT_LAYOUT_VERSION})`);
+        } catch (e) {
+          console.warn(`[SubMap Service] Spaceport re-furnish failed for ${subMap.id}:`, e.message);
+        }
+      }
+    }
+
     // Ensure collision map exists before returning
     const subMapWithCollision = await ensureCollisionMap(subMap);
     
