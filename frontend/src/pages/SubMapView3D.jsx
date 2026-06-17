@@ -27,6 +27,7 @@ import { useDungeonWorld } from '../world/useDungeonWorld';
 import { getAuthToken } from '../services/api/client';
 import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import SubmapScene from '../components/submap3d/SubmapScene';
+import SpaceportPA from '../components/submap3d/SpaceportPA';
 import { createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture } from '../components/submap3d/submapData';
 
 import HUD from '../components/hud/HUD';
@@ -339,6 +340,8 @@ export default function SubMapView3D() {
       </Canvas>
 
       <HUD />
+
+      {subMap?.type === 'spaceport' && <SpaceportPA spaceportName={subMap?.name} />}
 
       {proxPrompt && !modalOpen && (
         <div style={{ position: 'fixed', left: proxPrompt.x, top: proxPrompt.y, transform: 'translate(-50%, -130%)', zIndex: 45 }}>
