@@ -1014,7 +1014,7 @@ function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   }
 
   // Forest/Jungle planets
-  if (planetType === 'jungle' || terrain === 'jungle' || terrain === 'forest') {
+  if (planetType === 'jungle' || planetType === 'forest' || terrain === 'jungle' || terrain === 'forest') {
     return generateForestTileMap(mapData, tileSize);
   }
 

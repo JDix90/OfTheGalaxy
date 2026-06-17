@@ -29,6 +29,9 @@ const FOLIAGE_MAT = new THREE.MeshStandardMaterial({ color: '#3f6b3a', roughness
 const FLAT_GEOM = new THREE.PlaneGeometry(1, 1); FLAT_GEOM.rotateX(-Math.PI / 2);
 const WATER_MAT = new THREE.MeshStandardMaterial({ color: '#2f6fb0', roughness: 0.25, metalness: 0.1, transparent: true, opacity: 0.82 });
 const LAVA_MAT = new THREE.MeshStandardMaterial({ color: '#6a1a0a', emissive: '#ff5a1e', emissiveIntensity: 1.3, roughness: 0.6 });
+// Volcanic vents read as glowing rock mounds; crevasses/craters as dark recessed patches.
+const VENT_MAT = new THREE.MeshStandardMaterial({ color: '#2a1410', emissive: '#ff6a1e', emissiveIntensity: 1.1, roughness: 0.8, flatShading: true });
+const PIT_MAT = new THREE.MeshStandardMaterial({ color: '#15110e', roughness: 1, metalness: 0 });
 
 // Small instanced-mesh helper: `items` carry position + per-axis scale + Y-rotation.
 function InstancedProps({ geometry, material, items, cast = true }) {
@@ -63,7 +66,7 @@ function buildObstacleInstances(planet, worldHalf) {
   const tileW = tileSize * scale;
   const s2w = (sx, sy) => [(sx - 50) * scale, (sy - 50) * scale];
 
-  const rocks = [], trunks = [], foliage = [], water = [], lava = [];
+  const rocks = [], trunks = [], foliage = [], water = [], lava = [], vents = [], pits = [];
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
     if (!row) continue;
@@ -90,8 +93,14 @@ function buildObstacleInstances(planet, worldHalf) {
         foliage.push({ x: wx, y: ht * 0.45, z: wz, sx: tw, sy: ht * 0.65, sz: tw, ry: yaw });
       } else if (type === 'lava_flow') {
         lava.push({ x: wx, y: 0.06, z: wz, sx: tileW * 0.98, sy: 1, sz: tileW * 0.98, ry: yaw });
+      } else if (type === 'volcanic_vent') {
+        const sz = tileW * (0.4 + 0.3 * r);
+        vents.push({ x: wx, y: sz * 0.4, z: wz, sx: sz, sy: sz * 0.7, sz, ry: yaw });
       } else if (type === 'water') {
         water.push({ x: wx, y: 0.05, z: wz, sx: tileW, sy: 1, sz: tileW, ry: 0 });
+      } else if (type === 'crevasse' || type === 'crater') {
+        const s = tileW * (type === 'crater' ? 1.05 : 0.85);
+        pits.push({ x: wx, y: 0.04, z: wz, sx: s, sy: 1, sz: s, ry: yaw });
       }
     }
   }
@@ -99,7 +108,7 @@ function buildObstacleInstances(planet, worldHalf) {
   const cap = (a, n) => (a.length > n ? a.filter((_, i) => i % Math.ceil(a.length / n) === 0) : a);
   return {
     rocks: cap(rocks, 600), trunks: cap(trunks, 600), foliage: cap(foliage, 600),
-    water: cap(water, 1200), lava: cap(lava, 400),
+    water: cap(water, 1200), lava: cap(lava, 400), vents: cap(vents, 200), pits: cap(pits, 500),
   };
 }
 
@@ -112,6 +121,8 @@ export default function SurfaceObstacles({ planet, worldHalf }) {
       {data.trunks.length > 0 && <InstancedProps geometry={TRUNK_GEOM} material={TRUNK_MAT} items={data.trunks} />}
       {data.foliage.length > 0 && <InstancedProps geometry={FOLIAGE_GEOM} material={FOLIAGE_MAT} items={data.foliage} />}
       {data.lava.length > 0 && <InstancedProps geometry={FLAT_GEOM} material={LAVA_MAT} items={data.lava} cast={false} />}
+      {data.vents.length > 0 && <InstancedProps geometry={ROCK_GEOM} material={VENT_MAT} items={data.vents} />}
+      {data.pits.length > 0 && <InstancedProps geometry={FLAT_GEOM} material={PIT_MAT} items={data.pits} cast={false} />}
       {data.water.length > 0 && <InstancedProps geometry={FLAT_GEOM} material={WATER_MAT} items={data.water} cast={false} />}
     </>
   );
