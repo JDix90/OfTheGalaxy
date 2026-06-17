@@ -81,8 +81,45 @@ class WorldManager {
       return new PlanetWorld(planetId, sim, mapData, {
         dangerLevel: (planet && planet.dangerLevel) || 1,
         enemyPool: buildEnemyPool(planet || {}),
+        // Urban (medina) surfaces get the same cosmetic ambient crowd as the spaceport, ambling
+        // the souks/alleys (routed, not grinding walls). Null for wild surfaces — they stay empty.
+        crowd: this._buildSurfaceCrowdConfig(mapData),
       });
     });
+  }
+
+  /** Ambient-crowd config for an urban (medina) SURFACE: destination waypoints drawn from the
+   *  plaza + street tiles so walkers amble the souks and alleys. Null for non-medina/open planets
+   *  (wild surfaces stay uncrowded). */
+  _buildSurfaceCrowdConfig(mapData) {
+    const tm = mapData && mapData.tileMap;
+    if (!tm || tm.style !== 'medina' || !Array.isArray(tm.tiles)) return null;
+    const ts = tm.tileSize || 2;
+    const plazas = [], streets = [];
+    for (let ty = 0; ty < tm.tiles.length; ty++) {
+      const row = tm.tiles[ty];
+      if (!row) continue;
+      for (let tx = 0; tx < row.length; tx++) {
+        const t = row[tx];
+        if (!t || !t.walkable) continue;
+        const pt = { x: (tx + 0.5) * ts, y: (ty + 0.5) * ts };
+        if (t.type === 'plaza') plazas.push(pt);
+        else if (t.type === 'street') streets.push(pt);
+      }
+    }
+    const walkable = plazas.length + streets.length;
+    if (walkable < 4) return null;
+    // Favor plazas (souk gathering spots), plus a thinned sample of streets so walkers traverse
+    // the whole medina rather than clustering. Headcount scales with the walkable area (server caps it).
+    const sample = (arr, n) => {
+      if (arr.length <= n) return arr.slice();
+      const step = arr.length / n, out = [];
+      for (let i = 0; i < n; i++) out.push(arr[(i * step) | 0]);
+      return out;
+    };
+    const points = [...plazas, ...sample(streets, 40)];
+    const count = Math.min(60, Math.max(20, Math.round(walkable / 22)));
+    return { count, points };
   }
 
   /**
