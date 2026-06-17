@@ -84,6 +84,9 @@ const STACK_GEO = new THREE.CylinderGeometry(0.5, 0.6, 1, 8); STACK_GEO.translat
 const DOME_MAT = new THREE.MeshStandardMaterial({ color: '#e2edf6', roughness: 0.35, metalness: 0.1 });
 const PITCH_MAT = new THREE.MeshStandardMaterial({ color: '#7c4536', roughness: 0.85 }); // terracotta/timber
 const STACK_MAT = new THREE.MeshStandardMaterial({ color: '#2f2a26', roughness: 0.9 });
+// Rooftop bridge decks (cyber-medina) — gunmetal span with a neon edge that glows at night.
+const BRIDGE_MAT = new THREE.MeshStandardMaterial({ color: '#3a3e45', roughness: 0.7, metalness: 0.3 });
+const BRIDGE_GLOW = new THREE.Color('#4dffe6');
 
 // Night city-glow: each building gets a low, street-level skirt of soft self-lit colour, varied
 // per building (iridescent) — shopfronts/lanterns lining the alleys. Additive + toneMapped:false so
@@ -142,7 +145,7 @@ function buildMedina(planet, worldHalf) {
   const pavingBase = new THREE.Color(BIOME_PAVING[biome] || '#3a3a3a');
   const pavingShades = [pavingBase, pavingBase.clone().multiplyScalar(1.07), pavingBase.clone().multiplyScalar(0.93)];
 
-  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [], paving = [];
+  const buildings = [], stallBases = [], awnings = [], stairs = [], stairCaps = [], glow = [], shopAwnings = [], paving = [], bridges = [];
   const blocks = new Map(); // blockId -> { minx,maxx,miny,maxy,h } for per-block roofs
   for (let ty = 0; ty < tm.tiles.length; ty++) {
     const row = tm.tiles[ty];
@@ -203,6 +206,12 @@ function buildMedina(planet, worldHalf) {
         const sw = tileW * 0.7;
         stallBases.push({ x: wx, z: wz, w: sw, d: sw, h: 1.1 });
         awnings.push({ x: wx, z: wz, w: tileW * 0.92, d: tileW * 0.92, h: 0.18, y: 1.25, color: STALL_AWNINGS[(t.stallStyle || 0) % STALL_AWNINGS.length] });
+      } else if (t.type === 'bridge') {
+        // Pave the alley underneath (you walk under) + a roof-height deck you cross, with a neon edge.
+        paving.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.05, y: 0.02, color: pavingShades[hashTile(tx, ty) % 3] });
+        const by = (t.height || 1) * STORY;
+        bridges.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.22, y: by - 0.22 });
+        glow.push({ x: wx, z: wz, w: tileW * 1.08, d: tileW * 1.08, h: 0.3, y: by - 0.16, color: BRIDGE_GLOW });
       } else if (t.walkable && (t.type === 'street' || t.type === 'plaza')) {
         // Pave the navigable floor so it's unmistakably walkable (a road/deck), not terrain/water.
         paving.push({ x: wx, z: wz, w: tileW, d: tileW, h: 0.05, y: 0.02, color: pavingShades[hashTile(tx, ty) % 3] });
@@ -228,7 +237,7 @@ function buildMedina(planet, worldHalf) {
 
   if (!buildings.length && !stallBases.length && !stairs.length) return null;
   const glowOpacity = biome === 'medina' ? 1.0 : 0.8; // medina = punchier neon
-  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, glowOpacity, roofDomes, roofPitch, roofStacks, fillSky: fill[0], fillGround: fill[1] };
+  return { buildings, stallBases, awnings, stairs, stairCaps, glow, shopAwnings, paving, bridges, glowOpacity, roofDomes, roofPitch, roofStacks, fillSky: fill[0], fillGround: fill[1] };
 }
 
 export default function MedinaBuildings({ planet, worldHalf }) {
@@ -254,6 +263,7 @@ export default function MedinaBuildings({ planet, worldHalf }) {
       {data.roofStacks.length > 0 && <InstancedBoxes geometry={STACK_GEO} material={STACK_MAT} items={data.roofStacks} />}
       {data.stairs.length > 0 && <InstancedBoxes material={BLDG_MAT} items={data.stairs} />}
       {data.stairCaps.length > 0 && <InstancedBoxes material={STAIR_CAP_MAT} items={data.stairCaps} cast={false} />}
+      {data.bridges.length > 0 && <InstancedBoxes material={BRIDGE_MAT} items={data.bridges} />}
       {data.stallBases.length > 0 && <InstancedBoxes material={STALL_MAT} items={data.stallBases} />}
       {data.awnings.length > 0 && <InstancedBoxes material={AWNING_MAT} items={data.awnings} cast={false} />}
       {data.shopAwnings.length > 0 && <InstancedBoxes material={SHOP_AWNING_MAT} items={data.shopAwnings} cast={false} />}

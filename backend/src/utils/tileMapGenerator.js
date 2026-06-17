@@ -302,6 +302,36 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
     }
   }
 
+  // 7.5) Rooftop bridges: span a 2-wide alley between two SAME-HEIGHT building roofs so the flush
+  // roof network reconnects across the city. A 'bridge' tile stays ground-walkable (you pass under
+  // it) and becomes a roof deck at the buildings' height (you cross it) — see the sim's isRoofTile.
+  const bridgePlans = [];
+  for (let y = 1; y < gridSize - 1; y++) for (let x = 1; x < gridSize - 1; x++) {
+    const t = tiles[y][x];
+    if (t.type !== 'building' || !t.height) continue;
+    for (const [dx, dy] of [[1, 0], [0, 1]]) { // +x/+y only so each gap is considered once
+      const c1 = tiles[y + dy] && tiles[y + dy][x + dx];
+      const c2 = tiles[y + 2 * dy] && tiles[y + 2 * dy][x + 2 * dx];
+      const far = tiles[y + 3 * dy] && tiles[y + 3 * dy][x + 3 * dx];
+      const street = (c) => c && c.walkable && (c.type === 'street' || c.type === 'plaza');
+      if (street(c1) && street(c2) && far && far.type === 'building' && far.height === t.height) {
+        bridgePlans.push({ cells: [[x + dx, y + dy], [x + 2 * dx, y + 2 * dy]], h: t.height });
+      }
+    }
+  }
+  if (bridgePlans.length) {
+    const bridged = new Set();
+    const target = Math.min(22, Math.max(4, Math.round(bridgePlans.length * 0.2)));
+    const stride = Math.max(1, Math.floor(bridgePlans.length / target));
+    let placed = 0;
+    for (let i = 0; i < bridgePlans.length && placed < target; i += stride) {
+      const plan = bridgePlans[i];
+      if (plan.cells.some(([cx, cy]) => bridged.has(cx + ',' + cy))) continue;
+      for (const [cx, cy] of plan.cells) { tiles[cy][cx] = { type: 'bridge', walkable: true, visual: 'bridge', height: plan.h }; bridged.add(cx + ',' + cy); }
+      placed++;
+    }
+  }
+
   // 8) Market stalls at plaza corners (small obstacles; the plaza centre stays passable).
   plazas.forEach(pl => {
     [[pl.x - 1, pl.y - 1], [pl.x + 1, pl.y - 1], [pl.x - 1, pl.y + 1], [pl.x + 1, pl.y + 1]].forEach(([sx, sy]) => {
@@ -1231,7 +1261,8 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 // v4: building blocks tagged with a use `category` (apartment/shop/market/bar/...) + use-driven heights.
 // v5: building blocks carry a `block` id + tileMap.settlement flag (for the stationed-NPC ecology).
 // v6: every biome gets a fitting built-up settlement (per-terrain layout/population/bustle).
-const TILEMAP_VERSION = 6;
+// v7: medina gains rooftop 'bridge' tiles (cross same-height roofs over the alleys).
+const TILEMAP_VERSION = 7;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);

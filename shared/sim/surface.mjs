@@ -70,8 +70,10 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
     return (row && row[tx]) || null;
   }
   const groundWalkable = (t) => !!t && t.walkable === true && !OBSTACLE_TILE_TYPES.has(t.type);
-  // Tiles you can stand ON at roof level: building tops + stair landings.
-  const isRoofTile = (t) => !!t && (t.type === 'building' || t.type === 'stair');
+  // Tiles you can stand ON at roof level: building tops, stair landings, and bridge decks. A
+  // 'bridge' is dual-level — ground-walkable below (you walk under it) AND a roof deck above (you
+  // cross it), connecting two same-height roofs over an alley.
+  const isRoofTile = (t) => !!t && (t.type === 'building' || t.type === 'stair' || t.type === 'bridge');
   const storeysOf = (t) => (t && t.height) ? t.height : 0;
 
   // Ground walkability (level 0) — the long-standing surface collision used by enemies, crowd,
