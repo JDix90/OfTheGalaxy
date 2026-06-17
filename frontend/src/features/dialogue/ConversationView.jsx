@@ -192,7 +192,7 @@ export default function ConversationView({ npc, onClose, autoSendMessage, onShop
       </div>
 
       {logOpen && (
-        <ConversationLog npcId={npc.id} characterId={characterId} npcName={npc.name} onClose={() => setLogOpen(false)} />
+        <ConversationLog npcName={npc.name} onClose={() => setLogOpen(false)} />
       )}
 
       <NPCDetailsModal

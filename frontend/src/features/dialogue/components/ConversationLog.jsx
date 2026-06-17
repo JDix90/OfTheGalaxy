@@ -1,23 +1,22 @@
 /**
- * ConversationLog — the on-demand backlog. The default cinematic view stays
- * clean; pulling up the log is where the full transcript, search and topic
- * filters live (the Phase-5 power features, in their natural home rather than
- * cluttering every conversation). Uses the existing useConversationHistory hook.
+ * ConversationLog — the on-demand backlog. The cinematic view shows only the
+ * latest line, so this is where the full transcript lives. It renders the
+ * store's canonical `messages` (the history loaded at open() + every line this
+ * session) rather than a separate fetch, so what you just said is always here,
+ * with a simple client-side search over it.
  */
 
-import React from 'react';
-import { useConversationHistory } from '../../../hooks/useConversationHistory';
+import React, { useState } from 'react';
+import { useDialogueStore } from '../../../state/dialogueStore';
 import ConversationSearch from '../../../components/dialogue/ConversationSearch';
-import ConversationTopics from '../../../components/dialogue/ConversationTopics';
-import { normalizeMessage } from '../dialogueUtils';
 
-export default function ConversationLog({ npcId, characterId, npcName, onClose }) {
-  const {
-    messages, topics, isLoading, filterByTopic, search, searchQuery,
-  } = useConversationHistory(npcId, characterId);
-  const [selectedTopic, setSelectedTopic] = React.useState(null);
+export default function ConversationLog({ npcName, onClose }) {
+  const messages = useDialogueStore((s) => s.messages);
+  const [query, setQuery] = useState('');
 
-  const rows = (messages || []).map(normalizeMessage).filter(Boolean);
+  const transcript = (messages || []).filter((m) => m.sender === 'npc' || m.sender === 'player');
+  const q = query.trim().toLowerCase();
+  const rows = q ? transcript.filter((m) => (m.text || '').toLowerCase().includes(q)) : transcript;
 
   return (
     <div className="cv-log" role="dialog" aria-label="Conversation history">
@@ -26,22 +25,11 @@ export default function ConversationLog({ npcId, characterId, npcName, onClose }
         <button type="button" className="cv-iconbtn" aria-label="Close log" onClick={onClose}>×</button>
       </div>
 
-      <ConversationSearch onSearch={search} searchQuery={searchQuery} />
-
-      {topics && topics.length > 0 && (
-        <ConversationTopics
-          topics={topics}
-          selectedTopic={selectedTopic}
-          onTopicClick={(t) => { setSelectedTopic(t); filterByTopic(t); }}
-          onClearFilter={() => { setSelectedTopic(null); filterByTopic(null); }}
-        />
-      )}
+      <ConversationSearch onSearch={setQuery} searchQuery={query} />
 
       <div className="cv-log-body">
-        {isLoading ? (
-          <div className="cv-log-empty">Loading…</div>
-        ) : rows.length === 0 ? (
-          <div className="cv-log-empty">No earlier conversation.</div>
+        {rows.length === 0 ? (
+          <div className="cv-log-empty">{q ? 'No matching lines.' : 'Nothing said yet.'}</div>
         ) : (
           rows.map((m) => (
             <div key={m.id} className={`cv-log-row cv-log-${m.sender}`}>
