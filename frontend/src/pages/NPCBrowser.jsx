@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
 import { npcApi } from '../services/api/npcApi';
 import { galaxyApi } from '../services/api/galaxyApi';
-import DialogueInterface from '../features/dialogue/DialogueInterface';
+import ConversationView from '../features/dialogue/ConversationView';
 import './NPCBrowser.css';
 
 export default function NPCBrowser() {
@@ -415,7 +415,7 @@ export default function NPCBrowser() {
       </div>
 
       {selectedNPC && (
-        <DialogueInterface
+        <ConversationView
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}
         />

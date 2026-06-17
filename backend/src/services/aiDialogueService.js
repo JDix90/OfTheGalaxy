@@ -104,6 +104,9 @@ class AIDialogueService {
     }
 
     console.log(`[AI Dialogue] Generating response for NPC ${npc.name} (${npc.id}), call #${callCount + 1}`);
+    // Accumulates streamed tokens (when context.onToken is provided) so a mid-stream
+    // failure can still return the partial text instead of duplicating via a template.
+    let streamedText = '';
     try {
       // Build conversation history
       const conversationHistory = context.conversationHistory || [];
@@ -143,31 +146,63 @@ class AIDialogueService {
         context
       );
 
-      // Call OpenAI API
-      const completion = await this.openai.chat.completions.create({
+      // OpenAI request params — identical for streamed and buffered so the two
+      // modes produce equivalent text. A token sink (context.onToken) switches on
+      // real token streaming; context.signal aborts upstream generation.
+      const params = {
         model: 'gpt-4o-mini', // Using mini for cost efficiency
         messages: messages,
         max_tokens: 150, // Keep responses concise
         temperature: 0.7, // Balance creativity and consistency
         presence_penalty: 0.3, // Encourage variety
-      });
+      };
+      const requestOpts = context.signal ? { signal: context.signal } : undefined;
+      const onToken = typeof context.onToken === 'function' ? context.onToken : null;
+
+      if (onToken) {
+        // Streaming path: relay each delta to the caller as it arrives.
+        const stream = await this.openai.chat.completions.create({ ...params, stream: true }, requestOpts);
+        for await (const chunk of stream) {
+          const piece = chunk.choices[0]?.delta?.content;
+          if (piece) { streamedText += piece; onToken(piece); }
+        }
+        const full = streamedText.trim();
+        if (full) {
+          this.incrementAICallCount(conversationId);
+          this.cacheResponse(npc.id, playerMessage.toLowerCase(), full);
+          return full;
+        }
+        return null;
+      }
+
+      // Buffered path (unchanged behaviour).
+      const completion = await this.openai.chat.completions.create(params, requestOpts);
 
       const aiResponse = completion.choices[0]?.message?.content?.trim();
-      
+
       if (aiResponse) {
         // Track AI call
         this.incrementAICallCount(conversationId);
-        
+
         // Cache common responses (include NPC ID to prevent cross-NPC sharing)
         this.cacheResponse(npc.id, playerMessage.toLowerCase(), aiResponse);
-        
+
         return aiResponse;
       }
 
       return null;
     } catch (error) {
       console.error('[AI Dialogue] Error generating AI response:', error);
-      // Don't throw - gracefully fall back to templates
+      // If we already streamed partial text, keep it — re-rendering a full
+      // template reply would duplicate what the player has already seen. Count
+      // it against the per-conversation AI-call guard, same as a buffered
+      // success, so a partial-yield turn isn't "free" against the cost ceiling.
+      const partial = streamedText.trim();
+      if (partial) {
+        this.incrementAICallCount(conversationId);
+        return partial;
+      }
+      // Otherwise gracefully fall back to templates.
       return null;
     }
   }

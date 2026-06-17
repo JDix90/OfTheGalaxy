@@ -116,7 +116,7 @@ export default function SurfaceScene({
   world, input, planet, pois, npcs3d, waypoints, activePoiId, textureUrl, worldHalf,
   onProximity, onMoved, onPoiActivate, onNpcActivate,
   time, cycleSeconds, startTime = 0.6, paused, onTime, postQuality = 'high', weather,
-  combatTarget = null, onCombatTarget = () => {},
+  combatTarget = null, onCombatTarget = () => {}, focus = null,
 }) {
   const groundSize = worldHalf * 2;
   const atmoRef = useRef({ nightFactor: 0, dayFactor: 1, time: startTime });
@@ -194,7 +194,7 @@ export default function SurfaceScene({
         tiersRef={tiersRef} labelsRef={labelsRef} onChange={setNpcTiers} onLabels={setNpcLabels}
       />
 
-      <PlayerActor world={world} input={input} pois={pois} onProximity={onProximity} onMoved={onMoved} />
+      <PlayerActor world={world} input={input} pois={pois} onProximity={onProximity} onMoved={onMoved} focus={focus} />
 
       {/* Other players sharing the planet (Phase 4.1 — online only). */}
       <RemotePlayers world={world} />

@@ -291,9 +291,13 @@ class TutorialDialogueService {
       response = response.replace(/\{\{name\}\}/g, playerName);
     }
 
+    const { deriveSuggestionTone } = require('./suggestionTone');
     const result = {
       response,
-      suggestedResponses: suggestedResponses.map(r => typeof r === 'string' ? { text: r } : r),
+      suggestedResponses: suggestedResponses.map(r => {
+        const o = typeof r === 'string' ? { text: r } : r;
+        return { ...o, tone: o.tone || deriveSuggestionTone(o) };
+      }),
       offerQuest: offerQuest || false,
       nextState,
       isTutorial: true

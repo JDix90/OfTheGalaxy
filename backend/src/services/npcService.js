@@ -161,7 +161,7 @@ class NPCService {
   /**
    * Process dialogue interaction
    */
-  async processDialogue(npcId, characterId, playerMessage) {
+  async processDialogue(npcId, characterId, playerMessage, options = {}) {
     const { npc, relationship } = await this.getNPCWithRelationship(npcId, characterId);
     
     // Check if this is a tutorial NPC - use tutorial dialogue tree instead of AI
@@ -817,8 +817,14 @@ class NPCService {
     }
 
     // Generate dynamic response (normal dialogue generation)
-    // Phase 3: Pass context to dialogue generation
-    const response = await this.generateResponse(npc, relationship, character, playerMessage, { context });
+    // Phase 3: Pass context to dialogue generation. onToken/signal (when present)
+    // stream the reply token-by-token over SSE; all side-effects below still run
+    // once on the fully-accumulated text, so the turn semantics are unchanged.
+    const response = await this.generateResponse(npc, relationship, character, playerMessage, {
+      context,
+      onToken: options.onToken,
+      signal: options.signal,
+    });
     
     // Check if AI response mentions quest/work and NPC has urgent needs
     // If so, generate a quest offer even if behavior tree didn't catch it
@@ -1368,7 +1374,9 @@ class NPCService {
           {
             planet,
             conversationHistory: conversationHistory.slice(-10), // Last 10 messages
-            context: context // Phase 3: Pass context to AI
+            context: context, // Phase 3: Pass context to AI
+            onToken: options.onToken, // Phase 3: live token streaming over SSE (optional)
+            signal: options.signal,   // Phase 3: abort upstream generation on disconnect
           }
         );
 

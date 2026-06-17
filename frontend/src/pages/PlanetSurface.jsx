@@ -12,7 +12,7 @@ import { useQuestStore } from '../state/questSlice';
 import { galaxyApi } from '../services/api/galaxyApi';
 import { npcApi } from '../services/api/npcApi';
 import { characterApi } from '../services/api/characterApi';
-import DialogueInterface from '../features/dialogue/DialogueInterface';
+import ConversationView from '../features/dialogue/ConversationView';
 import POIInteractionMenu from '../components/poi/POIInteractionMenu';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
 import FastTravelMenu from '../components/fastTravel/FastTravelMenu';
@@ -2717,7 +2717,7 @@ export default function PlanetSurface() {
 
       {/* Dialogue Interface - opened when Talk is clicked */}
       {selectedNPC && !npcMenuOpen && (
-        <DialogueInterface
+        <ConversationView
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}
         />

@@ -34,7 +34,8 @@ import HUD from '../components/hud/HUD';
 import CombatToasts from '../components/hud/CombatToasts';
 import ConsumableQuickslot from '../components/hud/ConsumableQuickslot';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
-import DialogueInterface from '../features/dialogue/DialogueInterface';
+import ConversationView from '../features/dialogue/ConversationView';
+import DialogueVignette from '../features/dialogue/DialogueVignette';
 import VendorPanel from '../features/trading/VendorPanel';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -158,6 +159,12 @@ export default function SubMapView3D() {
   const pois = useMemo(() => buildSubmapPois(subMap, sim), [subMap, sim]);
   const exits = useMemo(() => buildSubmapExits(subMap, sim), [subMap, sim]);
   const npcs3d = useMemo(() => buildSubmapNpcs(npcs, subMap, sim), [npcs, subMap, sim]);
+  // World position of the NPC in dialogue → cinematic camera framing.
+  const convoFocus = useMemo(() => {
+    if (!selectedNPC) return null;
+    const n = npcs3d.find((x) => x.id === selectedNPC.id);
+    return n ? { x: n.wx, z: n.wz } : null;
+  }, [selectedNPC, npcs3d]);
   const waypoints = useMemo(() => buildSubmapWaypoints(activeQuests, subMap, sim), [activeQuests, subMap, sim]);
   const isInterior = subMap?.type === 'building_interior';
   // Furniture/decorations now also dress open districts (the spaceport concourse), not just
@@ -335,6 +342,7 @@ export default function SubMapView3D() {
             realtime={isRealtime} combatTarget={combatTarget} onCombatTarget={setCombatTarget}
             onProximity={onProximity} onMoved={onMoved}
             onPoiActivate={onPoiActivate} onNpcActivate={onNpcActivate} onExitActivate={onExitActivate}
+            focus={convoFocus}
           />
         )}
       </Canvas>
@@ -360,8 +368,9 @@ export default function SubMapView3D() {
           onShop={(n) => { setVendorNpc(n); setNpcMenu(null); }}
           position={{ x: npcMenu.x, y: npcMenu.y }} />
       )}
+      {selectedNPC && !npcMenu && <DialogueVignette />}
       {selectedNPC && !npcMenu && (
-        <DialogueInterface
+        <ConversationView
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}
           onShop={(n) => { setVendorNpc(n); setSelectedNPC(null); }}

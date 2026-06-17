@@ -37,7 +37,8 @@ import ConsumableQuickslot from '../components/hud/ConsumableQuickslot';
 import SubMapEntryMenu from '../components/submap/SubMapEntryMenu';
 import POIInteractionMenu from '../components/poi/POIInteractionMenu';
 import NPCInteractionMenu from '../components/npc/NPCInteractionMenu';
-import DialogueInterface from '../features/dialogue/DialogueInterface';
+import ConversationView from '../features/dialogue/ConversationView';
+import DialogueVignette from '../features/dialogue/DialogueVignette';
 import VendorPanel from '../features/trading/VendorPanel';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
@@ -151,6 +152,12 @@ export default function PlanetSurface3D() {
 
   const pois = useMemo(() => buildPois(planet, sim), [planet, sim]);
   const npcs3d = useMemo(() => buildNpcs(npcs, sim), [npcs, sim]);
+  // World position of the NPC currently in dialogue → cinematic camera framing.
+  const convoFocus = useMemo(() => {
+    if (!selectedNPC) return null;
+    const n = npcs3d.find((x) => x.id === selectedNPC.id);
+    return n ? { x: n.wx, z: n.wz } : null;
+  }, [selectedNPC, npcs3d]);
   const waypoints = useMemo(
     () => buildQuestWaypoints(activeQuests, planet?.id, sim, currentCharacter?.currentLocation?.area),
     [activeQuests, planet?.id, sim, currentCharacter?.currentLocation?.area],
@@ -344,6 +351,7 @@ export default function PlanetSurface3D() {
             onMoved={onMoved}
             onPoiActivate={onPoiActivate}
             onNpcActivate={onNpcActivate}
+            focus={convoFocus}
           />
         )}
       </Canvas>
@@ -385,8 +393,9 @@ export default function PlanetSurface3D() {
         />
       )}
 
+      {selectedNPC && !npcMenu && <DialogueVignette />}
       {selectedNPC && !npcMenu && (
-        <DialogueInterface
+        <ConversationView
           npc={selectedNPC}
           onClose={() => setSelectedNPC(null)}
           onShop={(n) => { setVendorNpc(n); setSelectedNPC(null); }}
