@@ -16,6 +16,7 @@ import { useEffect, useRef } from 'react';
 import { useCharacterStore } from '../state/characterSlice';
 import { createSurfaceSim, DEFAULTS } from '../../../shared/sim/surface.mjs';
 import { NetClient } from './netClient';
+import { snapToWalkable } from '../components/surface3d/surfaceData';
 
 const PERSIST_INTERVAL_MS = 2000; // throttle backend writes while walking (offline path)
 const PERSIST_MIN_MOVE = 0.6;     // world units; skip writes for tiny jitter
@@ -47,6 +48,11 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
     } else if (sp && Number.isFinite(sp.x)) {
       surf = { x: sp.x, y: sp.y, area: 'spaceport' };
     }
+    // Snap out of any wall (e.g. a saved position from before the planet's tileMap changed, like
+    // the dense medina) so the player is never boxed in. Mirrors the server's spawn guard; no-op
+    // on open planets or already-walkable spots.
+    const snapped = snapToWalkable(sim, surf.x, surf.y);
+    surf = { ...surf, x: snapped.x, y: snapped.y };
     const w0 = sim.surfaceToWorld(surf.x, surf.y);
 
     const world = {

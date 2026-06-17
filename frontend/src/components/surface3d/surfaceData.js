@@ -122,7 +122,7 @@ export function buildQuestWaypoints(activeQuests, planetId, sim, currentArea) {
 // Nudge a surface point out of any impassable tile to the nearest walkable one. Critical on the
 // dense medina (urban) maps where a fixed NPC spawn can land inside a building block; a no-op on
 // open planets (no tileMap) and on points already walkable.
-function snapToWalkable(sim, sx, sy) {
+export function snapToWalkable(sim, sx, sy) {
   if (!sim.hasTileMap || sim.isWalkableSurface(sx, sy)) return { x: sx, y: sy };
   for (let r = 2; r <= 24; r += 2) {
     for (let a = 0; a < 16; a++) {
