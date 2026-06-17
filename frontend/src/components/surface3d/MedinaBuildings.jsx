@@ -39,13 +39,25 @@ const toColorMap = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) 
 const CAT_WALL_C = toColorMap(CAT_WALL), CAT_GLOW_C = toColorMap(CAT_GLOW), CAT_AWNING_C = toColorMap(CAT_AWNING);
 const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
+// Urban (medina) is a CYBERPUNK city: grey concrete/steel/gunmetal by day, vivid neon signage by
+// night. Its own per-use palette (not the warm sandy one) keeps building-type variety in cool tones.
+const CYBER_WALL = {
+  apartment: '#474b54', shop: '#595d66', market: '#54585f', bar: '#3c3947',
+  restaurant: '#52505b', civic: '#6b7079', warehouse: '#44474d',
+};
+const CYBER_GLOW = {
+  apartment: '#6fc8ff', shop: '#ff4fd8', market: '#3ffbe0', bar: '#ff2e88',
+  restaurant: '#ff8a3d', civic: '#9b8cff', warehouse: '#39e0c8',
+};
+const CYBER_WALL_C = toColorMap(CYBER_WALL), CYBER_GLOW_C = toColorMap(CYBER_GLOW);
+
 // Per-biome look, keyed on tileMap.style (set by the settlement generators). The per-use wall/glow
 // colours are blended toward the biome's base so each world reads distinctly — sandstone outpost,
-// timber hamlet, weathered docks, frosted ice colony, basalt+ember mining camp, rusty scrap town —
-// while keeping building-type variety. medina = strength 0 (pure use colours, the original look).
+// timber hamlet, weathered docks, frosted ice colony, basalt+ember mining camp, rusty scrap town.
+// (medina has its own cyberpunk palette above, applied directly.)
 const BIOME_BASE = { medina: '#c7ab86', outpost: '#d3ba8a', hamlet: '#6e5a3e', docks: '#6e8088', dome_colony: '#e2ebf2', mining_camp: '#3c352f', scrap_town: '#7a6a52' };
 const BIOME_GLOW = { medina: '#ffcf9e', outpost: '#ffd9a0', hamlet: '#ffd09a', docks: '#7fe6ff', dome_colony: '#bfe8ff', mining_camp: '#ff6a2e', scrap_town: '#ffc066' };
-const BIOME_FILL = { medina: ['#a9c8ff', '#ffb583'], outpost: ['#bcd2ff', '#ffcf9e'], hamlet: ['#9fc0e0', '#caa46e'], docks: ['#8fd0ff', '#6fb0c0'], dome_colony: ['#cfe6ff', '#9fc4e8'], mining_camp: ['#ff8a5a', '#ff5a2e'], scrap_town: ['#bdb0d0', '#caa46e'] };
+const BIOME_FILL = { medina: ['#6ad0ff', '#c07aff'], outpost: ['#bcd2ff', '#ffcf9e'], hamlet: ['#9fc0e0', '#caa46e'], docks: ['#8fd0ff', '#6fb0c0'], dome_colony: ['#cfe6ff', '#9fc4e8'], mining_camp: ['#ff8a5a', '#ff5a2e'], scrap_town: ['#bdb0d0', '#caa46e'] };
 const BIOME_STRENGTH = 0.62; // how strongly the biome base overrides the per-use wall colour
 
 // Unit box with its base at y=0 (so an instance's Y scale grows upward from the ground).
@@ -97,13 +109,17 @@ function buildMedina(planet, worldHalf) {
 
   // Biome-tinted per-use palettes (computed once for this planet's settlement style).
   const biome = tm.style || 'medina';
-  const baseC = new THREE.Color(BIOME_BASE[biome] || BIOME_BASE.medina);
-  const glowC = new THREE.Color(BIOME_GLOW[biome] || BIOME_GLOW.medina);
-  const strength = biome === 'medina' ? 0 : BIOME_STRENGTH;
-  const wallFor = {}, glowFor = {};
-  for (const cat of Object.keys(CAT_WALL_C)) {
-    const w = CAT_WALL_C[cat].clone(); if (strength > 0) w.lerp(baseC, strength); wallFor[cat] = w;
-    const g = CAT_GLOW_C[cat].clone(); if (strength > 0) g.lerp(glowC, 0.55); glowFor[cat] = g;
+  let wallFor, glowFor;
+  if (biome === 'medina') {
+    wallFor = CYBER_WALL_C; glowFor = CYBER_GLOW_C; // grey-cyberpunk city + neon signage
+  } else {
+    const baseC = new THREE.Color(BIOME_BASE[biome] || BIOME_BASE.medina);
+    const glowC = new THREE.Color(BIOME_GLOW[biome] || BIOME_GLOW.medina);
+    wallFor = {}; glowFor = {};
+    for (const cat of Object.keys(CAT_WALL_C)) {
+      const w = CAT_WALL_C[cat].clone(); w.lerp(baseC, BIOME_STRENGTH); wallFor[cat] = w;
+      const g = CAT_GLOW_C[cat].clone(); g.lerp(glowC, 0.55); glowFor[cat] = g;
+    }
   }
   const fill = BIOME_FILL[biome] || BIOME_FILL.medina;
 
