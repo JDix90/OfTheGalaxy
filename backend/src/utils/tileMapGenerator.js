@@ -157,7 +157,32 @@ function generateUrbanTileMap(mapData, tileSize = 2) {
     t.style = (hh >>> 16) % 5;
   }
 
-  // 7) Market stalls at plaza corners (small obstacles; the plaza centre stays passable).
+  // 7) Stairwells: convert some street-adjacent building EDGE tiles into stairs up to the roof, so
+  // the rooftops are reachable (walkable upper level). A stair keeps its building's height, so
+  // ascending onto the adjacent roof of the same block is a flush step. Stairs stay ground-walkable
+  // (a notch off the alley), so they don't change the ground maze's connectivity.
+  const stairCandidates = [];
+  for (let y = 1; y < gridSize - 1; y++) for (let x = 1; x < gridSize - 1; x++) {
+    const t = tiles[y][x];
+    if (t.type !== 'building') continue;
+    let hasGround = false, hasRoof = false;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const n = tiles[y + dy] && tiles[y + dy][x + dx];
+      if (!n) continue;
+      if (n.walkable && (n.type === 'street' || n.type === 'plaza')) hasGround = true;
+      if (n.type === 'building' && n.height === t.height) hasRoof = true; // a flush roof to climb onto
+    }
+    if (hasGround && hasRoof) stairCandidates.push({ x, y, h: t.height });
+  }
+  if (stairCandidates.length) {
+    const target = Math.min(20, Math.max(6, Math.round(stairCandidates.length * 0.06)));
+    const p = target / stairCandidates.length;
+    for (const c of stairCandidates) {
+      if (rng() < p) tiles[c.y][c.x] = { type: 'stair', walkable: true, visual: 'stair', height: c.h };
+    }
+  }
+
+  // 8) Market stalls at plaza corners (small obstacles; the plaza centre stays passable).
   plazas.forEach(pl => {
     [[pl.x - 1, pl.y - 1], [pl.x + 1, pl.y - 1], [pl.x - 1, pl.y + 1], [pl.x + 1, pl.y + 1]].forEach(([sx, sy]) => {
       if (inB(sx, sy) && tiles[sy][sx].walkable && rng() < 0.7) {
@@ -1082,7 +1107,8 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
  */
 // Bump when a generator's output shape changes so cached planet.tileMap grids regenerate.
 // v2: urban planets become a dense maze-like medina (height/style-tagged buildings + stalls).
-const TILEMAP_VERSION = 2;
+// v3: medina gains 'stair' tiles → walkable rooftops (multi-level traversal).
+const TILEMAP_VERSION = 3;
 
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);

@@ -59,7 +59,7 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
       planetId: planet.id,
       sim,
       ready: true,
-      player: { x: w0.x, z: w0.z, facing: Math.PI, moving: false, speed: 0 },
+      player: { x: w0.x, z: w0.z, facing: Math.PI, moving: false, speed: 0, level: 0 },
       _net: null,
       // persistence bookkeeping (offline path)
       _persistAcc: 0,
@@ -78,6 +78,7 @@ export function useSurfaceWorld(planet, sharedSim, netOptions) {
         this.player.facing = next.facing;
         this.player.moving = next.moving;
         this.player.speed = next.speed;
+        this.player.level = next.level || 0; // 0 ground / 1 rooftop (medina multi-level)
 
         if (this._net && this._net.mode === 'online') {
           // Server is authoritative + autosaves; just stream inputs (reconcile is async).

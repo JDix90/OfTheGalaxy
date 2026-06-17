@@ -27,6 +27,7 @@ export default function PlayerActor({ world, input, pois, onProximity, onMoved }
   const motion = useRef({ speed: 0 });
   const model = useMemo(() => getCharacterModel('char.player'), []);
   const camTarget = useRef(new THREE.Vector3());
+  const playerY = useRef(0); // smoothed walk height (0 ground / roof top on the medina upper level)
   const proxAcc = useRef(0);
   const moveAcc = useRef(0);
   const lastProxId = useRef(undefined);
@@ -49,17 +50,28 @@ export default function PlayerActor({ world, input, pois, onProximity, onMoved }
     const p = w.step(i, dt);
     motion.current.speed = p.speed;
 
+    // Walk height: 0 on the ground, the roof top when up on the medina's upper level. Smoothed so
+    // climbing a stair / stepping between roof heights reads as a rise, not a teleport.
+    const sim = w.sim;
+    let targetY = 0;
+    if (sim && sim.surfaceLevelY && (p.level || 0)) {
+      const s = sim.worldToSurface(p.x, p.z);
+      targetY = sim.surfaceLevelY(s.x, s.y, p.level);
+    }
+    playerY.current += (targetY - playerY.current) * (1 - Math.pow(0.0008, dt));
+    const py = playerY.current;
+
     if (group.current) {
-      group.current.position.set(p.x, 0, p.z);
+      group.current.position.set(p.x, py, p.z);
       group.current.rotation.y = p.facing + (model.facingOffset || 0);
     }
 
-    // Third-person follow camera (behind the camera-yaw, looking at the player).
+    // Third-person follow camera (behind the camera-yaw, looking at the player; rises with them).
     const fwdX = -Math.sin(i.yaw), fwdZ = -Math.cos(i.yaw);
-    tmp.current.set(p.x - fwdX * CAM_DIST, CAM_HEIGHT, p.z - fwdZ * CAM_DIST);
+    tmp.current.set(p.x - fwdX * CAM_DIST, py + CAM_HEIGHT, p.z - fwdZ * CAM_DIST);
     if (!inited.current) { camera.position.copy(tmp.current); inited.current = true; }
     else camera.position.lerp(tmp.current, 1 - Math.pow(0.0016, dt));
-    camTarget.current.set(p.x, 1.6, p.z);
+    camTarget.current.set(p.x, py + 1.6, p.z);
     camera.lookAt(camTarget.current);
 
     // --- throttled proximity to enterable POIs ---

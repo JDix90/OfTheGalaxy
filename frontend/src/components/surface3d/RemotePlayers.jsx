@@ -25,18 +25,26 @@ function lerpAngle(a, b, t) {
   return a + d * t;
 }
 
-function RemotePlayer({ id, map }) {
+function RemotePlayer({ id, map, sim }) {
   const group = useRef();
   const motion = useRef({ speed: 0 });
+  const ry = useRef(0); // smoothed walk height (rooftop level)
   // A robot tinted by the remote's server color → clear "other player" identity.
   const entry0 = map.get(id);
   const model = useMemo(() => ({ ...getCharacterModel('char.player'), tint: entry0?.c || '#9fb3d1' }), [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useFrame(() => {
+  useFrame((_, dt) => {
     const r = map.get(id);
     if (!r || !group.current) return;
     const t = Math.min(1, (Date.now() - r.at) / INTERP_MS);
-    group.current.position.set(r.px + (r.x - r.px) * t, 0, r.pz + (r.z - r.pz) * t);
+    const x = r.px + (r.x - r.px) * t, z = r.pz + (r.z - r.pz) * t;
+    let targetY = 0;
+    if (sim && sim.surfaceLevelY && (r.l || 0)) {
+      const s = sim.worldToSurface(x, z);
+      targetY = sim.surfaceLevelY(s.x, s.y, r.l);
+    }
+    ry.current += (targetY - ry.current) * (1 - Math.pow(0.0008, Math.min(dt, 0.05)));
+    group.current.position.set(x, ry.current, z);
     group.current.rotation.y = (model.facingOffset || 0) + lerpAngle(r.pf, r.f, t);
     motion.current.speed = r.m ? (model.runRef || 6.5) * 0.8 : 0; // drive walk/idle anim
   });
@@ -66,6 +74,7 @@ export default function RemotePlayers({ world }) {
 
   const net = world.current && world.current._net;
   const map = net && net.remotes;
+  const sim = world.current && world.current.sim;
   if (!map || ids.length === 0) return null;
-  return <>{ids.map((id) => <RemotePlayer key={id} id={id} map={map} />)}</>;
+  return <>{ids.map((id) => <RemotePlayer key={id} id={id} map={map} sim={sim} />)}</>;
 }

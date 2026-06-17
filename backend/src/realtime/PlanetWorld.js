@@ -309,7 +309,7 @@ class PlanetWorld {
       level: character.level || 1,   // for enemy level-blending
       escort: false,                 // set async at join (escort-quest escalation)
       color,
-      x: spawn.x, z: spawn.z, facing: spawn.facing,
+      x: spawn.x, z: spawn.z, facing: spawn.facing, roofLevel: 0, // 0 ground / 1 rooftop (NOT `level`, which is the character level above)
       moving: false, speed: 0,
       maxHp: combatant ? combatant.stats.maxHealth : character.maxHealth,
       input: { f: 0, b: 0, l: 0, r: 0, run: 0, yaw: 0 },
@@ -380,9 +380,9 @@ class PlanetWorld {
     for (const p of this.players.values()) {
       // Dead players hold position until respawn; they don't integrate input.
       if (!p.dead) {
-        const next = this.sim.integrate({ x: p.x, z: p.z, facing: p.facing }, p.input, dt);
+        const next = this.sim.integrate({ x: p.x, z: p.z, facing: p.facing, level: p.roofLevel || 0 }, p.input, dt);
         p.x = next.x; p.z = next.z; p.facing = next.facing;
-        p.moving = next.moving; p.speed = next.speed;
+        p.moving = next.moving; p.speed = next.speed; p.roofLevel = next.level || 0;
         // Dodge dash: a brief burst in the facing direction (on top of input movement).
         if (p.dashUntil && now < p.dashUntil) {
           const step = (p.dashSpeed || 0) * dt;
@@ -533,6 +533,7 @@ class PlanetWorld {
       let target = null, best = Infinity;
       for (const p of this.players.values()) {
         if (p.dead) continue;
+        if (p.roofLevel) continue; // up on the rooftops → out of reach of ground enemies (a refuge)
         if (e.ownerId && p.id !== e.ownerId) continue;
         const d = Math.hypot(p.x - e.x, p.z - e.z);
         if (d < best) { best = d; target = p; }
@@ -578,6 +579,7 @@ class PlanetWorld {
       out.push({
         id: p.id, x: r2(p.x), z: r2(p.z), f: r2(p.facing), m: p.moving ? 1 : 0, c: p.color, name: p.name,
         hp: p.combatant ? p.combatant.stats.health : p.maxHp, maxHp: p.maxHp, dead: p.dead ? 1 : 0,
+        ...(p.roofLevel ? { l: p.roofLevel } : {}), // rooftop level (omitted on the ground to save bytes)
       });
     }
     return out;
