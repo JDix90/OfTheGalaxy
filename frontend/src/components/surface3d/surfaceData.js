@@ -119,12 +119,28 @@ export function buildQuestWaypoints(activeQuests, planetId, sim, currentArea) {
 }
 
 /** Map a surface-level NPC list to world-positioned actors. */
+// Nudge a surface point out of any impassable tile to the nearest walkable one. Critical on the
+// dense medina (urban) maps where a fixed NPC spawn can land inside a building block; a no-op on
+// open planets (no tileMap) and on points already walkable.
+function snapToWalkable(sim, sx, sy) {
+  if (!sim.hasTileMap || sim.isWalkableSurface(sx, sy)) return { x: sx, y: sy };
+  for (let r = 2; r <= 24; r += 2) {
+    for (let a = 0; a < 16; a++) {
+      const ang = (a / 16) * Math.PI * 2;
+      const nx = sx + Math.cos(ang) * r, ny = sy + Math.sin(ang) * r;
+      if (nx >= 0 && ny >= 0 && nx <= 100 && ny <= 100 && sim.isWalkableSurface(nx, ny)) return { x: nx, y: ny };
+    }
+  }
+  return { x: sx, y: sy };
+}
+
 export function buildNpcs(npcs, sim) {
   if (!sim) return [];
   return (npcs || [])
     .filter((n) => n.location && !n.location.subMapId)
     .map((n) => {
-      const s = normalizeSurfaceCoord(n.location.x || 0, n.location.y || 0);
+      const s0 = normalizeSurfaceCoord(n.location.x || 0, n.location.y || 0);
+      const s = snapToWalkable(sim, s0.x, s0.y);
       const w = sim.surfaceToWorld(s.x, s.y);
       return {
         id: n.id,
