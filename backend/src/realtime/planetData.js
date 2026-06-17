@@ -8,7 +8,7 @@
 
 const galaxyService = require('../services/galaxyService');
 const { getPlanetMapData } = require('../data/planetMaps');
-const { generateTileMapByPlanetType } = require('../utils/tileMapGenerator');
+const { generateTileMapByPlanetType, TILEMAP_VERSION } = require('../utils/tileMapGenerator');
 
 /**
  * @param {string} planetId
@@ -20,8 +20,8 @@ async function loadPlanetMapData(planetId) {
 
   const mapData = getPlanetMapData(planet) || {};
 
-  // tileMap: prefer the cached grid, else generate (same as the REST path).
-  if (planet.tileMap && planet.tileMap.tiles) {
+  // tileMap: prefer a CURRENT-version cached grid, else (re)generate (same as the REST path).
+  if (planet.tileMap && planet.tileMap.tiles && (planet.tileMap.version || 0) >= TILEMAP_VERSION) {
     mapData.tileMap = planet.tileMap;
   } else {
     try {

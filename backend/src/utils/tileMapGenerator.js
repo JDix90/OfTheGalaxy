@@ -4,86 +4,167 @@
  * Each tile is either walkable or an obstacle
  */
 
+// ---- deterministic helpers for the medina (urban) generator ----
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hash2(x, y, seed) {
+  let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(seed, 2246822519)) >>> 0;
+  h = (h ^ (h >>> 13)) >>> 0;
+  h = Math.imul(h, 1274126177) >>> 0;
+  return h >>> 0;
+}
+// Carve a straight (L-shaped) walkable corridor between two tiles — used to rescue marooned pockets.
+function carveLine(tiles, gridSize, x0, y0, x1, y1) {
+  const set = (x, y) => { if (x >= 0 && y >= 0 && x < gridSize && y < gridSize && !tiles[y][x].walkable) tiles[y][x] = { type: 'street', walkable: true, visual: 'street' }; };
+  let x = x0, y = y0;
+  while (x !== x1) { set(x, y); x += x1 > x ? 1 : -1; }
+  while (y !== y1) { set(x, y); y += y1 > y ? 1 : -1; }
+  set(x1, y1);
+}
+// Flood the walkable network from a central seed; carve straight stubs so every `mustReach`
+// tile is connected. Guarantees POI pockets aren't sealed off inside the building mass.
+function connectWalkable(tiles, gridSize, mustReach) {
+  const inB = (x, y) => x >= 0 && y >= 0 && x < gridSize && y < gridSize;
+  const nearestWalkable = (cx, cy) => {
+    for (let r = 0; r < gridSize; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+      const x = cx + dx, y = cy + dy; if (inB(x, y) && tiles[y][x].walkable) return { x, y };
+    }
+    return null;
+  };
+  const flood = (seed) => {
+    const seen = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
+    if (!seed) return seen;
+    const q = [seed]; seen[seed.y][seed.x] = true;
+    while (q.length) {
+      const { x, y } = q.shift();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy;
+        if (inB(nx, ny) && !seen[ny][nx] && tiles[ny][nx].walkable) { seen[ny][nx] = true; q.push({ x: nx, y: ny }); }
+      }
+    }
+    return seen;
+  };
+  const seedTile = nearestWalkable(gridSize >> 1, gridSize >> 1);
+  let seen = flood(seedTile);
+  const nearestSeen = (cx, cy) => {
+    for (let r = 1; r < gridSize; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+      const x = cx + dx, y = cy + dy; if (inB(x, y) && seen[y][x]) return { x, y };
+    }
+    return seedTile;
+  };
+  for (const m of mustReach) {
+    if (!inB(m.x, m.y) || (seen[m.y] && seen[m.y][m.x])) continue;
+    const tgt = nearestSeen(m.x, m.y);
+    if (tgt) { carveLine(tiles, gridSize, m.x, m.y, tgt.x, tgt.y); seen = flood(seedTile); }
+  }
+}
+
 /**
- * Generate a tile map for an urban planet
+ * Generate a tile map for an urban planet — a dense, maze-like medina.
+ * The whole map starts as buildings; a braided maze of narrow alleys is carved through it,
+ * with souk plazas, market stalls, and a walkable pocket around every POI. Building tiles carry
+ * a `height` (storeys) + `style` so the 3D surface can draw varied, crowded rooftops.
  * @param {Object} mapData - Planet map data with POIs and districts
  * @param {number} tileSize - Size of each tile as percentage (default 2% = 50x50 grid)
  * @returns {Object} Tile map with walkable/obstacle information
  */
 function generateUrbanTileMap(mapData, tileSize = 2) {
   const gridSize = Math.floor(100 / tileSize); // 50x50 grid for 2% tiles
-  const tileMap = {
-    gridSize: gridSize,
-    tileSize: tileSize,
-    tiles: []
-  };
-
-  // Initialize all tiles as open space (walkable)
-  for (let y = 0; y < gridSize; y++) {
-    tileMap.tiles[y] = [];
-    for (let x = 0; x < gridSize; x++) {
-      tileMap.tiles[y][x] = {
-        type: 'open',
-        walkable: true,
-        visual: 'terrain'
-      };
-    }
-  }
+  const tiles = [];
+  const tileMap = { gridSize, tileSize, tiles, style: 'medina' };
 
   const pois = mapData.pointsOfInterest || [];
-  const districts = mapData.mapLayout?.districts || [];
+  // Deterministic per-planet RNG so a planet always regenerates the same medina.
+  let seed = Math.abs((mapData.seed | 0) ||
+    pois.reduce((s, p) => s + Math.floor((p.x || 0) * 31 + (p.y || 0) * 17), gridSize * 101)) || 12345;
+  const rng = mulberry32(seed);
 
-  // Place buildings around POIs
-  pois.forEach(poi => {
-    if (poi.type === 'city' || poi.type === 'entertainment') {
-      // Districts are large areas - create plazas instead of buildings
-      const tileX = Math.floor(poi.x / tileSize);
-      const tileY = Math.floor(poi.y / tileSize);
-      createPlaza(tileMap, tileX, tileY, 4, 4);
-    } else {
-      // Individual POIs get buildings
-      const tileX = Math.floor(poi.x / tileSize);
-      const tileY = Math.floor(poi.y / tileSize);
-      createBuilding(tileMap, tileX, tileY, 2, 2);
+  // 1) Solid block of buildings to start.
+  for (let y = 0; y < gridSize; y++) {
+    tiles[y] = [];
+    for (let x = 0; x < gridSize; x++) tiles[y][x] = { type: 'building', walkable: false, visual: 'building' };
+  }
+  const inB = (x, y) => x >= 0 && y >= 0 && x < gridSize && y < gridSize;
+  const carve = (x, y, type = 'street') => { if (inB(x, y)) tiles[y][x] = { type, walkable: true, visual: type }; };
+
+  // 2) Braided maze of alleys on a cell lattice (recursive backtracker + a few extra loops).
+  const STREET = 2, WALL = 2, PITCH = STREET + WALL, margin = 1;
+  const cellsX = Math.floor((gridSize - margin * 2 - STREET) / PITCH) + 1;
+  const cellsY = Math.floor((gridSize - margin * 2 - STREET) / PITCH) + 1;
+  const originOf = (i, j) => ({ ox: margin + i * PITCH, oy: margin + j * PITCH });
+  const carveCell = (i, j) => { const { ox, oy } = originOf(i, j); for (let dy = 0; dy < STREET; dy++) for (let dx = 0; dx < STREET; dx++) carve(ox + dx, oy + dy); };
+  const carvePassage = (i, j, ni, nj) => {
+    const { ox, oy } = originOf(i, j);
+    if (ni > i) for (let dy = 0; dy < STREET; dy++) for (let g = 0; g < WALL; g++) carve(ox + STREET + g, oy + dy);
+    else if (ni < i) for (let dy = 0; dy < STREET; dy++) for (let g = 1; g <= WALL; g++) carve(ox - g, oy + dy);
+    else if (nj > j) for (let dx = 0; dx < STREET; dx++) for (let g = 0; g < WALL; g++) carve(ox + dx, oy + STREET + g);
+    else for (let dx = 0; dx < STREET; dx++) for (let g = 1; g <= WALL; g++) carve(ox + dx, oy - g);
+  };
+  const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  const visited = Array.from({ length: cellsY }, () => Array(cellsX).fill(false));
+  const stack = [[0, 0]]; visited[0][0] = true; carveCell(0, 0);
+  while (stack.length) {
+    const [ci, cj] = stack[stack.length - 1];
+    const open = DIRS.map(([dx, dy]) => [ci + dx, cj + dy]).filter(([ni, nj]) => ni >= 0 && nj >= 0 && ni < cellsX && nj < cellsY && !visited[nj][ni]);
+    if (open.length) { const [ni, nj] = open[(rng() * open.length) | 0]; visited[nj][ni] = true; carveCell(ni, nj); carvePassage(ci, cj, ni, nj); stack.push([ni, nj]); }
+    else stack.pop();
+  }
+  // Braid: extra passages create loops/through-routes (less labyrinth, more bustling medina).
+  for (let cj = 0; cj < cellsY; cj++) for (let ci = 0; ci < cellsX; ci++) {
+    if (rng() < 0.14) {
+      const opts = DIRS.map(([dx, dy]) => [ci + dx, cj + dy]).filter(([ni, nj]) => ni >= 0 && nj >= 0 && ni < cellsX && nj < cellsY);
+      if (opts.length) { const [ni, nj] = opts[(rng() * opts.length) | 0]; carvePassage(ci, cj, ni, nj); }
     }
-  });
+  }
 
-  // Create main streets connecting districts
-  const majorPOIs = pois.filter(p => 
-    p.type === 'spaceport' || 
-    p.type === 'city' || 
-    p.type === 'palace' ||
-    p.type === 'entertainment'
-  );
+  // 3) Souk plazas: open a few cells into wider market squares.
+  const plazas = [];
+  const plazaCount = 2 + ((rng() * 3) | 0);
+  for (let p = 0; p < plazaCount; p++) {
+    const ci = (rng() * cellsX) | 0, cj = (rng() * cellsY) | 0;
+    const { ox, oy } = originOf(ci, cj);
+    for (let dy = -1; dy <= STREET; dy++) for (let dx = -1; dx <= STREET; dx++) {
+      const x = ox + dx, y = oy + dy;
+      if (x >= margin && y >= margin && x < gridSize - margin && y < gridSize - margin) carve(x, y, 'plaza');
+    }
+    plazas.push({ x: ox + (STREET >> 1), y: oy + (STREET >> 1) });
+  }
 
-  // Connect spaceport to all major districts
-  const spaceport = majorPOIs.find(p => p.type === 'spaceport');
-  if (spaceport) {
-    majorPOIs.forEach(target => {
-      if (target !== spaceport) {
-        createStreet(tileMap, spaceport, target, 3); // 3 tiles wide
+  // 4) POIs + spaceport: carve a walkable pocket so each structure sits in the open and stays enterable.
+  const anchors = pois.map(p => ({ x: Math.floor((p.x ?? 50) / tileSize), y: Math.floor((p.y ?? 50) / tileSize) }));
+  if (mapData.spaceport && Number.isFinite(mapData.spaceport.x)) {
+    anchors.push({ x: Math.floor(mapData.spaceport.x / tileSize), y: Math.floor(mapData.spaceport.y / tileSize) });
+  }
+  anchors.forEach(a => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) carve(a.x + dx, a.y + dy, 'plaza'); });
+
+  // 5) Guarantee every pocket connects to the alley network (carve straight stubs if marooned).
+  connectWalkable(tiles, gridSize, anchors);
+
+  // 6) Tag building tiles with a coherent per-block height + style for the 3D renderer.
+  for (let y = 0; y < gridSize; y++) for (let x = 0; x < gridSize; x++) {
+    const t = tiles[y][x];
+    if (t.type !== 'building') continue;
+    const sbx = Math.floor((x - margin) / PITCH), sby = Math.floor((y - margin) / PITCH);
+    const hh = hash2(sbx, sby, seed);
+    const roll = (hh & 0xffff) / 0xffff;
+    t.height = roll < 0.42 ? 1 : roll < 0.74 ? 2 : roll < 0.92 ? 3 : 4; // mostly low, a few towers
+    t.style = (hh >>> 16) % 5;
+  }
+
+  // 7) Market stalls at plaza corners (small obstacles; the plaza centre stays passable).
+  plazas.forEach(pl => {
+    [[pl.x - 1, pl.y - 1], [pl.x + 1, pl.y - 1], [pl.x - 1, pl.y + 1], [pl.x + 1, pl.y + 1]].forEach(([sx, sy]) => {
+      if (inB(sx, sy) && tiles[sy][sx].walkable && rng() < 0.7) {
+        tiles[sy][sx] = { type: 'stall', walkable: false, visual: 'stall', stallStyle: (rng() * 4) | 0 };
       }
     });
-  }
-
-  // Create secondary streets between nearby POIs
-  for (let i = 0; i < pois.length; i++) {
-    for (let j = i + 1; j < pois.length; j++) {
-      const poi1 = pois[i];
-      const poi2 = pois[j];
-      const distance = Math.sqrt(
-        Math.pow(poi1.x - poi2.x, 2) + Math.pow(poi1.y - poi2.y, 2)
-      );
-      
-      // Connect nearby POIs (within 30% of map)
-      if (distance < 30 && distance > 5) {
-        createStreet(tileMap, poi1, poi2, 2); // 2 tiles wide (alley)
-      }
-    }
-  }
-
-  // Fill in alleys around buildings
-  createAlleys(tileMap);
+  });
 
   return tileMap;
 }
@@ -999,7 +1080,17 @@ function createLavaFlow(tileMap, startX, startY, endX, endY) {
 /**
  * Generate tile map based on planet type
  */
+// Bump when a generator's output shape changes so cached planet.tileMap grids regenerate.
+// v2: urban planets become a dense maze-like medina (height/style-tagged buildings + stalls).
+const TILEMAP_VERSION = 2;
+
 function generateTileMapByPlanetType(planet, mapData, tileSize = 2) {
+  const tm = _dispatchTileMapByPlanetType(planet, mapData, tileSize);
+  if (tm && typeof tm === 'object') tm.version = TILEMAP_VERSION;
+  return tm;
+}
+
+function _dispatchTileMapByPlanetType(planet, mapData, tileSize = 2) {
   const planetType = planet.planetType || planet.type;
   const terrain = mapData.terrain;
 
@@ -1052,6 +1143,7 @@ module.exports = {
   generateVolcanicTileMap,
   generateBarrenTileMap,
   generateTileMapByPlanetType,
+  TILEMAP_VERSION,
   isWalkable,
   getTileType
 };

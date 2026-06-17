@@ -263,13 +263,14 @@ class GalaxyController {
         }
 
         // Generate tile map for all planets (classic RPG-style navigation)
-        // Check if tile map is cached in database first
-        if (planet.tileMap && planet.tileMap.tiles) {
+        // Check if a CURRENT-version tile map is cached in the database first.
+        const { TILEMAP_VERSION } = require('../utils/tileMapGenerator');
+        if (planet.tileMap && planet.tileMap.tiles && (planet.tileMap.version || 0) >= TILEMAP_VERSION) {
           // Use cached tile map
           planetData.mapData.tileMap = planet.tileMap;
           console.log(`[Planet API] ${id}: Using cached tile map (${planet.tileMap.gridSize}x${planet.tileMap.gridSize} grid)`);
         } else {
-          // Generate new tile map based on planet type
+          // Generate new (or upgrade a stale) tile map based on planet type
           const { generateTileMapByPlanetType } = require('../utils/tileMapGenerator');
           try {
             const tileMap = generateTileMapByPlanetType(planet, mapData);
