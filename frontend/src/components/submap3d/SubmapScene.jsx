@@ -77,7 +77,8 @@ export default function SubmapScene({
       {!interior && <SubmapEnclosure sim={sim} mode={enclosureMode} />}
 
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}
-      {interior && <Furniture items={furniture} />}
+      {/* Furniture/props dress both enclosed interiors and open districts (spaceport concourse). */}
+      {furniture && furniture.length > 0 && <Furniture items={furniture} />}
 
       {pois.map((poi) => (
         <PoiStructure key={poi.id} poi={poi} active={poi.id === activePoiId} lit onActivate={onPoiActivate} />

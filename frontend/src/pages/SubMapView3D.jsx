@@ -159,7 +159,9 @@ export default function SubMapView3D() {
   const npcs3d = useMemo(() => buildSubmapNpcs(npcs, subMap, sim), [npcs, subMap, sim]);
   const waypoints = useMemo(() => buildSubmapWaypoints(activeQuests, subMap, sim), [activeQuests, subMap, sim]);
   const isInterior = subMap?.type === 'building_interior';
-  const furniture = useMemo(() => (isInterior ? buildSubmapFurniture(subMap, sim) : []), [isInterior, subMap, sim]);
+  // Furniture/decorations now also dress open districts (the spaceport concourse), not just
+  // enclosed building interiors — buildSubmapFurniture is a no-op when the layout has none.
+  const furniture = useMemo(() => buildSubmapFurniture(subMap, sim), [subMap, sim]);
 
   const planetLike = useMemo(() => ({ terrain: subMap?.type === 'spaceport' ? 'urban' : (subMap?.type || 'urban') }), [subMap]);
 
