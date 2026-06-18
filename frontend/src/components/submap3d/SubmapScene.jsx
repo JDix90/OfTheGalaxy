@@ -27,9 +27,10 @@ import ExitMarker from './ExitMarker';
 import InteriorWalls from './InteriorWalls';
 import SubmapProps from './SubmapProps';
 import SubmapCrowd from './SubmapCrowd';
+import SubmapSign from './SubmapSign';
 import SubmapEnclosure from './SubmapEnclosure';
 import { getSubmapTheme } from './submapThemes';
-import { buildSubmapProps } from './submapData';
+import { buildSubmapProps, buildSubmapSignage } from './submapData';
 
 // Cap on per-POI accent point lights so a roomful never blows the shared MAX_POINT_LIGHTS budget.
 const MAX_ACCENT_LIGHTS = 6;
@@ -74,6 +75,8 @@ export default function SubmapScene({
   // Themed dressing: biobeds/stalls/cargo/etc. derived from the layout + theme (replaces the bare
   // boxes; zone-derived props furnish the otherwise-empty clinic/market).
   const propData = useMemo(() => buildSubmapProps(subMap, sim, theme), [subMap, sim, theme]);
+  // Diegetic wayfinding signs for named zones (Reception / Hangar Bay / Market Floor / ...).
+  const signs = useMemo(() => buildSubmapSignage(subMap, sim, theme), [subMap, sim, theme]);
 
   // Exits double as enterable POIs so PlayerActor's proximity prompt reuse works.
   const proximityPois = useMemo(() => ([
@@ -97,6 +100,9 @@ export default function SubmapScene({
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}
       {/* Themed props dress both enclosed interiors and open districts (spaceport concourse). */}
       <SubmapProps data={propData} theme={theme} />
+
+      {/* Diegetic wayfinding signs for the interior's named zones. */}
+      {signs.map((s) => <SubmapSign key={s.id} sign={s} theme={theme} />)}
 
       {/* Building interiors keep their own InteriorWalls shell (no enclosure), so give them a
           themed fill so a home reads warm/cozy instead of flat daylight. */}

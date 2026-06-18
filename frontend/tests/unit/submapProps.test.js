@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { createSubmapSim, buildSubmapProps } from '../../src/components/submap3d/submapData';
+import { createSubmapSim, buildSubmapProps, buildSubmapSignage } from '../../src/components/submap3d/submapData';
 import { getSubmapTheme } from '../../src/components/submap3d/submapThemes';
 
 const B = (id, type, x, y, w = 2, h = 2) => ({ id, name: id, type, position: { x, y }, size: { width: w, height: h } });
@@ -53,5 +53,39 @@ describe('buildSubmapProps — themed dressing', () => {
 
   test('no sim → empty', () => {
     expect(buildSubmapProps(sm('market', {}), null, getSubmapTheme({ type: 'market' }))).toEqual({ themed: [], boxes: [] });
+  });
+});
+
+describe('buildSubmapSignage — diegetic zone signs', () => {
+  const Z = (id, name, x, y, width, height) => ({ id, name, bounds: { x, y, width, height } });
+
+  test('one world-positioned sign per named zone, deduped, whole-floor zones skipped', () => {
+    const subMap = sm('medical_center', {
+      zones: [
+        Z('a', 'Reception', 0, 5, 4, 3),
+        Z('b', 'Treatment Wing', 0, 0, 7, 4),
+        Z('b2', 'Treatment Wing', 8, 0, 4, 4),  // duplicate name → deduped
+        Z('c', 'Whole Floor', 0, 0, 12, 12),     // 100% area → skipped
+        { id: 'd', bounds: { x: 1, y: 1, width: 2, height: 2 } }, // no name → skipped
+      ],
+    });
+    const sim = createSubmapSim(subMap);
+    const signs = buildSubmapSignage(subMap, sim, getSubmapTheme(subMap));
+    expect(signs.map((s) => s.label).sort()).toEqual(['Reception', 'Treatment Wing']);
+    signs.forEach((s) => { expect(Number.isFinite(s.wx)).toBe(true); expect(Number.isFinite(s.wz)).toBe(true); });
+  });
+
+  test('caps at 12 signs', () => {
+    const zones = [];
+    for (let i = 0; i < 20; i++) zones.push(Z(`z${i}`, `Zone ${i}`, (i % 10), Math.floor(i / 10), 1, 1));
+    const subMap = sm('city', { zones });
+    const sim = createSubmapSim(subMap);
+    expect(buildSubmapSignage(subMap, sim, getSubmapTheme(subMap)).length).toBe(12);
+  });
+
+  test('no zones → no signs', () => {
+    const subMap = sm('market', { buildings: [] });
+    const sim = createSubmapSim(subMap);
+    expect(buildSubmapSignage(subMap, sim, getSubmapTheme(subMap))).toEqual([]);
   });
 });
