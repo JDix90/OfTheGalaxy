@@ -4,20 +4,22 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(4, 8, 18, 0.72);
+  backdrop-filter: var(--hud-blur);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: var(--hud-z-overlays-top);
   padding: 2rem;
   overflow-y: auto;
   /* Ensure overlay can scroll if modal is too tall */
 }
 
 .quest-offer-modal {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid #3b82f6;
-  border-radius: 12px;
+  background: var(--hud-surface-strong);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-accent);
+  border-radius: var(--hud-radius);
   max-width: 600px;
   width: 100%;
   max-height: calc(100vh - 4rem); /* Account for padding */
@@ -47,15 +49,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 2px solid #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
+  border-bottom: 1px solid var(--hud-border-soft);
+  background: var(--hud-accent-soft);
 }
 
 .quest-offer-header h2 {
   margin: 0;
-  color: #fcd34d;
+  color: var(--hud-text-primary);
+  font-weight: 600;
   font-size: 1.5rem;
-  text-shadow: 0 0 10px rgba(252, 211, 77, 0.5);
 }
 
 .quest-offer-close {
@@ -116,7 +118,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  border: 1px solid #3b82f6;
+  border: 1px solid var(--hud-accent);
 }
 
 .quest-offer-description,
@@ -131,7 +133,7 @@
 .quest-offer-rewards strong,
 .quest-offer-relationship-bonus strong,
 .quest-offer-consequences strong {
-  color: #fcd34d;
+  color: var(--hud-warn);
   display: block;
   margin-bottom: 0.5rem;
 }
@@ -155,11 +157,11 @@
   content: '▸';
   position: absolute;
   left: 0;
-  color: #3b82f6;
+  color: var(--hud-accent);
 }
 
 .quest-offer-objectives li.objective-completed {
-  color: #22c55e;
+  color: var(--hud-heal);
   opacity: 0.8;
 }
 
@@ -168,7 +170,7 @@
 }
 
 .quest-offer-objectives li .objective-check {
-  color: #22c55e;
+  color: var(--hud-heal);
   margin-right: 0.5rem;
   font-weight: bold;
 }
@@ -218,7 +220,7 @@
 }
 
 .quest-offer-relationship-bonus strong {
-  color: #34d399;
+  color: var(--hud-heal);
 }
 
 .quest-offer-consequences ul {
@@ -240,7 +242,7 @@
 }
 
 .quest-offer-consequences li.positive {
-  color: #34d399;
+  color: var(--hud-heal);
 }
 
 .quest-offer-warning {
@@ -257,7 +259,7 @@
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
-  border-top: 2px solid #3b82f6;
+  border-top: 2px solid var(--hud-accent);
   background: rgba(59, 130, 246, 0.05);
 }
 
@@ -284,15 +286,15 @@
 }
 
 .btn-accept {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  color: white;
-  border: 1px solid #22c55e;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  background: rgba(108, 240, 194, 0.14);
+  color: var(--hud-heal);
+  border: 1px solid var(--hud-heal);
+  box-shadow: 0 4px 12px rgba(108, 240, 194, 0.2);
 }
 
 .btn-accept:hover:not(:disabled) {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  background: rgba(108, 240, 194, 0.24);
+  box-shadow: 0 6px 16px rgba(108, 240, 194, 0.3);
   transform: translateY(-1px);
 }
 

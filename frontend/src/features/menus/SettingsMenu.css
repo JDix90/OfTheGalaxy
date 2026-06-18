@@ -1,22 +1,22 @@
 .settings-menu {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   max-width: 600px;
 }
 
 .settings-section {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background-color: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  border-radius: var(--hud-radius-sm);
+  border: 1px solid var(--hud-border-soft);
 }
 
 .settings-section h3 {
   margin: 0 0 1.5rem 0;
   font-size: 1.3rem;
-  color: var(--primary-color);
-  text-shadow: 0 0 6px rgba(74, 158, 255, 0.5);
-  border-bottom: 1px solid var(--border-color);
+  color: var(--hud-text-primary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--hud-border-soft);
   padding-bottom: 0.75rem;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .setting-item label {
-  color: var(--text-primary);
+  color: var(--hud-text-secondary);
   font-size: 0.95rem;
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@
 .setting-item input[type="range"] {
   width: 100%;
   height: 6px;
-  background-color: var(--bg-tertiary);
+  background: var(--hud-surface);
   border-radius: 3px;
   outline: none;
   -webkit-appearance: none;
@@ -53,48 +53,47 @@
   appearance: none;
   width: 18px;
   height: 18px;
-  background-color: var(--primary-color);
+  background: var(--hud-accent);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+  box-shadow: 0 0 8px var(--hud-accent-soft);
 }
 
 .setting-item input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  background-color: var(--primary-color);
+  background: var(--hud-accent);
   border-radius: 50%;
   cursor: pointer;
   border: none;
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+  box-shadow: 0 0 8px var(--hud-accent-soft);
 }
 
 .setting-item input[type="checkbox"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: var(--primary-color);
+  accent-color: var(--hud-accent);
 }
 
 .setting-item select {
   padding: 0.5rem 1rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius-sm);
   font-size: 0.9rem;
   cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
   outline: none;
 }
 
 .setting-item select:hover {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
 }
 
 .setting-item select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+  border-color: var(--hud-accent);
+  box-shadow: 0 0 0 1px var(--hud-accent-soft);
 }
 
 .settings-actions {
@@ -102,31 +101,29 @@
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid var(--border-color);
+  border-top: 1px solid var(--hud-border-soft);
 }
 
 .save-settings-button,
 .reset-settings-button {
   flex: 1;
   padding: 0.75rem 1.5rem;
-  border: 2px solid;
-  border-radius: 6px;
+  border: 1px solid;
+  border-radius: var(--hud-radius-sm);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
   transition: all 0.2s;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .save-settings-button {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
+  background: var(--hud-accent-soft);
+  border-color: var(--hud-accent);
+  color: var(--hud-accent);
 }
 
 .save-settings-button:hover:not(:disabled) {
-  background-color: #5a9fff;
-  box-shadow: 0 0 12px rgba(74, 158, 255, 0.4);
+  background: rgba(74, 158, 255, 0.28);
 }
 
 .save-settings-button:disabled {
@@ -135,13 +132,13 @@
 }
 
 .reset-settings-button {
-  background-color: transparent;
-  border-color: var(--border-color);
-  color: var(--text-primary);
+  background: transparent;
+  border-color: var(--hud-border-soft);
+  color: var(--hud-text-secondary);
 }
 
 .reset-settings-button:hover {
-  background-color: var(--bg-tertiary);
-  border-color: var(--text-secondary);
+  background: var(--hud-surface-soft);
+  border-color: var(--hud-text-muted);
 }
 

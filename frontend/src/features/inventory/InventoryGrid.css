@@ -2,9 +2,9 @@
   position: relative;
   flex: 1;
   overflow: auto;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background-color: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   padding: 1rem;
 }
 

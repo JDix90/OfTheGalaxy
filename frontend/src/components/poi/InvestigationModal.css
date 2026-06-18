@@ -4,19 +4,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(4, 8, 18, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
+  z-index: var(--hud-z-overlays);
+  backdrop-filter: var(--hud-blur);
 }
 
 .investigation-modal {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid #3b82f6;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.3);
+  background: var(--hud-surface-strong);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-accent);
+  border-radius: var(--hud-radius);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
   max-width: 600px;
   width: 90%;
   max-height: 80vh;
@@ -30,16 +31,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
-  background: rgba(59, 130, 246, 0.1);
+  border-bottom: 1px solid var(--hud-border-soft);
+  background: var(--hud-accent-soft);
 }
 
 .investigation-modal-header h2 {
   margin: 0;
-  color: #ffffff;
+  color: var(--hud-text-primary);
   font-size: 24px;
   font-weight: 600;
-  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
 .investigation-modal-header .close-btn {
@@ -142,21 +142,19 @@
 }
 
 .investigation-modal-footer .close-button {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border: none;
-  color: #ffffff;
+  background: var(--hud-accent-soft);
+  border: 1px solid var(--hud-accent);
+  color: var(--hud-accent);
   padding: 10px 24px;
-  border-radius: 6px;
+  border-radius: var(--hud-radius-sm);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .investigation-modal-footer .close-button:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  background: rgba(74, 158, 255, 0.28);
   transform: translateY(-1px);
 }
 

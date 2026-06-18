@@ -2,8 +2,8 @@
 
 .galaxy-map-container {
   min-height: 100vh;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: var(--hud-surface-strong);
+  color: var(--hud-text-primary);
   padding: 2rem;
 }
 
@@ -17,7 +17,7 @@
 .galaxy-map-header h1 {
   margin: 0;
   font-size: 2rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .map-controls {
@@ -28,25 +28,26 @@
 
 .map-controls button {
   padding: 0.5rem 1rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border);
   border-radius: 4px;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .map-controls button:hover {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
+  background: var(--hud-accent-soft);
+  border-color: var(--hud-accent);
 }
 
 .map-controls select {
   padding: 0.5rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border);
   border-radius: 4px;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   cursor: pointer;
 }
 
@@ -58,7 +59,9 @@
 
 .map-canvas-container {
   flex: 1;
-  background: var(--bg-secondary);
+  background: var(--hud-surface-soft);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border-soft);
   border-radius: 8px;
   overflow: hidden;
   position: relative;
@@ -71,7 +74,7 @@
   height: 100%;
   display: block;
   cursor: grab;
-  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  background: radial-gradient(circle at center, #0e1424 0%, #06090f 100%);
   user-select: none;
   -webkit-user-select: none;
 }
@@ -82,7 +85,9 @@
 
 .map-sidebar {
   width: 350px;
-  background: var(--bg-secondary);
+  background: var(--hud-surface-soft);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border);
   border-radius: 8px;
   padding: 1.5rem;
   overflow-y: auto;
@@ -93,24 +98,24 @@
 
 .map-stats {
   padding: 1rem;
-  background: var(--bg-tertiary);
+  background: var(--hud-surface-soft);
   border-radius: 6px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--hud-border-soft);
 }
 
 .stats-text {
   margin: 0 0 0.5rem 0;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.9rem;
 }
 
 .stats-text strong {
-  color: var(--primary-color);
+  color: var(--hud-accent);
 }
 
 .stats-hint {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--hud-text-muted);
   font-size: 0.8rem;
   font-style: italic;
   line-height: 1.4;
@@ -118,25 +123,25 @@
 
 .planets-hint {
   margin: 0 0 0.75rem 0;
-  color: var(--text-secondary);
+  color: var(--hud-text-muted);
   font-size: 0.85rem;
   font-style: italic;
 }
 
 .system-details h2 {
   margin: 0 0 0.5rem 0;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1.5rem;
 }
 
 .system-region {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
 
 .system-description {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -149,16 +154,16 @@
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--hud-border);
 }
 
 .info-label {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-weight: 500;
 }
 
 .info-value {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-weight: 600;
 }
 
@@ -168,14 +173,14 @@
 
 .planets-list h3 {
   margin: 0 0 1rem 0;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1.2rem;
 }
 
 .planet-item {
   padding: 1rem;
-  background: var(--bg-tertiary);
-  border: 2px solid var(--border-color);
+  background: var(--hud-surface);
+  border: 2px solid var(--hud-border);
   border-radius: 8px;
   margin-bottom: 0.5rem;
   cursor: pointer;
@@ -183,29 +188,29 @@
 }
 
 .planet-item:hover {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   background: rgba(74, 158, 255, 0.1);
 }
 
 .planet-item.selected {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   background: rgba(74, 158, 255, 0.2);
 }
 
 .planet-item.current {
-  border-color: #4ade80;
-  background: rgba(74, 222, 128, 0.1);
+  border-color: var(--hud-heal);
+  background: rgba(108, 240, 194, 0.1);
 }
 
 .planet-name {
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   margin-bottom: 0.25rem;
 }
 
 .planet-type {
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   text-transform: capitalize;
 }
 
@@ -213,7 +218,7 @@
   display: inline-block;
   margin-top: 0.5rem;
   padding: 0.25rem 0.5rem;
-  background: #4ade80;
+  background: var(--hud-heal);
   color: #0f172a;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -226,14 +231,14 @@
 
 .routes-list h3 {
   margin: 0 0 1rem 0;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1.2rem;
 }
 
 .route-item {
   padding: 0.75rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface);
+  border: 1px solid var(--hud-border);
   border-radius: 6px;
   margin-bottom: 0.5rem;
   cursor: pointer;
@@ -241,14 +246,14 @@
 }
 
 .route-item:hover {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   background: rgba(74, 158, 255, 0.1);
   transform: translateX(4px);
 }
 
 .route-destination {
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   margin-bottom: 0.25rem;
 }
 
@@ -256,18 +261,18 @@
   display: flex;
   gap: 1rem;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .planet-details {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid var(--border-color);
+  border-top: 2px solid var(--hud-border);
 }
 
 .planet-details h3 {
   margin: 0 0 1rem 0;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1.3rem;
 }
 
@@ -276,7 +281,7 @@
 }
 
 .planet-description {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   line-height: 1.6;
   margin-top: 1rem;
 }
@@ -286,8 +291,8 @@
 }
 
 .travel-cost-info {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface);
+  border: 1px solid var(--hud-border);
   border-radius: 6px;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -301,16 +306,16 @@
 }
 
 .cost-row span:first-child {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .cost-row span:last-child {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-weight: 600;
 }
 
 .cost-row .sufficient {
-  color: #4ade80;
+  color: var(--hud-heal);
 }
 
 .cost-row .insufficient {
@@ -320,7 +325,7 @@
 .travel-button {
   width: 100%;
   padding: 1rem;
-  background: var(--primary-color);
+  background: var(--hud-accent);
   border: none;
   border-radius: 8px;
   color: white;
@@ -355,8 +360,8 @@
 }
 
 .travel-confirm-dialog {
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  border: 2px solid var(--hud-border);
   border-radius: 12px;
   padding: 2rem;
   max-width: 500px;
@@ -366,7 +371,7 @@
 
 .travel-confirm-dialog h2 {
   margin: 0 0 1.5rem 0;
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-size: 1.8rem;
   text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
 }
@@ -377,13 +382,13 @@
 
 .confirm-details p {
   margin: 0 0 1rem 0;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1.1rem;
 }
 
 .cost-breakdown {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface);
+  border: 1px solid var(--hud-border);
   border-radius: 6px;
   padding: 1rem;
   margin-top: 1rem;
@@ -401,16 +406,16 @@
 }
 
 .cost-item span:first-child {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .cost-item span:last-child {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-weight: 600;
 }
 
 .cost-item .sufficient {
-  color: #4ade80;
+  color: var(--hud-heal);
 }
 
 .cost-item .insufficient {
@@ -447,7 +452,7 @@
 }
 
 .confirm-button {
-  background: var(--primary-color);
+  background: var(--hud-accent);
   color: white;
 }
 
@@ -462,13 +467,13 @@
 }
 
 .cancel-button {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
 }
 
 .cancel-button:hover:not(:disabled) {
-  background: var(--bg-dark);
+  background: var(--hud-surface-soft);
 }
 
 .loading,
@@ -478,7 +483,7 @@
   align-items: center;
   height: 100vh;
   font-size: 1.2rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .error {
@@ -545,7 +550,7 @@
 .reveal-banner-title {
   font-size: 1.15rem;
   font-weight: 800;
-  background: linear-gradient(180deg, #ffe9a8, #fbbf24);
+  background: linear-gradient(180deg, #ffe9a8, var(--hud-warn));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

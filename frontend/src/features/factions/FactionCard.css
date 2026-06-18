@@ -1,14 +1,15 @@
 .faction-card {
-  background-color: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
+  background-color: var(--hud-surface-soft);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   padding: 1.5rem;
   transition: all 0.2s;
 }
 
 .faction-card:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+  border-color: var(--hud-accent);
+  box-shadow: 0 0 0 1px var(--hud-accent-soft);
   transform: translateY(-2px);
 }
 
@@ -22,8 +23,8 @@
 .faction-title {
   margin: 0;
   font-size: 1.25rem;
-  color: var(--text-primary);
-  font-weight: bold;
+  color: var(--hud-text-primary);
+  font-weight: 600;
 }
 
 .tier-badge {

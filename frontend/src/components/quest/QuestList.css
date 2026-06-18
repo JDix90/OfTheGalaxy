@@ -4,39 +4,40 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(4, 8, 18, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
+  z-index: var(--hud-z-overlays);
+  backdrop-filter: var(--hud-blur);
 }
 
 .quest-list-content {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid #4a9eff;
-  border-radius: 12px;
+  background: var(--hud-surface-strong);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius);
   width: 90%;
   max-width: 700px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
 }
 
 .quest-list-header {
   padding: 1.5rem;
-  border-bottom: 2px solid rgba(74, 158, 255, 0.3);
+  border-bottom: 1px solid var(--hud-border-soft);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .quest-list-header h2 {
   margin: 0;
-  color: #93c5fd;
-  font-family: 'Orbitron', sans-serif;
+  color: var(--hud-text-primary);
+  font-weight: 600;
   font-size: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -44,11 +45,11 @@
 
 .quest-list-header .close-btn {
   background: transparent;
-  border: 2px solid #ef4444;
-  color: #ef4444;
+  border: 1px solid var(--hud-border-soft);
+  color: var(--hud-text-muted);
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: var(--hud-radius-sm);
   cursor: pointer;
   font-size: 1.2rem;
   display: flex;
@@ -58,8 +59,9 @@
 }
 
 .quest-list-header .close-btn:hover {
-  background: #ef4444;
-  color: white;
+  background: rgba(255, 90, 74, 0.14);
+  color: var(--hud-danger);
+  border-color: var(--hud-danger);
   transform: rotate(90deg);
 }
 
@@ -103,9 +105,9 @@
 }
 
 .quest-item.selected {
-  border-color: #fbbf24;
+  border-color: var(--hud-accent);
   background: rgba(30, 41, 59, 0.9);
-  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+  box-shadow: 0 0 0 1px var(--hud-accent-soft);
 }
 
 .quest-header {
@@ -118,7 +120,6 @@
 .quest-header h3 {
   margin: 0;
   color: #e2e8f0;
-  font-family: 'Orbitron', sans-serif;
   font-size: 1.1rem;
 }
 
@@ -167,10 +168,9 @@
 .quest-full-description strong,
 .quest-objectives strong,
 .quest-rewards strong {
-  color: #fbbf24;
+  color: var(--hud-warn);
   display: block;
   margin-bottom: 0.5rem;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .quest-full-description p {
@@ -191,7 +191,7 @@
 }
 
 .quest-rewards p {
-  color: #34d399;
+  color: var(--hud-heal);
   margin: 0;
   font-weight: 500;
 }
@@ -199,11 +199,10 @@
 .accept-quest-btn {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border: 2px solid #34d399;
-  color: white;
-  border-radius: 8px;
-  font-family: 'Orbitron', sans-serif;
+  background: rgba(108, 240, 194, 0.14);
+  border: 1px solid var(--hud-heal);
+  color: var(--hud-heal);
+  border-radius: var(--hud-radius-sm);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -213,9 +212,9 @@
 }
 
 .accept-quest-btn:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: rgba(108, 240, 194, 0.24);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.4);
+  box-shadow: 0 4px 12px rgba(108, 240, 194, 0.25);
 }
 
 .accept-quest-btn:active {
