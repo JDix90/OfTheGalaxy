@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { prefersReducedMotion } from '../utils/motion';
-import GalaxyScene3D from '../components/galaxy/GalaxyScene3D';
+import GalaxyScene3D, { GALAXY_COLORS } from '../components/galaxy/GalaxyScene3D';
 import { useCharacterStore } from '../state/characterSlice';
 import { useDiscoveryStore } from '../state/discoverySlice';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../services/tutorialTargetRegistry';
@@ -17,7 +17,7 @@ import { CharacterManager } from '../core/character/CharacterManager';
 import { useOptimizedCanvas } from '../hooks/useOptimizedCanvas';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import HUD from '../components/hud/HUD';
+import PauseMenu from '../features/menus/PauseMenu';
 import { formatDisplayName } from '../utils/formatName';
 import './GalaxyMap.css';
 
@@ -55,14 +55,8 @@ export default function GalaxyMap() {
   // Keyboard shortcuts
   useKeyboardShortcuts({
     onPauseMenuToggle: () => setIsPauseMenuOpen(prev => !prev),
-    onInventoryOpen: () => {
-      // Dispatch custom event to open HUD inventory overlay instead of navigating
-      window.dispatchEvent(new CustomEvent('hud:openInventory'));
-    },
-    onQuestLogOpen: () => {
-      // Dispatch custom event to open HUD quest log overlay instead of navigating
-      window.dispatchEvent(new CustomEvent('hud:openQuestLog'));
-    },
+    onInventoryOpen: () => setIsPauseMenuOpen(true),
+    onQuestLogOpen: () => setIsPauseMenuOpen(true),
     onMapOpen: () => {} // Already on map, do nothing
   });
 
@@ -1191,17 +1185,19 @@ export default function GalaxyMap() {
 
   return (
     <div className="galaxy-map-container" ref={containerRef}>
-      <HUD />
       <div className="galaxy-map-header">
-        <h1>Galaxy Map</h1>
-        <div className="map-controls">
-          <button onClick={() => setZoom(Math.min(zoom + 0.1, 2))}>+</button>
-          <button onClick={() => setZoom(Math.max(zoom - 0.1, 0.5))}>-</button>
-          <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}>Reset</button>
-          <select value={viewMode} onChange={(e) => setViewMode(e.target.value)}>
-            <option value="systems">Systems</option>
-            <option value="planets">Planets</option>
-          </select>
+        <div className="galaxy-map-title">
+          <h1>Galaxy Map</h1>
+          <span className="galaxy-map-hint">Scroll to zoom · drag to rotate · click a system to inspect</span>
+        </div>
+        <div className="map-nav">
+          <button className="map-nav-btn" onClick={() => setIsPauseMenuOpen(true)}>☰ Menu</button>
+          <button
+            className="map-nav-btn map-nav-primary"
+            onClick={() => navigate(currentCharacter?.currentPlanet ? `/game/planet/${currentCharacter.currentPlanet}` : '/game')}
+          >
+            ← Return to surface
+          </button>
         </div>
       </div>
 
@@ -1239,9 +1235,9 @@ export default function GalaxyMap() {
                 <small>Star systems contain planets. Click a system to see its planets, then click a planet to travel.</small>
               </p>
               <div className="map-legend">
-                <span className="legend-item"><span className="legend-dot" style={{ background: '#22c55e' }} /> Current</span>
-                <span className="legend-item"><span className="legend-dot" style={{ background: '#2563eb' }} /> Selected</span>
-                <span className="legend-item"><span className="legend-dot" style={{ background: '#64748b' }} /> System</span>
+                <span className="legend-item"><span className="legend-dot" style={{ background: GALAXY_COLORS.current }} /> Current</span>
+                <span className="legend-item"><span className="legend-dot" style={{ background: GALAXY_COLORS.selected }} /> Selected</span>
+                <span className="legend-item"><span className="legend-dot" style={{ background: GALAXY_COLORS.default }} /> System</span>
                 <span className="legend-item"><span className="legend-line" /> Fold-lane</span>
               </div>
             </div>
@@ -1461,6 +1457,7 @@ export default function GalaxyMap() {
           </div>
         </div>
       )}
+      <PauseMenu isOpen={isPauseMenuOpen} onClose={() => setIsPauseMenuOpen(false)} />
       <TutorialOverlay />
     </div>
   );
