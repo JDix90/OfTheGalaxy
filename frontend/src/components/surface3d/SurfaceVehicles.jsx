@@ -9,6 +9,7 @@ import React, { Suspense, useMemo, useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { createSurfaceSim } from '../../../../shared/sim/surface.mjs';
 
 // biome style -> vehicle kit model + behaviour (count, world speed, hover height, footprint factor).
 const SPEEDER = '/models/props/craft_speederA.glb';
@@ -35,6 +36,33 @@ function findStreetRuns(tm, ts, scale) {
   return runs.sort((p, q) => q.len - p.len);
 }
 
+// Trim a lane to its single longest stretch that's clear of buildings AND POI
+// footprints — sampled ~1u apart against the SAME walkability the player uses (the
+// shared sim, now POI-aware). So a lane that grazes a building is shortened to the
+// open part instead of driving straight through it. Returns null if no usable run.
+function clearestSubRun(run, isWalkable, minLen) {
+  const [ax, az] = run.a, [bx, bz] = run.b;
+  const dx = bx - ax, dz = bz - az;
+  const steps = Math.max(2, Math.ceil(Math.hypot(dx, dz)));
+  let bestS = -1, bestE = -1, curS = -1;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const ok = isWalkable(ax + t * dx, az + t * dz);
+    if (ok) {
+      if (curS < 0) curS = i;
+      if (i === steps && i - curS > bestE - bestS) { bestS = curS; bestE = i; }
+    } else {
+      if (curS >= 0 && i - 1 - curS > bestE - bestS) { bestS = curS; bestE = i - 1; }
+      curS = -1;
+    }
+  }
+  if (bestS < 0 || bestE <= bestS) return null;
+  const t0 = bestS / steps, t1 = bestE / steps;
+  const a = [ax + t0 * dx, az + t0 * dz], b = [ax + t1 * dx, az + t1 * dz];
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  return len >= minLen ? { a, b, len } : null;
+}
+
 function Vehicle({ scene, fit, baseY, run, speed, hover, seed }) {
   const ref = useRef();
   const cloned = useMemo(() => scene.clone(true), [scene]);
@@ -55,7 +83,7 @@ function Vehicle({ scene, fit, baseY, run, speed, hover, seed }) {
   );
 }
 
-function Fleet({ tm, worldHalf, cfg }) {
+function Fleet({ tm, planet, worldHalf, cfg }) {
   const { scene } = useGLTF(cfg.url);
   const ts = tm.tileSize || 2, scale = worldHalf / 50, tileW = ts * scale;
   const { fit, baseY } = useMemo(() => {
@@ -64,7 +92,13 @@ function Fleet({ tm, worldHalf, cfg }) {
     const s = new THREE.Vector3(); box.getSize(s);
     return { fit: (cfg.fit * tileW) / Math.max(s.x, s.y, s.z, 1e-3), baseY: box.min.y };
   }, [scene, tileW, cfg]);
-  const runs = useMemo(() => findStreetRuns(tm, ts, scale), [tm, ts, scale]);
+  const runs = useMemo(() => {
+    const sim = createSurfaceSim((planet && planet.mapData) || {}, { scale });
+    return findStreetRuns(tm, ts, scale)
+      .map((r) => clearestSubRun(r, sim.isWalkableWorld, tileW * 4)) // shorten lanes off buildings/POIs
+      .filter(Boolean)
+      .sort((p, q) => q.len - p.len);
+  }, [tm, ts, scale, planet, tileW]);
   if (!runs.length) return null;
   const fleet = [];
   for (let i = 0; i < cfg.count; i++) fleet.push({ run: runs[(i * 7) % runs.length], seed: i * 131 + 7 });
@@ -80,5 +114,5 @@ export default function SurfaceVehicles({ planet, worldHalf }) {
     return (tm.style in BIOME_VEHICLE) ? BIOME_VEHICLE[tm.style] : BIOME_VEHICLE.outpost;
   }, [tm]);
   if (!cfg) return null;
-  return <Suspense fallback={null}><Fleet tm={tm} worldHalf={worldHalf} cfg={cfg} /></Suspense>;
+  return <Suspense fallback={null}><Fleet tm={tm} planet={planet} worldHalf={worldHalf} cfg={cfg} /></Suspense>;
 }
