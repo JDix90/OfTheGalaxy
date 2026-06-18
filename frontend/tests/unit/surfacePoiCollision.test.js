@@ -35,3 +35,25 @@ describe('surface sim — POI footprint collision', () => {
     expect(sim.isWalkableWorld(0, 0)).toBe(true);
   });
 });
+
+describe('surface sim — obstacleHeightWorld (camera-collision data)', () => {
+  test('reports a POI building height inside its footprint, 0 outside', () => {
+    const sim = createSurfaceSim(mapData, { scale: DEFAULTS.scale });
+    expect(sim.obstacleHeightWorld(0, 0)).toBeGreaterThan(0); // inside the market footprint
+    expect(sim.obstacleHeightWorld(20, 0)).toBe(0);           // open ground
+  });
+
+  test('reports a building tile height (storeys * STORY) and 0 on open tiles', () => {
+    const gridSize = 50, tileSize = 2;
+    const tiles = [];
+    for (let y = 0; y < gridSize; y++) {
+      const row = [];
+      for (let x = 0; x < gridSize; x++) row.push({ type: 'open', walkable: true, visual: 'open' });
+      tiles.push(row);
+    }
+    tiles[25][25] = { type: 'building', walkable: false, visual: 'building', height: 3 };
+    const sim = createSurfaceSim({ tileMap: { gridSize, tileSize, tiles } }, { scale: DEFAULTS.scale });
+    expect(sim.obstacleHeightWorld(1.6, 1.6)).toBeCloseTo(3 * 2.4, 1); // tile (25,25) → 3 storeys * STORY(2.4)
+    expect(sim.obstacleHeightWorld(-16, -16)).toBe(0);                 // an open tile
+  });
+});
