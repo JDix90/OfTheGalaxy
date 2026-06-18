@@ -145,6 +145,20 @@ const PARTICLE = {
 };
 for (const k of Object.keys(SUBMAP_THEMES)) SUBMAP_THEMES[k].particle = PARTICLE[k] || null;
 
+// Ambient wandering crowd per theme (submap-liveliness Phase 4) — see SubmapCrowd.jsx.
+//   flavor: label only; 'none' = no crowd. density: target walker count (capped at 24). tints:
+//   civilian colour buckets. The realtime spaceport uses the SERVER crowd, so its offline flavor
+//   here ('travelers') only shows in the unauth /submap-test harness, never doubling up in-game.
+const CROWD = {
+  clinic: { flavor: 'patients', density: 6, tints: ['#dfe8f2', '#cbd6e6', '#b9c4d8', '#c6d0c0'] },
+  market: { flavor: 'shoppers', density: 14, tints: ['#d8c6a6', '#c6a9be', '#a9c6b0', '#cdd6e6', '#d6b89a'] },
+  civic: { flavor: 'civilians', density: 8, tints: ['#d8d2c0', '#c6d0e6', '#cdd6e6', '#c0b8a0'] },
+  settlement: { flavor: 'civilians', density: 10, tints: ['#cdd6e6', '#b9c4d8', '#d8c6a6', '#a9c6b0', '#c6a9be'] },
+  industrial: { flavor: 'workers', density: 5, tints: ['#b0a890', '#c0a070', '#9aa6b8', '#a89878'] },
+  spaceport: { flavor: 'travelers', density: 12, tints: ['#cdd6e6', '#b9c4d8', '#9fb3d1', '#d8c6a6', '#c6a9be'] },
+};
+for (const k of Object.keys(SUBMAP_THEMES)) SUBMAP_THEMES[k].crowd = CROWD[k] || { flavor: 'none' };
+
 /** Resolve the full theme object for a submap (palette + lighting + props + particle). */
 export function getSubmapTheme(subMap) {
   return SUBMAP_THEMES[resolveThemeKey(subMap)] || SUBMAP_THEMES.default;

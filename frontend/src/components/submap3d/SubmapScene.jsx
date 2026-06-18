@@ -26,6 +26,7 @@ import { AtmosphereContext } from '../surface3d/atmosphere/AtmosphereContext';
 import ExitMarker from './ExitMarker';
 import InteriorWalls from './InteriorWalls';
 import SubmapProps from './SubmapProps';
+import SubmapCrowd from './SubmapCrowd';
 import SubmapEnclosure from './SubmapEnclosure';
 import { getSubmapTheme } from './submapThemes';
 import { buildSubmapProps } from './submapData';
@@ -127,6 +128,12 @@ export default function SubmapScene({
       {/* Interior atmosphere — faint motes / steam / embers so the air isn't dead. Small, slow
           fields tuned per theme (Weather PRESETS) and kept under the ceiling for enclosed rooms. */}
       {theme.particle && <Weather preset={theme.particle.preset} world={world} worldHalf={worldHalf} />}
+
+      {/* Ambient wandering crowd (offline submaps): patients/shoppers/travelers give the space life.
+          Gated off when realtime (the spaceport keeps its server-authoritative CrowdActors below). */}
+      {!realtime && theme.crowd && theme.crowd.flavor !== 'none' && (
+        <SubmapCrowd world={world} sim={sim} theme={theme} />
+      )}
 
       <PlayerActor world={world} input={input} pois={proximityPois} onProximity={onProximity} onMoved={onMoved} focus={focus} />
 
