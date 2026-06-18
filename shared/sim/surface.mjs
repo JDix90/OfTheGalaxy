@@ -17,6 +17,8 @@
  * the two boundaries that need them: tile collision and persistence/interaction.
  */
 
+import { poiFootprintRadius } from './poiFootprint.mjs';
+
 // Tile types the 2D surface treats as impassable (PlanetSurface.jsx movement guards).
 export const OBSTACLE_TILE_TYPES = new Set([
   'building', 'rock', 'tree', 'canyon', 'lava_flow', 'volcanic_vent',
@@ -61,6 +63,44 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
   const surfaceToWorld = (sx, sy) => ({ x: (sx - 50) * scale, z: (sy - 50) * scale });
   const worldToSurface = (x, z) => ({ x: x / scale + 50, y: z / scale + 50 });
 
+  // ---- POI building footprints → solid collision circles (world units) ----
+  // Read straight from mapData so client + server agree with no caller wiring. This
+  // makes the rendered 3D structures impassable for everything that moves on the
+  // surface (player, enemies, the crowd's pathfinding, the ambient vehicles), so
+  // nothing walks or drives through a building. Circles are kept just inside the
+  // visible base so you can still close to the wall and trigger the enter prompt.
+  const poiCircles = (Array.isArray(mapData.pointsOfInterest) ? mapData.pointsOfInterest : [])
+    .map((p) => {
+      if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) return null;
+      const r = poiFootprintRadius(p.type);
+      if (!(r > 0)) return null;
+      const w = surfaceToWorld(p.x, p.y);
+      return { x: w.x, z: w.z, r2: r * r };
+    })
+    .filter(Boolean);
+  function blockedByPoi(x, z) {
+    for (let i = 0; i < poiCircles.length; i++) {
+      const c = poiCircles[i];
+      const dx = x - c.x, dz = z - c.z;
+      if (dx * dx + dz * dz < c.r2) return true;
+    }
+    return false;
+  }
+  // Escape-aware variant for stepped movers: block ENTERING a footprint from outside,
+  // but never trap something already inside one (lets a body that started/was shoved
+  // inside walk back out instead of grinding in place).
+  function enteringPoi(fromX, fromZ, toX, toZ) {
+    for (let i = 0; i < poiCircles.length; i++) {
+      const c = poiCircles[i];
+      const tdx = toX - c.x, tdz = toZ - c.z;
+      if (tdx * tdx + tdz * tdz < c.r2) {
+        const fdx = fromX - c.x, fdz = fromZ - c.z;
+        if (fdx * fdx + fdz * fdz >= c.r2) return true; // outside → inside: blocked
+      }
+    }
+    return false;
+  }
+
   // ---- tile lookup + per-level walkability ----
   function tileAt(sx, sy) {
     if (!tileMap || sx < 0 || sx > 100 || sy < 0 || sy > 100) return null;
@@ -80,6 +120,10 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
   // pathfinding, and spawns. Unchanged: 'stair' tiles read as walkable, buildings as blocked.
   function isWalkableSurface(sx, sy) {
     if (sx < 0 || sx > 100 || sy < 0 || sy > 100) return false;
+    if (poiCircles.length) {
+      const w = surfaceToWorld(sx, sy);
+      if (blockedByPoi(w.x, w.z)) return false; // POI footprints block everyone (incl. pathfinding)
+    }
     if (!tileMap) return true; // open planet — anywhere in bounds is fine
     return groundWalkable(tileAt(sx, sy));
   }
@@ -111,13 +155,13 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
   function resolveStep(fromX, fromZ, toX, toZ, level) {
     const ts = worldToSurface(toX, toZ);
     if (ts.x < 0 || ts.x > 100 || ts.y < 0 || ts.y > 100) return null;
-    if (!tileMap) return level ? null : { x: toX, z: toZ, level: 0 }; // open planet = ground only
+    if (!tileMap) return level ? null : (enteringPoi(fromX, fromZ, toX, toZ) ? null : { x: toX, z: toZ, level: 0 }); // open planet = ground only (still solid POIs)
     const toT = tileAt(ts.x, ts.y);
     if (!toT) return null;
     const fs = worldToSurface(fromX, fromZ);
     const fromT = tileAt(fs.x, fs.y);
     if (level === 0) {
-      if (groundWalkable(toT)) return { x: toX, z: toZ, level: 0 };
+      if (groundWalkable(toT) && !enteringPoi(fromX, fromZ, toX, toZ)) return { x: toX, z: toZ, level: 0 };
       // ascend: step off a stair onto the adjacent roof (≤ MAX_ROOF_STEP storeys)
       if (fromT && fromT.type === 'stair' && isRoofTile(toT) && Math.abs(storeysOf(toT) - storeysOf(fromT)) <= MAX_ROOF_STEP) {
         return { x: toX, z: toZ, level: 1 };
