@@ -7,7 +7,6 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCharacterStore } from '../state/characterSlice';
 import { CharacterManager } from '../core/character/CharacterManager';
-import HUD from '../components/hud/HUD';
 import PauseMenu from '../features/menus/PauseMenu';
 import CharacterSelector from '../components/CharacterSelector';
 import TutorialOverlay from '../components/tutorial/TutorialOverlay';
@@ -136,7 +135,8 @@ export default function GameWorld() {
 
   return (
     <div className="game-world">
-      <HUD />
+      {/* No in-world HUD here — this is the overview hub, which has its own top
+          nav + character panel. The HUD belongs to the 3D surface/submaps. */}
       <PauseMenu isOpen={isPauseMenuOpen} onClose={() => setIsPauseMenuOpen(false)} />
       <div className="game-header">
         <h1>Of the Galaxy</h1>

@@ -7,8 +7,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { addTutorialTarget, TUTORIAL_TARGETS } from '../../services/tutorialTargetRegistry';
 import './QuestTracker.css';
 
+const COLLAPSE_KEY = 'otg.questTracker.collapsed';
+
+// Collapsed by default so the surface's bottom-left stays calm beneath the
+// action cluster. The player's manual expand/collapse choice persists, so the
+// tracker doesn't re-collapse every time it remounts on an area change.
+function readCollapsedPref() {
+  try {
+    const stored = localStorage.getItem(COLLAPSE_KEY);
+    return stored === null ? true : stored === 'true';
+  } catch {
+    return true;
+  }
+}
+
 export default function QuestTracker({ quests = [] }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(readCollapsedPref);
   const [isVisible, setIsVisible] = useState(true);
   const trackerRef = useRef(null);
 
@@ -18,6 +32,15 @@ export default function QuestTracker({ quests = [] }) {
       addTutorialTarget(trackerRef.current, TUTORIAL_TARGETS.HUD_QUEST_TRACKER);
     }
   }, []);
+
+  // Remember the collapse preference across remounts / sessions
+  useEffect(() => {
+    try {
+      localStorage.setItem(COLLAPSE_KEY, String(isCollapsed));
+    } catch {
+      /* storage unavailable (private mode) — non-fatal */
+    }
+  }, [isCollapsed]);
 
   if (!isVisible) {
     return (
