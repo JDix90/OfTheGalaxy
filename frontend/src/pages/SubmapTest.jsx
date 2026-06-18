@@ -121,6 +121,66 @@ const SUBMAPS = {
     },
     npcs: [N('r1', 'Resident', 'generic', 4, 4)],
   },
+  spaceport: {
+    id: 'test_spaceport', type: 'spaceport', template: 'hub', planetId: 'testworld',
+    layoutData: {
+      width: 12, height: 12,
+      buildings: [
+        B('pad_0', 'Landing Pad A', 'landing_pad', 1, 1, 3, 3),
+        B('pad_1', 'Landing Pad B', 'landing_pad', 8, 1, 3, 3),
+        B('hangar', 'Hangar Bay', 'hangar', 1, 8, 3, 3),
+        B('parts', 'Ship Parts', 'ship_parts', 9, 8, 1, 1, 'int'),
+        B('cantina', 'Cantina', 'cantina', 6, 10, 1, 1, 'int'),
+        B('customs', 'Port Authority', 'reception', 5, 1, 2, 1),
+      ],
+      furniture: [
+        { id: 'b0', type: 'bench', position: { x: 5, y: 5 }, size: { width: 2, height: 1 } },
+        { id: 'p0', type: 'plant', position: { x: 4, y: 6 } },
+        { id: 'cr0', type: 'crate', position: { x: 9, y: 6 } },
+        { id: 'cr1', type: 'crate', position: { x: 9, y: 7 } },
+        { id: 'sg0', type: 'sign', position: { x: 5, y: 3 } },
+        { id: 'ks0', type: 'terminal', position: { x: 6, y: 6 } },
+      ],
+      entryPoints: [ENTRY(6, 6)], exitPoints: [EXIT(0, 6)],
+    },
+    npcs: [N('s1', 'Dock Officer', 'generic', 5, 4), N('s2', 'Ship Trader', 'vendor', 8, 8), N('s3', 'Traveler', 'generic', 4, 7)],
+  },
+  industrial: {
+    id: 'test_industrial', type: 'industrial', template: 'mine', planetId: 'testworld', parentLocationType: 'mine',
+    layoutData: {
+      width: 12, height: 12,
+      buildings: [
+        B('gen', 'Generator Hall', 'facility', 2, 2, 3, 3),
+        B('store_0', 'Ore Storage', 'storage', 8, 2, 2, 2),
+        B('rig', 'Drill Rig', 'industrial', 8, 8, 2, 2),
+        B('shop', 'Supply Depot', 'commercial', 2, 9, 1, 1, 'int'),
+      ],
+      furniture: [
+        { id: 'bar0', type: 'barrel', position: { x: 5, y: 5 } },
+        { id: 'bar1', type: 'barrel', position: { x: 6, y: 5 } },
+        { id: 'crt', type: 'storage', position: { x: 5, y: 7 } },
+      ],
+      entryPoints: [ENTRY(6, 6)], exitPoints: [EXIT(0, 6)],
+    },
+    npcs: [N('i1', 'Foreman', 'quest_giver', 5, 4), N('i2', 'Miner', 'generic', 8, 7), N('i3', 'Supplier', 'vendor', 3, 9)],
+  },
+  danger: {
+    id: 'test_danger', type: 'danger', template: 'ruins', planetId: 'testworld', parentLocationType: 'ruins',
+    layoutData: {
+      width: 12, height: 12,
+      buildings: [
+        B('ruin_0', 'Collapsed Spire', 'ruins', 2, 2, 2, 2),
+        B('ruin_1', 'Broken Vault', 'ruins', 8, 3, 2, 2),
+        B('lair', 'Lair Entrance', 'lair', 5, 8, 2, 2),
+      ],
+      furniture: [
+        { id: 'rk0', type: 'crate', position: { x: 5, y: 5 } },
+        { id: 'rk1', type: 'barrel', position: { x: 7, y: 6 } },
+      ],
+      entryPoints: [ENTRY(6, 6)], exitPoints: [EXIT(0, 6)],
+    },
+    npcs: [N('d1', 'Scavenger', 'generic', 4, 4)],
+  },
 };
 
 const TYPES = Object.keys(SUBMAPS);
@@ -141,7 +201,9 @@ export default function SubmapTest() {
   const npcs3d = useMemo(() => buildSubmapNpcs(subMap.npcs, subMap, sim), [type, sim]); // eslint-disable-line
   const waypoints = useMemo(() => buildSubmapWaypoints([], subMap, sim), [type, sim]); // eslint-disable-line
   const isInterior = subMap.type === 'building_interior';
-  const furniture = useMemo(() => (isInterior ? buildSubmapFurniture(subMap, sim) : []), [type, sim, isInterior]); // eslint-disable-line
+  // Build furniture for every type (mirrors the live SubMapView3D, which furnishes open districts
+  // like the spaceport concourse too — not just enclosed interiors).
+  const furniture = useMemo(() => buildSubmapFurniture(subMap, sim), [type, sim]); // eslint-disable-line
   const planetLike = useMemo(() => ({ terrain: subMap.type === 'spaceport' ? 'urban' : subMap.type }), [type]);
 
   const [activePoiId, setActivePoiId] = useState(null);

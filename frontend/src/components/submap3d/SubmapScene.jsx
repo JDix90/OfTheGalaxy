@@ -26,9 +26,10 @@ import ExitMarker from './ExitMarker';
 import InteriorWalls from './InteriorWalls';
 import Furniture from './Furniture';
 import SubmapEnclosure from './SubmapEnclosure';
+import { getSubmapTheme } from './submapThemes';
 
-// Facility submaps that should read as enclosed interiors (walls + ceiling), not open-air.
-const ENCLOSED_TYPES = new Set(['medical_center', 'hospital', 'civic', 'government', 'temple']);
+// Cap on per-POI accent point lights so a roomful never blows the shared MAX_POINT_LIGHTS budget.
+const MAX_ACCENT_LIGHTS = 6;
 
 function HeadlessHook() {
   const get = useThree((s) => s.get);
@@ -49,15 +50,23 @@ export default function SubmapScene({
   const groundSize = worldHalf * 2;
   const atmoRef = useRef({ nightFactor: 0, dayFactor: 1, time: startTime });
 
+  // Per-POI-type theme (palette + lighting). Drives the enclosure, ground tint, fog, and the
+  // per-POI accent lights — the submap analogue of the surface's biome look.
+  const theme = useMemo(() => getSubmapTheme(subMap), [subMap]);
+  const lit = theme.lighting;
+
   // How the boundary reads: building interiors keep their own (5.2) room shell + daylight;
   // clinics/civic become enclosed roofed rooms; everything else is an open-air district ringed
-  // by compound walls. Only the enclosed/open facility submaps get the SubmapEnclosure shell.
-  const enclosureMode = ENCLOSED_TYPES.has(subMap?.type) ? 'enclosed' : 'open';
-  const isEnclosed = !interior && enclosureMode === 'enclosed';
-  const isSpaceport = subMap?.type === 'spaceport';
+  // by compound walls. The theme owns enclosed vs open via `lighting.mode`.
+  const isEnclosed = !interior && lit.mode === 'enclosed';
   // Enclosed rooms render at "night" so the global sun never floods through the ceiling; the
   // room is lit by its ceiling strips, fill, and POI lights (which rise at night).
   const atmoTime = isEnclosed ? 0.02 : startTime;
+  // Accent point lights for the nearest enterable POIs (capped), tinted by the theme so each
+  // structure casts a soft in-character glow. Sorted by distance to the concourse centre.
+  const accentPois = useMemo(() => (
+    [...pois].sort((a, b) => (a.wx * a.wx + a.wz * a.wz) - (b.wx * b.wx + b.wz * b.wz)).slice(0, MAX_ACCENT_LIGHTS)
+  ), [pois]);
 
   // Exits double as enterable POIs so PlayerActor's proximity prompt reuse works.
   const proximityPois = useMemo(() => ([
@@ -70,30 +79,30 @@ export default function SubmapScene({
       <Atmosphere
         worldHalf={worldHalf} time={atmoTime} startTime={atmoTime} paused atmoRef={atmoRef}
         fogNear={isEnclosed ? 0.7 : 0.85} fogFar={isEnclosed ? 2.0 : 2.0}
-        fogColor={isEnclosed ? '#9aa6bc' : null}
+        fogColor={isEnclosed ? (lit.fog || '#9aa6bc') : (lit.fog || null)}
       />
-      <Ground planet={planetLike} size={groundSize} />
+      <Ground planet={planetLike} size={groundSize} colorOverride={theme.palette.floor} />
       {/* Open-air districts (spaceport/city) get the distant animated skyline so the edge reads
           as a continued world, not a blank slab. Enclosed rooms keep their walls/ceiling. */}
       {!interior && !isEnclosed && <DistantSkyline worldHalf={worldHalf} />}
-      {!interior && <SubmapEnclosure sim={sim} mode={enclosureMode} />}
+      {!interior && <SubmapEnclosure sim={sim} theme={theme} />}
 
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}
       {/* Furniture/props dress both enclosed interiors and open districts (spaceport concourse). */}
       {furniture && furniture.length > 0 && <Furniture items={furniture} />}
 
-      {/* Spaceport concourse lighting: the daytime POI lights stay dim, so add a warm fill +
-          sky hemisphere and a soft always-on accent over each structure so the terminal reads
-          bright and lively instead of dark and flat. */}
-      {isSpaceport && (
-        <>
-          <hemisphereLight args={['#cfe0fb', '#26304a', 0.55]} />
-          <pointLight position={[0, 16, 0]} intensity={0.55} distance={worldHalf * 2.4} decay={2} color="#ffe7c4" />
-          {pois.map((poi) => (
-            <pointLight key={`acc_${poi.id}`} position={[poi.wx, 3.4, poi.wz]} intensity={0.6} distance={15} decay={2} color="#ffd9a8" />
-          ))}
-        </>
+      {/* Building interiors keep their own InteriorWalls shell (no enclosure), so give them a
+          themed fill so a home reads warm/cozy instead of flat daylight. */}
+      {interior && (
+        <hemisphereLight args={[lit.hemiSky, lit.hemiGround, lit.hemiInt ?? 0.5]} />
       )}
+
+      {/* A soft always-on accent over the nearest few structures (theme-tinted) so each POI casts
+          an in-character glow — bright concourse, warm market stall, cold clinic console. Capped
+          to respect the shared point-light budget; the rest rely on emissive + bloom. */}
+      {accentPois.map((poi) => (
+        <pointLight key={`acc_${poi.id}`} position={[poi.wx, 3.4, poi.wz]} intensity={0.55} distance={15} decay={2} color={theme.palette.accent} />
+      ))}
 
       {pois.map((poi) => (
         <PoiStructure key={poi.id} poi={poi} active={poi.id === activePoiId} lit onActivate={onPoiActivate} />
