@@ -59,4 +59,13 @@ describe('submap theme resolution', () => {
       expect(['enclosed', 'open']).toContain(t.lighting.mode);
     }
   });
+
+  test('interior particle fields are attached where expected (and null elsewhere)', () => {
+    expect(SUBMAP_THEMES.clinic.particle.preset).toBe('sterile');
+    expect(SUBMAP_THEMES.market.particle.preset).toBe('motes');
+    expect(SUBMAP_THEMES.industrial.particle.preset).toBe('steam');
+    expect(SUBMAP_THEMES.danger.particle.preset).toBe('embers');
+    expect(SUBMAP_THEMES.settlement.particle).toBeNull();
+    expect(SUBMAP_THEMES.residential.particle).toBeNull();
+  });
 });

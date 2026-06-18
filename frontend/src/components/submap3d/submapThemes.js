@@ -133,7 +133,19 @@ export const SUBMAP_THEMES = {
     EMPTY_PROPS),
 };
 
-/** Resolve the full theme object for a submap (palette + lighting). */
+// Interior particle field per theme (submap-liveliness Phase 3) — see Weather.jsx PRESETS. Attached
+// here (not inline in T) so the rest of the table stays scannable. Themes not listed get no field.
+const PARTICLE = {
+  clinic: { preset: 'sterile' },
+  civic: { preset: 'motes' },
+  market: { preset: 'motes' },
+  industrial: { preset: 'steam' },
+  danger: { preset: 'embers' },
+  spaceport: { preset: 'sterile' },
+};
+for (const k of Object.keys(SUBMAP_THEMES)) SUBMAP_THEMES[k].particle = PARTICLE[k] || null;
+
+/** Resolve the full theme object for a submap (palette + lighting + props + particle). */
 export function getSubmapTheme(subMap) {
   return SUBMAP_THEMES[resolveThemeKey(subMap)] || SUBMAP_THEMES.default;
 }

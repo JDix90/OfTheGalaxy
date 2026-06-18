@@ -17,6 +17,7 @@ import RemotePlayers from '../surface3d/RemotePlayers';
 import RemoteEnemies from '../surface3d/RemoteEnemies';
 import CrowdActors from '../surface3d/CrowdActors';
 import CombatFx from '../surface3d/CombatFx';
+import Weather from '../surface3d/Weather';
 import QuestWaypoint from '../surface3d/QuestWaypoint';
 import Atmosphere from '../surface3d/atmosphere/Atmosphere';
 import DistantSkyline from '../surface3d/atmosphere/DistantSkyline';
@@ -122,6 +123,10 @@ export default function SubmapScene({
       ))}
 
       {(waypoints || []).map((wp) => <QuestWaypoint key={wp.id} wp={wp} />)}
+
+      {/* Interior atmosphere — faint motes / steam / embers so the air isn't dead. Small, slow
+          fields tuned per theme (Weather PRESETS) and kept under the ceiling for enclosed rooms. */}
+      {theme.particle && <Weather preset={theme.particle.preset} world={world} worldHalf={worldHalf} />}
 
       <PlayerActor world={world} input={input} pois={proximityPois} onProximity={onProximity} onMoved={onMoved} focus={focus} />
 
