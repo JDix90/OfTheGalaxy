@@ -220,6 +220,94 @@ export function buildSubmapFurniture(subMap, sim) {
   return out;
 }
 
+// glTF-kit prop keys (rendered instanced by SubmapProps); everything else is a composed-primitive
+// builder. Kept here so buildSubmapProps stays a pure data function (no three/JSX import).
+const GLB_PROP_KEYS = new Set(['crate', 'barrel', 'container', 'pipe', 'rock', 'crystal']);
+const EMPTY_PROP_RULES = { map: {}, zone: {}, scatter: [] };
+
+/**
+ * Themed furniture/props for a submap (Phase 2) — the lively replacement for the bare boxes.
+ * Pure: returns `{ themed, boxes }` (no rendering), so it's unit-testable.
+ *   - `themed`: { id, semantic, wx, wz, rot } — a themed prop (composed builder or glTF kit).
+ *   - `boxes`:  the old typed-box items, for any furniture a theme doesn't map (e.g. a home's bed).
+ * Sources (all via `theme.props`):
+ *   1. existing furniture/decorations/interactiveElements → themed if `map[type]`, else a box.
+ *   2. zone/building-derived: a themed prop per matching building `type` (`zone[type]`) — this is
+ *      what furnishes the otherwise-empty clinic/market that emit no furniture[] of their own.
+ *   3. `scatter`: a few props on walkable EDGE cells (industrial pipes, ruin rubble).
+ */
+export function buildSubmapProps(subMap, sim, theme) {
+  if (!sim) return { themed: [], boxes: [] };
+  const d = layoutOf(subMap);
+  const { w, h } = submapCoordDims(subMap);
+  const rules = (theme && theme.props) || EMPTY_PROP_RULES;
+  const map = rules.map || {}, zone = rules.zone || {}, scatter = rules.scatter || [];
+  const cellPct = 100 / w;
+  const themed = [], boxes = [];
+
+  // 1. furniture / decorations / interactive elements
+  const items = [...(d.furniture || []), ...(d.decorations || []), ...(d.interactiveElements || [])];
+  items.forEach((f, i) => {
+    const pos = f.position;
+    if (!pos || !Number.isFinite(pos.x)) return;
+    const sw = (f.size && f.size.width) || 1, sh = (f.size && f.size.height) || 1;
+    const cx = ((pos.x + sw / 2) / w) * 100, cy = ((pos.y + sh / 2) / h) * 100;
+    const wpos = sim.surfaceToWorld(cx, cy);
+    const rot = (f.rotation || 0) * Math.PI / 180;
+    const semantic = map[String(f.type || '').toLowerCase()];
+    if (semantic) {
+      themed.push({ id: f.id || `fp_${i}`, semantic, wx: wpos.x, wz: wpos.z, rot });
+    } else {
+      const def = FURN[f.type] || FURN.default;
+      const cap = def.max || 1.3;
+      boxes.push({
+        id: f.id || `fb_${i}`, type: f.type, wx: wpos.x, wz: wpos.z,
+        wlen: Math.max(0.5, Math.min(sw * cellPct * sim.scale * 0.9, cap)),
+        dlen: Math.max(0.5, Math.min(sh * cellPct * sim.scale * 0.9, cap)),
+        ht: def.ht, color: def.color, emissive: def.emissive || null, rot,
+      });
+    }
+  });
+
+  // 2. zone/building-derived themed props (furnish bare clinics/markets, additive to the structure)
+  for (const b of (d.buildings || [])) {
+    const pos = b.position || b;
+    if (!pos || !Number.isFinite(pos.x)) continue;
+    const rule = zone[String(b.type || '').toLowerCase()];
+    if (!rule) continue;
+    const sw = (b.size && b.size.width) || 1, sh = (b.size && b.size.height) || 1;
+    const cx = ((pos.x + sw / 2) / w) * 100, cy = ((pos.y + sh / 2) / h) * 100;
+    const wpos = sim.surfaceToWorld(cx, cy);
+    const list = Array.isArray(rule) ? rule : [rule];
+    list.forEach((sem, k) => {
+      // first prop centred in the room; extras ringed around it so they don't z-fight.
+      const ang = k * 2.2, off = k === 0 ? 0 : 1.0;
+      themed.push({ id: `${b.id || b.type}_zp_${k}`, semantic: sem, wx: wpos.x + Math.cos(ang) * off, wz: wpos.z + Math.sin(ang) * off, rot: ang });
+    });
+  }
+
+  // 3. scatter props on a few walkable EDGE cells (kept off the central walkways/spawn)
+  if (scatter.length) {
+    let placed = 0;
+    for (let gy = 2; gy < h - 1 && placed < 8; gy += 2) {
+      for (let gx = 2; gx < w - 1 && placed < 8; gx += 2) {
+        const cx = ((gx + 0.5) / w) * 100, cy = ((gy + 0.5) / h) * 100;
+        if (Math.abs(cx - 50) < 18 && Math.abs(cy - 50) < 18) continue; // leave the centre clear
+        if (!sim.isWalkableSurface(cx, cy)) continue;
+        const sem = scatter[(gx * 7 + gy) % scatter.length];
+        const wpos = sim.surfaceToWorld(cx, cy);
+        themed.push({ id: `sc_${gx}_${gy}`, semantic: sem, wx: wpos.x, wz: wpos.z, rot: ((gx + gy) % 4) * Math.PI / 2 });
+        placed++;
+      }
+    }
+  }
+
+  return { themed, boxes };
+}
+
+/** Which prop keys render as instanced glTF kit models (vs composed primitives). */
+export const isGlbProp = (semantic) => GLB_PROP_KEYS.has(semantic);
+
 /** Quest objectives located in THIS submap → world-positioned waypoint beacons. */
 export function buildSubmapWaypoints(activeQuests, subMap, sim) {
   if (!sim || !Array.isArray(activeQuests)) return [];

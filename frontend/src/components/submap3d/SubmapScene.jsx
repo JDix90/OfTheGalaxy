@@ -24,9 +24,10 @@ import PostFX from '../surface3d/atmosphere/PostFX';
 import { AtmosphereContext } from '../surface3d/atmosphere/AtmosphereContext';
 import ExitMarker from './ExitMarker';
 import InteriorWalls from './InteriorWalls';
-import Furniture from './Furniture';
+import SubmapProps from './SubmapProps';
 import SubmapEnclosure from './SubmapEnclosure';
 import { getSubmapTheme } from './submapThemes';
+import { buildSubmapProps } from './submapData';
 
 // Cap on per-POI accent point lights so a roomful never blows the shared MAX_POINT_LIGHTS budget.
 const MAX_ACCENT_LIGHTS = 6;
@@ -43,7 +44,7 @@ function HeadlessHook() {
 export default function SubmapScene({
   world, input, planetLike, pois, exits, npcs3d, waypoints, activePoiId, worldHalf,
   onProximity, onMoved, onPoiActivate, onNpcActivate, onExitActivate,
-  subMap, sim, furniture, interior = false,
+  subMap, sim, interior = false,
   startTime = 0.4, postQuality = 'high',
   realtime = false, combatTarget = null, onCombatTarget = () => {}, focus = null,
 }) {
@@ -68,6 +69,10 @@ export default function SubmapScene({
     [...pois].sort((a, b) => (a.wx * a.wx + a.wz * a.wz) - (b.wx * b.wx + b.wz * b.wz)).slice(0, MAX_ACCENT_LIGHTS)
   ), [pois]);
 
+  // Themed dressing: biobeds/stalls/cargo/etc. derived from the layout + theme (replaces the bare
+  // boxes; zone-derived props furnish the otherwise-empty clinic/market).
+  const propData = useMemo(() => buildSubmapProps(subMap, sim, theme), [subMap, sim, theme]);
+
   // Exits double as enterable POIs so PlayerActor's proximity prompt reuse works.
   const proximityPois = useMemo(() => ([
     ...pois,
@@ -88,8 +93,8 @@ export default function SubmapScene({
       {!interior && <SubmapEnclosure sim={sim} theme={theme} />}
 
       {interior && <InteriorWalls subMap={subMap} sim={sim} />}
-      {/* Furniture/props dress both enclosed interiors and open districts (spaceport concourse). */}
-      {furniture && furniture.length > 0 && <Furniture items={furniture} />}
+      {/* Themed props dress both enclosed interiors and open districts (spaceport concourse). */}
+      <SubmapProps data={propData} theme={theme} />
 
       {/* Building interiors keep their own InteriorWalls shell (no enclosure), so give them a
           themed fill so a home reads warm/cozy instead of flat daylight. */}

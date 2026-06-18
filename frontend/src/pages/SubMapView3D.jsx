@@ -28,7 +28,7 @@ import { getAuthToken } from '../services/api/client';
 import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import SubmapScene from '../components/submap3d/SubmapScene';
 import SpaceportPA from '../components/submap3d/SpaceportPA';
-import { createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture } from '../components/submap3d/submapData';
+import { createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints } from '../components/submap3d/submapData';
 
 import HUD from '../components/hud/HUD';
 import Minimap from '../components/hud/Minimap';
@@ -169,9 +169,7 @@ export default function SubMapView3D() {
   }, [selectedNPC, npcs3d]);
   const waypoints = useMemo(() => buildSubmapWaypoints(activeQuests, subMap, sim), [activeQuests, subMap, sim]);
   const isInterior = subMap?.type === 'building_interior';
-  // Furniture/decorations now also dress open districts (the spaceport concourse), not just
-  // enclosed building interiors — buildSubmapFurniture is a no-op when the layout has none.
-  const furniture = useMemo(() => buildSubmapFurniture(subMap, sim), [subMap, sim]);
+  // Themed props (biobeds/stalls/cargo/...) are built inside SubmapScene from the layout + theme.
 
   const planetLike = useMemo(() => ({ terrain: subMap?.type === 'spaceport' ? 'urban' : (subMap?.type || 'urban') }), [subMap]);
 
@@ -337,7 +335,7 @@ export default function SubMapView3D() {
           <SubmapScene
             world={worldRef} input={input} planetLike={planetLike}
             pois={pois} exits={exits} npcs3d={npcs3d} waypoints={waypoints}
-            subMap={subMap} sim={sim} furniture={furniture} interior={isInterior}
+            subMap={subMap} sim={sim} interior={isInterior}
             activePoiId={activePoiId} worldHalf={sim.worldHalf}
             startTime={isInterior ? 0.5 : 0.42} postQuality="high"
             realtime={isRealtime} combatTarget={combatTarget} onCombatTarget={setCombatTarget}
