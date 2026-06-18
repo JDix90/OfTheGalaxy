@@ -36,18 +36,27 @@ function findStreetRuns(tm, ts, scale) {
   return runs.sort((p, q) => q.len - p.len);
 }
 
-// Trim a lane to its single longest stretch that's clear of buildings AND POI
-// footprints — sampled ~1u apart against the SAME walkability the player uses (the
-// shared sim, now POI-aware). So a lane that grazes a building is shortened to the
-// open part instead of driving straight through it. Returns null if no usable run.
-function clearestSubRun(run, isWalkable, minLen) {
+// Trim a lane to its single longest stretch where the WHOLE VEHICLE FOOTPRINT fits
+// clear of buildings, POIs, and stalls — not just the centerline. At each step we
+// check the lane point AND the two points half-a-vehicle-width to either side
+// (perpendicular), so a lane that's too narrow or grazes a wall is rejected/shortened
+// rather than letting the body overhang. Ends are pulled in by the half-length so the
+// nose never pokes past the clear stretch. Returns null if no usable run.
+export function clearestSubRun(run, isWalkable, minLen, halfW, halfL) {
   const [ax, az] = run.a, [bx, bz] = run.b;
   const dx = bx - ax, dz = bz - az;
-  const steps = Math.max(2, Math.ceil(Math.hypot(dx, dz)));
+  const L = Math.hypot(dx, dz) || 1;
+  const ux = dx / L, uz = dz / L;   // along the lane
+  const px = -uz, pz = ux;          // perpendicular (unit)
+  const steps = Math.max(2, Math.ceil(L));
+  const clearAt = (x, z) =>
+    isWalkable(x, z) &&
+    isWalkable(x + px * halfW, z + pz * halfW) &&
+    isWalkable(x - px * halfW, z - pz * halfW);
   let bestS = -1, bestE = -1, curS = -1;
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
-    const ok = isWalkable(ax + t * dx, az + t * dz);
+    const ok = clearAt(ax + t * dx, az + t * dz);
     if (ok) {
       if (curS < 0) curS = i;
       if (i === steps && i - curS > bestE - bestS) { bestS = curS; bestE = i; }
@@ -57,13 +66,12 @@ function clearestSubRun(run, isWalkable, minLen) {
     }
   }
   if (bestS < 0 || bestE <= bestS) return null;
-  const t0 = bestS / steps, t1 = bestE / steps;
-  const a = [ax + t0 * dx, az + t0 * dz], b = [ax + t1 * dx, az + t1 * dz];
-  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-  return len >= minLen ? { a, b, len } : null;
+  let s0 = (bestS / steps) * L + halfL, s1 = (bestE / steps) * L - halfL; // keep the body inside the clear stretch
+  if (s1 - s0 < minLen) return null;
+  return { a: [ax + ux * s0, az + uz * s0], b: [ax + ux * s1, az + uz * s1], len: s1 - s0 };
 }
 
-function Vehicle({ scene, fit, baseY, run, speed, hover, seed }) {
+function Vehicle({ scene, fit, baseY, run, speed, hover, seed, isWalkable, halfW }) {
   const ref = useRef();
   const cloned = useMemo(() => scene.clone(true), [scene]);
   const dir = useMemo(() => { const dx = run.b[0] - run.a[0], dz = run.b[1] - run.a[1]; const L = Math.hypot(dx, dz) || 1; return { dx: dx / L, dz: dz / L, L }; }, [run]);
@@ -71,9 +79,17 @@ function Vehicle({ scene, fit, baseY, run, speed, hover, seed }) {
   const sgn = useRef(((hash(seed + 9) & 1) ? 1 : -1));
   useFrame((_, dt) => {
     if (!ref.current) return;
-    t.current += sgn.current * (speed * Math.min(dt, 0.05)) / dir.L;
-    if (t.current > 1) { t.current = 1; sgn.current = -1; } else if (t.current < 0) { t.current = 0; sgn.current = 1; }
-    ref.current.position.set(run.a[0] + (run.b[0] - run.a[0]) * t.current, hover, run.a[1] + (run.b[1] - run.a[1]) * t.current);
+    let nt = t.current + sgn.current * (speed * Math.min(dt, 0.05)) / dir.L;
+    if (nt > 1) { nt = 1; sgn.current = -1; } else if (nt < 0) { nt = 0; sgn.current = 1; }
+    // Per-frame footprint guard: if the body (centre ± half-width) would clip a building,
+    // POI, or storefront, turn back instead of advancing into it — a hard guarantee on top
+    // of the lane trim, so nothing the trim missed (awnings, odd geometry) gets driven through.
+    const cx = run.a[0] + (run.b[0] - run.a[0]) * nt, cz = run.a[1] + (run.b[1] - run.a[1]) * nt;
+    const px = -dir.dz, pz = dir.dx;
+    const clear = isWalkable(cx, cz) && isWalkable(cx + px * halfW, cz + pz * halfW) && isWalkable(cx - px * halfW, cz - pz * halfW);
+    if (clear) t.current = nt; else sgn.current = -sgn.current;
+    const x = run.a[0] + (run.b[0] - run.a[0]) * t.current, z = run.a[1] + (run.b[1] - run.a[1]) * t.current;
+    ref.current.position.set(x, hover, z);
     ref.current.rotation.y = Math.atan2(dir.dx * sgn.current, dir.dz * sgn.current) + Math.PI; // kit models face -Z
   });
   return (
@@ -86,24 +102,27 @@ function Vehicle({ scene, fit, baseY, run, speed, hover, seed }) {
 function Fleet({ tm, planet, worldHalf, cfg }) {
   const { scene } = useGLTF(cfg.url);
   const ts = tm.tileSize || 2, scale = worldHalf / 50, tileW = ts * scale;
-  const { fit, baseY } = useMemo(() => {
+  const { fit, baseY, halfW, halfL } = useMemo(() => {
     scene.updateWorldMatrix(true, true);
     const box = new THREE.Box3().setFromObject(scene);
     const s = new THREE.Vector3(); box.getSize(s);
-    return { fit: (cfg.fit * tileW) / Math.max(s.x, s.y, s.z, 1e-3), baseY: box.min.y };
+    const fitS = (cfg.fit * tileW) / Math.max(s.x, s.y, s.z, 1e-3);
+    // Kit models face -Z: length runs along Z, width along X. Inflate the width a little
+    // (storefront awnings spill ~0.4 tiles into the alleys) so the body keeps real clearance.
+    return { fit: fitS, baseY: box.min.y, halfW: s.x * fitS * 0.5 + tileW * 0.3, halfL: s.z * fitS * 0.5 };
   }, [scene, tileW, cfg]);
-  const runs = useMemo(() => {
-    const sim = createSurfaceSim((planet && planet.mapData) || {}, { scale });
-    return findStreetRuns(tm, ts, scale)
-      .map((r) => clearestSubRun(r, sim.isWalkableWorld, tileW * 4)) // shorten lanes off buildings/POIs
+  const sim = useMemo(() => createSurfaceSim((planet && planet.mapData) || {}, { scale }), [planet, scale]);
+  const runs = useMemo(() => (
+    findStreetRuns(tm, ts, scale)
+      .map((r) => clearestSubRun(r, sim.isWalkableWorld, tileW * 3, halfW, halfL))
       .filter(Boolean)
-      .sort((p, q) => q.len - p.len);
-  }, [tm, ts, scale, planet, tileW]);
+      .sort((p, q) => q.len - p.len)
+  ), [tm, ts, scale, sim, halfW, halfL, tileW]);
   if (!runs.length) return null;
   const fleet = [];
   for (let i = 0; i < cfg.count; i++) fleet.push({ run: runs[(i * 7) % runs.length], seed: i * 131 + 7 });
   return fleet.map((v, i) => (
-    <Vehicle key={i} scene={scene} fit={fit} baseY={baseY} run={v.run} speed={cfg.speed} hover={cfg.hover} seed={v.seed} />
+    <Vehicle key={i} scene={scene} fit={fit} baseY={baseY} run={v.run} speed={cfg.speed} hover={cfg.hover} seed={v.seed} isWalkable={sim.isWalkableWorld} halfW={halfW} />
   ));
 }
 
