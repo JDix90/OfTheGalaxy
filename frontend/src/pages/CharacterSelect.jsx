@@ -25,7 +25,15 @@ export default function CharacterSelect() {
 
   const handleSelectCharacter = (character) => {
     setCurrentCharacter(character);
-    navigate('/game');
+    // Home is the 3D planet surface for anyone past the brand-new-character
+    // tutorial; new characters go to /game, which runs the spaceport onboarding
+    // redirect. (Matches GameWorld's isNewCharacter definition.)
+    const isNew = character?.level === 1 && !character?.tutorialCompleted;
+    if (!isNew && character?.currentPlanet) {
+      navigate(`/game/planet/${character.currentPlanet}`);
+    } else {
+      navigate('/game');
+    }
   };
 
   const handleCreateNew = () => {

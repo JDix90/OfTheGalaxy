@@ -66,7 +66,19 @@ export default function HUDMenu({ onOpenInventory }) {
     setIsOpen(false);
   }, [navigate, currentCharacter]);
 
+  const handleOverview = useCallback(() => {
+    navigate('/game'); // the command-hub overview (surface is home now)
+    setIsOpen(false);
+  }, [navigate]);
+
   const menuItems = useMemo(() => [
+    {
+      id: 'overview',
+      label: 'Overview',
+      icon: '🧭',
+      shortcut: null,
+      action: handleOverview
+    },
     {
       id: 'inventory',
       label: 'Inventory',
@@ -102,7 +114,7 @@ export default function HUDMenu({ onOpenInventory }) {
       shortcut: 'G',
       action: handleGalaxy
     }
-  ], [handleInventory, handleQuests, handleFactions, handleExploration, handleGalaxy]);
+  ], [handleOverview, handleInventory, handleQuests, handleFactions, handleExploration, handleGalaxy]);
 
   // Add tutorial targets to menu buttons
   useEffect(() => {
