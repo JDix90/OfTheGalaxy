@@ -47,13 +47,25 @@ export default function MinimapCanvas({
 
     const draw = () => {
       ctx.clearRect(0, 0, size, size);
-      ctx.fillStyle = HUD.surfaceSoft;
+      // Lighter blue-gray ground (pure dark read as unreadable) + a faint grid
+      // for spatial reference.
+      const grad = ctx.createLinearGradient(0, 0, 0, size);
+      grad.addColorStop(0, 'rgba(32, 43, 64, 0.94)');
+      grad.addColorStop(1, 'rgba(20, 28, 44, 0.94)');
+      ctx.fillStyle = grad;
       ctx.fillRect(0, 0, size, size);
+      ctx.strokeStyle = 'rgba(120, 150, 200, 0.12)';
+      ctx.lineWidth = 1;
+      const step = size / 6;
+      for (let i = 1; i < 6; i++) {
+        ctx.beginPath(); ctx.moveTo(i * step, 0); ctx.lineTo(i * step, size); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i * step); ctx.lineTo(size, i * step); ctx.stroke();
+      }
 
-      pois.forEach((p) => dot(p.wx, p.wz, 3, p.enterable ? 'rgba(74,158,255,0.35)' : '#586a86', p.enterable));
-      npcs3d.forEach((n) => dot(n.wx, n.wz, 2.4, HUD.heal));
-      exits.forEach((e) => dot(e.wx ?? e.x, e.wz ?? e.z, 3, '#7bdc8a', true));
-      waypoints.forEach((w) => dot(w.wx, w.wz, 3.5, HUD.warn, true));
+      pois.forEach((p) => dot(p.wx, p.wz, 3.2, p.enterable ? 'rgba(74,158,255,0.6)' : '#9fb3d1', p.enterable));
+      npcs3d.forEach((n) => dot(n.wx, n.wz, 3, HUD.heal));
+      exits.forEach((e) => dot(e.wx ?? e.x, e.wz ?? e.z, 3.4, '#7bdc8a', true));
+      waypoints.forEach((w) => dot(w.wx, w.wz, 4, HUD.warn, true));
 
       // Player heading triangle (live position from the world).
       const p = worldRef && worldRef.current && worldRef.current.player;

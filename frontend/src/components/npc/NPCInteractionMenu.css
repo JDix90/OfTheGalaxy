@@ -8,7 +8,9 @@
   min-width: 250px;
   max-width: 360px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  backdrop-filter: var(--hud-blur);
+  /* NOTE: deliberately no backdrop-filter — it would create a containing block
+     for the fixed-position QuestList modal rendered inside, trapping/clipping it
+     (the "can't dismiss" bug). The opaque surface reads fine without it. */
   color: var(--hud-text-primary);
   font-family: system-ui, -apple-system, sans-serif;
   overflow: hidden;

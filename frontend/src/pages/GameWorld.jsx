@@ -180,6 +180,13 @@ export default function GameWorld() {
           <div className="quick-actions">
             <h3>Quick Actions</h3>
             <div className="action-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+              {character.currentPlanet && (
+                <button className="action-card" onClick={() => navigate(`/game/planet/${character.currentPlanet}`)}>
+                  <span className="action-icon">🌐</span>
+                  <span className="action-label">Return to Surface</span>
+                </button>
+              )}
+
               <button className="action-card" onClick={() => window.location.href = '/game/quests'}>
                 <span className="action-icon">📜</span>
                 <span className="action-label">Quest Log</span>

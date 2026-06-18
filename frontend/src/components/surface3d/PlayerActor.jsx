@@ -21,10 +21,12 @@ const YAW_RATE = 2.0;
 const PROXIMITY_WORLD = 7;     // how close (world units) to "enter" a location
 const PROXIMITY_PERIOD = 0.15; // s
 const MOVE_REPORT_PERIOD = 0.4; // s
-// Conversation framing: an over-the-shoulder shot of the NPC, blended in/out.
-const CONV_DIST = 6.2;
-const CONV_HEIGHT = 4.0;
-const CONV_LATERAL = 2.2;
+// Conversation framing: a raised 3/4 shot of the NPC, blended in/out. Higher +
+// closer than the follow cam so it looks DOWN over nearby buildings rather than
+// getting trapped behind them in tight medina alleys.
+const CONV_DIST = 5.4;
+const CONV_HEIGHT = 7.2;
+const CONV_LATERAL = 1.5;
 
 export default function PlayerActor({ world, input, pois, onProximity, onMoved, focus = null }) {
   const group = useRef();
