@@ -202,7 +202,7 @@ export default function SurfaceTest() {
           </div>
           <div style={{ marginTop: 8, color: '#7e8aa6' }}>weather</div>
           <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
-            {['dust', 'ash', 'rain', 'snow', 'none'].map((w) => (
+            {['dust', 'ash', 'rain', 'snow', 'mist', 'pollen', 'none'].map((w) => (
               <button key={w} onClick={() => setWeather(w)} style={{ ...todBtn, opacity: weather === w ? 1 : 0.55, borderColor: weather === w ? '#7db8ff' : '#2a3654' }}>{w}</button>
             ))}
           </div>
