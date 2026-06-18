@@ -38,9 +38,12 @@ export default defineConfig({
       thresholds: {
         // Realistic floors at ~current coverage so the gate passes on green tests
         // while preventing regression. Raise these as suite coverage grows.
+        // branches lowered 45 -> 43 after the legacy-2D removal: deleting the 2D
+        // pages took well-tested utils (collisionDetection/pathfinding) + their
+        // tests with them, which mechanically dropped the global branch ratio.
         lines: 8,
         functions: 15,
-        branches: 45,
+        branches: 43,
         statements: 8
       },
       include: ['src/**/*.{js,jsx}']
