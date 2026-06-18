@@ -28,6 +28,32 @@ const CONV_DIST = 5.4;
 const CONV_HEIGHT = 7.2;
 const CONV_LATERAL = 1.5;
 
+// Keep the player in view past buildings between the camera and the look target. Two
+// steps, both sampling the sim's obstacle heights (~1u apart) along the target→pos ray:
+//   1) LIFT — raise the camera above the tallest building on the sightline (+`lift`) so it
+//      looks DOWN over the rooftops into the street instead of into a wall;
+//   2) PULL IN — if a block is still in the way (one right beside the player), zoom the
+//      camera in toward the player. `minFrac` stops it collapsing onto the player.
+function clampCamToView(sim, tgt, pos, minFrac, lift) {
+  const dx = pos.x - tgt.x, dz = pos.z - tgt.z;
+  const dist = Math.hypot(dx, pos.y - tgt.y, dz) || 1;
+  const steps = Math.max(2, Math.ceil(dist));
+  if (lift > 0) {
+    let maxTop = 0;
+    for (let s = 1; s <= steps; s++) { const f = s / steps; maxTop = Math.max(maxTop, sim.obstacleHeightWorld(tgt.x + dx * f, tgt.z + dz * f)); }
+    if (maxTop > 0 && pos.y < maxTop + lift) pos.y = maxTop + lift;
+  }
+  const dy = pos.y - tgt.y; // re-read after any lift
+  for (let s = 1; s <= steps; s++) {
+    const f = s / steps;
+    if (sim.obstacleHeightWorld(tgt.x + dx * f, tgt.z + dz * f) > tgt.y + dy * f) {
+      const safe = Math.max(minFrac, (s - 1) / steps);
+      pos.set(tgt.x + dx * safe, tgt.y + dy * safe, tgt.z + dz * safe);
+      return;
+    }
+  }
+}
+
 export default function PlayerActor({ world, input, pois, onProximity, onMoved, focus = null }) {
   const group = useRef();
   const motion = useRef({ speed: 0 });
@@ -111,9 +137,14 @@ export default function PlayerActor({ world, input, pois, onProximity, onMoved, 
 
     const fb = focusBlend.current;
     blendPos.current.lerpVectors(defPos.current, convPos.current, fb);
+    camTarget.current.lerpVectors(defTgt.current, convTgt.current, fb);
+    // Camera collision: pull the desired spot in past any building between it and the look
+    // target so the cam zooms in near tall blocks instead of burying itself in the medina.
+    if (sim && sim.obstacleHeightWorld) clampCamToView(sim, camTarget.current, blendPos.current, 0.22, 2.2);
     if (!inited.current) { camera.position.copy(blendPos.current); inited.current = true; }
     else camera.position.lerp(blendPos.current, 1 - Math.pow(0.0016, dt));
-    camTarget.current.lerpVectors(defTgt.current, convTgt.current, fb);
+    // Final guard: never let the live camera sit inside a building mid-lerp (no extra lift).
+    if (sim && sim.obstacleHeightWorld) clampCamToView(sim, camTarget.current, camera.position, 0.1, 0);
     camera.lookAt(camTarget.current);
 
     // --- throttled proximity to enterable POIs ---

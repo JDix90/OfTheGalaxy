@@ -43,9 +43,28 @@ const RADIUS = {
   default: 2.9,
 };
 
+// Approx structure height (world units) per category — mirrors POI_STRUCTURES[*].height
+// in modelManifest. Used by the camera so it knows how tall a POI is when avoiding burial.
+const HEIGHT = {
+  spaceport: 5.5,
+  market: 3.5,
+  settlement: 7,
+  civic: 5.5,
+  industrial: 5.5,
+  danger: 6.5,
+  default: 4.5,
+};
+
 /** Collision footprint radius (world units) for a POI of the given `type`. */
 export function poiFootprintRadius(type) {
   if (!type) return RADIUS.default;
   const cat = CATEGORY[String(type).toLowerCase()] || 'default';
   return RADIUS[cat] ?? RADIUS.default;
+}
+
+/** Approx structure height (world units) for a POI of the given `type`. */
+export function poiFootprintHeight(type) {
+  if (!type) return HEIGHT.default;
+  const cat = CATEGORY[String(type).toLowerCase()] || 'default';
+  return HEIGHT[cat] ?? HEIGHT.default;
 }

@@ -17,7 +17,7 @@
  * the two boundaries that need them: tile collision and persistence/interaction.
  */
 
-import { poiFootprintRadius } from './poiFootprint.mjs';
+import { poiFootprintRadius, poiFootprintHeight } from './poiFootprint.mjs';
 
 // Tile types the 2D surface treats as impassable (PlanetSurface.jsx movement guards).
 export const OBSTACLE_TILE_TYPES = new Set([
@@ -75,7 +75,7 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
       const r = poiFootprintRadius(p.type);
       if (!(r > 0)) return null;
       const w = surfaceToWorld(p.x, p.y);
-      return { x: w.x, z: w.z, r2: r * r };
+      return { x: w.x, z: w.z, r2: r * r, h: poiFootprintHeight(p.type) };
     })
     .filter(Boolean);
   function blockedByPoi(x, z) {
@@ -130,6 +130,21 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
   function isWalkableWorld(x, z) {
     const s = worldToSurface(x, z);
     return isWalkableSurface(s.x, s.y);
+  }
+  /** World-Y top of any view-blocking structure at (x,z) — a building tile (storeys*STORY)
+   *  or a POI building — else 0. The follow camera samples this along its sightline so it
+   *  pulls in past tall buildings instead of burying itself behind them. */
+  function obstacleHeightWorld(x, z) {
+    for (let i = 0; i < poiCircles.length; i++) {
+      const c = poiCircles[i];
+      const dx = x - c.x, dz = z - c.z;
+      if (dx * dx + dz * dz < c.r2) return c.h;
+    }
+    if (!tileMap) return 0;
+    const s = worldToSurface(x, z);
+    const t = tileAt(s.x, s.y);
+    if (t && !groundWalkable(t)) return (t.height || 1) * STORY;
+    return 0;
   }
 
   /** World Y a body stands at for a given level at (sx,sy): 0 on the ground, the roof top
@@ -245,6 +260,7 @@ export function createSurfaceSim(mapData = {}, opts = {}) {
     hasTileMap: !!tileMap,
     surfaceToWorld, worldToSurface,
     isWalkableSurface, isWalkableWorld,
+    obstacleHeightWorld,
     surfaceLevelY,
     integrate,
   };
