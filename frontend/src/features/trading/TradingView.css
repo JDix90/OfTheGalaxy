@@ -4,8 +4,8 @@
 
 .trading-view {
   min-height: 100vh;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: var(--hud-surface-strong);
+  color: var(--hud-text-primary);
   padding: 2rem;
 }
 
@@ -20,7 +20,7 @@
 }
 
 .trading-error p {
-  color: var(--error-color);
+  color: var(--hud-danger);
   font-size: 1.2rem;
 }
 
@@ -29,21 +29,22 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 100%);
-  border-bottom: 2px solid var(--primary-color);
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--hud-border-soft);
   margin-bottom: 2rem;
-  border-radius: 8px;
+  border-radius: var(--hud-radius);
 }
 
 .vendor-info h1 {
   margin: 0;
   font-size: 2rem;
-  color: var(--primary-color);
+  color: var(--hud-text-primary);
+  font-weight: 600;
 }
 
 .vendor-subtitle {
   margin: 0.5rem 0 0 0;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -55,19 +56,19 @@
 }
 
 .credits-label {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .credits-value {
-  color: var(--primary-color);
+  color: var(--hud-warn);
   font-weight: bold;
   font-size: 1.5rem;
 }
 
 .close-button {
   background: transparent;
-  border: 2px solid var(--primary-color);
-  color: var(--primary-color);
+  border: 1px solid var(--hud-border-soft);
+  color: var(--hud-text-muted);
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -77,8 +78,9 @@
 }
 
 .close-button:hover {
-  background: var(--primary-color);
-  color: var(--bg-primary);
+  background: rgba(255, 90, 74, 0.14);
+  color: var(--hud-danger);
+  border-color: var(--hud-danger);
 }
 
 .trading-content {
@@ -90,7 +92,7 @@
 .trading-tabs {
   display: flex;
   gap: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--hud-border-soft);
 }
 
 .tab-button {
@@ -98,19 +100,19 @@
   background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
-  color: var(--text-secondary);
+  color: var(--hud-text-muted);
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .tab-button:hover {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .tab-button.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
+  color: var(--hud-accent);
+  border-bottom-color: var(--hud-accent);
 }
 
 .trading-panels {
@@ -121,17 +123,18 @@
 
 .item-list-panel,
 .transaction-panel {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   padding: 1.5rem;
 }
 
 .item-list-panel h3,
 .transaction-panel h3 {
   margin: 0 0 1rem 0;
-  color: var(--primary-color);
+  color: var(--hud-text-primary);
   font-size: 1.3rem;
+  font-weight: 600;
 }
 
 .item-list {
@@ -143,27 +146,28 @@
 }
 
 .item-card {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   padding: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .item-card:hover {
-  background: rgba(0, 0, 0, 0.5);
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
+  box-shadow: 0 0 0 1px var(--hud-accent-soft);
 }
 
 .item-card.selected {
-  background: rgba(var(--primary-color-rgb, 0, 150, 255), 0.2);
-  border-color: var(--primary-color);
+  background: var(--hud-accent-soft);
+  border-color: var(--hud-accent);
+  box-shadow: 0 0 0 1px var(--hud-accent-soft);
 }
 
 .item-name {
   font-weight: bold;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -171,13 +175,13 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   margin-bottom: 0.5rem;
 }
 
 .item-description {
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-style: italic;
 }
 
@@ -185,7 +189,7 @@
 .no-selection {
   text-align: center;
   padding: 2rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-style: italic;
 }
 
@@ -198,7 +202,7 @@
 .selected-item-name {
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--primary-color);
+  color: var(--hud-text-primary);
 }
 
 .quantity-selector {
@@ -208,23 +212,23 @@
 }
 
 .quantity-selector label {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .quantity-selector input {
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius-sm);
   padding: 0.5rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   width: 80px;
   font-size: 1rem;
 }
 
 .price-quote {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -234,20 +238,20 @@
 .price-line {
   display: flex;
   justify-content: space-between;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .price-line.total {
   font-size: 1.2rem;
   font-weight: bold;
-  color: var(--primary-color);
-  border-top: 1px solid var(--border-color);
+  color: var(--hud-warn);
+  border-top: 1px solid var(--hud-border-soft);
   padding-top: 0.5rem;
   margin-top: 0.5rem;
 }
 
 .price-warning {
-  color: var(--error-color);
+  color: var(--hud-danger);
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
@@ -259,15 +263,15 @@
   gap: 0.25rem;
   padding-bottom: 0.5rem;
   margin-bottom: 0.25rem;
-  border-bottom: 1px dashed var(--border-color);
+  border-bottom: 1px dashed var(--hud-border-soft);
 }
 .price-line.subtle {
   font-size: 0.82rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   opacity: 0.9;
 }
-.price-line.subtle.mod-good span:last-child { color: #6ee79a; }
-.price-line.subtle.mod-bad span:last-child { color: #ff9b9b; }
+.price-line.subtle.mod-good span:last-child { color: var(--hud-heal); }
+.price-line.subtle.mod-bad span:last-child { color: var(--hud-danger); }
 
 .transaction-actions {
   display: flex;
@@ -286,21 +290,23 @@
 }
 
 .buy-button {
-  background: var(--primary-color);
-  color: var(--bg-primary);
+  background: var(--hud-accent-soft);
+  border: 1px solid var(--hud-accent);
+  color: var(--hud-accent);
 }
 
 .buy-button:hover:not(:disabled) {
-  background: var(--primary-color-hover);
+  background: rgba(74, 158, 255, 0.28);
 }
 
 .sell-button {
-  background: #4ade80;
-  color: var(--bg-primary);
+  background: rgba(108, 240, 194, 0.14);
+  border: 1px solid var(--hud-heal);
+  color: var(--hud-heal);
 }
 
 .sell-button:hover:not(:disabled) {
-  background: #22c55e;
+  background: rgba(108, 240, 194, 0.24);
 }
 
 .buy-button:disabled,
@@ -330,27 +336,29 @@
   top: 80px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: var(--hud-z-toasts);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.2rem;
-  border-radius: 8px;
+  border-radius: var(--hud-radius-sm);
   font-weight: 600;
   font-size: 0.95rem;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--hud-blur);
+  -webkit-backdrop-filter: var(--hud-blur);
   animation: trade-toast-in 0.25s ease-out;
 }
 .trade-toast-icon { font-size: 1.1rem; }
 .trade-toast-success {
-  background: #16361f;
-  color: #6ee79a;
-  border: 1px solid #2f7d4f;
+  background: var(--hud-surface-strong);
+  color: var(--hud-heal);
+  border: 1px solid var(--hud-heal);
 }
 .trade-toast-error {
-  background: #3a1d1d;
-  color: #ff9b9b;
-  border: 1px solid #8c3a3a;
+  background: var(--hud-surface-strong);
+  color: var(--hud-danger);
+  border: 1px solid var(--hud-danger);
 }
 @keyframes trade-toast-in {
   from { opacity: 0; transform: translate(-50%, -10px); }

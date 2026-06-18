@@ -1,5 +1,5 @@
 .character-sheet {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -10,28 +10,28 @@
 .character-header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--hud-border-soft);
 }
 
 .character-header h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.8rem;
-  color: var(--primary-color);
-  text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+  color: var(--hud-text-primary);
+  font-weight: 600;
 }
 
 .character-basic-info {
   display: flex;
   gap: 1rem;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .character-basic-info span {
   padding: 0.25rem 0.75rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  border-radius: var(--hud-radius-sm);
+  border: 1px solid var(--hud-border-soft);
 }
 
 .character-content {
@@ -41,17 +41,17 @@
 }
 
 .character-section {
-  background-color: var(--bg-secondary);
+  background: var(--hud-surface-soft);
   padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  border-radius: var(--hud-radius-sm);
+  border: 1px solid var(--hud-border-soft);
 }
 
 .character-section h4 {
   margin: 0 0 1rem 0;
   font-size: 1.2rem;
-  color: var(--primary-color);
-  border-bottom: 1px solid var(--border-color);
+  color: var(--hud-accent);
+  border-bottom: 1px solid var(--hud-border-soft);
   padding-bottom: 0.5rem;
 }
 
@@ -66,27 +66,28 @@
   display: flex;
   flex-direction: column;
   padding: 0.75rem;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   cursor: help;
   transition: border-color 0.2s;
 }
 
 .combat-stat-item:hover {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
+  box-shadow: 0 0 0 1px var(--hud-accent-soft);
 }
 
 .combat-stat-item .stat-name {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   margin-bottom: 0.25rem;
 }
 
 .combat-stat-item .stat-value {
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--primary-color);
+  color: var(--hud-accent);
 }
 
 .stats-grid {
@@ -100,18 +101,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  border-radius: var(--hud-radius-sm);
+  border: 1px solid var(--hud-border-soft);
 }
 
 .stat-name {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.9rem;
 }
 
 .stat-value {
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-weight: bold;
   font-size: 1.1rem;
 }
@@ -124,14 +125,14 @@
 
 .skill-tree {
   padding: 1rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  border-radius: var(--hud-radius-sm);
+  border: 1px solid var(--hud-border-soft);
 }
 
 .skill-tree h5 {
   margin: 0 0 0.75rem 0;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1rem;
 }
 
@@ -146,23 +147,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem;
-  background-color: rgba(74, 158, 255, 0.1);
-  border-radius: 4px;
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
 }
 
 .skill-name {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 0.9rem;
 }
 
 .skill-level {
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-weight: bold;
 }
 
 .no-skills {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--hud-text-muted);
   font-size: 0.85rem;
   font-style: italic;
 }
@@ -178,18 +180,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface-soft);
+  border-radius: var(--hud-radius-sm);
+  border: 1px solid var(--hud-border-soft);
 }
 
 .resource-label {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.9rem;
 }
 
 .resource-value {
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-weight: bold;
   font-size: 1.1rem;
 }
@@ -199,18 +201,18 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--hud-border-soft);
   padding-bottom: 0.5rem;
 }
 
 .tab-button {
   padding: 0.75rem 1.5rem;
-  background: none;
+  background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
   cursor: pointer;
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-muted);
   transition: all 0.3s ease;
   position: relative;
   display: flex;
@@ -219,27 +221,28 @@
 }
 
 .tab-button:hover {
-  color: var(--text-primary);
-  background-color: var(--bg-tertiary);
+  color: var(--hud-text-primary);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .tab-button.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
+  color: var(--hud-accent);
+  border-bottom-color: var(--hud-accent);
   font-weight: bold;
 }
 
 .tab-button.has-points {
-  color: #4CAF50;
+  color: var(--hud-heal);
 }
 
 .tab-button.has-points.active {
-  color: var(--primary-color);
+  color: var(--hud-accent);
 }
 
 .points-badge {
-  background-color: #4CAF50;
-  color: white;
+  background: rgba(108, 240, 194, 0.14);
+  border: 1px solid var(--hud-heal);
+  color: var(--hud-heal);
   border-radius: 12px;
   padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
@@ -249,7 +252,9 @@
 }
 
 .tab-button.active .points-badge {
-  background-color: var(--primary-color);
+  background: var(--hud-accent-soft);
+  border-color: var(--hud-accent);
+  color: var(--hud-accent);
 }
 
 /* Tab Content */
@@ -266,24 +271,24 @@
 .allocation-prompt {
   margin-top: 1rem;
   padding: 1rem;
-  background-color: rgba(76, 175, 80, 0.1);
-  border: 1px solid #4CAF50;
-  border-radius: 6px;
+  background: rgba(108, 240, 194, 0.14);
+  border: 1px solid var(--hud-heal);
+  border-radius: var(--hud-radius-sm);
   text-align: center;
 }
 
 .allocation-prompt p {
   margin: 0 0 0.75rem 0;
-  color: #4CAF50;
+  color: var(--hud-heal);
   font-weight: bold;
 }
 
 .prompt-button {
   padding: 0.5rem 1.5rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  background: var(--hud-accent-soft);
+  color: var(--hud-accent);
+  border: 1px solid var(--hud-accent);
+  border-radius: var(--hud-radius-sm);
   font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
@@ -291,7 +296,7 @@
 }
 
 .prompt-button:hover {
-  background-color: #45a049;
+  background: rgba(74, 158, 255, 0.28);
 }
 
 

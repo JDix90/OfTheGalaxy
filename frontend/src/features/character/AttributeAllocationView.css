@@ -1,7 +1,7 @@
 .attribute-allocation-view {
   padding: 0;
   width: 100%;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .attribute-allocation-view .header {
@@ -10,24 +10,24 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--hud-border-soft);
 }
 
 .attribute-allocation-view .header h3 {
   margin: 0;
   font-size: 1.5rem;
-  color: var(--primary-color);
-  text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+  color: var(--hud-text-primary);
+  font-weight: 600;
 }
 
 .points-counter {
   font-size: 1rem;
   font-weight: normal;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .points-value {
-  color: var(--success-color);
+  color: var(--hud-accent);
   font-size: 1.5rem;
   font-weight: bold;
   margin-left: 0.5rem;
@@ -35,12 +35,12 @@
 
 .error-message {
   background-color: rgba(239, 68, 68, 0.2);
-  color: var(--danger-color);
+  color: var(--hud-danger);
   padding: 1rem;
   border-radius: 6px;
   margin-bottom: 1.5rem;
-  border: 1px solid var(--danger-color);
-  border-left: 4px solid var(--danger-color);
+  border: 1px solid var(--hud-danger);
+  border-left: 4px solid var(--hud-danger);
 }
 
 .attributes-grid {
@@ -50,26 +50,26 @@
 }
 
 .attribute-card {
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--hud-border);
   border-radius: 8px;
   padding: 1.5rem;
-  background-color: var(--bg-secondary);
+  background-color: var(--hud-surface-soft);
   transition: all 0.3s ease;
 }
 
 .attribute-card:hover {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
   transform: translateY(-2px);
 }
 
 .attribute-card.soft-capped {
-  border-color: var(--warning-color);
+  border-color: var(--hud-warn);
   background-color: rgba(251, 191, 36, 0.1);
 }
 
 .attribute-card.capped {
-  border-color: var(--danger-color);
+  border-color: var(--hud-danger);
   opacity: 0.7;
   background-color: rgba(239, 68, 68, 0.1);
 }
@@ -88,13 +88,13 @@
 .attribute-info h4 {
   margin: 0;
   font-size: 1.2rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-weight: bold;
 }
 
 .attribute-description {
   margin: 0.5rem 0 0 0;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -104,41 +104,41 @@
   font-size: 2.5rem;
   font-weight: bold;
   text-align: center;
-  color: var(--primary-color);
+  color: var(--hud-accent);
   text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
 }
 
 .soft-cap-warning {
   display: block;
   font-size: 0.85rem;
-  color: var(--warning-color);
+  color: var(--hud-warn);
   margin-top: 0.5rem;
   padding: 0.5rem;
   background-color: rgba(251, 191, 36, 0.1);
   border-radius: 4px;
-  border-left: 3px solid var(--warning-color);
+  border-left: 3px solid var(--hud-warn);
 }
 
 .hard-cap-warning {
   display: block;
   font-size: 0.85rem;
-  color: var(--danger-color);
+  color: var(--hud-danger);
   margin-top: 0.5rem;
   padding: 0.5rem;
   background-color: rgba(239, 68, 68, 0.1);
   border-radius: 4px;
-  border-left: 3px solid var(--danger-color);
+  border-left: 3px solid var(--hud-danger);
 }
 
 .attribute-effects {
   margin: 1rem 0;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .attribute-effects h5 {
   margin: 0 0 0.5rem 0;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 0.95rem;
   font-weight: bold;
 }
@@ -151,22 +151,22 @@
 
 .attribute-effects ul li {
   padding: 0.25rem 0;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .attribute-effects ul li::before {
   content: "• ";
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-weight: bold;
   margin-right: 0.5rem;
 }
 
 .allocate-button.expensive {
-  background-color: var(--warning-color, #f59e0b);
+  background-color: var(--hud-warn);
 }
 
 .allocate-button.expensive:hover:not(:disabled) {
-  background-color: var(--warning-color, #f59e0b);
+  background-color: var(--hud-warn);
   opacity: 0.9;
 }
 
@@ -178,14 +178,14 @@
 .cost-preview {
   margin-top: 4px;
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   text-align: center;
 }
 
 .allocate-button {
   width: 100%;
   padding: 0.75rem 1.5rem;
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -203,8 +203,8 @@
 }
 
 .allocate-button:disabled {
-  background-color: var(--bg-tertiary);
-  color: var(--text-secondary);
+  background-color: var(--hud-surface);
+  color: var(--hud-text-secondary);
   cursor: not-allowed;
   opacity: 0.5;
   box-shadow: none;
@@ -214,9 +214,9 @@
   margin-top: 1.5rem;
   padding: 1rem;
   background-color: rgba(74, 158, 255, 0.1);
-  border: 1px solid var(--primary-color);
+  border: 1px solid var(--hud-accent);
   border-radius: 6px;
   text-align: center;
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-size: 0.9rem;
 }

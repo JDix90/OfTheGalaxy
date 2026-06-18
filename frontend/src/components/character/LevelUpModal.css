@@ -25,14 +25,14 @@
   margin: 0.25rem 0 0.75rem;
   font-size: 2.2rem;
   font-weight: 800;
-  background: linear-gradient(180deg, #ffe9a8, #fbbf24);
+  background: linear-gradient(180deg, #ffe9a8, var(--hud-warn));
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .levelup-levels { display: flex; align-items: center; justify-content: center; gap: 0.75rem; font-size: 1.4rem; font-weight: 700; }
 .levelup-from { color: #8aa0bd; }
-.levelup-arrow { color: #fbbf24; }
+.levelup-arrow { color: var(--hud-warn); }
 .levelup-to { color: #ffe9a8; font-size: 1.7rem; }
-.levelup-multi { color: #fbbf24; font-weight: 700; margin: 0.4rem 0 0; }
+.levelup-multi { color: var(--hud-warn); font-weight: 700; margin: 0.4rem 0 0; }
 .levelup-rewards { margin: 1.1rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.5rem; }
 .levelup-reward { display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #cfe0ff; font-size: 0.95rem; }
 .levelup-continue { min-width: 140px; }

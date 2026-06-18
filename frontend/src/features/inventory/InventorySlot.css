@@ -2,8 +2,8 @@
   aspect-ratio: 1;
   min-width: 64px;
   min-height: 64px;
-  background-color: var(--bg-tertiary);
-  border: 2px solid var(--border-color);
+  background-color: var(--hud-surface-soft);
+  border: 2px solid var(--hud-border-soft);
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -19,13 +19,13 @@
 }
 
 .inventory-slot.filled {
-  background-color: var(--bg-secondary);
-  border-color: var(--primary-color);
+  background-color: var(--hud-surface);
+  border-color: var(--hud-accent);
   box-shadow: 0 0 8px rgba(74, 158, 255, 0.2);
 }
 
 .inventory-slot:hover {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   box-shadow: 0 0 12px rgba(74, 158, 255, 0.4);
   transform: scale(1.05);
 }
@@ -59,7 +59,7 @@
   position: absolute;
   top: 2px;
   right: 4px;
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
   width: 18px;
   height: 18px;

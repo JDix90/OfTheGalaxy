@@ -24,7 +24,6 @@
   cursor: pointer;
   animation: slideIn 0.3s ease;
   transition: all 0.2s;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .notification:hover {
@@ -33,7 +32,7 @@
 }
 
 .notification-success {
-  border-color: #34d399;
+  border-color: var(--hud-heal);
   box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
 }
 
@@ -43,12 +42,12 @@
 }
 
 .notification-warning {
-  border-color: #fbbf24;
+  border-color: var(--hud-warn);
   box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
 }
 
 .notification-info {
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   box-shadow: 0 4px 16px rgba(74, 158, 255, 0.3);
 }
 
@@ -60,7 +59,7 @@
 }
 
 .notification-success .notification-icon {
-  color: #34d399;
+  color: var(--hud-heal);
 }
 
 .notification-error .notification-icon {
@@ -68,16 +67,16 @@
 }
 
 .notification-warning .notification-icon {
-  color: #fbbf24;
+  color: var(--hud-warn);
 }
 
 .notification-info .notification-icon {
-  color: var(--primary-color);
+  color: var(--hud-accent);
 }
 
 .notification-message {
   flex: 1;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -85,7 +84,7 @@
 .notification-close {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -101,7 +100,7 @@
 
 .notification-close:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 @keyframes slideIn {

@@ -2,9 +2,8 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 60px);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Orbitron', sans-serif;
+  background-color: var(--hud-surface-strong);
+  color: var(--hud-text-primary);
 }
 
 .inventory-header {
@@ -12,15 +11,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--hud-surface-soft);
+  border-bottom: 1px solid var(--hud-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .header-info h1 {
   margin: 0;
   font-size: 2rem;
-  color: var(--primary-color);
+  color: var(--hud-accent);
   text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
 }
 
@@ -29,14 +28,14 @@
   gap: 1.5rem;
   margin-top: 0.5rem;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .inventory-stats span {
   padding: 0.25rem 0.75rem;
-  background-color: var(--bg-tertiary);
+  background-color: var(--hud-surface);
   border-radius: 4px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--hud-border);
 }
 
 .header-actions {
@@ -46,20 +45,19 @@
 
 .back-button {
   padding: 0.6rem 1.2rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.95rem;
   transition: all 0.2s;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .back-button:hover {
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   box-shadow: 0 0 12px rgba(74, 158, 255, 0.4);
 }
 
@@ -95,16 +93,16 @@
 }
 
 .filter-section {
-  background-color: var(--bg-secondary);
+  background-color: var(--hud-surface-soft);
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--hud-border);
 }
 
 .filter-section h3 {
   margin: 0 0 1rem 0;
   font-size: 1.1rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .filter-buttons {
@@ -115,25 +113,24 @@
 
 .filter-buttons button {
   padding: 0.5rem 1rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .filter-buttons button:hover {
-  background-color: var(--bg-secondary);
-  border-color: var(--primary-color);
+  background-color: var(--hud-surface-soft);
+  border-color: var(--hud-accent);
 }
 
 .filter-buttons button.active {
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   box-shadow: 0 0 8px rgba(74, 158, 255, 0.4);
 }
 
@@ -143,7 +140,7 @@
   align-items: center;
   height: 100%;
   font-size: 1.2rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .error {

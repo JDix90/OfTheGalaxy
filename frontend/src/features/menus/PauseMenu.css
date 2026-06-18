@@ -4,9 +4,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
-  z-index: 2000;
+  background: rgba(4, 8, 18, 0.72);
+  backdrop-filter: var(--hud-blur);
+  z-index: var(--hud-z-overlays);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,16 +23,15 @@
 }
 
 .pause-menu {
-  background: linear-gradient(135deg, rgba(20, 20, 30, 0.95) 0%, rgba(10, 10, 20, 0.95) 100%);
-  backdrop-filter: blur(10px);
-  border: 2px solid var(--primary-color);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  background: var(--hud-surface-strong);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-border);
+  border-radius: var(--hud-radius);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
   max-width: 90vw;
   max-height: 90vh;
   overflow: hidden;
   animation: slideUp 0.3s ease;
-  font-family: 'Orbitron', sans-serif;
 }
 
 @keyframes slideUp {
@@ -63,21 +62,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
-  border-bottom: 2px solid var(--border-color);
-  background-color: rgba(74, 158, 255, 0.1);
+  border-bottom: 1px solid var(--hud-border-soft);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .pause-menu-header h2 {
   margin: 0;
   font-size: 1.8rem;
-  color: var(--primary-color);
-  text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+  color: var(--hud-text-primary);
+  font-weight: 600;
 }
 
 .close-button {
   background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  border: 1px solid var(--hud-border-soft);
+  color: var(--hud-text-muted);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -91,27 +90,26 @@
 }
 
 .close-button:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
+  background: rgba(255, 90, 74, 0.14);
+  border-color: var(--hud-danger);
+  color: var(--hud-danger);
 }
 
 .back-button {
   padding: 0.5rem 1rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: var(--hud-surface-soft);
+  color: var(--hud-text-secondary);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .back-button:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
+  background: var(--hud-accent-soft);
+  border-color: var(--hud-accent);
+  color: var(--hud-accent);
 }
 
 .pause-menu-buttons {
@@ -128,41 +126,46 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--hud-surface-soft);
+  color: var(--hud-text-secondary);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
   transition: all 0.2s;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .menu-button:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 0 16px rgba(74, 158, 255, 0.4);
+  background: var(--hud-accent-soft);
+  border-color: var(--hud-accent);
+  color: var(--hud-accent);
+  box-shadow: 0 0 0 1px var(--hud-accent-soft);
   transform: translateX(5px);
 }
 
 .menu-button.resume {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
+  background: var(--hud-accent-soft);
+  border-color: var(--hud-accent);
+  color: var(--hud-accent);
   font-weight: bold;
 }
 
+.menu-button.resume:hover {
+  background: rgba(74, 158, 255, 0.28);
+}
+
 .menu-button.quit {
-  background-color: rgba(239, 68, 68, 0.2);
-  border-color: #ef4444;
-  color: #ef4444;
+  background: rgba(255, 90, 74, 0.12);
+  border-color: var(--hud-danger);
+  color: var(--hud-danger);
 }
 
 .menu-button.quit:hover {
-  background-color: #ef4444;
-  color: white;
+  background: rgba(255, 90, 74, 0.22);
+  border-color: var(--hud-danger);
+  color: var(--hud-danger);
+  box-shadow: none;
 }
 
 .menu-icon {

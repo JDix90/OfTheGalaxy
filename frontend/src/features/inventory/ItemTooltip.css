@@ -1,7 +1,7 @@
 .item-tooltip {
   position: fixed;
-  background-color: var(--bg-secondary);
-  border: 2px solid var(--primary-color);
+  background-color: var(--hud-surface-soft);
+  border: 2px solid var(--hud-accent);
   border-radius: 8px;
   padding: 1rem;
   min-width: 250px;
@@ -9,7 +9,6 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 1000;
   pointer-events: auto;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .tooltip-header {
@@ -18,18 +17,18 @@
   align-items: center;
   margin-bottom: 0.75rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--hud-border);
 }
 
 .tooltip-header h4 {
   margin: 0;
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-size: 1.1rem;
   text-shadow: 0 0 6px rgba(74, 158, 255, 0.5);
 }
 
 .equipped-badge {
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -38,7 +37,7 @@
 }
 
 .tooltip-body {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .tooltip-section {
@@ -52,21 +51,21 @@
 .item-description {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   line-height: 1.4;
 }
 
 .acquired-from {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-style: italic;
 }
 
 .tooltip-close-button {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -83,13 +82,13 @@
 
 .tooltip-close-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .tooltip-stats-label {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
-  color: var(--primary-color);
+  color: var(--hud-accent);
 }
 
 .tooltip-stats {
@@ -102,34 +101,33 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.85rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .stat-value {
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-weight: bold;
 }
 
 .equipment-slot-info {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--primary-color);
+  color: var(--hud-accent);
 }
 
 .tooltip-actions {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--hud-border);
 }
 
 .equip-button {
   width: 100%;
   padding: 0.5rem;
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
   border: none;
   border-radius: 4px;
-  font-family: 'Orbitron', sans-serif;
   font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
@@ -152,13 +150,13 @@
 .item-set-label {
   margin: 0 0 0.5rem 0;
   font-size: 0.95rem;
-  color: var(--primary-color);
+  color: var(--hud-accent);
 }
 
 .item-set-description {
   margin: 0 0 0.75rem 0;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   line-height: 1.4;
 }
 
@@ -169,7 +167,7 @@
 .set-pieces-label {
   margin: 0 0 0.5rem 0;
   font-size: 0.85rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-weight: 500;
 }
 
@@ -181,24 +179,24 @@
 
 .set-piece {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   margin-bottom: 0.25rem;
 }
 
 .set-piece.current-item {
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-weight: 600;
 }
 
 .item-set-bonuses {
   padding-top: 0.75rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--hud-border);
 }
 
 .set-bonuses-label {
   margin: 0 0 0.5rem 0;
   font-size: 0.85rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-weight: 500;
 }
 
@@ -210,18 +208,18 @@
   padding: 0.5rem;
   background: rgba(74, 158, 255, 0.1);
   border-radius: 4px;
-  border-left: 3px solid var(--primary-color);
+  border-left: 3px solid var(--hud-accent);
 }
 
 .bonus-tier {
   font-size: 0.8rem;
-  color: var(--primary-color);
+  color: var(--hud-accent);
   font-weight: 600;
 }
 
 .bonus-description {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 

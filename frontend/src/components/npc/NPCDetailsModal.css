@@ -6,12 +6,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
+  background: rgba(4, 8, 18, 0.72);
+  backdrop-filter: var(--hud-blur);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: var(--hud-z-overlays);
   animation: fadeIn 0.2s ease-in;
   padding: 1rem;
   overflow-y: auto;
@@ -28,10 +28,11 @@
 }
 
 .npc-details-modal {
-  background: linear-gradient(135deg, #1a1f2e 0%, #16213e 100%);
-  border: 2px solid #4a9eff;
+  background: var(--hud-surface-strong);
+  backdrop-filter: var(--hud-blur);
+  border: 1px solid var(--hud-accent);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
   max-width: 800px;
   width: 100%;
   max-height: calc(100vh - 2rem);
@@ -56,8 +57,8 @@
 
 .npc-details-modal-header {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-bottom: 2px solid rgba(74, 158, 255, 0.3);
+  background: var(--hud-accent-soft);
+  border-bottom: 1px solid var(--hud-border-soft);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -114,7 +115,7 @@
 .npc-meta-badge.faction-badge {
   background: rgba(251, 191, 36, 0.15);
   border-color: rgba(251, 191, 36, 0.3);
-  color: #fcd34d;
+  color: var(--hud-warn);
 }
 
 .npc-details-close-btn {
@@ -256,7 +257,7 @@
 .faction-name {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #fcd34d;
+  color: var(--hud-warn);
 }
 
 .faction-description {
@@ -453,28 +454,26 @@
 
 .npc-details-modal-footer {
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-top: 2px solid rgba(74, 158, 255, 0.3);
+  background: transparent;
+  border-top: 1px solid var(--hud-border-soft);
   display: flex;
   justify-content: flex-end;
 }
 
 .npc-details-close-button {
   padding: 0.75rem 2rem;
-  background: linear-gradient(135deg, #4a9eff 0%, #3b82f6 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
+  background: var(--hud-accent-soft);
+  color: var(--hud-accent);
+  border: 1px solid var(--hud-accent);
+  border-radius: var(--hud-radius-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
 }
 
 .npc-details-close-button:hover {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: rgba(74, 158, 255, 0.28);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(74, 158, 255, 0.4);
 }
 
 .npc-details-close-button:active {
@@ -522,7 +521,7 @@
 }
 
 .primary-goal h4 {
-  color: #fcd34d;
+  color: var(--hud-warn);
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
@@ -574,7 +573,7 @@
 .immediate-needs h4,
 .fears h4,
 .values h4 {
-  color: #fcd34d;
+  color: var(--hud-warn);
   font-size: 0.95rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
@@ -596,7 +595,7 @@
   padding: 0.75rem;
   background: rgba(30, 41, 59, 0.4);
   border-radius: 6px;
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--hud-warn);
 }
 
 .need-description {
@@ -605,7 +604,7 @@
 }
 
 .need-urgency {
-  color: #fbbf24;
+  color: var(--hud-warn);
   font-size: 0.875rem;
   font-weight: 600;
   margin-left: 1rem;
@@ -639,7 +638,7 @@
   padding: 0.75rem;
   background: rgba(30, 41, 59, 0.4);
   border-radius: 6px;
-  border-left: 3px solid #10b981;
+  border-left: 3px solid var(--hud-heal);
 }
 
 .value-name {
@@ -649,7 +648,7 @@
 }
 
 .value-importance {
-  color: #34d399;
+  color: var(--hud-heal);
   font-size: 0.875rem;
   font-weight: 600;
 }
@@ -705,7 +704,7 @@
 
 .trust-factors h4,
 .trust-thresholds h4 {
-  color: #fcd34d;
+  color: var(--hud-warn);
   font-size: 0.95rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
@@ -732,7 +731,7 @@
 }
 
 .factor-value {
-  color: #10b981;
+  color: var(--hud-heal);
   font-weight: 600;
   font-size: 0.875rem;
 }
@@ -769,7 +768,7 @@
 }
 
 .threshold-status.met {
-  color: #10b981;
+  color: var(--hud-heal);
   background: rgba(16, 185, 129, 0.2);
 }
 
