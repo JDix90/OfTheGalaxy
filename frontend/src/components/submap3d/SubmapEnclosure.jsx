@@ -27,18 +27,19 @@ import * as THREE from 'three';
 const WALL_MARGIN = 5;
 const CAM_HEIGHT = 6.5;
 
-const PALETTE = {
-  // Enclosed = bright, sterile clinic/civic: clean light surfaces lit by cool artificial light.
-  // floor matches Ground's clinical tone (#808a9e) so the play-area floor + border are seamless.
-  enclosed: { wall: '#c2cbdb', floor: '#808a9e', ceiling: '#dde4ef', strip: '#f3f8ff', trim: '#7fd6ff' },
-  open: { wall: '#39405a', floor: '#2a3145', ceiling: '#161b2a', strip: '#cfe3ff', trim: '#6cf0c2' },
+// Fallback palette/lighting if no theme is passed (keeps the component usable standalone). The
+// real per-POI-type look comes from the `theme` prop (submapThemes.js) — see SubmapScene.
+const FALLBACK = {
+  palette: { wall: '#c2cbdb', floor: '#808a9e', ceiling: '#dde4ef', trim: '#7fd6ff' },
+  lighting: { mode: 'enclosed', ambient: '#e3ecf8', ambientInt: 0.9, hemiSky: '#eef4ff', hemiGround: '#aeb8cc', hemiInt: 1.4, fill: '#f3f8ff', fillInt: 1.6, strip: '#f3f8ff', stripInt: 2.4 },
 };
 
-export default function SubmapEnclosure({ sim, mode = 'open', accent }) {
+export default function SubmapEnclosure({ sim, theme, accent }) {
   if (!sim) return null;
   const half = sim.worldHalf || 40;
-  const enclosed = mode === 'enclosed'; // clinics/civic: roofed room. else: open-air district.
-  const pal = enclosed ? PALETTE.enclosed : PALETTE.open;
+  const pal = (theme && theme.palette) || FALLBACK.palette;
+  const lit = (theme && theme.lighting) || FALLBACK.lighting;
+  const enclosed = lit.mode === 'enclosed'; // clinics/civic: roofed room. else: open-air district.
   const trim = accent || pal.trim;
 
   // Walls just outside the walkable area so they read as a real boundary, not a far horizon.
@@ -96,15 +97,28 @@ export default function SubmapEnclosure({ sim, mode = 'open', accent }) {
           {[-ringHalf * 0.55, 0, ringHalf * 0.55].map((cx, i) => (
             <mesh key={i} position={[cx, wallH - 0.18, 0]}>
               <boxGeometry args={[ringHalf * 0.07, 0.12, span * 0.74]} />
-              <meshStandardMaterial color={pal.strip} emissive={pal.strip} emissiveIntensity={2.4} toneMapped={false} />
+              <meshStandardMaterial color={lit.strip} emissive={lit.strip} emissiveIntensity={lit.stripInt ?? 2.4} toneMapped={false} />
             </mesh>
           ))}
-          {/* Bright clinical lighting: strong hemisphere + ambient give an even, distance-
-              independent cool-white base (no dark corners / no hotspot), with a soft overhead
-              point for a touch of depth. The sun is off (night) so this fully defines the room. */}
-          <ambientLight intensity={0.9} color="#e3ecf8" />
-          <hemisphereLight intensity={1.4} color="#eef4ff" groundColor="#aeb8cc" />
-          <pointLight position={[0, wallH - 1, 0]} intensity={1.6} distance={ringHalf * 3.6} decay={1.5} color="#f3f8ff" />
+          {/* Themed artificial lighting: a strong hemisphere + ambient give an even, distance-
+              independent base (no dark corners / no hotspot), with a soft overhead point for
+              depth. The sun is off (night) so this fully defines the room — its colour temp is
+              what makes a clinic read surgical and a hall read warm marble. */}
+          <ambientLight intensity={lit.ambientInt ?? 0.9} color={lit.ambient} />
+          <hemisphereLight intensity={lit.hemiInt ?? 1.4} color={lit.hemiSky} groundColor={lit.hemiGround} />
+          <pointLight position={[0, wallH - 1, 0]} intensity={lit.fillInt ?? 1.6} distance={ringHalf * 3.6} decay={1.5} color={lit.fill} />
+        </group>
+      )}
+
+      {/* Open-air districts keep the global day-night sun, but the theme adds a tinted hemisphere
+          + a soft overhead fill so each district reads in-character (warm gold market, cold
+          spaceport concourse, ominous ruin) instead of one flat daylight. */}
+      {!enclosed && (
+        <group>
+          <hemisphereLight intensity={lit.hemiInt ?? 0.5} color={lit.hemiSky} groundColor={lit.hemiGround} />
+          {lit.fillInt > 0 && (
+            <pointLight position={[0, wallH + 4, 0]} intensity={lit.fillInt} distance={half * 2.6} decay={2} color={lit.fill} />
+          )}
         </group>
       )}
     </group>

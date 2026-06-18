@@ -30,9 +30,11 @@ function terrainColor(planet) {
   return '#2a3145';
 }
 
-export default function Ground({ planet, size, textureUrl }) {
+export default function Ground({ planet, size, textureUrl, colorOverride }) {
   const matRef = useRef();
-  const color = useMemo(() => terrainColor(planet), [planet]);
+  // `colorOverride` lets a submap tint the play-area floor to its theme palette so the floor and
+  // the surrounding enclosure floor read as one surface (submapThemes). Else terrain-tint.
+  const color = useMemo(() => colorOverride || terrainColor(planet), [planet, colorOverride]);
 
   // Load the planet's aerial texture manually (no Suspense): missing = tint only.
   useEffect(() => {
