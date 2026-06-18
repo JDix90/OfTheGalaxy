@@ -2,9 +2,8 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 60px);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Orbitron', sans-serif;
+  background-color: var(--hud-surface-strong);
+  color: var(--hud-text-primary);
 }
 
 .npc-browser-header {
@@ -12,22 +11,22 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--hud-surface-soft);
+  border-bottom: 1px solid var(--hud-border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .header-info h1 {
   margin: 0;
   font-size: 2rem;
-  color: var(--primary-color);
+  color: var(--hud-accent);
   text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
 }
 
 .location-info {
   margin: 0.25rem 0 0 0;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .header-actions {
@@ -37,9 +36,9 @@
 
 .back-button {
   padding: 0.6rem 1.2rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.95rem;
@@ -47,15 +46,15 @@
 }
 
 .back-button:hover {
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
 }
 
 .npc-browser-controls {
   padding: 1rem 2rem;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--hud-surface-soft);
+  border-bottom: 1px solid var(--hud-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -70,9 +69,9 @@
 
 .view-mode-toggle button {
   padding: 0.5rem 1rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -84,9 +83,9 @@
 }
 
 .view-mode-toggle button.active {
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
 }
 
 .view-mode-toggle button:disabled {
@@ -102,9 +101,9 @@
 
 .search-input {
   padding: 0.5rem 1rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
   border-radius: 5px;
   font-size: 0.9rem;
   min-width: 200px;
@@ -112,14 +111,14 @@
 
 .search-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
 }
 
 .filter-select {
   padding: 0.5rem 1rem;
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: var(--hud-surface);
+  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border);
   border-radius: 5px;
   font-size: 0.9rem;
   cursor: pointer;
@@ -127,7 +126,7 @@
 
 .filter-select:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
 }
 
 .npc-browser-content {
@@ -143,7 +142,7 @@
 
 .npc-count {
   margin-bottom: 1.5rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.95rem;
 }
 
@@ -154,8 +153,8 @@
 }
 
 .npc-card {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background-color: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border);
   border-radius: 8px;
   padding: 1.5rem;
   cursor: pointer;
@@ -163,15 +162,15 @@
 }
 
 .npc-card:hover {
-  background-color: var(--bg-tertiary);
-  border-color: var(--primary-color);
+  background-color: var(--hud-surface);
+  border-color: var(--hud-accent);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .npc-card.selected {
   background-color: rgba(74, 158, 255, 0.1);
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
   box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
 }
 
@@ -185,7 +184,7 @@
 .npc-name {
   margin: 0;
   font-size: 1.3rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   flex: 1;
 }
 
@@ -211,18 +210,18 @@
 }
 
 .detail-label {
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   font-size: 0.9rem;
 }
 
 .detail-value {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 0.9rem;
   text-transform: capitalize;
 }
 
 .detail-value.faction-name {
-  color: #fcd34d;
+  color: var(--hud-warn);
   font-weight: 600;
 }
 
@@ -242,13 +241,13 @@
   gap: 0.5rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--hud-border);
 }
 
 .talk-button {
   flex: 1;
   padding: 0.6rem;
-  background-color: var(--primary-color);
+  background-color: var(--hud-accent);
   color: white;
   border: none;
   border-radius: 5px;
@@ -258,14 +257,14 @@
 }
 
 .talk-button:hover {
-  background-color: #5a9eff;
+  background-color: var(--hud-accent);
   transform: translateY(-1px);
 }
 
 .no-npcs {
   text-align: center;
   padding: 4rem 2rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .no-npcs p {
@@ -276,7 +275,7 @@
 .no-npcs .hint {
   font-size: 0.9rem;
   font-style: italic;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .loading,
@@ -286,12 +285,12 @@
   align-items: center;
   height: 100%;
   font-size: 1.5rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   flex-direction: column;
   gap: 1rem;
 }
 
 .error {
-  color: #ef4444;
+  color: var(--hud-danger);
 }
 

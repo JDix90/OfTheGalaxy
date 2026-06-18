@@ -13,8 +13,8 @@
 .no-characters {
   text-align: center;
   padding: 3rem 2rem;
-  background: rgba(20, 28, 48, 0.5);
-  border: 1px solid rgba(90, 120, 200, 0.18);
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border-soft);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -22,5 +22,5 @@
   gap: 0.6rem;
 }
 .no-characters-icon { font-size: 3.2rem; }
-.no-characters h2 { margin: 0; color: #e3edff; }
-.no-characters p { color: #8aa0bd; max-width: 36ch; margin: 0 0 1rem; }
+.no-characters h2 { margin: 0; color: var(--hud-text-primary); }
+.no-characters p { color: var(--hud-text-muted); max-width: 36ch; margin: 0 0 1rem; }
