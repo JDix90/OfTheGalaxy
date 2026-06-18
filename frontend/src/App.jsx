@@ -25,7 +25,6 @@ const CharacterCreation = lazy(() => import('./features/character-creation/Chara
 const GameWorld = lazy(() => import('./pages/GameWorld'));
 const QuestLog = lazy(() => import('./features/quests/QuestLog'));
 const GalaxyMap = lazy(() => import('./pages/GalaxyMap'));
-const PlanetSurface = lazy(() => import('./pages/PlanetSurface'));
 const PlanetSurface3D = lazy(() => import('./pages/PlanetSurface3D'));
 const SubMapView3D = lazy(() => import('./pages/SubMapView3D')); // 3D interiors (delegates dungeons/building-interiors to the 2D SubMapView)
 const NPCBrowser = lazy(() => import('./pages/NPCBrowser'));
@@ -104,9 +103,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        {/* The planet surface is the real-time 3D walkable scene by default. The 2D
-            surface is kept reachable only via the explicit /game/planet2d fallback
-            (no UI links to it) so it can be restored if ever needed. */}
+        {/* The planet surface is the real-time 3D walkable scene. /game/planet3d
+            is kept as an explicit alias of the default /game/planet route. */}
         <Route
           path="/game/planet/:planetId"
           element={
@@ -120,14 +118,6 @@ function App() {
           element={
             <ProtectedRoute>
               {currentCharacter ? <PlanetSurface3D /> : <Navigate to="/character/select" />}
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/game/planet2d/:planetId"
-          element={
-            <ProtectedRoute>
-              {currentCharacter ? <PlanetSurface /> : <Navigate to="/character/select" />}
             </ProtectedRoute>
           }
         />
