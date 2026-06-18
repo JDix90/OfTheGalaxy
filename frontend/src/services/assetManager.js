@@ -167,57 +167,6 @@ class AssetManager {
   }
 
   /**
-   * Load an NPC sprite
-   * @param {string} npcType - NPC type (e.g., 'venox', 'sytheen')
-   * @returns {Promise<Image|null>} Loaded image or null if failed
-   */
-  async loadNPCSprite(npcType) {
-    const cacheKey = `npc:${npcType}`;
-
-    // Check cache
-    if (this.spriteCache.has(cacheKey)) {
-      const cached = this.spriteCache.get(cacheKey);
-      if (cached && cached.complete) {
-        return cached;
-      }
-    }
-
-    // Check if already loading
-    if (this.loadingPromises.has(cacheKey)) {
-      return this.loadingPromises.get(cacheKey);
-    }
-
-    const npcSpriteModule = await import('../data/npcSpriteMap');
-    const spriteFilename = npcSpriteModule.npcSpriteMap[npcType] || npcSpriteModule.npcSpriteMap[npcType?.toLowerCase()];
-    
-    if (!spriteFilename) {
-      console.warn(`No sprite mapping found for NPC type: ${npcType}`);
-      return null;
-    }
-
-    const src = `/assets/sprites/npc/${spriteFilename}`;
-    this.loadingStates.set(cacheKey, 'loading');
-
-    const promise = this._loadImage(src)
-      .then((image) => {
-        this.spriteCache.set(cacheKey, image);
-        this.loadingStates.set(cacheKey, 'loaded');
-        return image;
-      })
-      .catch((error) => {
-        this.loadingStates.set(cacheKey, 'error');
-        console.error(`Failed to load NPC sprite for ${npcType}:`, error);
-        return null;
-      })
-      .finally(() => {
-        this.loadingPromises.delete(cacheKey);
-      });
-
-    this.loadingPromises.set(cacheKey, promise);
-    return promise;
-  }
-
-  /**
    * Load a particle sprite
    * @param {string} particleType - Particle type (e.g., 'sand', 'mist')
    * @returns {Promise<Image|null>} Loaded image or null if failed
