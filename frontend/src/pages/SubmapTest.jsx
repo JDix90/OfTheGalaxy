@@ -17,7 +17,7 @@ import { useSurfaceInput } from '../components/surface3d/useSurfaceInput';
 import SubmapScene from '../components/submap3d/SubmapScene';
 import {
   createSubmapSim, buildSubmapPois, buildSubmapExits, buildSubmapNpcs,
-  buildSubmapWaypoints, buildSubmapFurniture,
+  buildSubmapWaypoints,
 } from '../components/submap3d/submapData';
 
 useGLTF.preload(CHARACTER_GLTF_URLS[0]);
@@ -201,9 +201,7 @@ export default function SubmapTest() {
   const npcs3d = useMemo(() => buildSubmapNpcs(subMap.npcs, subMap, sim), [type, sim]); // eslint-disable-line
   const waypoints = useMemo(() => buildSubmapWaypoints([], subMap, sim), [type, sim]); // eslint-disable-line
   const isInterior = subMap.type === 'building_interior';
-  // Build furniture for every type (mirrors the live SubMapView3D, which furnishes open districts
-  // like the spaceport concourse too — not just enclosed interiors).
-  const furniture = useMemo(() => buildSubmapFurniture(subMap, sim), [type, sim]); // eslint-disable-line
+  // Themed props are built inside SubmapScene from the layout + theme (no furniture prop needed).
   const planetLike = useMemo(() => ({ terrain: subMap.type === 'spaceport' ? 'urban' : subMap.type }), [type]);
 
   const [activePoiId, setActivePoiId] = useState(null);
@@ -225,7 +223,7 @@ export default function SubmapTest() {
           <SubmapScene
             world={worldRef} input={input} planetLike={planetLike}
             pois={pois} exits={exits} npcs3d={npcs3d} waypoints={waypoints}
-            subMap={subMap} sim={sim} furniture={furniture} interior={isInterior}
+            subMap={subMap} sim={sim} interior={isInterior}
             activePoiId={activePoiId} worldHalf={sim.worldHalf}
             startTime={tod} postQuality="high"
             onProximity={(hit) => setActivePoiId(hit ? hit.poi.id : null)}
