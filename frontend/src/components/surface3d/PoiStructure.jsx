@@ -9,13 +9,89 @@
  * enterable locations, a pulsing ground ring when the player is in range (`active`).
  */
 
-import React, { Suspense, useRef, useState } from 'react';
+import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import GltfModel from './GltfModel';
 import { useAtmosphere } from './atmosphere/AtmosphereContext';
 import { formatDisplayName } from '../../utils/formatName';
+import { getPOISpriteFilename } from '../../data/poiSpriteMap';
+
+// Painted POI icon (frontend/public/assets/sprites/poi/*). Loaded as a THREE
+// texture once per URL and shared across every POI of the same type — a promise
+// cache dedupes concurrent first-loads. Mirrors Ground.jsx's manual (no-Suspense)
+// loader so a missing sprite degrades gracefully to "no icon", never a throw.
+// The shipped POI PNGs are circular badges, but they were exported with NO alpha
+// channel — a transparency checkerboard is baked into the (square) corners, and
+// they're a needlessly heavy 1024². Rather than depend on re-exported art, we
+// composite each through a circular canvas clip on load: real transparent corners
+// + downsampled to 256² (a VRAM win). The result reads as an intentional medallion
+// marker. (When proper cut-out art arrives, this loader can become a plain load.)
+// One texture per URL, shared across every POI of the same type; a promise cache
+// dedupes concurrent first-loads, and a failed load resolves to null (no icon).
+const _poiTexCache = new Map(); // url -> Promise<THREE.Texture | null>
+function loadPoiTexture(url) {
+  if (_poiTexCache.has(url)) return _poiTexCache.get(url);
+  const p = new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const size = 256;
+      const cx = size / 2;
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, size, size);
+
+      // The colorful badge sits in the center; the baked checkerboard is a
+      // desaturated (gray) ring/corners. Find the badge edge per-sprite by
+      // scanning outward along 8 directions for the saturation falloff, then
+      // clip to the median radius so every icon crops to just its art.
+      const px = ctx.getImageData(0, 0, size, size).data;
+      const satAt = (x, y) => {
+        const i = (y * size + x) * 4;
+        return Math.max(px[i], px[i + 1], px[i + 2]) - Math.min(px[i], px[i + 1], px[i + 2]);
+      };
+      const dirs = [[1, 0], [0, 1], [-1, 0], [0, -1], [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071], [-0.7071, -0.7071]];
+      const edges = dirs.map(([dx, dy]) => {
+        for (let f = 0.20; f <= 0.48; f += 0.01) {
+          if (satAt(Math.round(cx + dx * f * size), Math.round(cx + dy * f * size)) < 22) return f;
+        }
+        return 0.46;
+      }).sort((a, b) => a - b);
+      const rFrac = Math.min(0.46, Math.max(0.26, edges[edges.length >> 1])); // clamped median
+
+      ctx.clearRect(0, 0, size, size);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cx, rFrac * size, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, 0, 0, size, size);
+      ctx.restore();
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
+      resolve(tex);
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+  _poiTexCache.set(url, p);
+  return p;
+}
+
+function usePoiSpriteTexture(poiType) {
+  const [tex, setTex] = useState(null);
+  useEffect(() => {
+    const file = getPOISpriteFilename(poiType);
+    if (!file) { setTex(null); return undefined; }
+    let cancelled = false;
+    loadPoiTexture(`/assets/sprites/poi/${file}`).then((t) => { if (!cancelled) setTex(t); });
+    return () => { cancelled = true; };
+  }, [poiType]);
+  return tex;
+}
 
 function Box({ w, h, d, y = 0, color, emissive, ei = 0, ...rest }) {
   return (
@@ -205,9 +281,11 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
   const ringRef = useRef();
   const lightRef = useRef();
   const labelRef = useRef();
+  const spriteMatRef = useRef();
   const atmo = useAtmosphere();
   const s = poi.structure;
   const building = poi.building;
+  const spriteTex = usePoiSpriteTexture(poi.type);
 
   // Building height drives label/light placement. Until the glTF reports its fitted
   // height, use a guess from its target footprint (hangars are wider than tall).
@@ -228,11 +306,16 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
       const flicker = 0.92 + Math.sin(clock.elapsedTime * 6 + poi.wx) * 0.08;
       lightRef.current.intensity = (0.25 + night * 1.6) * s.glow * (s.footprint * 0.6) * flicker;
     }
+    const d = Math.hypot(camera.position.x - poi.wx, camera.position.z - poi.wz);
     if (labelRef.current) {
-      const d = Math.hypot(camera.position.x - poi.wx, camera.position.z - poi.wz);
       let o = active ? 1 : d <= LABEL_NEAR ? 0.9 : d >= LABEL_FAR ? 0 : 0.9 * (1 - (d - LABEL_NEAR) / (LABEL_FAR - LABEL_NEAR));
       labelRef.current.style.opacity = o.toFixed(2);
       labelRef.current.style.display = o <= 0.03 ? 'none' : 'block';
+    }
+    if (spriteMatRef.current) {
+      // Painted POI icon fades on the same near/far band as the label so the
+      // horizon doesn't fill with signs; full opacity up close.
+      spriteMatRef.current.opacity = active ? 1 : d <= LABEL_NEAR ? 1 : d >= LABEL_FAR ? 0 : 1 - (d - LABEL_NEAR) / (LABEL_FAR - LABEL_NEAR);
     }
   });
 
@@ -267,6 +350,22 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
 
       <PropScatter props={poi.props} />
 
+      {/* Painted POI icon — a camera-facing sign that gives each location its
+          identity at a glance (cantina vs temple vs garrison). Sprites always
+          face the camera natively; missing art simply renders nothing. */}
+      {spriteTex && (
+        <sprite position={[0, h + 1.7, 0]} scale={[2.2, 2.2, 1]}>
+          <spriteMaterial
+            ref={spriteMatRef}
+            map={spriteTex}
+            transparent
+            alphaTest={0.1}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </sprite>
+      )}
+
       {lit && (
         <pointLight
           ref={lightRef}
@@ -285,7 +384,7 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
         </mesh>
       )}
 
-      <Html position={[0, h + 1.6, 0]} center distanceFactor={28} occlude={false} style={{ pointerEvents: 'none' }}>
+      <Html position={[0, h + (spriteTex ? 3.2 : 1.6), 0]} center distanceFactor={28} occlude={false} style={{ pointerEvents: 'none' }}>
         <div ref={labelRef} style={{
           textAlign: 'center', whiteSpace: 'nowrap', fontFamily: 'system-ui, sans-serif',
           transform: 'translateY(-50%)', opacity: 0.9,
