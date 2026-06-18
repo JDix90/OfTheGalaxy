@@ -35,6 +35,8 @@ const CROWD_SPEED = 2.9;            // ambient walk speed (m/s)
 const CROWD_PAUSE_MIN_MS = 600;     // dwell range once a walker reaches a destination (short =
 const CROWD_PAUSE_MAX_MS = 2400;    // more walking, less standing around → reads as bustling)
 const CROWD_ROLES = 6;              // tint buckets (client maps to muted civilian colors)
+const CROWD_NPC_AVOID = 1.8;        // personal-space radius (world u) cosmetic walkers keep from standing NPCs
+const CROWD_NPC_PUSH = 1.4;         // repulsion weight vs the unit steer (so walkers veer around, not through)
 const MAX_CROWD = 64;              // hard cap per world (bandwidth + render backstop)
 const r2 = (n) => Math.round(n * 100) / 100;
 const normYaw = (y) => (typeof y === 'number' && Number.isFinite(y) ? ((y % TWO_PI) + TWO_PI) % TWO_PI : null);
@@ -69,6 +71,7 @@ class PlanetWorld {
     this._crowdSeq = 0;
     this._crowdWps = [];       // world-space destination waypoints
     this.crowdCfg = (options.crowd && options.crowd.count > 0) ? options.crowd : null;
+    this._npcPoints = Array.isArray(options.npcPoints) ? options.npcPoints : []; // world-space NPC positions the crowd steers around
     if (this.ambient) this.spawnEnemies();
     if (this.crowdCfg) this.spawnCrowd();
   }
@@ -620,6 +623,25 @@ class PlanetWorld {
     }
   }
 
+  /** Sum of away-from-NPC vectors for any standing NPC within personal space of (x,z),
+   *  weighted by closeness (→0 at the radius, strongest at contact). Crowd-only nudge so
+   *  cosmetic walkers don't trample interactive NPCs; the player/enemies are unaffected. */
+  _npcRepel(x, z) {
+    let rx = 0, rz = 0;
+    const R = CROWD_NPC_AVOID, R2 = R * R;
+    for (let i = 0; i < this._npcPoints.length; i++) {
+      const np = this._npcPoints[i];
+      const ddx = x - np.x, ddz = z - np.z;
+      const d2 = ddx * ddx + ddz * ddz;
+      if (d2 < R2 && d2 > 1e-4) {
+        const d = Math.sqrt(d2);
+        const w = ((R - d) / R) * CROWD_NPC_PUSH;
+        rx += (ddx / d) * w; rz += (ddz / d) * w;
+      }
+    }
+    return { rx, rz };
+  }
+
   /** Walk each crowd member toward its destination; dwell on arrival, then pick a new one.
    *  Routes through the alleys via _routeSteer (same as enemies) so a medina-surface crowd
    *  ambles the souks instead of grinding against building walls. */
@@ -637,7 +659,13 @@ class PlanetWorld {
       const steer = this._routeSteer(c, c.tx, c.tz, now);
       const sx = steer.x - c.x, sz = steer.z - c.z, sd = Math.hypot(sx, sz);
       if (sd > 1e-3) {
-        const ux = sx / sd, uz = sz / sd;
+        let ux = sx / sd, uz = sz / sd;
+        // Veer around any standing NPC in personal space so a walker steps past them, not over
+        // them. _tryMove still collision-slides, so the veer never pushes them into a wall/POI.
+        if (this._npcPoints.length) {
+          const rep = this._npcRepel(c.x, c.z);
+          if (rep.rx || rep.rz) { ux += rep.rx; uz += rep.rz; const l = Math.hypot(ux, uz) || 1; ux /= l; uz /= l; }
+        }
         c.facing = Math.atan2(ux, uz); // 0 = +Z (sim convention)
         this._tryMove(c, ux * c.speed * dt, uz * c.speed * dt);
       }

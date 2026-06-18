@@ -13,6 +13,7 @@ const { loadPlanetMapData, loadSubmap } = require('./planetData');
 const { CombatManager } = require('./combat');
 const { CombatEncounter } = require('../models');
 const characterService = require('../services/characterService');
+const npcService = require('../services/npcService');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 const r3 = (n) => Math.round(n * 1000) / 1000;
@@ -78,14 +79,32 @@ class WorldManager {
     return this._getOrCreate(planetId, async () => {
       const { planet, mapData } = await loadPlanetMapData(planetId);
       const sim = this.createSurfaceSim(mapData || {}, { scale: this.DEFAULTS.scale });
+      // Settlement surfaces get a cosmetic ambient crowd, ambling the streets (routed, not
+      // grinding walls), headcount scaled by the planet's population. Null for wild surfaces.
+      const crowd = this._buildSurfaceCrowdConfig(mapData, planet);
+      // Only fetch NPC positions when there's a crowd that has to keep clear of them.
+      const npcPoints = crowd ? await this._loadNpcPoints(planetId, sim) : [];
       return new PlanetWorld(planetId, sim, mapData, {
         dangerLevel: (planet && planet.dangerLevel) || 1,
         enemyPool: buildEnemyPool(planet || {}),
-        // Settlement surfaces get a cosmetic ambient crowd, ambling the streets (routed, not
-        // grinding walls), headcount scaled by the planet's population. Null for wild surfaces.
-        crowd: this._buildSurfaceCrowdConfig(mapData, planet),
+        crowd,
+        npcPoints,
       });
     });
+  }
+
+  /** World-space positions of a planet's standing NPCs (for crowd avoidance). Best-effort:
+   *  any failure just means the crowd won't dodge NPCs — it never blocks world creation. */
+  async _loadNpcPoints(planetId, sim) {
+    try {
+      const npcs = await npcService.getNPCsByLocation(planetId);
+      return (npcs || [])
+        .map((n) => n && n.location)
+        .filter((l) => l && Number.isFinite(l.x) && Number.isFinite(l.y))
+        .map((l) => sim.surfaceToWorld(l.x, l.y));
+    } catch (e) {
+      return [];
+    }
   }
 
   /** Ambient-crowd config for an urban (medina) SURFACE: destination waypoints drawn from the
