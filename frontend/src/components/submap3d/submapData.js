@@ -308,6 +308,39 @@ export function buildSubmapProps(subMap, sim, theme) {
 /** Which prop keys render as instanced glTF kit models (vs composed primitives). */
 export const isGlbProp = (semantic) => GLB_PROP_KEYS.has(semantic);
 
+/**
+ * Diegetic wayfinding signs (submap-liveliness Phase 5) from the layout's NAMED ZONES — the areas
+ * ("Reception Area", "Treatment Wing", "Hangar Bay", "Market Floor") that today have no in-world
+ * label at all (buildings/POIs already float their own names; zones don't). Returns world-positioned
+ * sign anchors; SubmapSign renders the physical panel + text. Pure + testable.
+ *
+ * Placed at the zone centre, raised by the sign mesh. Skips unnamed zones, dedupes by name, skips
+ * map-spanning zones (>55% area — those are "the whole floor", not a wayfinding sub-area), caps at 12.
+ */
+export function buildSubmapSignage(subMap, sim, theme) { // theme reserved for future per-type styling
+  if (!sim) return [];
+  const d = layoutOf(subMap);
+  const { w, h } = submapCoordDims(subMap);
+  const area = Math.max(1, w * h);
+  const out = [];
+  const seen = new Set();
+  for (const z of (d.zones || [])) {
+    const name = z && z.name;
+    const b = z && z.bounds;
+    if (!name || !b || !Number.isFinite(b.x)) continue;
+    const key = String(name).toLowerCase();
+    if (seen.has(key)) continue;
+    if (((b.width || 1) * (b.height || 1)) / area > 0.55) continue; // skip whole-floor zones
+    seen.add(key);
+    const cx = ((b.x + (b.width || 1) / 2) / w) * 100;
+    const cy = ((b.y + (b.height || 1) / 2) / h) * 100;
+    const wpos = sim.surfaceToWorld(cx, cy);
+    out.push({ id: z.id || `sign_${out.length}`, label: name, wx: wpos.x, wz: wpos.z });
+    if (out.length >= 12) break;
+  }
+  return out;
+}
+
 /** Quest objectives located in THIS submap → world-positioned waypoint beacons. */
 export function buildSubmapWaypoints(activeQuests, subMap, sim) {
   if (!sim || !Array.isArray(activeQuests)) return [];
