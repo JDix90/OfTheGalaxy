@@ -68,4 +68,13 @@ describe('submap theme resolution', () => {
     expect(SUBMAP_THEMES.settlement.particle).toBeNull();
     expect(SUBMAP_THEMES.residential.particle).toBeNull();
   });
+
+  test('ambient crowd flavors are set per theme (and off for homes/ruins)', () => {
+    expect(SUBMAP_THEMES.clinic.crowd.flavor).toBe('patients');
+    expect(SUBMAP_THEMES.market.crowd.flavor).toBe('shoppers');
+    expect(SUBMAP_THEMES.spaceport.crowd.flavor).toBe('travelers');
+    expect(SUBMAP_THEMES.market.crowd.density).toBeGreaterThan(0);
+    expect(SUBMAP_THEMES.danger.crowd.flavor).toBe('none');
+    expect(SUBMAP_THEMES.residential.crowd.flavor).toBe('none');
+  });
 });
