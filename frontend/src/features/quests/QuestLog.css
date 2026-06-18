@@ -4,7 +4,7 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .quest-log-header {
@@ -13,7 +13,7 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 2px solid var(--hud-border);
 }
 
 .quest-log-header h1 {
@@ -28,23 +28,23 @@
 
 .quest-tabs .tab {
   padding: 0.5rem 1rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
+  background: var(--hud-surface-soft);
+  border: 1px solid var(--hud-border);
+  color: var(--hud-text-secondary);
   cursor: pointer;
   border-radius: 4px;
   transition: all 0.2s;
 }
 
 .quest-tabs .tab:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
+  background: var(--hud-surface);
+  color: var(--hud-text-primary);
 }
 
 .quest-tabs .tab.active {
-  background: var(--primary-color);
+  background: var(--hud-accent);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--hud-accent);
 }
 
 .quest-log-content {
@@ -55,7 +55,7 @@
 }
 
 .quest-log-sidebar {
-  background: var(--bg-secondary);
+  background: var(--hud-surface-soft);
   border-radius: 8px;
   padding: 1rem;
   overflow-y: auto;
@@ -63,7 +63,7 @@
 }
 
 .quest-log-main {
-  background: var(--bg-secondary);
+  background: var(--hud-surface-soft);
   border-radius: 8px;
   padding: 2rem;
 }
@@ -77,22 +77,22 @@
 
 .quest-item {
   padding: 1rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background: var(--hud-surface);
+  border: 1px solid var(--hud-border);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .quest-item:hover {
-  background: var(--bg-primary);
-  border-color: var(--primary-color);
+  background: var(--hud-surface-strong);
+  border-color: var(--hud-accent);
   transform: translateX(4px);
 }
 
 .quest-item.selected {
-  background: var(--bg-primary);
-  border-color: var(--primary-color);
+  background: var(--hud-surface-strong);
+  border-color: var(--hud-accent);
   border-width: 2px;
 }
 
@@ -106,13 +106,13 @@
 .quest-header h4 {
   margin: 0;
   font-size: 1.1rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .quest-faction {
   font-size: 0.85rem;
   padding: 0.25rem 0.5rem;
-  background: var(--primary-color);
+  background: var(--hud-accent);
   color: white;
   border-radius: 4px;
 }
@@ -120,14 +120,14 @@
 .quest-short-desc {
   margin: 0.5rem 0;
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
   line-height: 1.4;
 }
 
 .quest-progress-bar {
   width: 100%;
   height: 4px;
-  background: var(--bg-primary);
+  background: var(--hud-surface-strong);
   border-radius: 2px;
   overflow: hidden;
   margin-top: 0.5rem;
@@ -135,33 +135,33 @@
 
 .progress-fill {
   height: 100%;
-  background: var(--success-color);
+  background: var(--hud-heal);
   transition: width 0.3s;
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .loading {
   text-align: center;
   padding: 2rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 /* Quest Details */
 .quest-details-empty {
   text-align: center;
   padding: 4rem 2rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .quest-details h2 {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .quest-meta {
@@ -169,24 +169,24 @@
   gap: 1.5rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--hud-border);
   flex-wrap: wrap;
 }
 
 .meta-item {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .meta-item strong {
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   margin-right: 0.5rem;
 }
 
 .quest-description {
   margin-bottom: 2rem;
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: var(--hud-text-secondary);
 }
 
 .quest-objectives {
@@ -195,7 +195,7 @@
 
 .quest-objectives h3 {
   margin-bottom: 1rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1.2rem;
 }
 
@@ -205,7 +205,7 @@
   gap: 0.75rem;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
-  background: var(--bg-tertiary);
+  background: var(--hud-surface);
   border-radius: 4px;
   transition: all 0.2s;
 }
@@ -216,26 +216,26 @@
 
 .objective-checkbox {
   font-size: 1.2rem;
-  color: var(--success-color);
+  color: var(--hud-heal);
   min-width: 20px;
 }
 
 .objective-text {
   flex: 1;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
 }
 
 .quest-rewards {
   margin-bottom: 2rem;
   padding: 1rem;
-  background: var(--bg-tertiary);
+  background: var(--hud-surface);
   border-radius: 6px;
 }
 
 .quest-rewards h3 {
   margin-top: 0;
   margin-bottom: 0.75rem;
-  color: var(--text-primary);
+  color: var(--hud-text-primary);
   font-size: 1.2rem;
 }
 
@@ -247,8 +247,8 @@
 
 .quest-rewards li {
   padding: 0.5rem 0;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-color);
+  color: var(--hud-text-secondary);
+  border-bottom: 1px solid var(--hud-border);
 }
 
 .quest-rewards li:last-child {
@@ -260,12 +260,12 @@
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--hud-border);
 }
 
 .btn-danger {
   padding: 0.75rem 1.5rem;
-  background: var(--danger-color);
+  background: var(--hud-danger);
   color: white;
   border: none;
   border-radius: 6px;
@@ -275,7 +275,7 @@
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: var(--hud-danger);
   transform: translateY(-2px);
 }
 
