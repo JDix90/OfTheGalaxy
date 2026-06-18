@@ -4,9 +4,9 @@
   left: 20px;
   width: 320px;
   max-height: 350px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+  background: var(--hud-surface);
   backdrop-filter: blur(10px);
-  border: 2px solid var(--primary-color);
+  border: 1px solid var(--hud-border-soft);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   z-index: 1002;
@@ -147,7 +147,7 @@
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
-  font-family: 'Orbitron', sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .view-quests-button:hover {
@@ -161,9 +161,9 @@
   left: 20px;
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+  background: var(--hud-surface);
   backdrop-filter: blur(10px);
-  border: 2px solid var(--primary-color);
+  border: 1px solid var(--hud-border-soft);
   border-radius: 50%;
   font-size: 1.5rem;
   cursor: pointer;

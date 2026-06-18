@@ -11,6 +11,7 @@ import { useInventoryStore } from '../../state/inventorySlice';
 import { useQuestStore } from '../../state/questSlice';
 import poiApi from '../../services/api/poiApi';
 import { notify } from '../hud/NotificationCenter';
+import { Z } from '../hud/hudTokens';
 import { COMBAT_OFFLINE_MESSAGE } from '../../config/combat';
 import { formatDisplayName } from '../../utils/formatName';
 import InvestigationModal from './InvestigationModal';
@@ -542,7 +543,7 @@ export default function POIInteractionMenu({ poi, planet, isOpen, onClose, onCom
         position: 'fixed',
         left: `${position.x}px`,
         top: `${position.y}px`,
-        zIndex: 1000
+        zIndex: Z.CONTEXT_MENUS
       }}
       onClick={(e) => e.stopPropagation()}
     >

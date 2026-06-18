@@ -1,14 +1,16 @@
+/* NPC interaction menu — migrated onto the flat-dark HUD tokens so it reads as
+   the same family as the dialogue / combat UI (was its own blue-slate theme). */
 .npc-interaction-menu {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid #3b82f6;
-  border-radius: 12px;
+  background: var(--hud-surface);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius);
   padding: 0;
-  min-width: 280px;
-  max-width: 400px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
-              0 0 20px rgba(59, 130, 246, 0.3);
-  color: #e2e8f0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-width: 250px;
+  max-width: 360px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  backdrop-filter: var(--hud-blur);
+  color: var(--hud-text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
   overflow: hidden;
 }
 
@@ -16,83 +18,61 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-  border-bottom: 2px solid #3b82f6;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--hud-border-soft);
 }
 
 .npc-interaction-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: var(--hud-text-primary);
 }
 
 .close-btn {
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  font-size: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--hud-border-soft);
+  color: var(--hud-text-muted);
+  font-size: 18px;
+  line-height: 1;
   cursor: pointer;
-  padding: 0;
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: var(--hud-radius-sm);
+  transition: all 0.15s ease;
 }
+.close-btn:hover { background: rgba(239, 68, 68, 0.18); border-color: rgba(239, 68, 68, 0.5); color: #ff6a5a; }
 
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.npc-interaction-info {
-  padding: 16px 20px;
-}
+.npc-interaction-info { padding: 12px 16px; }
 
 .npc-type-badge {
   display: inline-block;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: var(--hud-radius-sm);
+  font-size: 11px;
   font-weight: 600;
-  color: #ffffff;
+  color: #06121f;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
 }
 
 .npc-occupation,
-.npc-level {
-  margin: 8px 0;
-  font-size: 14px;
-  color: #cbd5e1;
-}
-
+.npc-level { margin: 6px 0; font-size: 13px; color: var(--hud-text-muted); }
 .npc-occupation strong,
-.npc-level strong {
-  color: #e2e8f0;
-  margin-right: 6px;
-}
+.npc-level strong { color: var(--hud-text-secondary); margin-right: 6px; }
 
-.npc-description {
-  margin: 12px 0;
-  font-size: 13px;
-  color: #94a3b8;
-  line-height: 1.5;
-  font-style: italic;
-}
+.npc-description { margin: 10px 0; font-size: 12px; color: var(--hud-text-muted); line-height: 1.5; font-style: italic; }
 
 .npc-interaction-actions {
   display: flex;
-  gap: 12px;
-  padding: 16px 20px;
-  background: rgba(15, 23, 42, 0.5);
-  border-top: 1px solid rgba(59, 130, 246, 0.3);
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--hud-surface-soft);
+  border-top: 1px solid var(--hud-border-soft);
 }
 
 .action-btn {
@@ -100,96 +80,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
+  background: rgba(74, 158, 255, 0.06);
+  color: var(--hud-text-secondary);
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
+.action-btn:hover:not(:disabled) { transform: translateX(1px); }
+.action-icon { font-size: 16px; }
 
-.action-icon {
-  font-size: 18px;
+.talk-btn { border-color: rgba(74, 158, 255, 0.35); }
+.talk-btn:hover:not(:disabled) { background: var(--hud-accent-soft); border-color: var(--hud-accent); }
+
+.shop-btn { color: var(--hud-heal); border-color: rgba(108, 240, 194, 0.3); }
+.shop-btn:hover:not(:disabled) { background: rgba(108, 240, 194, 0.12); border-color: var(--hud-heal); }
+
+.quest-btn { color: var(--hud-warn); border-color: rgba(255, 210, 74, 0.3); }
+.quest-btn:hover:not(:disabled) { background: rgba(255, 210, 74, 0.12); border-color: var(--hud-warn); }
+
+.attack-btn { color: #ff8a7a; border-color: rgba(255, 90, 74, 0.3); }
+.attack-btn:hover:not(:disabled) { background: rgba(255, 90, 74, 0.14); border-color: var(--hud-danger); }
+
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  .action-btn:hover:not(:disabled) { transform: none; }
 }
-
-.action-label {
-  font-size: 14px;
-}
-
-.talk-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-.talk-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
-  transform: translateY(-2px);
-}
-
-.talk-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
-}
-
-.attack-btn {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-}
-
-.attack-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
-  transform: translateY(-2px);
-}
-
-.attack-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-}
-
-.quest-btn {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
-}
-
-.quest-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  box-shadow: 0 6px 16px rgba(251, 191, 36, 0.5);
-  transform: translateY(-2px);
-}
-
-.quest-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
-}
-
-.shop-btn {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.4);
-}
-
-.shop-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 6px 16px rgba(52, 211, 153, 0.5);
-  transform: translateY(-2px);
-}
-
-.shop-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(52, 211, 153, 0.4);
-}
-
-.action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-

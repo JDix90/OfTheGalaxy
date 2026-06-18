@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { Z } from '../../components/hud/hudTokens';
 
 export default function DialogueVignette() {
   return (
@@ -14,7 +15,7 @@ export default function DialogueVignette() {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 1003,
+        zIndex: Z.DIALOGUE_SCRIM,
         pointerEvents: 'none',
         background:
           'radial-gradient(120% 75% at 50% 38%, rgba(5,8,15,0) 35%, rgba(5,8,15,0.28) 72%, rgba(5,8,15,0.55) 100%)',

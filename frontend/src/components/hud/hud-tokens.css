@@ -1,0 +1,39 @@
+/* hud-tokens.css — CSS-var mirror of hudTokens.js. Keep in lockstep.
+   Imported once (src/index.css). Stylesheets read these; inline-styled
+   overlays use the JS module. */
+:root {
+  /* z-layer scale (see hudTokens.js Z) */
+  --hud-z-ambient-hints: 990;
+  --hud-z-base: 1001;
+  --hud-z-panels: 1002;
+  --hud-z-vitals: 1010;
+  --hud-z-world-prompts: 1020;
+  --hud-z-context-menus: 1030;
+  --hud-z-status: 1040;
+  --hud-z-toasts: 1050;
+  --hud-z-dialogue-scrim: 1060;
+  --hud-z-dialogue: 1070;
+  --hud-z-dock-panels: 1080;
+  --hud-z-defeat: 1100;
+  --hud-z-overlays: 2000;
+  --hud-z-overlays-top: 3000;
+  --hud-z-tutorial: 4000;
+
+  /* flat-dark palette + shapes */
+  --hud-surface: rgba(10, 15, 28, 0.9);
+  --hud-surface-soft: rgba(8, 12, 22, 0.8);
+  --hud-surface-strong: rgba(10, 14, 24, 0.96);
+  --hud-accent: #4a9eff;
+  --hud-accent-soft: rgba(74, 158, 255, 0.15);
+  --hud-heal: #6cf0c2;
+  --hud-danger: #ff5a4a;
+  --hud-warn: #ffd24a;
+  --hud-text-primary: #e6eefc;
+  --hud-text-secondary: #cfe0fb;
+  --hud-text-muted: #8aa0c4;
+  --hud-border: #2a3654;
+  --hud-border-soft: rgba(120, 150, 200, 0.18);
+  --hud-radius: 12px;
+  --hud-radius-sm: 8px;
+  --hud-blur: blur(9px);
+}
