@@ -36,23 +36,39 @@ function findStreetRuns(tm, ts, scale) {
   return runs.sort((p, q) => q.len - p.len);
 }
 
-// Trim a lane to its single longest stretch where the WHOLE VEHICLE FOOTPRINT fits
-// clear of buildings, POIs, and stalls — not just the centerline. At each step we
-// check the lane point AND the two points half-a-vehicle-width to either side
-// (perpendicular), so a lane that's too narrow or grazes a wall is rejected/shortened
-// rather than letting the body overhang. Ends are pulled in by the half-length so the
-// nose never pokes past the clear stretch. Returns null if no usable run.
+// Is the WHOLE vehicle footprint clear? The body is a (2·halfL)×(2·halfW) rectangle centred at
+// (cx,cz), oriented by the unit vector u (along travel) and p (across it). We sample a 5×5 grid
+// over the rectangle, not just the centre + two side edges: a wide body (the speeder is ~2 tiles
+// across) can straddle a building/POI tile that pokes into the MIDDLE of its width, which the old
+// 3-point check sailed straight through. The grid step (≤ ~1.6u) is finer than a tile (3.2u) so no
+// obstacle tile overlapping the body is missed. ~25 cheap tile lookups — negligible per frame.
+function footprintClear(isWalkable, cx, cz, ux, uz, px, pz, halfW, halfL) {
+  const N = 4; // 5 samples per axis → 25 points covering the rectangle
+  for (let li = 0; li <= N; li++) {
+    const lf = ((li / N) * 2 - 1) * halfL;          // -halfL .. +halfL (nose..tail)
+    const bx = cx + ux * lf, bz = cz + uz * lf;
+    for (let wi = 0; wi <= N; wi++) {
+      const wf = ((wi / N) * 2 - 1) * halfW;         // -halfW .. +halfW (left..right)
+      if (!isWalkable(bx + px * wf, bz + pz * wf)) return false;
+    }
+  }
+  return true;
+}
+
+// Trim a lane to its single longest stretch where the WHOLE VEHICLE FOOTPRINT fits clear of
+// buildings, POIs, and stalls — not just the centerline. At each step we test the full body
+// rectangle (via footprintClear), so a lane that's too narrow, grazes a wall, or has an obstacle
+// jutting into the body is shortened/rejected rather than letting the vehicle overhang or drive
+// through it. footprintClear already covers the ±halfL nose/tail, so the centre may range over the
+// whole clear span (no extra end-trim needed). Returns null if no usable run.
 export function clearestSubRun(run, isWalkable, minLen, halfW, halfL) {
   const [ax, az] = run.a, [bx, bz] = run.b;
   const dx = bx - ax, dz = bz - az;
   const L = Math.hypot(dx, dz) || 1;
   const ux = dx / L, uz = dz / L;   // along the lane
   const px = -uz, pz = ux;          // perpendicular (unit)
-  const steps = Math.max(2, Math.ceil(L));
-  const clearAt = (x, z) =>
-    isWalkable(x, z) &&
-    isWalkable(x + px * halfW, z + pz * halfW) &&
-    isWalkable(x - px * halfW, z - pz * halfW);
+  const steps = Math.max(2, Math.ceil(L * 2)); // ~0.5u sampling along the lane
+  const clearAt = (x, z) => footprintClear(isWalkable, x, z, ux, uz, px, pz, halfW, halfL);
   let bestS = -1, bestE = -1, curS = -1;
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
@@ -66,12 +82,12 @@ export function clearestSubRun(run, isWalkable, minLen, halfW, halfL) {
     }
   }
   if (bestS < 0 || bestE <= bestS) return null;
-  let s0 = (bestS / steps) * L + halfL, s1 = (bestE / steps) * L - halfL; // keep the body inside the clear stretch
+  const s0 = (bestS / steps) * L, s1 = (bestE / steps) * L;
   if (s1 - s0 < minLen) return null;
   return { a: [ax + ux * s0, az + uz * s0], b: [ax + ux * s1, az + uz * s1], len: s1 - s0 };
 }
 
-function Vehicle({ scene, fit, baseY, run, speed, hover, seed, isWalkable, halfW }) {
+function Vehicle({ scene, fit, baseY, run, speed, hover, seed, isWalkable, halfW, halfL }) {
   const ref = useRef();
   const cloned = useMemo(() => scene.clone(true), [scene]);
   const dir = useMemo(() => { const dx = run.b[0] - run.a[0], dz = run.b[1] - run.a[1]; const L = Math.hypot(dx, dz) || 1; return { dx: dx / L, dz: dz / L, L }; }, [run]);
@@ -81,12 +97,13 @@ function Vehicle({ scene, fit, baseY, run, speed, hover, seed, isWalkable, halfW
     if (!ref.current) return;
     let nt = t.current + sgn.current * (speed * Math.min(dt, 0.05)) / dir.L;
     if (nt > 1) { nt = 1; sgn.current = -1; } else if (nt < 0) { nt = 0; sgn.current = 1; }
-    // Per-frame footprint guard: if the body (centre ± half-width) would clip a building,
-    // POI, or storefront, turn back instead of advancing into it — a hard guarantee on top
-    // of the lane trim, so nothing the trim missed (awnings, odd geometry) gets driven through.
+    // Per-frame footprint guard: if the whole body would clip a building, POI, or storefront at
+    // the next step, turn back instead of advancing into it — a hard guarantee on top of the lane
+    // trim, so nothing the trim missed (awnings, odd geometry, a tile poking into the body's width)
+    // gets driven through. Tests the full footprint rectangle, not just the centre + side edges.
     const cx = run.a[0] + (run.b[0] - run.a[0]) * nt, cz = run.a[1] + (run.b[1] - run.a[1]) * nt;
     const px = -dir.dz, pz = dir.dx;
-    const clear = isWalkable(cx, cz) && isWalkable(cx + px * halfW, cz + pz * halfW) && isWalkable(cx - px * halfW, cz - pz * halfW);
+    const clear = footprintClear(isWalkable, cx, cz, dir.dx, dir.dz, px, pz, halfW, halfL);
     if (clear) t.current = nt; else sgn.current = -sgn.current;
     const x = run.a[0] + (run.b[0] - run.a[0]) * t.current, z = run.a[1] + (run.b[1] - run.a[1]) * t.current;
     ref.current.position.set(x, hover, z);
@@ -122,7 +139,7 @@ function Fleet({ tm, planet, worldHalf, cfg }) {
   const fleet = [];
   for (let i = 0; i < cfg.count; i++) fleet.push({ run: runs[(i * 7) % runs.length], seed: i * 131 + 7 });
   return fleet.map((v, i) => (
-    <Vehicle key={i} scene={scene} fit={fit} baseY={baseY} run={v.run} speed={cfg.speed} hover={cfg.hover} seed={v.seed} isWalkable={sim.isWalkableWorld} halfW={halfW} />
+    <Vehicle key={i} scene={scene} fit={fit} baseY={baseY} run={v.run} speed={cfg.speed} hover={cfg.hover} seed={v.seed} isWalkable={sim.isWalkableWorld} halfW={halfW} halfL={halfL} />
   ));
 }
 

@@ -31,6 +31,18 @@ function pickBuildingCategory(hh) {
   if (r < 93) return 'bar';
   return 'civic';                   // halls/offices
 }
+// Walkable pocket RADIUS (in tiles) to clear around a POI so its 3D structure sits in the open and
+// doesn't poke into the surrounding procedural buildings. The old fixed 1-tile (3×3) pocket was
+// smaller than the rendered POI_STRUCTURES, so buildings overlapped them. Mirrors the footprint
+// sizing in shared/sim/poiFootprint.mjs: a landing pad needs a wide apron (radius 3 ≈ a 7×7 plaza);
+// every other category's building box clears a radius-2 (5×5) plaza. Kept as a small CJS table (this
+// generator is CommonJS, the footprint module is ESM) — keep the spaceport set in sync with it.
+function poiPocketRadius(type) {
+  const t = String(type || '').toLowerCase();
+  if (t === 'spaceport' || t === 'landing_zone' || t === 'landing_pad') return 3;
+  return 2;
+}
+
 // Height (storeys) by use: apartments rise into towers, civic mid-rise, commercial low.
 function buildingHeightFor(category, hh) {
   const r = ((hh >>> 8) & 0xff) / 255;
@@ -163,10 +175,11 @@ function placeSettlement(tileMap, planet, mapData, biomeKey) {
 
   // POI pockets + connectivity: clear a walkable pocket at each POI/centre/spaceport, then flood-fill
   // and carve stubs so nothing is sealed off (esp. important when the town meets impassable terrain).
-  const anchors = pois.map(p => ({ x: Math.floor((p.x ?? 50) / tileSize), y: Math.floor((p.y ?? 50) / tileSize) }));
-  anchors.push({ x: cx, y: cy });
-  if (sp && Number.isFinite(sp.x)) anchors.push({ x: Math.floor(sp.x / tileSize), y: Math.floor(sp.y / tileSize) });
-  anchors.forEach(a => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const x = a.x + dx, y = a.y + dy; if (inB(x, y) && !tiles[y][x].walkable) tiles[y][x] = { type: 'plaza', walkable: true, visual: 'plaza' }; } });
+  const anchors = pois.map(p => ({ x: Math.floor((p.x ?? 50) / tileSize), y: Math.floor((p.y ?? 50) / tileSize), r: poiPocketRadius(p.type) }));
+  anchors.push({ x: cx, y: cy, r: 2 });
+  if (sp && Number.isFinite(sp.x)) anchors.push({ x: Math.floor(sp.x / tileSize), y: Math.floor(sp.y / tileSize), r: 3 });
+  // Clear a pocket sized to each structure's footprint (radius in tiles) so it doesn't overlap buildings.
+  anchors.forEach(a => { const r = a.r || 2; for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const x = a.x + dx, y = a.y + dy; if (inB(x, y) && !tiles[y][x].walkable) tiles[y][x] = { type: 'plaza', walkable: true, visual: 'plaza' }; } });
   connectWalkable(tiles, gridSize, anchors);
 
   // Market stalls around the square's RIM (after connectivity, so the pocket pass can't erase them
@@ -260,11 +273,12 @@ function generateUrbanTileMap(mapData, tileSize = 2, planet = {}) {
   }
 
   // 4) POIs + spaceport: carve a walkable pocket so each structure sits in the open and stays enterable.
-  const anchors = pois.map(p => ({ x: Math.floor((p.x ?? 50) / tileSize), y: Math.floor((p.y ?? 50) / tileSize) }));
+  const anchors = pois.map(p => ({ x: Math.floor((p.x ?? 50) / tileSize), y: Math.floor((p.y ?? 50) / tileSize), r: poiPocketRadius(p.type) }));
   if (mapData.spaceport && Number.isFinite(mapData.spaceport.x)) {
-    anchors.push({ x: Math.floor(mapData.spaceport.x / tileSize), y: Math.floor(mapData.spaceport.y / tileSize) });
+    anchors.push({ x: Math.floor(mapData.spaceport.x / tileSize), y: Math.floor(mapData.spaceport.y / tileSize), r: 3 });
   }
-  anchors.forEach(a => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) carve(a.x + dx, a.y + dy, 'plaza'); });
+  // Clear a pocket sized to each structure's footprint (radius in tiles) so it doesn't overlap buildings.
+  anchors.forEach(a => { const r = a.r || 2; for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) carve(a.x + dx, a.y + dy, 'plaza'); });
 
   // 5) Guarantee every pocket connects to the alley network (carve straight stubs if marooned).
   connectWalkable(tiles, gridSize, anchors);
