@@ -22,6 +22,13 @@ const PRESETS = {
   snow:   { count: 360, color: '#eaf2ff', sprite: 'spr_particle_ice_crystal_64.png', size: 0.5,  fall: 1.3,   drift: 1.1, area: 64, top: 26, opacity: 0.95 },
   mist:   { count: 150, color: '#cfd9e6', sprite: 'spr_particle_mist_64.png',        size: 1.3,  fall: 0.12,  drift: 0.4, area: 60, top: 14, opacity: 0.4 },
   pollen: { count: 300, color: '#dfe9a0', sprite: 'spr_particle_pollen_64.png',      size: 0.32, fall: -0.15, drift: 0.9, area: 60, top: 18, opacity: 0.9, glow: true },
+  // INTERIOR presets (submap-liveliness Phase 3) — small, slow, low fields kept UNDER an enclosed
+  // room's ceiling (top < wallH ≈ 10) so motes never poke through the roof. Air that isn't dead:
+  // faint sterile specks in a clinic, warm dust in a market, rising steam in a mine, embers in a ruin.
+  sterile: { count: 80,  color: '#dbe6f0',                                            size: 0.12, fall: 0.06,  drift: 0.22, area: 42, top: 7, opacity: 0.30 },
+  motes:   { count: 120, color: '#e8d8b8',                                            size: 0.14, fall: 0.07,  drift: 0.30, area: 46, top: 8, opacity: 0.40 },
+  steam:   { count: 90,  color: '#c6c0b6', sprite: 'spr_particle_mist_64.png',        size: 0.85, fall: -0.22, drift: 0.30, area: 44, top: 8, opacity: 0.26 },
+  embers:  { count: 90,  color: '#ff7a44', sprite: 'spr_particle_ember_64.png',       size: 0.20, fall: -0.4,  drift: 0.5,  area: 44, top: 9, opacity: 0.70, glow: true },
 };
 
 const KEYWORDS = [
