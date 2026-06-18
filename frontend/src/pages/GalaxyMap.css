@@ -20,35 +20,52 @@
   color: var(--hud-text-primary);
 }
 
-.map-controls {
+.galaxy-map-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.galaxy-map-hint {
+  font-size: 0.85rem;
+  color: var(--hud-text-muted);
+}
+
+.map-nav {
   display: flex;
   gap: 0.5rem;
   align-items: center;
 }
 
-.map-controls button {
-  padding: 0.5rem 1rem;
+.map-nav-btn {
+  padding: 0.55rem 1rem;
   background: var(--hud-surface-soft);
   backdrop-filter: var(--hud-blur);
-  border: 1px solid var(--hud-border);
-  border-radius: 4px;
-  color: var(--hud-text-primary);
+  border: 1px solid var(--hud-border-soft);
+  border-radius: var(--hud-radius-sm);
+  color: var(--hud-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
-.map-controls button:hover {
+.map-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--hud-text-muted);
+  color: var(--hud-text-primary);
+}
+
+.map-nav-primary {
   background: var(--hud-accent-soft);
   border-color: var(--hud-accent);
+  color: var(--hud-accent);
 }
 
-.map-controls select {
-  padding: 0.5rem;
-  background: var(--hud-surface-soft);
-  border: 1px solid var(--hud-border);
-  border-radius: 4px;
-  color: var(--hud-text-primary);
-  cursor: pointer;
+.map-nav-primary:hover {
+  background: rgba(74, 158, 255, 0.28);
+  border-color: var(--hud-accent);
+  color: var(--hud-accent);
 }
 
 .galaxy-map-content {

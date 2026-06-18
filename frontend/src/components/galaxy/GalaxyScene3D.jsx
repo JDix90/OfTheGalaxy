@@ -15,12 +15,17 @@ import { OrbitControls, Stars, Line, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { prefersReducedMotion } from '../../utils/motion';
 
-const COLORS = {
-  current: '#4ade80',
-  selected: '#4a9eff',
-  hovered: '#93c5fd',
-  default: '#9fb3d1'
+// Single source of truth for the galaxy's star/route colors, aligned to the HUD
+// token palette. The legend and the sidebar import these so the map, its key,
+// and the planet list always agree (previously three different "current" hues).
+export const GALAXY_COLORS = {
+  current: '#6cf0c2',   // --hud-heal — "you are here"
+  selected: '#4a9eff',  // --hud-accent — selected system
+  hovered: '#93c5fd',   // light accent on hover
+  default: '#9fb3d1',   // muted star
+  route: '#3f72c4'      // dim accent fold-lane
 };
+const COLORS = GALAXY_COLORS;
 
 // Build a centered 2D→3D layout: galaxy x/y map onto world x/z, fit to ~90 units.
 function useLayout(systems) {
@@ -110,7 +115,7 @@ function RouteLines({ systems, routes, layout }) {
   }, [routes, byId, layout]);
 
   return segments.map((seg, i) => (
-    <Line key={i} points={seg} color="#3f72c4" lineWidth={1} transparent opacity={0.35} />
+    <Line key={i} points={seg} color={GALAXY_COLORS.route} lineWidth={1} transparent opacity={0.35} />
   ));
 }
 
