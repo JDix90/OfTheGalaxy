@@ -30,6 +30,7 @@ const ABILITY_RANGE_MELEE = 6;
 const TURN_MS = 1000;          // ability cooldown: turns → ms
 const ENEMY_MELEE = 2.8;
 const ENEMY_CD_MS = 1400;
+const ENEMY_RANGED_CD_MS = 1900; // ranged enemies fire a touch slower than melee swings
 const DISENGAGE_MS = 6000;
 // Dodge-roll (Phase 4.4)
 const DODGE_CD_MS = 1000;
@@ -171,12 +172,15 @@ function onEnemyDeath(world, player, enemy) {
 /** Enemy → player melee attack (called from the enemy AI when in range + off cooldown). */
 function enemyTryAttack(world, enemy, target, now) {
   if (enemy.dead || !target || target.dead) return;
-  if (dist(enemy, target) > ENEMY_MELEE) return;
+  // Range + cooldown are weapon-driven: a rifle-armed enemy attacks from its weapon's world range,
+  // a melee enemy only at ~2.8. `ranged` drives the enemy→player tracer + a slightly slower cadence.
+  const ranged = isRangedWeapon(enemy.combatant);
+  if (dist(enemy, target) > attackRangeOf(enemy.combatant)) return;
   if (now < (enemy.attackCdUntil || 0)) return;
-  enemy.attackCdUntil = now + ENEMY_CD_MS;
-  // Dodge i-frames: the swing whiffs.
+  enemy.attackCdUntil = now + (ranged ? ENEMY_RANGED_CD_MS : ENEMY_CD_MS);
+  // Dodge i-frames: the swing/shot whiffs.
   if (now < (target.iFrameUntil || 0)) {
-    world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, dmg: 0, dodged: true });
+    world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, sx: enemy.x, sz: enemy.z, ranged, dmg: 0, dodged: true });
     return;
   }
   const res = combatService.calculateDamage(enemy.combatant, target.combatant);
@@ -188,7 +192,7 @@ function enemyTryAttack(world, enemy, target, now) {
   }
   target.lastCombatAt = now;
   if (!target.engagedEnemies.has(enemy.id)) target.engagedEnemies.set(enemy.id, enemy.combatant);
-  world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit });
+  world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, sx: enemy.x, sz: enemy.z, ranged, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit });
   world.pushIntent({ type: 'engage', playerId: target.id });
   if (target.combatant.stats.health <= 0 && !target.dead) {
     target.dead = true;

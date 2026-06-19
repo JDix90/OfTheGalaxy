@@ -237,7 +237,16 @@ class CombatService {
    */
   buildEnemyCombatant(enemyTemplate) {
     const id = `enemy_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
+    // Derive weapon range/class from the equipped weapon's item def so a rifle-armed enemy attacks
+    // from distance (the realtime sim reads equipment.weapon.range/class). Unarmed/unknown → melee.
+    const tplWeapon = enemyTemplate.equipment && enemyTemplate.equipment.weapon;
+    const equipment = { ...enemyTemplate.equipment };
+    if (tplWeapon && tplWeapon.itemId) {
+      const def = getItemDefinition(tplWeapon.itemId);
+      equipment.weapon = { ...tplWeapon, range: def?.stats?.range, class: weaponClass(def) };
+    }
+
     return {
       id,
       name: enemyTemplate.name,
@@ -250,7 +259,7 @@ class CombatService {
         // Modest evasion from speed (cap 15%) so dodge applies to enemies too.
         dodgeChance: Math.min(0.15, Math.max(0, ((enemyTemplate.stats.speed || 10) - 10) * 0.01))
       },
-      equipment: { ...enemyTemplate.equipment },
+      equipment,
       statusEffects: [],
       position: { x: 0, y: 0 },
       lootTable: enemyTemplate.lootTable,
