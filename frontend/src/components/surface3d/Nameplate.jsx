@@ -63,7 +63,11 @@ export default function Nameplate({ name, npcType, level, y = 2.4, hp, maxHp }) 
 
   return (
     <group ref={gref}>
-    <Html position={[0, y, 0]} center distanceFactor={22} occlude={false} style={{ pointerEvents: 'none' }}>
+    {/* zIndexRange caps the nameplate's DOM z-index below the HUD layer scale (lowest = --hud-z-
+        ambient-hints 990) so it can't paint over menus/dialogue/toasts/fullscreen overlays. drei's
+        default is ~16.7M, which is why nameplates were bleeding over the inventory modal. The Html
+        still renders above the 3D canvas (separate DOM overlay), so world labels remain visible. */}
+    <Html position={[0, y, 0]} center distanceFactor={22} occlude={false} zIndexRange={[980, 0]} style={{ pointerEvents: 'none' }}>
       <div ref={divRef} style={{ textAlign: 'center', whiteSpace: 'nowrap', fontFamily: 'system-ui, sans-serif', transform: 'translateY(-50%)' }}>
         {cfg.marker && (
           <div style={{ color: cfg.markerColor, fontSize: 18, fontWeight: 800, lineHeight: 1, textShadow: '0 1px 5px #000', animation: 'otgQuestPulse 1.2s ease-in-out infinite' }}>
