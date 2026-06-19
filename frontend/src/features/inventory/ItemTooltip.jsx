@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useState, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSettingsStore } from '../../state/settingsSlice';
 import { useInventoryStore } from '../../state/inventorySlice';
 import { useCharacterStore } from '../../state/characterSlice';
@@ -79,7 +80,11 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
     return labels[slot] || slot;
   };
 
-  return (
+  // Portal to <body> so the fixed-position panel escapes the inventory modal — that modal sets
+  // backdrop-filter + overflow:hidden, which makes a position:fixed descendant clip to (and position
+  // relative to) the modal box instead of the viewport. In the portal, fixed = true viewport coords,
+  // so the clamp/flip math actually keeps the panel on-screen.
+  return createPortal(
     <div
       ref={tooltipRef}
       className="item-tooltip"
@@ -380,7 +385,8 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
           </button>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

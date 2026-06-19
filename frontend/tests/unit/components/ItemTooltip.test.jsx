@@ -27,9 +27,11 @@ describe('ItemTooltip', () => {
     useCharacterStore.mockReturnValue({ currentCharacter: { id: 'c1' } });
   });
 
+  // The panel is portaled to <body> (to escape the modal's backdrop-filter/overflow clip), so query
+  // the document rather than the render container.
   test('renders the detail panel for a hovered item and is never stuck hidden', () => {
-    const { container } = render(<ItemTooltip item={ITEM} position={{ x: 100, y: 100 }} />);
-    const panel = container.querySelector('.item-tooltip');
+    render(<ItemTooltip item={ITEM} position={{ x: 100, y: 100 }} />);
+    const panel = document.querySelector('.item-tooltip');
     expect(panel).toBeInTheDocument();
     expect(panel).toHaveTextContent('Medpac');
     expect(panel.style.visibility).not.toBe('hidden'); // the regression: panel must not be gated invisible
@@ -37,8 +39,14 @@ describe('ItemTooltip', () => {
 
   test('renders nothing when tooltips are disabled in settings', () => {
     useSettingsStore.mockReturnValue(false);
-    const { container } = render(<ItemTooltip item={ITEM} position={{ x: 100, y: 100 }} />);
-    expect(container.querySelector('.item-tooltip')).toBeNull();
+    render(<ItemTooltip item={ITEM} position={{ x: 100, y: 100 }} />);
+    expect(document.querySelector('.item-tooltip')).toBeNull();
+  });
+
+  test('portals the panel to document.body (escapes the modal clip)', () => {
+    render(<ItemTooltip item={ITEM} position={{ x: 100, y: 100 }} />);
+    const panel = document.querySelector('.item-tooltip');
+    expect(panel.parentElement).toBe(document.body);
   });
 
   test('flips to the left of the cursor and stays on-screen near the right edge', () => {
@@ -48,8 +56,8 @@ describe('ItemTooltip', () => {
     const origW = window.innerWidth, origH = window.innerHeight;
     window.innerWidth = 600; window.innerHeight = 800;
     try {
-      const { container } = render(<ItemTooltip item={ITEM} position={{ x: 580, y: 100 }} />);
-      const panel = container.querySelector('.item-tooltip');
+      render(<ItemTooltip item={ITEM} position={{ x: 580, y: 100 }} />);
+      const panel = document.querySelector('.item-tooltip');
       const left = parseFloat(panel.style.left);
       expect(left).toBeLessThan(580);                 // flipped to the left of the cursor
       expect(left).toBeGreaterThanOrEqual(12);        // respects the left margin
