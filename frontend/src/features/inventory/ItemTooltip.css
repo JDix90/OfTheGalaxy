@@ -1,6 +1,9 @@
 .item-tooltip {
   position: fixed;
-  background-color: var(--hud-surface-soft);
+  /* Solid surface + its own blur: the panel is portaled to <body>, so it no longer sits behind the
+     modal's backdrop-filter — without this the inventory grid bleeds through the panel. */
+  background-color: var(--hud-surface-strong);
+  backdrop-filter: var(--hud-blur);
   border: 2px solid var(--hud-accent);
   border-radius: 8px;
   padding: 1rem;
