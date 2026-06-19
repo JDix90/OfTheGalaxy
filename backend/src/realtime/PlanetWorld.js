@@ -10,7 +10,7 @@
  */
 
 const { generateRandomEnemy } = require('../data/enemyTemplates');
-const { resolveCast, resolveDodge, enemyTryAttack, buildEnemyActorCombatant, DISENGAGE_MS } = require('./combat');
+const { resolveCast, resolveDodge, enemyTryAttack, buildEnemyActorCombatant, attackRangeOf, isRangedWeapon, DISENGAGE_MS } = require('./combat');
 const { findPath } = require('../utils/gridPathfinder');
 
 const PALETTE = ['#ffcf5c', '#6cf0c2', '#7db8ff', '#ff8d6c', '#d18cff', '#9affa0', '#ff5a8a', '#5ad1ff'];
@@ -191,6 +191,11 @@ class PlanetWorld {
     if (spec.objectiveId) combatant.objectiveId = spec.objectiveId;
     if (spec.tutorial) combatant.tutorial = true;                   // finalize detects tutorial kills
     if (spec.isBoss) combatant.isBoss = true;                       // credits the defeat_boss achievement
+    // meleeOnly forces a short reach regardless of the template's weapon (the tutorial drone uses a
+    // ranged template but should stay an approach-and-hit trainer, not kite a first-timer).
+    if (spec.meleeOnly && combatant.equipment && combatant.equipment.weapon) {
+      combatant.equipment.weapon = { ...combatant.equipment.weapon, range: undefined, class: 'melee' };
+    }
     const home = (spec.near && Number.isFinite(spec.near.x)) ? this._nearWalkable(spec.near) : this._farWalkable();
     const id = `s${this._enemySeq++}`; // 's' = scripted (vs 'e' ambient)
     this.enemies.set(id, {
@@ -558,9 +563,15 @@ class PlanetWorld {
         const steer = this._patrolSteer(e, now);
         tx = steer.x; tz = steer.z;
       }
+      // Ranged enemies hold at their weapon range and fire (line-of-sight) instead of closing to
+      // melee — keep-distance behaviour. Within the hold band they stop advancing but keep aiming.
+      const rangedHold = e.state === 'chase' && target && isRangedWeapon(e.combatant) && best <= attackRangeOf(e.combatant) * 0.85;
       const dx = tx - e.x, dz = tz - e.z, dd = Math.hypot(dx, dz);
       const bx = e.x, bz = e.z;
-      if (dd > 0.15) {
+      if (rangedHold) {
+        const fdx = target.x - e.x, fdz = target.z - e.z; // aim at the player while holding
+        if (Math.hypot(fdx, fdz) > 1e-3) e.facing = Math.atan2(fdx, fdz);
+      } else if (dd > 0.15) {
         const ux = dx / dd, uz = dz / dd;
         e.facing = Math.atan2(ux, uz); // 0 = +Z (sim convention)
         const stp = speed * dt;

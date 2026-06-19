@@ -364,7 +364,7 @@ class WorldManager {
       const id = world.spawnScriptedEnemy({
         templateId: 'droid_security', name: 'Training Drone', enemyType: 'training_drone',
         level: Math.max(1, player.level || 1), difficulty: 'easy',
-        near, tutorial: true, ownerId: player.id, passive: true,
+        near, tutorial: true, ownerId: player.id, passive: true, meleeOnly: true,
       });
       if (id && player.combatant && player.combatant.stats) {
         player._hpFloor = Math.max(1, Math.ceil(player.combatant.stats.maxHealth * 0.5));
