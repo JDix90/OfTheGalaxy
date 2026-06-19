@@ -4,7 +4,7 @@
  */
 
 const { PlayerInventory } = require('../models');
-const { getItemDefinition } = require('../data/items');
+const { getItemDefinition, aggregateEquipmentStats } = require('../data/items');
 
 class ToolService {
   /**
@@ -96,6 +96,20 @@ class ToolService {
     };
   }
   
+  /**
+   * Aggregate attribute / skill / combat bonuses from a character's equipped gear.
+   * `skills` covers NON-tool slots only (the tool slot is applied via getToolBonus as tool quality),
+   * so building a ProgressionSystem with `skills` AND adding a tool-quality bonus never double-counts.
+   * `attributes` (e.g. +intelligence datapad) lets skill checks add gear to the attribute they roll on.
+   * @param {string} characterId - Character UUID
+   * @returns {Promise<{attributes: Object, skills: Object, combat: Object}>}
+   */
+  async getEquipmentBonuses(characterId) {
+    const equipped = await PlayerInventory.findEquipped(characterId);
+    const items = (equipped || []).map((i) => ({ slot: i.equipmentSlot, stats: getItemDefinition(i.itemId)?.stats || {} }));
+    return aggregateEquipmentStats(items);
+  }
+
   /**
    * Check if character has required tool for action
    * @param {string} characterId - Character UUID

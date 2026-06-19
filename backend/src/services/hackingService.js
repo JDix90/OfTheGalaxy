@@ -23,13 +23,15 @@ class HackingService {
       throw new Error('Character not found');
     }
     
-    const progressionSystem = new ProgressionSystem(character);
-    
+    // Equipped gear can grant hacking + intelligence (e.g. a slicer accessory); fold both in.
+    const equipBonuses = await require('./toolService').getEquipmentBonuses(characterId);
+    const progressionSystem = new ProgressionSystem(character, equipBonuses.skills);
+
     // Get hacking skill level
     const hackingLevel = progressionSystem.getSkillLevel('technical', 'hacking');
-    
+
     // Get intelligence
-    const intelligence = character.stats.intelligence || 10;
+    const intelligence = (character.stats.intelligence || 10) + (equipBonuses.attributes.intelligence || 0);
     
     // Check if hacking is unlocked
     if (hackingLevel <= 0) {
@@ -104,9 +106,10 @@ class HackingService {
       throw new Error('Character not found');
     }
     
-    const progressionSystem = new ProgressionSystem(character);
+    const equipBonuses = await require('./toolService').getEquipmentBonuses(characterId);
+    const progressionSystem = new ProgressionSystem(character, equipBonuses.skills);
     const hackingLevel = progressionSystem.getSkillLevel('technical', 'hacking');
-    const intelligence = character.stats.intelligence || 10;
+    const intelligence = (character.stats.intelligence || 10) + (equipBonuses.attributes.intelligence || 0);
     
     // Auto-retrieve tool bonus if not provided
     let finalToolQuality = toolQuality;

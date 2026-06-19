@@ -100,13 +100,15 @@ class CraftingService {
     }
 
     const { calculateCraftingSuccess, calculateMaterialCostReduction, calculateQualityBonus } = require('../utils/abilityScaling');
-    const progressionSystem = new ProgressionSystem(character);
-    
+    // Equipped gear can grant engineering/crafting + intelligence (e.g. an engineer's accessory).
+    const equipBonuses = await require('./toolService').getEquipmentBonuses(characterId);
+    const progressionSystem = new ProgressionSystem(character, equipBonuses.skills);
+
     // Get engineering skill level
     const engineeringLevel = progressionSystem.getSkillLevel('technical', 'engineering');
-    
+
     // Get intelligence
-    const intelligence = character.stats.intelligence || 10;
+    const intelligence = (character.stats.intelligence || 10) + (equipBonuses.attributes.intelligence || 0);
     
     // Get tool bonus from equipped crafting tool
     let toolBonus = 0;
