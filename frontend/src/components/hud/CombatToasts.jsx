@@ -9,6 +9,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useCharacterStore } from '../../state/characterSlice';
 
 const TTL_MS = 4500;
 const RARITY = { common: '#cfd6e6', uncommon: '#6cf0c2', rare: '#7db8ff', epic: '#d18cff', legendary: '#ffd24a' };
@@ -27,15 +28,22 @@ export default function CombatToasts({ world }) {
   useEffect(() => {
     const tick = setInterval(() => {
       const w = world && world.current;
-      const drained = w && w.drainToasts ? w.drainToasts() : null;
+      const drained = (w && w.drainToasts ? w.drainToasts() : null) || [];
       const now = Date.now();
+      const fresh = drained.filter((t) => !seen.current.has(t.id));
+      fresh.forEach((t) => seen.current.add(t.id));
+
+      // A reward toast means the server granted XP / credits / a level on a kill. Combat runs in the
+      // 3D net layer, which never touches the character store — so re-sync the character here, else
+      // the HUD's StatsBar (credits / level / XP) stays stale until a full reload.
+      if (fresh.some((t) => t.kind === 'reward')) {
+        const cs = useCharacterStore.getState();
+        const cid = cs.currentCharacter && cs.currentCharacter.id;
+        if (cid && cs.loadCharacter) cs.loadCharacter(cid).catch(() => {});
+      }
+
       setToasts((prev) => {
-        let next = prev;
-        if (drained && drained.length) {
-          const fresh = drained.filter((t) => !seen.current.has(t.id));
-          fresh.forEach((t) => seen.current.add(t.id));
-          if (fresh.length) next = [...prev, ...fresh];
-        }
+        const next = fresh.length ? [...prev, ...fresh] : prev;
         const alive = next.filter((t) => now - t.at < TTL_MS);
         return alive.length === prev.length && next === prev ? prev : alive;
       });
