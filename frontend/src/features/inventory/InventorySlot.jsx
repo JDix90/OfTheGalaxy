@@ -65,6 +65,10 @@ export default function InventorySlot({ item, slotIndex, onHover, onLeave, onCli
   const isMedpac = item?.itemId === 'medpac_01';
   const tutorialTarget = isMedpac ? 'inventory-item-medpac' : `inventory-item-${item?.itemId || slotIndex}`;
   
+  // No native `title` on the slot: its OS tooltip overlapped our richer detail panel (which opens on
+  // hover). aria-label keeps the affordance for assistive tech without the visual OS tooltip.
+  const slotLabel = item ? `${item.name || item.itemId}${isEquippable ? ' — click to inspect, double-click to equip' : ' — click to inspect'}` : undefined;
+
   return (
     <div
       className={`inventory-slot ${item ? 'filled' : 'empty'} ${item?.rarity ? `rarity-${item.rarity}` : ''} ${isEquippable ? 'equippable' : ''}`}
@@ -74,7 +78,7 @@ export default function InventorySlot({ item, slotIndex, onHover, onLeave, onCli
       onDoubleClick={handleDoubleClick}
       onContextMenu={handleContextMenu}
       style={rarityBorderColor ? { borderColor: rarityBorderColor, borderWidth: '2px' } : {}}
-      title={item ? `${item.name || item.itemId}${isEquippable ? ' — click to inspect, double-click to equip' : ' — click to inspect'}` : ''}
+      aria-label={slotLabel}
       data-tutorial-target={item ? tutorialTarget : undefined}
     >
       {item && (
