@@ -4,7 +4,7 @@
  */
 
 const { CombatEncounter, PlayerCharacter, PlayerInventory, QuestProgress, Quest, sequelize } = require('../models');
-const { getItemDefinition } = require('../data/items');
+const { getItemDefinition, weaponClass } = require('../data/items');
 const { generateRandomEnemy, getEnemyTemplate, scaleEnemyForLevel } = require('../data/enemyTemplates');
 const { getAbilityDefinition, isCombatUsable } = require('../data/abilityDefinitions');
 const { calculateSetBonuses, applySetBonuses } = require('../data/itemSets');
@@ -222,7 +222,9 @@ class CombatService {
       defenseModifiers: effectResults.defenseStats, // Store defense modifiers
       luckModifiers: effectResults.luckStats, // Store luck modifiers
       equipment: {
-        weapon: weapon ? { itemId: equippedMap.weapon.itemId, damage: weaponDamage } : null,
+        // range/class let the realtime sim gate attacks by the equipped weapon (ranged vs melee)
+        // instead of a hardcoded melee reach. See data/items.weaponWorldRange.
+        weapon: weapon ? { itemId: equippedMap.weapon.itemId, damage: weaponDamage, range: weapon.stats?.range, class: weaponClass(weapon) } : null,
         armor: armor ? { itemId: equippedMap.armor.itemId, defense: armorDefense } : null
       },
       statusEffects: staminaStatusEffects, // Include stamina-based status effects

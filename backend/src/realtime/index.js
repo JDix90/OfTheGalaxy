@@ -21,7 +21,7 @@ const { WorldManager } = require('./WorldManager');
 const characterService = require('../services/characterService');
 const combatService = require('../services/combatService');
 const { isCombatUsable } = require('../data/abilityDefinitions');
-const { buildHotbar } = require('./combat'); // shared with _refreshCombatant (mid-session hotbar push)
+const { buildHotbar, attackRangeOf } = require('./combat'); // shared with _refreshCombatant (mid-session hotbar push)
 const { setRealtimeManager } = require('./registry'); // expose the manager to the HTTP inventory path
 const escortService = require('../services/escortService'); // escort-quest ambient-spawn escalation
 
@@ -132,6 +132,7 @@ async function attachRealtime(server) {
             tickHz: manager.TICK_HZ,
             spawn: { x: player.x, z: player.z, facing: player.facing },
             hotbar: buildHotbar(character), // ability bar (Phase 4.4)
+            atkRange: attackRangeOf(combatant), // weapon-driven auto-attack reach (client gate sync)
           }));
         } catch (e) {
           try { ws.close(4002, 'join-failed'); } catch (_) {}

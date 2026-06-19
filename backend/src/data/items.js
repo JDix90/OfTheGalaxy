@@ -3765,6 +3765,42 @@ function getItemsByRarity(rarity) {
   return Object.values(itemDefinitions).filter(item => item.rarity === rarity);
 }
 
+// ===== Weapon range → world range =====================================================
+// Weapons carry a `stats.range` on a data scale (blades 1–2, pistols ~30, rifles ~50,
+// snipers 100–150). The realtime sim works in world units (melee ~2.8). These pure helpers
+// classify a weapon and map its data range to a world distance so the sim can gate attacks
+// by the equipped weapon instead of a hardcoded melee reach. RANGED_WORLD_MAX is kept at/below
+// PlanetWorld's AGGRO_RADIUS (16) so a ranged target is actually streamed to the client.
+const MELEE_DATA_MAX = 5;        // data range ≤ this → melee weapon
+const MELEE_WORLD_RANGE = 2.8;   // world units a melee weapon reaches (unchanged from prior)
+const RANGED_WORLD_BASE = 8;     // shortest ranged reach (just past the melee threshold)
+const RANGED_WORLD_SCALE = 0.07; // world units gained per point of data range above the threshold
+const RANGED_WORLD_MIN = 8;
+const RANGED_WORLD_MAX = 15;
+
+/** Numeric data range from either a full item def (`stats.range`) or a combatant weapon block
+ *  (`range`). Returns null when unknown/unarmed. */
+function weaponDataRange(weapon) {
+  if (!weapon) return null;
+  const r = weapon.stats ? weapon.stats.range : weapon.range;
+  return Number.isFinite(r) ? r : null;
+}
+
+/** 'melee' | 'ranged' for a weapon (or unarmed → 'melee'). */
+function weaponClass(weapon) {
+  const r = weaponDataRange(weapon);
+  return r !== null && r > MELEE_DATA_MAX ? 'ranged' : 'melee';
+}
+
+/** World-unit attack range for a weapon. Melee (or unarmed) → MELEE_WORLD_RANGE; ranged maps the
+ *  data range onto [RANGED_WORLD_MIN, RANGED_WORLD_MAX]. Pure + deterministic. */
+function weaponWorldRange(weapon) {
+  const r = weaponDataRange(weapon);
+  if (r === null || r <= MELEE_DATA_MAX) return MELEE_WORLD_RANGE;
+  const scaled = RANGED_WORLD_BASE + (r - MELEE_DATA_MAX) * RANGED_WORLD_SCALE;
+  return Math.min(RANGED_WORLD_MAX, Math.max(RANGED_WORLD_MIN, scaled));
+}
+
 module.exports = {
   ITEM_TYPES,
   ITEM_RARITIES,
@@ -3772,7 +3808,12 @@ module.exports = {
   getItemDefinition,
   getAllItemDefinitions,
   getItemsByType,
-  getItemsByRarity
+  getItemsByRarity,
+  weaponDataRange,
+  weaponClass,
+  weaponWorldRange,
+  MELEE_WORLD_RANGE,
+  RANGED_WORLD_MAX
 };
 
 
