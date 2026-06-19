@@ -13,6 +13,7 @@ import React, { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import CharacterModel from './CharacterModel';
+import LevelUpGlow from './LevelUpGlow';
 import { getCharacterModel } from '../../data/modelManifest';
 
 const CAM_DIST = 11;
@@ -181,6 +182,8 @@ export default function PlayerActor({ world, input, pois, onProximity, onMoved, 
   return (
     <group ref={group}>
       <CharacterModel model={model} motion={motion} />
+      {/* celebratory golden burst on level-up (self-arming via the LEVEL_UP event) */}
+      <LevelUpGlow />
       {/* soft contact shadow blob under the player for grounding */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
         <circleGeometry args={[0.7, 20]} />
