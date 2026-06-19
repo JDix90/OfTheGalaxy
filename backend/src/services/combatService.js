@@ -4,7 +4,7 @@
  */
 
 const { CombatEncounter, PlayerCharacter, PlayerInventory, QuestProgress, Quest, sequelize } = require('../models');
-const { getItemDefinition } = require('../data/items');
+const { getItemDefinition, aggregateEquipmentStats } = require('../data/items');
 const { generateRandomEnemy, getEnemyTemplate, scaleEnemyForLevel } = require('../data/enemyTemplates');
 const { getAbilityDefinition, isCombatUsable } = require('../data/abilityDefinitions');
 const { calculateSetBonuses, applySetBonuses } = require('../data/itemSets');
@@ -35,8 +35,23 @@ class CombatService {
     const weapon = equippedMap.weapon ? getItemDefinition(equippedMap.weapon.itemId) : null;
     const armor = equippedMap.armor ? getItemDefinition(equippedMap.armor.itemId) : null;
 
-    // Base stats from character attributes
-    const stats = character.stats || {};
+    // Aggregate attribute / combat bonuses from ALL equipped gear (accessories, plus weapon/armor
+    // forcePower) so they actually reach the stat pipeline instead of being cosmetic. weapon.damage /
+    // armor.defense|mobility are consumed separately below, so they're excluded from this aggregate.
+    const equipAgg = aggregateEquipmentStats((equipped && Array.isArray(equipped) ? equipped : []).map(
+      (i) => ({ slot: i.equipmentSlot, stats: getItemDefinition(i.itemId)?.stats || {} })
+    ));
+
+    // Base stats from character attributes, with equipped-gear attribute bonuses folded in so a
+    // +perception scanner raises crit/accuracy, a +forcePower relic raises forcePower, etc.
+    const ATTR_DEFAULTS = { strength: 10, agility: 10, endurance: 10, intelligence: 10, perception: 10, charisma: 10, forcePower: 0 };
+    const baseStats = character.stats || {};
+    const stats = { ...baseStats };
+    for (const [f, bonus] of Object.entries(equipAgg.attributes)) {
+      if (!bonus) continue;
+      const base = baseStats[f] != null ? baseStats[f] : (ATTR_DEFAULTS[f] != null ? ATTR_DEFAULTS[f] : 0);
+      stats[f] = base + bonus;
+    }
     const baseAttack = Math.floor((stats.strength || 10) / 2) + (stats.agility || 10) / 4;
     const baseDefense = Math.floor((stats.endurance || 10) / 2);
     const baseSpeed = Math.floor((stats.agility || 10) / 2);
@@ -57,8 +72,10 @@ class CombatService {
     // Calculate derived stats using centralized system
     const { calculateCombatStats } = require('../utils/derivedStats');
     
+    // Use the gear-merged `stats` so attribute bonuses (perception → crit/accuracy, endurance →
+    // defense, strength → attack) flow through the derived-stat formulas.
     const combatStats = calculateCombatStats({
-      character,
+      character: { ...character, stats },
       equipment: {
         weaponBase: weaponDamage,
         armorBase: armorDefense
@@ -113,7 +130,14 @@ class CombatService {
       // Endurance affects defense (additional to derived stats)
       modifiedDefense += Math.floor(passiveBonuses.stats.endurance * 0.3);
     }
-    
+
+    // Flat combat bonuses from accessory gear (defense / damage / accuracy / speed). Applied AFTER the
+    // skill multipliers so an accessory's flat value isn't scaled by skill percentages.
+    if (equipAgg.combat.damage) modifiedAttack += equipAgg.combat.damage;
+    if (equipAgg.combat.defense) modifiedDefense += equipAgg.combat.defense;
+    if (equipAgg.combat.accuracy) modifiedAccuracy = Math.min(100, modifiedAccuracy + equipAgg.combat.accuracy);
+    if (equipAgg.combat.speed) modifiedSpeed += equipAgg.combat.speed;
+
     // Store stat breakdowns for UI/debugging
     const statBreakdowns = {
       attackRating: combatStats.attackRating.breakdown,
@@ -489,11 +513,17 @@ class CombatService {
     const healEffect = abilityDef.effects.heal;
     const baseHeal = healEffect.base || 40; // Default base healing
     
-    // Get intelligence
+    // Get intelligence (the combatant's stats already fold in equipped-gear attribute bonuses,
+    // see buildPlayerCombatant).
     const intelligence = healer.stats.intelligence || 10;
-    
-    // Get Field Medic skill level
-    const progressionSystem = new ProgressionSystem(healer);
+
+    // Get Field Medic skill level. The combatant carries equippedItems (with slot + stats), so fold
+    // any gear field_medic/medical bonus into the level. (Trained level relies on healer.skills,
+    // which combatants don't carry — a pre-existing limitation, so this mainly applies gear bonuses.)
+    const equipSkills = aggregateEquipmentStats((healer.equippedItems || []).map(
+      (i) => ({ slot: i.equipmentSlot, stats: i.stats || {} })
+    )).skills;
+    const progressionSystem = new ProgressionSystem(healer, equipSkills);
     const medicLevel = progressionSystem.getSkillLevel('survival', 'field_medic');
     
     // Calculate healing with piecewise scaling

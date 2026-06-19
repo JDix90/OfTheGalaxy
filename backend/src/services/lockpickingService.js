@@ -24,14 +24,16 @@ class LockpickingService {
     }
     
     try {
-      const progressionSystem = new ProgressionSystem(character);
-      
+      // Equipped gear can grant lockpicking + agility (e.g. a security keycard / slicer glove).
+      const equipBonuses = await require('./toolService').getEquipmentBonuses(characterId);
+      const progressionSystem = new ProgressionSystem(character, equipBonuses.skills);
+
       // Get lockpicking skill level
       const lockpickingLevel = progressionSystem.getSkillLevel('stealth', 'lockpicking');
-      
+
       // Get agility (ensure stats object exists)
       const stats = character.stats || {};
-      const agility = stats.agility || 10;
+      const agility = (stats.agility || 10) + (equipBonuses.attributes.agility || 0);
       
       // Validate lockTier
       const validatedLockTier = parseInt(lockTier) || 1;
@@ -122,9 +124,10 @@ class LockpickingService {
       throw new Error('Character not found');
     }
     
-    const progressionSystem = new ProgressionSystem(character);
+    const equipBonuses = await require('./toolService').getEquipmentBonuses(characterId);
+    const progressionSystem = new ProgressionSystem(character, equipBonuses.skills);
     const lockpickingLevel = progressionSystem.getSkillLevel('stealth', 'lockpicking');
-    const agility = character.stats.agility || 10;
+    const agility = (character.stats.agility || 10) + (equipBonuses.attributes.agility || 0);
     
     // Auto-retrieve tool bonus if not provided
     let finalToolQuality = toolQuality;

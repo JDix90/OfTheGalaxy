@@ -3765,6 +3765,35 @@ function getItemsByRarity(rarity) {
   return Object.values(itemDefinitions).filter(item => item.rarity === rarity);
 }
 
+// ===== Equipment bonus aggregation =====================================================
+// Item `stats` advertise attribute / skill / combat bonuses that the combat + skill-check
+// pipelines historically ignored for anything but the weapon (damage) and armor (defense/
+// mobility) primaries — so accessories (and weapon/armor forcePower) were cosmetic. These pure
+// helpers sum those bonuses so the pipelines can apply them. Disjoint from existing channels:
+//   - weapon.damage / armor.defense / armor.mobility are consumed elsewhere → NOT re-summed here.
+//   - skill bonuses from the `tool` slot are applied by toolService (tool quality) → excluded here,
+//     so the tool-slot and non-tool-slot skill paths never double-count.
+const EQUIP_ATTR_FIELDS = ['strength', 'agility', 'endurance', 'intelligence', 'perception', 'charisma', 'forcePower'];
+const EQUIP_SKILL_FIELDS = ['repair', 'hacking', 'medical', 'lockpicking', 'crafting', 'archaeology', 'mining', 'engineering', 'field_medic', 'slicing', 'demolitions', 'survival', 'basic_stealth'];
+const EQUIP_COMBAT_FIELDS = ['defense', 'damage', 'accuracy', 'speed']; // accessory-only flat combat adds
+
+/**
+ * Sum equipment bonuses from a list of equipped entries.
+ * @param {Array<{slot?: string, stats?: Object}>} items - equipped items (slot = equipmentSlot).
+ * @returns {{attributes: Object, skills: Object, combat: Object}} summed bonus maps.
+ */
+function aggregateEquipmentStats(items) {
+  const attributes = {}, skills = {}, combat = {};
+  for (const it of (items || [])) {
+    const s = (it && it.stats) || {};
+    const slot = it && it.slot;
+    for (const f of EQUIP_ATTR_FIELDS) if (s[f]) attributes[f] = (attributes[f] || 0) + s[f]; // all slots
+    if (slot !== 'tool') for (const f of EQUIP_SKILL_FIELDS) if (s[f]) skills[f] = (skills[f] || 0) + s[f]; // tool slot → toolService
+    if (slot === 'accessory') for (const f of EQUIP_COMBAT_FIELDS) if (s[f]) combat[f] = (combat[f] || 0) + s[f];
+  }
+  return { attributes, skills, combat };
+}
+
 module.exports = {
   ITEM_TYPES,
   ITEM_RARITIES,
@@ -3772,7 +3801,8 @@ module.exports = {
   getItemDefinition,
   getAllItemDefinitions,
   getItemsByType,
-  getItemsByRarity
+  getItemsByRarity,
+  aggregateEquipmentStats
 };
 
 

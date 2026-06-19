@@ -6,8 +6,15 @@
 const { getSkillDefinition } = require('../data/skills');
 
 class ProgressionSystem {
-  constructor(character) {
+  /**
+   * @param {Object} character
+   * @param {Object} [equipmentSkillBonuses] - flat skillId→bonus map from equipped gear (non-tool
+   *   slots; tool-slot bonuses are applied separately by toolService). Added on top of the trained
+   *   level in getSkillLevel so a +skill accessory actually improves the check.
+   */
+  constructor(character, equipmentSkillBonuses = null) {
     this.character = character;
+    this.equipmentSkillBonuses = equipmentSkillBonuses || null;
   }
 
   /**
@@ -72,7 +79,10 @@ class ProgressionSystem {
     const skills = this.character.skills || {};
     const treeSkills = skills[tree] || {};
     const skillData = treeSkills[skillId];
-    return skillData?.level || 0;
+    const trained = skillData?.level || 0;
+    // Flat bonus from equipped gear (e.g. a +lockpicking accessory), keyed by skill id.
+    const gear = (this.equipmentSkillBonuses && this.equipmentSkillBonuses[skillId]) || 0;
+    return trained + gear;
   }
 
   /**
