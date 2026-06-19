@@ -52,6 +52,7 @@ export class NetClient {
     this.selfDead = false;
     this.fxQueue = [];           // combat fx events to render (drained by the scene)
     this.hotbar = [];            // ability bar (Phase 4.4) [{id,name,type,cd,stam,target}]
+    this.atkRange = 4.0;         // weapon-driven auto-attack reach (server-authoritative; default melee-ish)
     this.castCdUntil = {};       // local cooldown display (ms) per ability id
     this.dodgeCdUntil = 0;
     this.log = [];               // combat log lines (bounded)
@@ -112,6 +113,7 @@ export class NetClient {
         this._lastAck = -1;
         this._lastAckAt = Date.now();
         this.hotbar = m.hotbar || [];
+        if (Number.isFinite(m.atkRange)) this.atkRange = m.atkRange;
         // Adopt the authoritative spawn (server resumes saved position / spaceport).
         if (m.spawn) {
           this.player.x = m.spawn.x; this.player.z = m.spawn.z; this.player.facing = m.spawn.facing;
@@ -133,8 +135,9 @@ export class NetClient {
         // from the backend so the HUD needs no faction registry.
         this._pushToast({ kind: 'reward', xp: m.xp || 0, credits: m.credits || 0, loot: m.loot || [], leveledUp: m.leveledUp || [], newLevel: m.newLevel, reputation: Array.isArray(m.reputation) ? m.reputation : [] });
       } else if (m.t === 'hotbar') {
-        // Server pushed a refreshed kit (e.g. a mid-session ability unlock after a level-up).
+        // Server pushed a refreshed kit (e.g. a mid-session ability unlock after a level-up / equip change).
         if (Array.isArray(m.hotbar)) this.hotbar = m.hotbar;
+        if (Number.isFinite(m.atkRange)) this.atkRange = m.atkRange;
       } else if (m.t === 'combat_done') {
         // A scripted 3D fight finished (e.g. the tutorial training drone). Re-emit on the tutorial
         // bus so the state machine advances COMBAT_ENDED → COMBAT_COMPLETE → VENDOR_INTRO — the

@@ -18,10 +18,11 @@
 
 const combatService = require('../services/combatService');
 const { getAbilityDefinition, isCombatUsable } = require('../data/abilityDefinitions');
+const { weaponWorldRange, weaponClass, MELEE_WORLD_RANGE } = require('../data/items');
 const { CombatEncounter } = require('../models');
 
 const BASIC = 'basic_attack';
-const BASIC_RANGE = 2.8;       // melee
+const BASIC_RANGE = MELEE_WORLD_RANGE; // fallback melee reach when unarmed (weapon-driven otherwise)
 const BASIC_CD_MS = 850;
 const BASIC_STAMINA = 3;
 const ABILITY_RANGE_RANGED = 13;
@@ -29,6 +30,7 @@ const ABILITY_RANGE_MELEE = 6;
 const TURN_MS = 1000;          // ability cooldown: turns → ms
 const ENEMY_MELEE = 2.8;
 const ENEMY_CD_MS = 1400;
+const ENEMY_RANGED_CD_MS = 1900; // ranged enemies fire a touch slower than melee swings
 const DISENGAGE_MS = 6000;
 // Dodge-roll (Phase 4.4)
 const DODGE_CD_MS = 1000;
@@ -37,6 +39,11 @@ const DASH_SPEED = 17;       // world units/s during the dash
 const DASH_MS = 180;
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+
+/** Equipped-weapon world attack range for a combatant (melee/unarmed → MELEE_WORLD_RANGE). */
+const attackRangeOf = (combatant) => weaponWorldRange(combatant && combatant.equipment && combatant.equipment.weapon);
+/** True when the combatant's equipped weapon is a ranged class (drives the tracer/ranged feel). */
+const isRangedWeapon = (combatant) => weaponClass(combatant && combatant.equipment && combatant.equipment.weapon) === 'ranged';
 
 /** Dodge-roll: brief i-frames + a forward dash (applied in PlanetWorld.step). */
 function resolveDodge(world, player, now) {
@@ -78,13 +85,13 @@ function resolveCast(world, player, msg, now) {
   if (abilityId === BASIC) {
     if (!enemy || enemy.dead) return;
     if (now < (player.abilityCdUntil[BASIC] || 0)) return;
-    if (dist(player, enemy) > BASIC_RANGE) return;
+    if (dist(player, enemy) > attackRangeOf(player.combatant)) return;
     if (player.combatant.stats.stamina < BASIC_STAMINA) return;
     player.combatant.stats.stamina = Math.max(0, player.combatant.stats.stamina - BASIC_STAMINA);
     const res = combatService.calculateDamage(player.combatant, enemy.combatant);
     applyDamage(enemy.combatant, res);
     player.abilityCdUntil[BASIC] = now + BASIC_CD_MS;
-    afterPlayerHit(world, player, enemy, res, now, BASIC);
+    afterPlayerHit(world, player, enemy, res, now, BASIC, isRangedWeapon(player.combatant));
     return;
   }
 
@@ -120,9 +127,10 @@ function resolveCast(world, player, msg, now) {
     return;
   }
 
-  // enemy-targeted (damage / debuff)
+  // enemy-targeted (damage / debuff). A damage ability reaches at least ABILITY_RANGE_RANGED, but a
+  // ranged weapon (e.g. sniper) extends it to the weapon's world range; non-damage debuffs stay short.
   if (!enemy || enemy.dead) return;
-  const range = eff.damage ? ABILITY_RANGE_RANGED : ABILITY_RANGE_MELEE;
+  const range = eff.damage ? Math.max(ABILITY_RANGE_RANGED, attackRangeOf(player.combatant)) : ABILITY_RANGE_MELEE;
   if (dist(player, enemy) > range) return;
   player.combatant.stats.stamina = Math.max(0, player.combatant.stats.stamina - cost);
   const enc = { combatants: [player.combatant, enemy.combatant] };
@@ -137,14 +145,16 @@ function resolveCast(world, player, msg, now) {
     try { combatService.applyAbilityDebuff(enc, player.combatant, enemy.combatant, eff.debuff); } catch (e) {}
   }
   player.abilityCdUntil[abilityId] = now + (def.cooldown || 1) * TURN_MS;
-  afterPlayerHit(world, player, enemy, res, now, abilityId);
+  // A damage ability fired from a ranged weapon draws the ranged tracer/muzzle feel too.
+  afterPlayerHit(world, player, enemy, res, now, abilityId, !!eff.damage && isRangedWeapon(player.combatant));
 }
 
-function afterPlayerHit(world, player, enemy, res, now, abilityId) {
+function afterPlayerHit(world, player, enemy, res, now, abilityId, ranged = false) {
   player.lastCombatAt = now;
   enemy.aggressive = true; // a struck enemy fights back — wakes a passive/tutorial drone
   if (!player.engagedEnemies.has(enemy.id)) player.engagedEnemies.set(enemy.id, enemy.combatant);
-  world.pushFx({ type: 'hit', sourceId: player.id, targetId: enemy.id, x: enemy.x, z: enemy.z, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit, ability: abilityId });
+  // sx/sz = attacker origin; `ranged` lets the client draw a bolt/tracer + muzzle flash from it.
+  world.pushFx({ type: 'hit', sourceId: player.id, targetId: enemy.id, x: enemy.x, z: enemy.z, sx: player.x, sz: player.z, ranged: !!ranged, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit, ability: abilityId });
   world.pushIntent({ type: 'engage', playerId: player.id });
   if (enemy.combatant.stats.health <= 0) onEnemyDeath(world, player, enemy);
 }
@@ -162,12 +172,15 @@ function onEnemyDeath(world, player, enemy) {
 /** Enemy → player melee attack (called from the enemy AI when in range + off cooldown). */
 function enemyTryAttack(world, enemy, target, now) {
   if (enemy.dead || !target || target.dead) return;
-  if (dist(enemy, target) > ENEMY_MELEE) return;
+  // Range + cooldown are weapon-driven: a rifle-armed enemy attacks from its weapon's world range,
+  // a melee enemy only at ~2.8. `ranged` drives the enemy→player tracer + a slightly slower cadence.
+  const ranged = isRangedWeapon(enemy.combatant);
+  if (dist(enemy, target) > attackRangeOf(enemy.combatant)) return;
   if (now < (enemy.attackCdUntil || 0)) return;
-  enemy.attackCdUntil = now + ENEMY_CD_MS;
-  // Dodge i-frames: the swing whiffs.
+  enemy.attackCdUntil = now + (ranged ? ENEMY_RANGED_CD_MS : ENEMY_CD_MS);
+  // Dodge i-frames: the swing/shot whiffs.
   if (now < (target.iFrameUntil || 0)) {
-    world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, dmg: 0, dodged: true });
+    world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, sx: enemy.x, sz: enemy.z, ranged, dmg: 0, dodged: true });
     return;
   }
   const res = combatService.calculateDamage(enemy.combatant, target.combatant);
@@ -179,7 +192,7 @@ function enemyTryAttack(world, enemy, target, now) {
   }
   target.lastCombatAt = now;
   if (!target.engagedEnemies.has(enemy.id)) target.engagedEnemies.set(enemy.id, enemy.combatant);
-  world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit });
+  world.pushFx({ type: 'hit', sourceId: enemy.id, targetId: target.id, x: target.x, z: target.z, sx: enemy.x, sz: enemy.z, ranged, dmg: res.damage || 0, crit: !!res.critical, dodged: !!res.dodged, miss: !res.hit });
   world.pushIntent({ type: 'engage', playerId: target.id });
   if (target.combatant.stats.health <= 0 && !target.dead) {
     target.dead = true;
@@ -422,7 +435,7 @@ class CombatManager {
     if (Array.isArray(character.abilities)) {
       player.abilities = character.abilities.filter((aid) => isCombatUsable(aid));
     }
-    this._send(player, { t: 'hotbar', hotbar: buildHotbar(character) });
+    this._send(player, { t: 'hotbar', hotbar: buildHotbar(character), atkRange: attackRangeOf(player.combatant) });
   }
 
   /** endEncounter('lost') already respawned the character (hp + location); mirror it in-world.
@@ -479,6 +492,6 @@ class CombatManager {
 module.exports = {
   CombatManager, resolveCast, resolveDodge, enemyTryAttack, applyDamage,
   buildEnemyActorCombatant: (template) => combatService.buildEnemyCombatant(template),
-  buildEncounterMeta, buildHotbar,
+  buildEncounterMeta, buildHotbar, attackRangeOf, isRangedWeapon,
   DISENGAGE_MS, FRESH_TURNBASED_MS,
 };

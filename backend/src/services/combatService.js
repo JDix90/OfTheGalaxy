@@ -4,7 +4,7 @@
  */
 
 const { CombatEncounter, PlayerCharacter, PlayerInventory, QuestProgress, Quest, sequelize } = require('../models');
-const { getItemDefinition, aggregateEquipmentStats } = require('../data/items');
+const { getItemDefinition, aggregateEquipmentStats, weaponClass } = require('../data/items');
 const { generateRandomEnemy, getEnemyTemplate, scaleEnemyForLevel } = require('../data/enemyTemplates');
 const { getAbilityDefinition, isCombatUsable } = require('../data/abilityDefinitions');
 const { calculateSetBonuses, applySetBonuses } = require('../data/itemSets');
@@ -246,7 +246,9 @@ class CombatService {
       defenseModifiers: effectResults.defenseStats, // Store defense modifiers
       luckModifiers: effectResults.luckStats, // Store luck modifiers
       equipment: {
-        weapon: weapon ? { itemId: equippedMap.weapon.itemId, damage: weaponDamage } : null,
+        // range/class let the realtime sim gate attacks by the equipped weapon (ranged vs melee)
+        // instead of a hardcoded melee reach. See data/items.weaponWorldRange.
+        weapon: weapon ? { itemId: equippedMap.weapon.itemId, damage: weaponDamage, range: weapon.stats?.range, class: weaponClass(weapon) } : null,
         armor: armor ? { itemId: equippedMap.armor.itemId, defense: armorDefense } : null
       },
       statusEffects: staminaStatusEffects, // Include stamina-based status effects
@@ -259,7 +261,16 @@ class CombatService {
    */
   buildEnemyCombatant(enemyTemplate) {
     const id = `enemy_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
+    // Derive weapon range/class from the equipped weapon's item def so a rifle-armed enemy attacks
+    // from distance (the realtime sim reads equipment.weapon.range/class). Unarmed/unknown → melee.
+    const tplWeapon = enemyTemplate.equipment && enemyTemplate.equipment.weapon;
+    const equipment = { ...enemyTemplate.equipment };
+    if (tplWeapon && tplWeapon.itemId) {
+      const def = getItemDefinition(tplWeapon.itemId);
+      equipment.weapon = { ...tplWeapon, range: def?.stats?.range, class: weaponClass(def) };
+    }
+
     return {
       id,
       name: enemyTemplate.name,
@@ -272,7 +283,7 @@ class CombatService {
         // Modest evasion from speed (cap 15%) so dodge applies to enemies too.
         dodgeChance: Math.min(0.15, Math.max(0, ((enemyTemplate.stats.speed || 10) - 10) * 0.01))
       },
-      equipment: { ...enemyTemplate.equipment },
+      equipment,
       statusEffects: [],
       position: { x: 0, y: 0 },
       lootTable: enemyTemplate.lootTable,
