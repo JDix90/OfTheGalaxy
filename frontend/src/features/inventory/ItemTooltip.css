@@ -6,6 +6,10 @@
   padding: 1rem;
   min-width: 250px;
   max-width: 350px;
+  /* A content-heavy panel (set bonuses, effects) can be taller than the viewport — cap it and let it
+     scroll so the bottom is never clipped (positioning logic keeps it on-screen horizontally). */
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 1000;
   pointer-events: auto;

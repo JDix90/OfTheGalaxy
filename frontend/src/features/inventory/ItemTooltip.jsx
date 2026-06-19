@@ -3,7 +3,7 @@
  * Displays item information on hover with equip functionality
  */
 
-import React from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import { useSettingsStore } from '../../state/settingsSlice';
 import { useInventoryStore } from '../../state/inventorySlice';
 import { useCharacterStore } from '../../state/characterSlice';
@@ -17,7 +17,32 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
   const tooltipsEnabled = useSettingsStore(state => state.getSetting('gameplay', 'tooltips'));
   const { equipItem, useItem, unequipItem } = useInventoryStore();
   const { currentCharacter } = useCharacterStore();
-  
+
+  // Keep the panel fully on-screen: measure it after render and clamp/flip so it never spills past a
+  // viewport edge (the raw cursor position would clip a panel opened near the right/bottom of the
+  // screen — e.g. an item in the last grid column). Positioned in a layout effect (before paint) so
+  // there's no visible jump; hidden until measured.
+  const tooltipRef = useRef(null);
+  const [coords, setCoords] = useState({ left: 0, top: 0, ready: false });
+  const px = position?.x ?? 0;
+  const py = position?.y ?? 0;
+  useLayoutEffect(() => {
+    const el = tooltipRef.current;
+    if (!el) return;
+    const M = 12; // viewport margin + cursor offset
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    let left = px + M;
+    if (left + w > vw - M) left = px - w - M; // flip to the left of the cursor on right-edge overflow
+    left = Math.max(M, Math.min(left, vw - w - M));
+    let top = py + M;
+    if (top + h > vh - M) top = vh - h - M;   // lift up on bottom-edge overflow
+    top = Math.max(M, top);
+    setCoords({ left, top, ready: true });
+  }, [px, py, item?.itemId, item?.quantity]);
+
   if (!item || !tooltipsEnabled) return null;
 
   const isEquippable = item.equipmentSlot && !item.equipped;
@@ -53,10 +78,14 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
 
   return (
     <div
+      ref={tooltipRef}
       className="item-tooltip"
       style={{
-        left: `${position.x + 10}px`,
-        top: `${position.y + 10}px`
+        left: `${coords.left}px`,
+        top: `${coords.top}px`,
+        // Hide for the first frame (before the layout-effect measure) so it never flashes at an
+        // unclamped spot.
+        visibility: coords.ready ? 'visible' : 'hidden'
       }}
       onClick={(e) => e.stopPropagation()}
       onMouseEnter={(e) => e.stopPropagation()}
