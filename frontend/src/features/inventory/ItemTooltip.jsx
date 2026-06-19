@@ -18,29 +18,32 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
   const { equipItem, useItem, unequipItem } = useInventoryStore();
   const { currentCharacter } = useCharacterStore();
 
-  // Keep the panel fully on-screen: measure it after render and clamp/flip so it never spills past a
-  // viewport edge (the raw cursor position would clip a panel opened near the right/bottom of the
-  // screen — e.g. an item in the last grid column). Positioned in a layout effect (before paint) so
-  // there's no visible jump; hidden until measured.
+  // Keep the panel fully on-screen: clamp/flip its position so it never spills past a viewport edge
+  // (the raw cursor position clips a panel opened near the right/bottom edge — e.g. the last grid
+  // column). We clamp on the first render with an upper-bound size, then refine with the measured
+  // size in a layout effect. The panel is ALWAYS rendered (no visibility gating) so it can't get
+  // stuck hidden — at worst it shifts a few px once after measuring.
   const tooltipRef = useRef(null);
-  const [coords, setCoords] = useState({ left: 0, top: 0, ready: false });
   const px = position?.x ?? 0;
   const py = position?.y ?? 0;
-  useLayoutEffect(() => {
-    const el = tooltipRef.current;
-    if (!el) return;
+  const clampToViewport = (w, h) => {
     const M = 12; // viewport margin + cursor offset
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const w = el.offsetWidth;
-    const h = el.offsetHeight;
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
     let left = px + M;
     if (left + w > vw - M) left = px - w - M; // flip to the left of the cursor on right-edge overflow
-    left = Math.max(M, Math.min(left, vw - w - M));
+    left = Math.max(M, Math.min(left, Math.max(M, vw - w - M)));
     let top = py + M;
     if (top + h > vh - M) top = vh - h - M;   // lift up on bottom-edge overflow
     top = Math.max(M, top);
-    setCoords({ left, top, ready: true });
+    return { left, top };
+  };
+  // First-frame clamp uses an upper-bound box (max-width 350 + padding/border) so even before
+  // measuring, an edge-opened panel starts on-screen; the layout effect then refines with real size.
+  const [coords, setCoords] = useState(() => clampToViewport(360, 320));
+  useLayoutEffect(() => {
+    const el = tooltipRef.current;
+    if (el) setCoords(clampToViewport(el.offsetWidth, el.offsetHeight));
   }, [px, py, item?.itemId, item?.quantity]);
 
   if (!item || !tooltipsEnabled) return null;
@@ -82,10 +85,7 @@ export default function ItemTooltip({ item, position, onEquip, onClose }) {
       className="item-tooltip"
       style={{
         left: `${coords.left}px`,
-        top: `${coords.top}px`,
-        // Hide for the first frame (before the layout-effect measure) so it never flashes at an
-        // unclamped spot.
-        visibility: coords.ready ? 'visible' : 'hidden'
+        top: `${coords.top}px`
       }}
       onClick={(e) => e.stopPropagation()}
       onMouseEnter={(e) => e.stopPropagation()}
