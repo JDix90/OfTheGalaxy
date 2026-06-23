@@ -6,15 +6,16 @@
  */
 
 const { generateShantytownMap, getSeed } = require('../../../src/services/subMapGenerator');
+const { generateDefaultMap } = require('../../../src/data/planetMaps');
 
 const make = (variant = 'medium') =>
   generateShantytownMap({ id: 'gravenmoor', name: 'Gravenmoor' }, 'the_dust_warren', variant, getSeed('gravenmoor_the_dust_warren_shantytown'));
 
 describe('generateShantytownMap', () => {
-  test('produces a dense cluster of solid shacks (no enterable interiors)', () => {
+  test('produces a DENSE cluster of solid shacks (no enterable interiors)', () => {
     const layout = make();
     const shacks = layout.buildings.filter((b) => b.type === 'shack');
-    expect(shacks.length).toBeGreaterThanOrEqual(12); // dense, not a handful of houses
+    expect(shacks.length).toBeGreaterThanOrEqual(30); // densely packed, not a handful of houses
     expect(shacks.every((b) => b.collision.doors.length === 0)).toBe(true); // solid props, no interiors
   });
 
@@ -43,5 +44,19 @@ describe('generateShantytownMap', () => {
     const med = make('medium').buildings.filter((b) => b.type === 'shack').length;
     const lg = make('large').buildings.filter((b) => b.type === 'shack').length;
     expect(lg).toBeGreaterThanOrEqual(med);
+  });
+});
+
+describe('shantytown distribution (generateDefaultMap)', () => {
+  const shantyOf = (planet) => generateDefaultMap(planet).pointsOfInterest.find((p) => p.type === 'shantytown');
+
+  test('the starting world (Drydock) always gets a shantytown', () => {
+    const shanty = shantyOf({ id: 'drydock', name: 'Drydock', planetType: 'terrestrial', population: 3e9, majorCities: ['Coronet'] });
+    expect(shanty).toBeTruthy();
+    expect(shanty.type).toBe('shantytown');
+  });
+
+  test('a sparsely-populated world usually has none (seeded, not on every planet)', () => {
+    expect(shantyOf({ id: 'mereth', name: 'Mereth', planetType: 'ocean', population: 1e8, majorCities: ['Hunchuzuc'] })).toBeUndefined();
   });
 });

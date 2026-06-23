@@ -769,9 +769,9 @@ function generateMarketMap(planet, parentLocationId, variant = 'medium', seed) {
  */
 function generateShantytownMap(planet, parentLocationId, variant = 'medium', seed) {
   const random = seededRandom(seed);
-  const size = variant === 'small' ? { width: 14, height: 14 } :
-                variant === 'large' ? { width: 20, height: 20 } :
-                { width: 17, height: 17 };
+  const size = variant === 'small' ? { width: 16, height: 16 } :
+                variant === 'large' ? { width: 22, height: 22 } :
+                { width: 18, height: 18 };
 
   const zones = [];
   const buildings = [];
@@ -796,16 +796,16 @@ function generateShantytownMap(planet, parentLocationId, variant = 'medium', see
   const crossX = Math.floor(size.width * 0.62);
   const isLane = (x, y) => laneRows.has(y) || x === crossX || x <= 1;
 
-  // Pack shacks on a 2-cell-spaced grid with per-cell jitter + skips → dense but irregular, with
-  // ~1-cell dirt gaps between them. Cap the count so collision + render stay light.
+  // Pack shacks on a 2-cell-spaced grid with per-cell jitter + a few skips → dense but irregular,
+  // with ~1-cell dirt gaps (alleys) between them. The low skip + larger grid keep it tightly packed.
   let n = 0;
-  const MAX_SHACKS = variant === 'large' ? 34 : 24;
+  const MAX_SHACKS = variant === 'small' ? 28 : variant === 'large' ? 60 : 40;
   for (let gy = 0; gy < size.height - 1 && n < MAX_SHACKS; gy += 2) {
     for (let gx = 2; gx < size.width - 1 && n < MAX_SHACKS; gx += 2) {
       const x = Math.min(size.width - 2, gx + (random() < 0.4 ? 1 : 0));
       const y = Math.min(size.height - 2, gy + (random() < 0.4 ? 1 : 0));
       if (isLane(x, y) || isLane(x, y + 1)) continue;   // keep lanes walkable
-      if (random() < 0.18) continue;                    // gaps / small yards
+      if (random() < 0.07) continue;                    // a few gaps / small yards
       buildings.push({
         id: `shack_${n}`,
         name: `Shack ${n + 1}`,

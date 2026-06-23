@@ -23,6 +23,7 @@ const planetMaps = {
       { name: 'Keeper Sanctum', x: 40, y: 20, type: 'temple', description: 'Ancient Keeper stronghold' },
       { name: 'Nightrun Entertainment District', x: 30, y: 40, type: 'entertainment', description: 'Nightlife and entertainment hub' },
       { name: 'Lowmarket Markets', x: 70, y: 60, type: 'market', description: 'Major trading district' },
+      { name: 'The Understacks', x: 78, y: 72, type: 'shantytown', description: 'A teeming shanty warren wedged beneath the Lowmarket overpasses' },
       { name: 'Centralis Underworld', x: 20, y: 80, type: 'danger', description: 'Dangerous lower levels' },
       { name: 'Central Spire Spaceport', x: 50, y: 50, type: 'spaceport', description: 'Main spaceport and landing facility' },
       { name: 'Central Spire Medical Center', x: 48, y: 52, type: 'medical_center', description: 'State-of-the-art medical facility' },
@@ -785,6 +786,24 @@ function generateDefaultMap(planet) {
     medicalCenters.push(medicalCenter);
     pointsOfInterest.push(medicalCenter);
     allLocations.push(medicalCenter);
+  }
+
+  // Shantytown / slum district — guaranteed on the starting world (Drydock) so players meet one
+  // early, and seeded onto a handful of other populated worlds so the galaxy has a few. Placed on
+  // the margins (informal settlements grow at the city edges), away from the civic POIs.
+  const isDrydock = (planet.id === 'drydock') || (String(planet.name || '').toLowerCase() === 'drydock');
+  const populated = (planet.population || 0) >= 5e8;
+  if (isDrydock || (populated && seededRandom(777) < 0.22)) {
+    const pos = findGoodPosition(allLocations, 'remote', 9);
+    const shanty = {
+      name: isDrydock ? 'The Tangle' : `${planet.name} Shanties`,
+      x: pos.x,
+      y: pos.y,
+      type: 'shantytown',
+      description: 'A sprawling shanty settlement of corrugated shacks clinging to the city margins'
+    };
+    pointsOfInterest.push(shanty);
+    allLocations.push(shanty);
   }
 
   // Generate spaceport property (for frontend compatibility)

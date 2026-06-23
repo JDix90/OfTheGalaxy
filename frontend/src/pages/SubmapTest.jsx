@@ -46,12 +46,12 @@ const ENTRY = (x, y) => ({ id: 'main_entrance', position: { x, y }, label: 'Entr
 // can be verified without auth.
 function shantyShacks() {
   const out = [];
-  const W = 16, H = 16, midY = 8;
+  const W = 18, H = 18, midY = 9;
   let n = 0;
-  for (let gy = 0; gy < H - 1 && n < 26; gy += 2) {
-    for (let gx = 2; gx < W - 1 && n < 26; gx += 2) {
+  for (let gy = 0; gy < H - 1 && n < 40; gy += 2) {
+    for (let gx = 2; gx < W - 1 && n < 40; gx += 2) {
       if ([midY - 1, midY, midY + 1].includes(gy) || gx <= 1) continue; // keep the lane clear
-      if ((gx + gy) % 5 === 0) continue;                                 // gaps / small yards
+      if ((gx + gy) % 8 === 0) continue;                                 // a few gaps / small yards
       out.push(B(`shack_${n}`, `Shack ${n + 1}`, 'shack', gx, gy, 1, 1));
       n++;
     }
@@ -213,12 +213,12 @@ const SUBMAPS = {
   shantytown: {
     id: 'test_shantytown', type: 'shantytown', template: 'medium', planetId: 'testworld',
     layoutData: {
-      width: 16, height: 16,
+      width: 18, height: 18,
       buildings: shantyShacks(),
-      pointsOfInterest: [{ id: 'water_tank', name: 'Water Tank', type: 'landmark', position: { x: 10, y: 8 } }],
-      entryPoints: [ENTRY(8, 8)], exitPoints: [EXIT(0, 8)],
+      pointsOfInterest: [{ id: 'water_tank', name: 'Water Tank', type: 'landmark', position: { x: 11, y: 9 } }],
+      entryPoints: [ENTRY(9, 9)], exitPoints: [EXIT(0, 9)],
     },
-    npcs: [N('sh1', 'Resident', 'generic', 4, 3), N('sh2', 'Resident', 'generic', 12, 11), N('sh3', 'Water Seller', 'vendor', 10, 9), N('sh4', 'Child', 'generic', 6, 13)],
+    npcs: [N('sh1', 'Resident', 'generic', 4, 3), N('sh2', 'Resident', 'generic', 14, 13), N('sh3', 'Water Seller', 'vendor', 11, 10), N('sh4', 'Child', 'generic', 6, 15)],
   },
 };
 
