@@ -26,6 +26,7 @@ const TYPE_OVERRIDE = {
   market: 'market',
   city: 'settlement', settlement: 'settlement', province: 'settlement',
   civic: 'civic', government: 'civic', temple: 'civic', palace: 'civic',
+  shantytown: 'shantytown', slum: 'shantytown',
   dungeon: 'danger',
 };
 
@@ -121,6 +122,14 @@ export const SUBMAP_THEMES = {
     { mode: 'open', hemiSky: '#3a4258', hemiGround: '#140e18', hemiInt: 0.36, fill: '#7a3040', fillInt: 0.3, fog: '#241a22' },
     { map: { crate: 'crate', barrel: 'barrel' }, zone: {}, scatter: ['rock', 'crystal'] }),
 
+  // Shantytown / slum: open-air, arid + dusty. Earth-tone dirt ground and weathered shacks under a
+  // thick brown haze + warm-muted light. Reads as a sprawling informal settlement (corrugated-roof
+  // shacks come from the 'shack' building shape; brown dust from the 'shantyDust' particle preset).
+  shantytown: T('shantytown',
+    { floor: '#6b5a44', wall: '#7a6a52', ceiling: '#3a2e1f', accent: '#d9a84a', emissive: '#c8883c', trim: '#a98a5a' },
+    { mode: 'open', hemiSky: '#a9967a', hemiGround: '#352a1c', hemiInt: 0.5, fill: '#d8b878', fillInt: 0.32, fog: '#9a8a6a' },
+    { map: { crate: 'crate', barrel: 'barrel' }, zone: {}, scatter: ['rock', 'crate', 'barrel'] }),
+
   // Building interior (home): warm, cozy. Keeps its own InteriorWalls shell + plain box furniture.
   residential: T('residential',
     { floor: '#5a4a3a', wall: '#6a5444', ceiling: '#2a2018', accent: '#e0b890', emissive: '#ffb060', trim: '#ffb060' },
@@ -142,6 +151,7 @@ const PARTICLE = {
   industrial: { preset: 'steam' },
   danger: { preset: 'embers' },
   spaceport: { preset: 'sterile' },
+  shantytown: { preset: 'shantyDust' },
 };
 for (const k of Object.keys(SUBMAP_THEMES)) SUBMAP_THEMES[k].particle = PARTICLE[k] || null;
 
@@ -156,6 +166,7 @@ const CROWD = {
   settlement: { flavor: 'civilians', density: 10, tints: ['#cdd6e6', '#b9c4d8', '#d8c6a6', '#a9c6b0', '#c6a9be'] },
   industrial: { flavor: 'workers', density: 5, tints: ['#b0a890', '#c0a070', '#9aa6b8', '#a89878'] },
   spaceport: { flavor: 'travelers', density: 12, tints: ['#cdd6e6', '#b9c4d8', '#9fb3d1', '#d8c6a6', '#c6a9be'] },
+  shantytown: { flavor: 'residents', density: 10, tints: ['#a89878', '#9a8868', '#b0a088', '#8a7860', '#7e6c54', '#9c8a70'] },
 };
 for (const k of Object.keys(SUBMAP_THEMES)) SUBMAP_THEMES[k].crowd = CROWD[k] || { flavor: 'none' };
 

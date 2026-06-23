@@ -89,6 +89,7 @@ const planetMaps = {
       { name: 'Vorga\'s Palace', x: 25, y: 30, type: 'palace', description: 'Vorr crime lord stronghold' },
       { name: 'Marn Homestead', x: 35, y: 55, type: 'homestead', description: 'Moisture farm' },
       { name: 'Devourer Pit', x: 20, y: 25, type: 'danger', description: 'Ancient creature pit' },
+      { name: 'The Dust Warren', x: 46, y: 62, type: 'shantytown', description: 'A sprawling shanty settlement of corrugated shacks clinging to the dust hills' },
       { name: 'Greywell Medical Facility', x: 42, y: 52, type: 'medical_center', description: 'Basic medical services' }
     ],
     markets: [

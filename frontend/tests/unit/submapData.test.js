@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  createSubmapSim, toPct, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture,
+  createSubmapSim, toPct, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture, buildSubmapPois,
 } from '../../src/components/submap3d/submapData';
 import { submapCoordDims } from '../../../shared/sim/submap.mjs';
 
@@ -133,5 +133,27 @@ describe('submapData — coordinate conversion + builders', () => {
     const q = (done) => ([{ quest: { id: 'q1', title: 'T', objectives: [{ id: 'o1', description: 'Go', location: { subMapId: sm.id, x: 8, y: 8 } }] }, progress: { objectivesCompleted: done ? { o1: true } : {} } }]);
     expect(buildSubmapWaypoints(q(false), sm, sim)).toHaveLength(1);
     expect(buildSubmapWaypoints(q(true), sm, sim)).toHaveLength(0);
+  });
+
+  it('shantytown shack buildings render as the makeshift "shack" shape with a per-building seed', () => {
+    const sub = {
+      id: 'gravenmoor_the_dust_warren_shantytown', type: 'shantytown', planetId: 'gravenmoor',
+      layoutData: {
+        width: 17, height: 17, gridSize: 40,
+        exitPoints: [{ id: 'main_exit', position: { x: 1, y: 8 } }],
+        entryPoints: [{ id: 'main_entrance', position: { x: 1, y: 8 } }],
+        buildings: [
+          { id: 'shack_0', name: 'Shack 1', type: 'shack', position: { x: 5, y: 3 }, size: { width: 1, height: 1 }, collision: { doors: [] } },
+          { id: 'shack_1', name: 'Shack 2', type: 'shack', position: { x: 9, y: 11 }, size: { width: 1, height: 1 }, collision: { doors: [] } },
+        ],
+        pointsOfInterest: [],
+        collisionMap: { resolution: 100, cells: Array.from({ length: 100 }, () => Array(100).fill(0)) },
+      },
+    };
+    const sim = createSubmapSim(sub);
+    const shacks = buildSubmapPois(sub, sim).filter((p) => p.structure && p.structure.shape === 'shack');
+    expect(shacks).toHaveLength(2);
+    expect(shacks.every((s) => typeof s.structure.seed === 'number')).toBe(true);
+    expect(shacks[0].structure.seed).not.toBe(shacks[1].structure.seed); // varied per building id
   });
 });

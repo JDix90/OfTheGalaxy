@@ -41,6 +41,24 @@ const EXIT = (x, y) => ({ id: 'main_exit', position: { x, y }, label: 'Exit to S
 // portal stays at the map edge. The real game uses edge entries.
 const ENTRY = (x, y) => ({ id: 'main_entrance', position: { x, y }, label: 'Entrance' });
 
+// Dense shack cluster for the shantytown harness scene — mirrors the backend generateShantytownMap
+// shape (many 1x1 'shack' buildings on a grid, lanes kept clear) so the theme + shack shape + haze
+// can be verified without auth.
+function shantyShacks() {
+  const out = [];
+  const W = 16, H = 16, midY = 8;
+  let n = 0;
+  for (let gy = 0; gy < H - 1 && n < 26; gy += 2) {
+    for (let gx = 2; gx < W - 1 && n < 26; gx += 2) {
+      if ([midY - 1, midY, midY + 1].includes(gy) || gx <= 1) continue; // keep the lane clear
+      if ((gx + gy) % 5 === 0) continue;                                 // gaps / small yards
+      out.push(B(`shack_${n}`, `Shack ${n + 1}`, 'shack', gx, gy, 1, 1));
+      n++;
+    }
+  }
+  return out;
+}
+
 // ---- Synthetic submaps (one per scene type) ----
 const SUBMAPS = {
   medical_center: {
@@ -191,6 +209,16 @@ const SUBMAPS = {
       entryPoints: [ENTRY(6, 6)], exitPoints: [EXIT(0, 6)],
     },
     npcs: [N('d1', 'Scavenger', 'generic', 4, 4)],
+  },
+  shantytown: {
+    id: 'test_shantytown', type: 'shantytown', template: 'medium', planetId: 'testworld',
+    layoutData: {
+      width: 16, height: 16,
+      buildings: shantyShacks(),
+      pointsOfInterest: [{ id: 'water_tank', name: 'Water Tank', type: 'landmark', position: { x: 10, y: 8 } }],
+      entryPoints: [ENTRY(8, 8)], exitPoints: [EXIT(0, 8)],
+    },
+    npcs: [N('sh1', 'Resident', 'generic', 4, 3), N('sh2', 'Resident', 'generic', 12, 11), N('sh3', 'Water Seller', 'vendor', 10, 9), N('sh4', 'Child', 'generic', 6, 13)],
   },
 };
 

@@ -29,6 +29,9 @@ const PRESETS = {
   motes:   { count: 120, color: '#e8d8b8',                                            size: 0.14, fall: 0.07,  drift: 0.30, area: 46, top: 8, opacity: 0.40 },
   steam:   { count: 90,  color: '#c6c0b6', sprite: 'spr_particle_mist_64.png',        size: 0.85, fall: -0.22, drift: 0.30, area: 44, top: 8, opacity: 0.26 },
   embers:  { count: 90,  color: '#ff7a44', sprite: 'spr_particle_ember_64.png',       size: 0.20, fall: -0.4,  drift: 0.5,  area: 44, top: 9, opacity: 0.70, glow: true },
+  // Open-air slum haze: slow, settling brown dust across the whole district (taller field than the
+  // enclosed presets since the shantytown is open-air, not roofed).
+  shantyDust: { count: 170, color: '#b6a484', sprite: 'spr_particle_sand_64.png',     size: 0.5,  fall: 0.05,  drift: 0.55, area: 52, top: 14, opacity: 0.5 },
 };
 
 const KEYWORDS = [
