@@ -318,6 +318,32 @@ export function buildSubmapProps(subMap, sim, theme) {
     }
   }
 
+  // 4. laundry lines strung between orthogonally-adjacent shacks (shantytown "lived-in" dressing).
+  //    Each shack pairs with at most one neighbour; capped so the alleys don't become a cat's cradle.
+  if (rules.lines === 'laundry') {
+    const shacks = (d.buildings || [])
+      .filter((b) => /shack|shanty|slum/.test(String(b.type || '').toLowerCase()))
+      .map((b) => { const pos = b.position || b; const cx = ((pos.x + 0.5) / w) * 100, cy = ((pos.y + 0.5) / h) * 100; const wp = sim.surfaceToWorld(cx, cy); return { id: b.id, wx: wp.x, wz: wp.z }; });
+    // adaptive distance: ~2.6 cells in world units, so only near neighbours connect (no map-spanning lines)
+    const o = sim.surfaceToWorld(50, 50), e1 = sim.surfaceToWorld(50 + 100 / w, 50);
+    const maxD = Math.hypot(e1.x - o.x, e1.z - o.z) * 2.6;
+    const used = new Set();
+    let lines = 0;
+    for (let i = 0; i < shacks.length && lines < 14; i++) {
+      if (used.has(shacks[i].id)) continue;
+      let best = null, bd = Infinity;
+      for (let j = 0; j < shacks.length; j++) {
+        if (i === j || used.has(shacks[j].id)) continue;
+        const dd = Math.hypot(shacks[i].wx - shacks[j].wx, shacks[i].wz - shacks[j].wz);
+        if (dd > 0.5 && dd <= maxD && dd < bd) { bd = dd; best = shacks[j]; }
+      }
+      if (!best) continue;
+      used.add(shacks[i].id); used.add(best.id);
+      themed.push({ id: `laundry_${shacks[i].id}_${best.id}`, semantic: 'laundry_line', wx: shacks[i].wx, wz: shacks[i].wz, wxEnd: best.wx, wzEnd: best.wz, seed: lines * 131 + 7 });
+      lines++;
+    }
+  }
+
   return { themed, boxes };
 }
 

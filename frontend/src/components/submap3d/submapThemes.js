@@ -128,7 +128,8 @@ export const SUBMAP_THEMES = {
   shantytown: T('shantytown',
     { floor: '#6b5a44', wall: '#7a6a52', ceiling: '#3a2e1f', accent: '#d9a84a', emissive: '#c8883c', trim: '#a98a5a' },
     { mode: 'open', hemiSky: '#a9967a', hemiGround: '#352a1c', hemiInt: 0.5, fill: '#d8b878', fillInt: 0.32, fog: '#9a8a6a' },
-    { map: { crate: 'crate', barrel: 'barrel' }, zone: {}, scatter: ['rock', 'crate', 'barrel'] }),
+    // lines:'laundry' strings cloth between adjacent shacks; debris/cookfire add lived-in clutter.
+    { map: { crate: 'crate', barrel: 'barrel' }, zone: {}, scatter: ['rock', 'crate', 'barrel', 'debris', 'debris', 'cookfire'], lines: 'laundry' }),
 
   // Building interior (home): warm, cozy. Keeps its own InteriorWalls shell + plain box furniture.
   residential: T('residential',
@@ -166,7 +167,7 @@ const CROWD = {
   settlement: { flavor: 'civilians', density: 10, tints: ['#cdd6e6', '#b9c4d8', '#d8c6a6', '#a9c6b0', '#c6a9be'] },
   industrial: { flavor: 'workers', density: 5, tints: ['#b0a890', '#c0a070', '#9aa6b8', '#a89878'] },
   spaceport: { flavor: 'travelers', density: 12, tints: ['#cdd6e6', '#b9c4d8', '#9fb3d1', '#d8c6a6', '#c6a9be'] },
-  shantytown: { flavor: 'residents', density: 10, tints: ['#a89878', '#9a8868', '#b0a088', '#8a7860', '#7e6c54', '#9c8a70'] },
+  shantytown: { flavor: 'residents', density: 16, tints: ['#a89878', '#9a8868', '#b0a088', '#8a7860', '#7e6c54', '#9c8a70'] },
 };
 for (const k of Object.keys(SUBMAP_THEMES)) SUBMAP_THEMES[k].crowd = CROWD[k] || { flavor: 'none' };
 
