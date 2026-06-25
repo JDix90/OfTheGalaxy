@@ -63,6 +63,7 @@ class PlanetWorld {
     this._decayAcc = 0;        // accumulator for periodic status-effect decay
     this.dangerLevel = options.dangerLevel || 1;
     this.enemyPool = (Array.isArray(options.enemyPool) && options.enemyPool.length) ? options.enemyPool : null; // faction/planet-appropriate template ids
+    this.localFaction = options.localFaction || null; // controlling faction; standing with it throttles ambient spawns (set per-player at join → player.repSpawnScale)
     this.ambient = options.ambient !== false; // safe hubs (e.g. the spaceport) pass ambient:false — no auto enemies, but scripted spawns (NPC/POI/quest/tutorial) still work
     this._enemySeq = 0;        // monotonic id source so respawned enemies get fresh ids
     this._respawnAcc = 0;      // accumulator for ambient respawn (replaces the old random-encounter roll)
@@ -128,10 +129,22 @@ class PlanetWorld {
   /** Any player on this world currently escorting? (raises spawn target + difficulty). */
   _anyEscort() { for (const p of this.players.values()) if (p.escort) return true; return false; }
 
-  /** Target ambient-enemy population: danger-scaled, bumped while a player is escorting. */
+  /** Smallest ambient-spawn multiplier among present players, from their standing with this area's
+   *  controlling faction (`player.repSpawnScale`, set at join). 1 = baseline; <1 means an ingratiated
+   *  player calms the area; >1 means a despised one draws more heat. No faction / unknown → 1. */
+  _repSpawnScale() {
+    let scale = 1;
+    for (const p of this.players.values()) if (typeof p.repSpawnScale === 'number') scale = Math.min(scale, p.repSpawnScale);
+    return scale;
+  }
+
+  /** Target ambient-enemy population: danger-scaled, bumped while escorting, then throttled by the
+   *  most-ingratiated player's standing with the local faction (so a rough shantytown calms for a
+   *  friend of the faction, and stays dangerous for everyone else). */
   _targetCount() {
     const base = Math.max(2, Math.min(8, 2 + Math.floor(this.dangerLevel / 2)));
-    return Math.min(10, base + (this._anyEscort() ? 2 : 0));
+    const withEscort = base + (this._anyEscort() ? 2 : 0);
+    return Math.max(0, Math.min(10, Math.round(withEscort * this._repSpawnScale())));
   }
 
   /** Effective enemy level: the planet's danger blended with the average player level present,

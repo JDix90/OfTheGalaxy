@@ -168,14 +168,21 @@ class WorldManager {
       const dims = this.submapCoordDims ? this.submapCoordDims(subMap)
         : { w: d.width || (d.size && d.size.width) || 12, h: d.height || (d.size && d.size.height) || 12 };
       const isDungeon = subMap.type === 'dungeon';
-      const dangerLevel = opts.dangerLevel || (subMap.metadata && subMap.metadata.dangerLevel) || (isDungeon ? 6 : 1);
+      const isShanty = subMap.type === 'shantytown';
+      let dangerLevel = opts.dangerLevel || (subMap.metadata && subMap.metadata.dangerLevel) || (isDungeon ? 6 : 1);
+      // Shantytowns are lawless: floor the danger so street toughs are a real threat. Reputation with
+      // the controlling faction scales the actual count down per-player at spawn time (_repSpawnScale).
+      if (isShanty) dangerLevel = Math.max(5, dangerLevel + 2);
       // Bustling hubs get a server-authoritative ambient crowd (cosmetic walkers) that path
       // between the concourse's people-places — the storefronts, lounges, and hangar gates
       // (its NPC spawn points + entrance), so every player sees the same lively port.
       const crowd = (subMap.type === 'spaceport') ? this._buildCrowdConfig(d, dims) : null;
       return new PlanetWorld(subMapId, sim, mapData, {
         dangerLevel,
-        ambient: isDungeon, // dungeons populate; hub submaps (spaceport/city/...) don't auto-spawn
+        // dungeons + shantytowns populate; other hub submaps (spaceport/city/...) don't auto-spawn.
+        ambient: isDungeon || isShanty,
+        enemyPool: isShanty ? ['syndicate_thug', 'pirate', 'bounty_hunter'] : undefined, // slum criminals
+        localFaction: (subMap.metadata && subMap.metadata.faction) || null,
         crowd,
         zone: { type: isDungeon ? 'dungeon' : (subMap.type || 'submap'), subMapId, planetId: subMap.planetId || opts.planetId, parentLocationId: subMap.parentLocationId, entrance, dims },
       });

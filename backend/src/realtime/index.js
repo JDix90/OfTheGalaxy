@@ -24,6 +24,13 @@ const { isCombatUsable } = require('../data/abilityDefinitions');
 const { buildHotbar, attackRangeOf } = require('./combat'); // shared with _refreshCombatant (mid-session hotbar push)
 const { setRealtimeManager } = require('./registry'); // expose the manager to the HTTP inventory path
 const escortService = require('../services/escortService'); // escort-quest ambient-spawn escalation
+const factionService = require('../services/factionService'); // local-faction standing throttles area spawns
+
+// Faction-standing → ambient-spawn multiplier for a controlled area (e.g. a shantytown). Being
+// ingratiated with the controlling faction thins out the street toughs (≤1); neutral-and-below pay
+// the area's full danger floor. (Values stay ≤1: PlanetWorld._repSpawnScale takes the calmest present
+// player, so a >1 "extra heat" term wouldn't apply across a shared world anyway.)
+const REP_SPAWN_SCALE = { exalted: 0, honored: 0.35, friendly: 0.7, neutral: 1, unfriendly: 1, hostile: 1, hated: 1 };
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -123,6 +130,13 @@ async function attachRealtime(server) {
           // Escort-quest escalation: an escorting player draws denser/tougher ambient spawns.
           // Checked async so it never blocks the join (re-evaluated on the next join).
           escortService.getActiveEscortQuest(character.id).then((eq) => { player.escort = !!eq; }).catch(() => {});
+          // In a faction-controlled area (shantytown), throttle ambient hostile spawns by the player's
+          // standing with the local faction. Async so it never blocks the join — baseline (1) until it resolves.
+          if (world.localFaction) {
+            factionService.getReputation(character.id, world.localFaction)
+              .then((rep) => { player.repSpawnScale = REP_SPAWN_SCALE[(rep && rep.tier) || 'neutral'] ?? 1; })
+              .catch(() => {});
+          }
           joined = true;
           clearTimeout(joinTimeout);
           ws.send(JSON.stringify({
