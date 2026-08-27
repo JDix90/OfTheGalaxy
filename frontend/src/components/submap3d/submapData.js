@@ -63,7 +63,17 @@ const SUBMAP_PALETTE = {
   civic: { color: '#c6d0e6', accent: '#ffe9a8', emissive: '#ffcf5c' },
   home: { color: '#7e6450', accent: '#e0b890', emissive: '#ffb060' },
   tech: { color: '#33506e', accent: '#bfe3ff', emissive: '#3aa0ff' },
+  shanty: { color: '#6f6256', accent: '#caa45a', emissive: '#000000' }, // drab base; the shack shape varies its own color from a seed
 };
+
+// Stable 0..1 hash from a building id so a shack's randomized look (roof tilt, occasional paint)
+// is deterministic per building instead of flickering each render.
+function hashSeed(str) {
+  let h = 0;
+  const s = String(str || '');
+  for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) | 0;
+  return ((h >>> 0) % 10000) / 10000;
+}
 
 function submapStructure(b, w, sim) {
   const t = String(b.type || '').toLowerCase();
@@ -80,6 +90,9 @@ function submapStructure(b, w, sim) {
     const s = getPoiStructure(b.type);
     return { ...s, height: Math.min(s.height, 6), footprint: Math.min(s.footprint, 9), glow: 0.5 };
   }
+  // Shantytown shacks: low makeshift dwellings with corrugated roofs. A per-building seed drives the
+  // shack shape's roof tilt + occasional painted color so a cluster looks varied, not stamped.
+  if (/shack|shanty|slum/.test(t)) return { shape: 'shack', ...SUBMAP_PALETTE.shanty, height: Math.min(2.4, Math.max(1.6, cellW * 0.65)), footprint: Math.min(fp, 3.2), glow: 0, seed: hashSeed(b.id) };
   if (/vendor|stall|stand|market/.test(t)) return mk('stall', 'vendor', Math.min(2.6, cellW));
   if (/crafting|reception|desk|terminal|counter|kiosk|info/.test(t)) return mk('desk', 'tech', Math.min(1.9, cellW * 0.9));
   if (/treatment|surgery|patient|ward|exam|medical|clinic/.test(t)) return mk('room', 'medical', Math.min(3.4, Math.max(2.4, cellW * 0.7)));
@@ -145,6 +158,9 @@ export function buildSubmapPois(subMap, sim) {
       id, name: b.name || b.type, type: b.type, kind: 'building',
       sx: p.x, sy: p.y, wx: wpos.x, wz: wpos.z,
       enterable: !!b.opensTo || b.type === 'crafting_bench' || b.type === 'vendor_stall' || b.type === 'commercial',
+      // Shacks are ambient scenery (a slum is dozens of them) — no floating name label, or the
+      // district fills with "Shack 12" tags.
+      hideLabel: String(b.type || '').toLowerCase() === 'shack',
       structure: submapStructure(b, w, sim),
       ...(building ? { building, ...(isHangar ? { props: getPoiProps(b.type, id) } : {}) } : {}),
       raw: b,
@@ -299,6 +315,32 @@ export function buildSubmapProps(subMap, sim, theme) {
         themed.push({ id: `sc_${gx}_${gy}`, semantic: sem, wx: wpos.x, wz: wpos.z, rot: ((gx + gy) % 4) * Math.PI / 2 });
         placed++;
       }
+    }
+  }
+
+  // 4. laundry lines strung between orthogonally-adjacent shacks (shantytown "lived-in" dressing).
+  //    Each shack pairs with at most one neighbour; capped so the alleys don't become a cat's cradle.
+  if (rules.lines === 'laundry') {
+    const shacks = (d.buildings || [])
+      .filter((b) => /shack|shanty|slum/.test(String(b.type || '').toLowerCase()))
+      .map((b) => { const pos = b.position || b; const cx = ((pos.x + 0.5) / w) * 100, cy = ((pos.y + 0.5) / h) * 100; const wp = sim.surfaceToWorld(cx, cy); return { id: b.id, wx: wp.x, wz: wp.z }; });
+    // adaptive distance: ~2.6 cells in world units, so only near neighbours connect (no map-spanning lines)
+    const o = sim.surfaceToWorld(50, 50), e1 = sim.surfaceToWorld(50 + 100 / w, 50);
+    const maxD = Math.hypot(e1.x - o.x, e1.z - o.z) * 2.6;
+    const used = new Set();
+    let lines = 0;
+    for (let i = 0; i < shacks.length && lines < 14; i++) {
+      if (used.has(shacks[i].id)) continue;
+      let best = null, bd = Infinity;
+      for (let j = 0; j < shacks.length; j++) {
+        if (i === j || used.has(shacks[j].id)) continue;
+        const dd = Math.hypot(shacks[i].wx - shacks[j].wx, shacks[i].wz - shacks[j].wz);
+        if (dd > 0.5 && dd <= maxD && dd < bd) { bd = dd; best = shacks[j]; }
+      }
+      if (!best) continue;
+      used.add(shacks[i].id); used.add(best.id);
+      themed.push({ id: `laundry_${shacks[i].id}_${best.id}`, semantic: 'laundry_line', wx: shacks[i].wx, wz: shacks[i].wz, wxEnd: best.wx, wzEnd: best.wz, seed: lines * 131 + 7 });
+      lines++;
     }
   }
 

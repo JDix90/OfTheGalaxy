@@ -105,6 +105,43 @@ function Box({ w, h, d, y = 0, color, emissive, ei = 0, ...rest }) {
 function StructureMesh({ s }) {
   const { shape, color, accent, emissive, height: H, footprint: F, glow } = s;
   switch (shape) {
+    case 'shack': {
+      // A makeshift slum dwelling: a low irregular body under a tilted corrugated-metal roof weighed
+      // down by rocks, an optional lean-to, and a dark doorway. Per-building `seed` varies the look
+      // (mostly drab earth/metal, the occasional painted shack) so a cluster reads as a real slum.
+      const seed = s.seed || 0;
+      const rnd = (n) => { const x = Math.sin(seed * 127.1 + n * 311.7) * 43758.5453; return x - Math.floor(x); };
+      const DRAB = ['#7a6a52', '#6f6256', '#867f72', '#6a5e4e', '#8a7a62'];
+      const PAINT = ['#5a82a8', '#6fae84', '#b06a86', '#3f7d86', '#c2a14a'];
+      const body = rnd(1) > 0.78 ? PAINT[Math.floor(rnd(2) * PAINT.length)] : DRAB[Math.floor(rnd(3) * DRAB.length)];
+      const roof = '#8d8a82';                 // weathered corrugated metal
+      const bodyH = H * (0.82 + rnd(4) * 0.4);
+      const wR = 0.6 + rnd(5) * 0.16, dR = 0.58 + rnd(6) * 0.16;
+      const tilt = (rnd(7) - 0.5) * 0.16;      // slight roof slope
+      const leanTo = rnd(8) > 0.5;
+      return (
+        <group rotation={[0, (rnd(9) - 0.5) * 0.5, 0]}>
+          <Box w={F * wR} h={bodyH} d={F * dR} color={body} />
+          {/* corrugated roof: a thin tilted slab overhanging the walls */}
+          <mesh position={[0, bodyH + 0.05, 0]} rotation={[tilt, 0, tilt * 0.7]} castShadow receiveShadow>
+            <boxGeometry args={[F * (wR + 0.16), 0.07, F * (dR + 0.16)]} />
+            <meshStandardMaterial color={roof} roughness={0.85} metalness={0.45} />
+          </mesh>
+          {/* rocks/junk holding the roof down against the wind */}
+          <mesh position={[F * wR * 0.22, bodyH + 0.17, F * dR * 0.16]}><boxGeometry args={[0.2, 0.16, 0.2]} /><meshStandardMaterial color="#3c3833" roughness={1} /></mesh>
+          <mesh position={[-F * wR * 0.2, bodyH + 0.16, -F * dR * 0.14]}><boxGeometry args={[0.16, 0.14, 0.16]} /><meshStandardMaterial color="#46413a" roughness={1} /></mesh>
+          {/* dark doorway on the front face */}
+          <mesh position={[0, bodyH * 0.32, F * dR * 0.5 + 0.01]}><planeGeometry args={[F * 0.18, bodyH * 0.56]} /><meshStandardMaterial color="#141210" /></mesh>
+          {/* optional lean-to addition for irregular silhouettes */}
+          {leanTo && (
+            <group position={[F * wR * 0.56, 0, 0]}>
+              <Box w={F * 0.28} h={bodyH * 0.7} d={F * dR * 0.78} color={DRAB[Math.floor(rnd(10) * DRAB.length)]} />
+              <mesh position={[0, bodyH * 0.7 + 0.04, 0]} rotation={[tilt * 0.5, 0, -0.14]} castShadow><boxGeometry args={[F * 0.34, 0.06, F * dR * 0.9]} /><meshStandardMaterial color={roof} roughness={0.85} metalness={0.45} /></mesh>
+            </group>
+          )}
+        </group>
+      );
+    }
     case 'pad':
       return (
         <group>
@@ -384,17 +421,20 @@ export default function PoiStructure({ poi, active, onActivate, lit }) {
         </mesh>
       )}
 
-      <Html position={[0, h + (spriteTex ? 3.2 : 1.6), 0]} center distanceFactor={28} occlude={false} style={{ pointerEvents: 'none' }}>
-        <div ref={labelRef} style={{
-          textAlign: 'center', whiteSpace: 'nowrap', fontFamily: 'system-ui, sans-serif',
-          transform: 'translateY(-50%)', opacity: 0.9,
-        }}>
-          <div style={{ color: '#e6eefc', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px #000' }}>{label}</div>
-          {poi.enterable && active && (
-            <div style={{ color: s.emissive, fontSize: 11, textShadow: '0 1px 3px #000' }}>▸ enter</div>
-          )}
-        </div>
-      </Html>
+      {/* Ambient scenery (e.g. slum shacks) opts out of the floating name label. */}
+      {!poi.hideLabel && (
+        <Html position={[0, h + (spriteTex ? 3.2 : 1.6), 0]} center distanceFactor={28} occlude={false} style={{ pointerEvents: 'none' }}>
+          <div ref={labelRef} style={{
+            textAlign: 'center', whiteSpace: 'nowrap', fontFamily: 'system-ui, sans-serif',
+            transform: 'translateY(-50%)', opacity: 0.9,
+          }}>
+            <div style={{ color: '#e6eefc', fontSize: 13, fontWeight: 600, textShadow: '0 1px 4px #000' }}>{label}</div>
+            {poi.enterable && active && (
+              <div style={{ color: s.emissive, fontSize: 11, textShadow: '0 1px 3px #000' }}>▸ enter</div>
+            )}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }

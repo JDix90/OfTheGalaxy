@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
-  createSubmapSim, toPct, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture,
+  createSubmapSim, toPct, buildSubmapExits, buildSubmapNpcs, buildSubmapWaypoints, buildSubmapFurniture, buildSubmapPois, buildSubmapProps,
 } from '../../src/components/submap3d/submapData';
+import { getSubmapTheme } from '../../src/components/submap3d/submapThemes';
 import { submapCoordDims } from '../../../shared/sim/submap.mjs';
 
 // Mirrors the real Drydock "Coronet Spaceport" submap: 12x12, fully walkable, exit at
@@ -133,5 +134,52 @@ describe('submapData — coordinate conversion + builders', () => {
     const q = (done) => ([{ quest: { id: 'q1', title: 'T', objectives: [{ id: 'o1', description: 'Go', location: { subMapId: sm.id, x: 8, y: 8 } }] }, progress: { objectivesCompleted: done ? { o1: true } : {} } }]);
     expect(buildSubmapWaypoints(q(false), sm, sim)).toHaveLength(1);
     expect(buildSubmapWaypoints(q(true), sm, sim)).toHaveLength(0);
+  });
+
+  it('shantytown shack buildings render as the makeshift "shack" shape with a per-building seed', () => {
+    const sub = {
+      id: 'gravenmoor_the_dust_warren_shantytown', type: 'shantytown', planetId: 'gravenmoor',
+      layoutData: {
+        width: 17, height: 17, gridSize: 40,
+        exitPoints: [{ id: 'main_exit', position: { x: 1, y: 8 } }],
+        entryPoints: [{ id: 'main_entrance', position: { x: 1, y: 8 } }],
+        buildings: [
+          { id: 'shack_0', name: 'Shack 1', type: 'shack', position: { x: 5, y: 3 }, size: { width: 1, height: 1 }, collision: { doors: [] } },
+          { id: 'shack_1', name: 'Shack 2', type: 'shack', position: { x: 9, y: 11 }, size: { width: 1, height: 1 }, collision: { doors: [] } },
+        ],
+        pointsOfInterest: [],
+        collisionMap: { resolution: 100, cells: Array.from({ length: 100 }, () => Array(100).fill(0)) },
+      },
+    };
+    const sim = createSubmapSim(sub);
+    const shacks = buildSubmapPois(sub, sim).filter((p) => p.structure && p.structure.shape === 'shack');
+    expect(shacks).toHaveLength(2);
+    expect(shacks.every((s) => typeof s.structure.seed === 'number')).toBe(true);
+    expect(shacks[0].structure.seed).not.toBe(shacks[1].structure.seed); // varied per building id
+  });
+
+  it('shantytown strings laundry lines between orthogonally-adjacent shacks', () => {
+    const shack = (id, x, y) => ({ id, name: id, type: 'shack', position: { x, y }, size: { width: 1, height: 1 }, collision: { doors: [] } });
+    const sub = {
+      id: 'gravenmoor_the_dust_warren_shantytown', type: 'shantytown', planetId: 'gravenmoor',
+      layoutData: {
+        width: 18, height: 18, gridSize: 40,
+        exitPoints: [{ id: 'e', position: { x: 1, y: 9 } }], entryPoints: [{ id: 'en', position: { x: 1, y: 9 } }],
+        // a tight row + an adjacent pair → at least two near-neighbour links
+        buildings: [shack('s0', 3, 3), shack('s1', 5, 3), shack('s2', 3, 5), shack('s3', 5, 5)],
+        pointsOfInterest: [],
+        collisionMap: { resolution: 100, cells: Array.from({ length: 100 }, () => Array(100).fill(0)) },
+      },
+    };
+    const sim = createSubmapSim(sub);
+    const theme = getSubmapTheme(sub);
+    const { themed } = buildSubmapProps(sub, sim, theme);
+    const laundry = themed.filter((p) => p.semantic === 'laundry_line');
+    expect(laundry.length).toBeGreaterThanOrEqual(1);
+    expect(laundry.every((l) => Number.isFinite(l.wxEnd) && Number.isFinite(l.wzEnd))).toBe(true); // carries both endpoints
+    // far-apart shacks must NOT be linked by a map-spanning line
+    const farSub = { ...sub, layoutData: { ...sub.layoutData, buildings: [shack('a', 3, 3), shack('b', 15, 15)] } };
+    const farLines = buildSubmapProps(farSub, createSubmapSim(farSub), theme).themed.filter((p) => p.semantic === 'laundry_line');
+    expect(farLines.length).toBe(0);
   });
 });

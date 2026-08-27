@@ -16,7 +16,19 @@ describe('submap theme resolution', () => {
     expect(key('settlement')).toBe('settlement');
     expect(key('government')).toBe('civic');
     expect(key('temple')).toBe('civic');
+    expect(key('shantytown')).toBe('shantytown');
+    expect(key('slum')).toBe('shantytown');
     expect(key('dungeon')).toBe('danger');
+  });
+
+  test('shantytown theme is open-air, dusty, with brown haze + residents', () => {
+    const theme = getSubmapTheme({ type: 'shantytown' });
+    expect(theme.key).toBe('shantytown');
+    expect(theme.lighting.mode).toBe('open');
+    expect(theme.lighting.fog).toBeTruthy();              // brown haze tint
+    expect(theme.particle).toEqual({ preset: 'shantyDust' });
+    expect(theme.crowd.flavor).toBe('residents');
+    expect(theme.crowd.density).toBeGreaterThan(0);
   });
 
   test('falls back to the POI category of the type', () => {

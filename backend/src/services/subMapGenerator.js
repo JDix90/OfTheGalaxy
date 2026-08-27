@@ -761,6 +761,75 @@ function generateMarketMap(planet, parentLocationId, variant = 'medium', seed) {
 }
 
 /**
+ * Generate shantytown / slum sub-map: a DENSE, irregular cluster of small makeshift shacks
+ * threaded by dirt lanes. Unlike the city generator (a handful of 2x2 residences in a tidy zone),
+ * this packs many 1x1 "shack" buildings on a jittered grid so the district reads as a sprawling
+ * informal settlement. Shacks are solid props (no interiors/doors) you weave between; the frontend
+ * "shantytown" theme skins them as corrugated-roof shacks under a brown dust haze.
+ */
+function generateShantytownMap(planet, parentLocationId, variant = 'medium', seed) {
+  const random = seededRandom(seed);
+  const size = variant === 'small' ? { width: 16, height: 16 } :
+                variant === 'large' ? { width: 22, height: 22 } :
+                { width: 18, height: 18 };
+
+  const zones = [];
+  const buildings = [];
+  const entryPoints = [];
+  const exitPoints = [];
+  const npcSpawnPoints = [];
+  const pointsOfInterest = [];
+
+  const midY = Math.floor(size.height / 2);
+
+  // Entrance + a main dirt lane running across the settlement (kept clear of shacks so the player
+  // can always get in and through).
+  zones.push({ id: 'entrance', name: 'Settlement Edge', type: 'entrance', bounds: { x: 0, y: midY, width: 2, height: 2 }, connections: ['main_lane'] });
+  zones.push({ id: 'main_lane', name: 'Dirt Lane', type: 'street', bounds: { x: 2, y: midY - 1, width: size.width - 3, height: 3 }, connections: ['entrance', 'shacks'] });
+  zones.push({ id: 'shacks', name: 'Shanty Cluster', type: 'residential', bounds: { x: 1, y: 0, width: size.width - 2, height: size.height }, connections: ['main_lane'] });
+
+  entryPoints.push({ id: 'main_entrance', position: { x: 1, y: midY }, label: 'Settlement Edge', fromParent: { locationId: parentLocationId, position: { x: 50, y: 50 } } });
+  exitPoints.push({ id: 'main_exit', position: { x: 1, y: midY }, label: 'Exit to Surface', toParent: { locationId: parentLocationId, position: { x: 50, y: 50 } } });
+
+  // Reserve the main lane (and a perpendicular cross-lane) so shacks never wall the player in.
+  const laneRows = new Set([midY - 1, midY, midY + 1]);
+  const crossX = Math.floor(size.width * 0.62);
+  const isLane = (x, y) => laneRows.has(y) || x === crossX || x <= 1;
+
+  // Pack shacks on a 2-cell-spaced grid with per-cell jitter + a few skips → dense but irregular,
+  // with ~1-cell dirt gaps (alleys) between them. The low skip + larger grid keep it tightly packed.
+  let n = 0;
+  const MAX_SHACKS = variant === 'small' ? 28 : variant === 'large' ? 60 : 40;
+  for (let gy = 0; gy < size.height - 1 && n < MAX_SHACKS; gy += 2) {
+    for (let gx = 2; gx < size.width - 1 && n < MAX_SHACKS; gx += 2) {
+      const x = Math.min(size.width - 2, gx + (random() < 0.4 ? 1 : 0));
+      const y = Math.min(size.height - 2, gy + (random() < 0.4 ? 1 : 0));
+      if (isLane(x, y) || isLane(x, y + 1)) continue;   // keep lanes walkable
+      if (random() < 0.07) continue;                    // a few gaps / small yards
+      buildings.push({
+        id: `shack_${n}`,
+        name: `Shack ${n + 1}`,
+        type: 'shack',
+        position: { x, y },
+        size: { width: 1, height: 1 },
+        entrance: { x, y: y + 1 },
+        // Solid makeshift dwellings — no enterable interior (no doors).
+        collision: { doors: [] }
+      });
+      n++;
+    }
+  }
+
+  // A communal water tank as a focal landmark on the lane, plus a couple of resident spawn points.
+  pointsOfInterest.push({ id: 'water_tank', name: 'Water Tank', type: 'landmark', position: { x: crossX, y: midY }, description: 'The settlement’s shared water tank.' });
+  for (let i = 0; i < 6 + Math.floor(random() * 4); i++) {
+    npcSpawnPoints.push({ id: `resident_${i}`, position: { x: 2 + Math.floor(random() * (size.width - 4)), y: Math.floor(random() * size.height) }, npcIds: [], spawnChance: 0.7 });
+  }
+
+  return { width: size.width, height: size.height, gridSize: 40, zones, buildings, entryPoints, exitPoints, npcSpawnPoints, pointsOfInterest };
+}
+
+/**
  * Main generator function
  */
 async function generateSubMap({ planet, parentLocationId, parentLocationType, type }) {
@@ -790,6 +859,9 @@ async function generateSubMap({ planet, parentLocationId, parentLocationType, ty
       break;
     case 'market':
       layout = generateMarketMap(planet, parentLocationId, variant, seed);
+      break;
+    case 'shantytown':
+      layout = generateShantytownMap(planet, parentLocationId, variant, seed);
       break;
     case 'medical_center':
     case 'hospital':
@@ -914,6 +986,7 @@ async function generateSubMap({ planet, parentLocationId, parentLocationType, ty
 module.exports = {
   generateSubMap,
   generateSpaceportMap,
+  generateShantytownMap,
   getSeed,
   SPACEPORT_LAYOUT_VERSION,
 };

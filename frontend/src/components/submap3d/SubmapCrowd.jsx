@@ -40,6 +40,7 @@ export default function SubmapCrowd({ world, sim, theme }) {
   }, [sim]);
 
   const tints = (crowd && crowd.tints) || ['#cdd6e6'];
+  const idleFrac = (crowd && crowd.idle) || 0; // fraction that loiter/squat in place (e.g. shantytown)
 
   // Walker state (mutated in useFrame). Deterministic initial build/tint/spot from a per-index hash.
   const walkers = useMemo(() => {
@@ -50,6 +51,7 @@ export default function SubmapCrowd({ world, sim, theme }) {
       const h = hashStr(`sc${i}`);          // uint32; use UNSIGNED shifts so indices never go negative
       const s = spots[h % spots.length];
       const wp = spots[(h >>> 3) % spots.length];
+      const idle = (((h >>> 17) & 0xff) / 255) < idleFrac; // some residents squat instead of wandering
       arr.push({
         build: h % 3, color: tints[(h >>> 7) % tints.length],
         x: s[0], z: s[1], tx: wp[0], tz: wp[1], yaw: Math.atan2(wp[0] - s[0], wp[1] - s[1]),
@@ -57,11 +59,11 @@ export default function SubmapCrowd({ world, sim, theme }) {
         sH: 0.95 + ((h >>> 5) & 0xff) / 255 * 0.13,
         sG: 0.95 + ((h >>> 13) & 0xff) / 255 * 0.12,
         phase: (h % 1000) / 1000 * Math.PI * 2,
-        carries: (h % 10) < 3, moving: true,
+        carries: (h % 10) < 3 && !idle, moving: !idle, idle,
       });
     }
     return arr;
-  }, [crowd, spots, tints]);
+  }, [crowd, spots, tints, idleFrac]);
 
   const pick = () => (spots.length ? spots[(Math.random() * spots.length) | 0] : null);
 
@@ -81,6 +83,20 @@ export default function SubmapCrowd({ world, sim, theme }) {
     let propCount = 0;
 
     for (const wk of walkers) {
+      // Idle residents squat in place: planted feet, low body, a slow look-around — no steering/gait.
+      if (wk.idle) {
+        wk.yaw += Math.sin(tNow * 0.25 + wk.phase) * 0.0035;
+        const mesh = meshes[wk.build];
+        const idx = counts[wk.build];
+        dummy.position.set(wk.x, 0, wk.z);
+        dummy.rotation.set(0, wk.yaw, 0, 'XYZ');
+        dummy.scale.set(wk.sG * 1.06, wk.sH * 0.58, wk.sG * 1.06); // squashed Y reads as squatting
+        dummy.updateMatrix();
+        mesh.setMatrixAt(idx, dummy.matrix);
+        mesh.setColorAt(idx, col.set(wk.color));
+        counts[wk.build] = idx + 1;
+        continue;
+      }
       let dx = wk.tx - wk.x, dz = wk.tz - wk.z;
       let d = Math.hypot(dx, dz) || 1;
       if (d < 0.6) { const np = pick(); if (np) { [wk.tx, wk.tz] = np; } dx = wk.tx - wk.x; dz = wk.tz - wk.z; d = Math.hypot(dx, dz) || 1; }

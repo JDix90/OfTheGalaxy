@@ -383,6 +383,9 @@ async function getSubMapForLocation(planetId, parentLocationId, parentLocationTy
     
     if (isDungeon) {
       subMapType = 'dungeon';
+    } else if (locationType === 'shantytown' || locationType === 'slum') {
+      // Informal settlement: dense makeshift shacks (its own generator + frontend theme).
+      subMapType = 'shantytown';
     } else if (locationType === 'settlement' || locationType === 'province') {
       subMapType = 'settlement';
     } else if (locationType === 'wilderness') {
@@ -390,7 +393,7 @@ async function getSubMapForLocation(planetId, parentLocationId, parentLocationTy
       subMapType = 'settlement';
     } else if (locationType === 'medical_center') {
       subMapType = 'medical_center';
-    } else if (!['city', 'spaceport', 'market', 'cantina', 'palace', 'temple', 'government', 'base', 'arena', 'mine', 'landscape', 'wilderness', 'danger', 'medical_center', 'hospital', 'settlement', 'dungeon'].includes(locationType)) {
+    } else if (!['city', 'spaceport', 'market', 'cantina', 'palace', 'temple', 'government', 'base', 'arena', 'mine', 'landscape', 'wilderness', 'danger', 'medical_center', 'hospital', 'settlement', 'shantytown', 'dungeon'].includes(locationType)) {
       // Default unknown types to city
       console.log(`[SubMap Service] Unknown location type "${locationType}", defaulting to "city"`);
       subMapType = 'city';
